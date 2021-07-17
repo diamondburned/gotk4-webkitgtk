@@ -1,6 +1,6 @@
 # gotk4-webkitgtk
 
-[Package documentation](https://pkg.go.dev/github.com/diamondburned/gotk4/pkg)
+[Package documentation](https://pkg.go.dev/github.com/diamondburned/gotk4-webkitgtk/pkg)
 
 Go generated bindings for [webkitgtk][webkitgtk] and [libsoup][soup].
 
