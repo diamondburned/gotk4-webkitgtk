@@ -3,10 +3,13 @@
 package soup
 
 import (
+	"context"
 	"fmt"
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
@@ -121,14 +124,18 @@ func marshalSocketter(p uintptr) (interface{}, error) {
 //
 // If cancellable is non-NULL, it can be used to cancel the connection. callback
 // will still be invoked in this case, with a status of SOUP_STATUS_CANCELLED.
-func (sock *Socket) ConnectAsync(cancellable *gio.Cancellable, callback SocketCallback) {
+func (sock *Socket) ConnectAsync(ctx context.Context, callback SocketCallback) {
 	var _arg0 *C.SoupSocket        // out
 	var _arg1 *C.GCancellable      // out
 	var _arg2 C.SoupSocketCallback // out
 	var _arg3 C.gpointer
 
 	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
-	_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg2 = (*[0]byte)(C._gotk4_soup2_SocketCallback)
 	_arg3 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -139,13 +146,17 @@ func (sock *Socket) ConnectAsync(cancellable *gio.Cancellable, callback SocketCa
 //
 // If cancellable is non-NULL, it can be used to cancel the connection, in which
 // case soup_socket_connect_sync() will return SOUP_STATUS_CANCELLED.
-func (sock *Socket) ConnectSync(cancellable *gio.Cancellable) uint {
+func (sock *Socket) ConnectSync(ctx context.Context) uint {
 	var _arg0 *C.SoupSocket   // out
 	var _arg1 *C.GCancellable // out
 	var _cret C.guint         // in
 
 	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
-	_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 
 	_cret = C.soup_socket_connect_sync(_arg0, _arg1)
 
@@ -287,21 +298,25 @@ func (sock *Socket) Listen() bool {
 // MUST read all available data off the socket first. Socket::readable is only
 // emitted after soup_socket_read() returns SOUP_SOCKET_WOULD_BLOCK, and it is
 // only emitted once. See the documentation for Socket:non-blocking.)
-func (sock *Socket) Read(buffer []byte, cancellable *gio.Cancellable) (uint, SocketIOStatus, error) {
-	var _arg0 *C.SoupSocket // out
+func (sock *Socket) Read(ctx context.Context, buffer []byte) (uint, SocketIOStatus, error) {
+	var _arg0 *C.SoupSocket   // out
+	var _arg4 *C.GCancellable // out
 	var _arg1 C.gpointer
 	var _arg2 C.gsize
 	var _arg3 C.gsize              // in
-	var _arg4 *C.GCancellable      // out
 	var _cret C.SoupSocketIOStatus // in
 	var _cerr *C.GError            // in
 
 	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg4 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg2 = (C.gsize)(len(buffer))
 	if len(buffer) > 0 {
 		_arg1 = (C.gpointer)(unsafe.Pointer(&buffer[0]))
 	}
-	_arg4 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 
 	_cret = C.soup_socket_read(_arg0, _arg1, _arg2, &_arg3, _arg4, &_cerr)
 
@@ -318,15 +333,19 @@ func (sock *Socket) Read(buffer []byte, cancellable *gio.Cancellable) (uint, Soc
 
 // StartProxySsl starts using SSL on socket, expecting to find a host named
 // ssl_host.
-func (sock *Socket) StartProxySsl(sslHost string, cancellable *gio.Cancellable) bool {
+func (sock *Socket) StartProxySsl(ctx context.Context, sslHost string) bool {
 	var _arg0 *C.SoupSocket   // out
-	var _arg1 *C.char         // out
 	var _arg2 *C.GCancellable // out
+	var _arg1 *C.char         // out
 	var _cret C.gboolean      // in
 
 	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(sslHost)))
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 
 	_cret = C.soup_socket_start_proxy_ssl(_arg0, _arg1, _arg2)
 
@@ -340,13 +359,17 @@ func (sock *Socket) StartProxySsl(sslHost string, cancellable *gio.Cancellable) 
 }
 
 // StartSSL starts using SSL on socket.
-func (sock *Socket) StartSSL(cancellable *gio.Cancellable) bool {
+func (sock *Socket) StartSSL(ctx context.Context) bool {
 	var _arg0 *C.SoupSocket   // out
 	var _arg1 *C.GCancellable // out
 	var _cret C.gboolean      // in
 
 	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
-	_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 
 	_cret = C.soup_socket_start_ssl(_arg0, _arg1)
 
@@ -370,21 +393,25 @@ func (sock *Socket) StartSSL(cancellable *gio.Cancellable) bool {
 // Socket::writable is only emitted after soup_socket_write() returns
 // SOUP_SOCKET_WOULD_BLOCK, and it is only emitted once. See the documentation
 // for Socket:non-blocking.)
-func (sock *Socket) Write(buffer []byte, cancellable *gio.Cancellable) (uint, SocketIOStatus, error) {
-	var _arg0 *C.SoupSocket // out
+func (sock *Socket) Write(ctx context.Context, buffer []byte) (uint, SocketIOStatus, error) {
+	var _arg0 *C.SoupSocket   // out
+	var _arg4 *C.GCancellable // out
 	var _arg1 C.gconstpointer
 	var _arg2 C.gsize
 	var _arg3 C.gsize              // in
-	var _arg4 *C.GCancellable      // out
 	var _cret C.SoupSocketIOStatus // in
 	var _cerr *C.GError            // in
 
 	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg4 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg2 = (C.gsize)(len(buffer))
 	if len(buffer) > 0 {
 		_arg1 = (C.gconstpointer)(unsafe.Pointer(&buffer[0]))
 	}
-	_arg4 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 
 	_cret = C.soup_socket_write(_arg0, _arg1, _arg2, &_arg3, _arg4, &_cerr)
 

@@ -3,11 +3,13 @@
 package soup
 
 import (
+	"context"
 	"fmt"
 	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
@@ -89,7 +91,7 @@ func _gotk4_soup2_SessionCallback(arg0 *C.SoupSession, arg1 *C.SoupMessage, arg2
 
 // SessionConnectProgressCallback: prototype for the progress callback passed to
 // soup_session_connect_async().
-type SessionConnectProgressCallback func(session *Session, event gio.SocketClientEvent, connection *gio.IOStream)
+type SessionConnectProgressCallback func(session *Session, event gio.SocketClientEvent, connection gio.IOStreamer)
 
 //export _gotk4_soup2_SessionConnectProgressCallback
 func _gotk4_soup2_SessionConnectProgressCallback(arg0 *C.SoupSession, arg1 C.GSocketClientEvent, arg2 *C.GIOStream, arg3 C.gpointer) {
@@ -100,16 +102,11 @@ func _gotk4_soup2_SessionConnectProgressCallback(arg0 *C.SoupSession, arg1 C.GSo
 
 	var session *Session            // out
 	var event gio.SocketClientEvent // out
-	var connection *gio.IOStream    // out
+	var connection gio.IOStreamer   // out
 
 	session = wrapSession(externglib.Take(unsafe.Pointer(arg0)))
 	event = gio.SocketClientEvent(arg1)
-	{
-		obj := externglib.Take(unsafe.Pointer(arg2))
-		connection = &gio.IOStream{
-			Object: obj,
-		}
-	}
+	connection = (gextras.CastObject(externglib.Take(unsafe.Pointer(arg2)))).(gio.IOStreamer)
 
 	fn := v.(SessionConnectProgressCallback)
 	fn(session, event, connection)
@@ -302,7 +299,7 @@ func (session *Session) CancelMessage(msg *Message, statusCode uint) {
 
 // ConnectFinish gets the OStream created for the connection to communicate with
 // the server.
-func (session *Session) ConnectFinish(result gio.AsyncResulter) (*gio.IOStream, error) {
+func (session *Session) ConnectFinish(result gio.AsyncResulter) (gio.IOStreamer, error) {
 	var _arg0 *C.SoupSession  // out
 	var _arg1 *C.GAsyncResult // out
 	var _cret *C.GIOStream    // in
@@ -313,15 +310,10 @@ func (session *Session) ConnectFinish(result gio.AsyncResulter) (*gio.IOStream, 
 
 	_cret = C.soup_session_connect_finish(_arg0, _arg1, &_cerr)
 
-	var _ioStream *gio.IOStream // out
-	var _goerr error            // out
+	var _ioStream gio.IOStreamer // out
+	var _goerr error             // out
 
-	{
-		obj := externglib.AssumeOwnership(unsafe.Pointer(_cret))
-		_ioStream = &gio.IOStream{
-			Object: obj,
-		}
-	}
+	_ioStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.IOStreamer)
 	_goerr = gerror.Take(unsafe.Pointer(_cerr))
 
 	return _ioStream, _goerr
@@ -354,7 +346,7 @@ func (session *Session) AsyncContext() *glib.MainContext {
 // Feature gets the first feature in session of type feature_type. For features
 // where there may be more than one feature of a given type, use
 // soup_session_get_features().
-func (session *Session) Feature(featureType externglib.Type) *SessionFeature {
+func (session *Session) Feature(featureType externglib.Type) SessionFeaturer {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 C.GType               // out
 	var _cret *C.SoupSessionFeature // in
@@ -364,9 +356,9 @@ func (session *Session) Feature(featureType externglib.Type) *SessionFeature {
 
 	_cret = C.soup_session_get_feature(_arg0, _arg1)
 
-	var _sessionFeature *SessionFeature // out
+	var _sessionFeature SessionFeaturer // out
 
-	_sessionFeature = wrapSessionFeature(externglib.Take(unsafe.Pointer(_cret)))
+	_sessionFeature = (gextras.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(SessionFeaturer)
 
 	return _sessionFeature
 }
@@ -377,7 +369,7 @@ func (session *Session) Feature(featureType externglib.Type) *SessionFeature {
 // match a single feature. In particular, if there are two matching features,
 // and the first is disabled on msg, and the second is not, then this will
 // return NULL, not the second feature.
-func (session *Session) FeatureForMessage(featureType externglib.Type, msg *Message) *SessionFeature {
+func (session *Session) FeatureForMessage(featureType externglib.Type, msg *Message) SessionFeaturer {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 C.GType               // out
 	var _arg2 *C.SoupMessage        // out
@@ -389,9 +381,9 @@ func (session *Session) FeatureForMessage(featureType externglib.Type, msg *Mess
 
 	_cret = C.soup_session_get_feature_for_message(_arg0, _arg1, _arg2)
 
-	var _sessionFeature *SessionFeature // out
+	var _sessionFeature SessionFeaturer // out
 
-	_sessionFeature = wrapSessionFeature(externglib.Take(unsafe.Pointer(_cret)))
+	_sessionFeature = (gextras.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(SessionFeaturer)
 
 	return _sessionFeature
 }
@@ -440,16 +432,20 @@ func (session *Session) PauseMessage(msg *Message) {
 //
 // If cancellable is non-NULL, it can be used to cancel the resolution. callback
 // will still be invoked in this case, with a status of SOUP_STATUS_CANCELLED.
-func (session *Session) PrefetchDns(hostname string, cancellable *gio.Cancellable, callback AddressCallback) {
+func (session *Session) PrefetchDns(ctx context.Context, hostname string, callback AddressCallback) {
 	var _arg0 *C.SoupSession        // out
-	var _arg1 *C.char               // out
 	var _arg2 *C.GCancellable       // out
+	var _arg1 *C.char               // out
 	var _arg3 C.SoupAddressCallback // out
 	var _arg4 C.gpointer
 
 	_arg0 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(hostname)))
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg3 = (*[0]byte)(C._gotk4_soup2_AddressCallback)
 	_arg4 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -686,28 +682,27 @@ func (session *Session) RequeueMessage(msg *Message) {
 //
 // (Note that this method cannot be called on the deprecated SessionAsync
 // subclass.)
-func (session *Session) Send(msg *Message, cancellable *gio.Cancellable) (*gio.InputStream, error) {
+func (session *Session) Send(ctx context.Context, msg *Message) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupSession  // out
-	var _arg1 *C.SoupMessage  // out
 	var _arg2 *C.GCancellable // out
+	var _arg1 *C.SoupMessage  // out
 	var _cret *C.GInputStream // in
 	var _cerr *C.GError       // in
 
 	_arg0 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 
 	_cret = C.soup_session_send(_arg0, _arg1, _arg2, &_cerr)
 
-	var _inputStream *gio.InputStream // out
-	var _goerr error                  // out
+	var _inputStream gio.InputStreamer // out
+	var _goerr error                   // out
 
-	{
-		obj := externglib.AssumeOwnership(unsafe.Pointer(_cret))
-		_inputStream = &gio.InputStream{
-			Object: obj,
-		}
-	}
+	_inputStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
 	_goerr = gerror.Take(unsafe.Pointer(_cerr))
 
 	return _inputStream, _goerr
@@ -727,16 +722,20 @@ func (session *Session) Send(msg *Message, cancellable *gio.Cancellable) (*gio.I
 // (Note that this method cannot be called on the deprecated SessionSync
 // subclass, and can only be called on SessionAsync if you have set the
 // Session:use-thread-context property.)
-func (session *Session) SendAsync(msg *Message, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (session *Session) SendAsync(ctx context.Context, msg *Message, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.SoupSession        // out
-	var _arg1 *C.SoupMessage        // out
 	var _arg2 *C.GCancellable       // out
+	var _arg1 *C.SoupMessage        // out
 	var _arg3 C.GAsyncReadyCallback // out
 	var _arg4 C.gpointer
 
 	_arg0 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg4 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -745,7 +744,7 @@ func (session *Session) SendAsync(msg *Message, cancellable *gio.Cancellable, ca
 
 // SendFinish gets the response to a soup_session_send_async() call and (if
 // successful), returns a Stream that can be used to read the response body.
-func (session *Session) SendFinish(result gio.AsyncResulter) (*gio.InputStream, error) {
+func (session *Session) SendFinish(result gio.AsyncResulter) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupSession  // out
 	var _arg1 *C.GAsyncResult // out
 	var _cret *C.GInputStream // in
@@ -756,15 +755,10 @@ func (session *Session) SendFinish(result gio.AsyncResulter) (*gio.InputStream, 
 
 	_cret = C.soup_session_send_finish(_arg0, _arg1, &_cerr)
 
-	var _inputStream *gio.InputStream // out
-	var _goerr error                  // out
+	var _inputStream gio.InputStreamer // out
+	var _goerr error                   // out
 
-	{
-		obj := externglib.AssumeOwnership(unsafe.Pointer(_cret))
-		_inputStream = &gio.InputStream{
-			Object: obj,
-		}
-	}
+	_inputStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
 	_goerr = gerror.Take(unsafe.Pointer(_cerr))
 
 	return _inputStream, _goerr
@@ -807,7 +801,7 @@ func (session *Session) SendMessage(msg *Message) uint {
 //
 // Calling this function may cause msg to be freed if you are not holding any
 // other reference to it.
-func (session *Session) StealConnection(msg *Message) *gio.IOStream {
+func (session *Session) StealConnection(msg *Message) gio.IOStreamer {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
 	var _cret *C.GIOStream   // in
@@ -817,14 +811,9 @@ func (session *Session) StealConnection(msg *Message) *gio.IOStream {
 
 	_cret = C.soup_session_steal_connection(_arg0, _arg1)
 
-	var _ioStream *gio.IOStream // out
+	var _ioStream gio.IOStreamer // out
 
-	{
-		obj := externglib.AssumeOwnership(unsafe.Pointer(_cret))
-		_ioStream = &gio.IOStream{
-			Object: obj,
-		}
-	}
+	_ioStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.IOStreamer)
 
 	return _ioStream
 }
@@ -864,16 +853,21 @@ func (session *Session) UnpauseMessage(msg *Message) {
 // will contain the complete response headers and body from the server's
 // response, and soup_session_websocket_connect_finish() will return
 // SOUP_WEBSOCKET_ERROR_NOT_WEBSOCKET.
-func (session *Session) WebsocketConnectAsync(msg *Message, origin string, protocols []string, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.SoupSession // out
-	var _arg1 *C.SoupMessage // out
-	var _arg2 *C.char        // out
+func (session *Session) WebsocketConnectAsync(ctx context.Context, msg *Message, origin string, protocols []string, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.SoupSession  // out
+	var _arg4 *C.GCancellable // out
+	var _arg1 *C.SoupMessage  // out
+	var _arg2 *C.char         // out
 	var _arg3 **C.char
-	var _arg4 *C.GCancellable       // out
 	var _arg5 C.GAsyncReadyCallback // out
 	var _arg6 C.gpointer
 
 	_arg0 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg4 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(origin)))
 	{
@@ -887,7 +881,6 @@ func (session *Session) WebsocketConnectAsync(msg *Message, origin string, proto
 			}
 		}
 	}
-	_arg4 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg5 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg6 = C.gpointer(gbox.AssignOnce(callback))
 

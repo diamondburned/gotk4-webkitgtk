@@ -52,8 +52,8 @@ const (
 	WebsiteDataDeviceIDHashSalt WebsiteDataTypes = 0b1000000000
 	// WebsiteDataHstsCache: HSTS cache. Since 2.26
 	WebsiteDataHstsCache WebsiteDataTypes = 0b10000000000
-	// WebsiteDataItp: intelligent Tracking Prevention data. Since 2.30.
-	WebsiteDataItp WebsiteDataTypes = 0b100000000000
+	// WebsiteDataITP: intelligent Tracking Prevention data. Since 2.30.
+	WebsiteDataITP WebsiteDataTypes = 0b100000000000
 	// WebsiteDataServiceWorkerRegistrations: service worker registrations.
 	// Since 2.30
 	WebsiteDataServiceWorkerRegistrations WebsiteDataTypes = 0b1000000000000
@@ -103,8 +103,8 @@ func (w WebsiteDataTypes) String() string {
 			builder.WriteString("DeviceIDHashSalt|")
 		case WebsiteDataHstsCache:
 			builder.WriteString("HstsCache|")
-		case WebsiteDataItp:
-			builder.WriteString("Itp|")
+		case WebsiteDataITP:
+			builder.WriteString("ITP|")
 		case WebsiteDataServiceWorkerRegistrations:
 			builder.WriteString("ServiceWorkerRegistrations|")
 		case WebsiteDataDomCache:

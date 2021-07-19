@@ -3,6 +3,7 @@
 package webkit2
 
 import (
+	"context"
 	"fmt"
 	"runtime"
 	"strings"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	"github.com/diamondburned/gotk4/pkg/gdk/v3"
@@ -456,16 +458,20 @@ func NewWebViewWithUserContentManager(userContentManager *UserContentManager) *W
 // When the operation is finished, callback will be called. You can then call
 // webkit_web_view_can_execute_editing_command_finish() to get the result of the
 // operation.
-func (webView *WebView) CanExecuteEditingCommand(command string, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (webView *WebView) CanExecuteEditingCommand(ctx context.Context, command string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebView      // out
-	var _arg1 *C.gchar              // out
 	var _arg2 *C.GCancellable       // out
+	var _arg1 *C.gchar              // out
 	var _arg3 C.GAsyncReadyCallback // out
 	var _arg4 C.gpointer
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(command)))
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg4 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -753,7 +759,7 @@ func (webView *WebView) FindController() *FindController {
 
 // InputMethodContext: get the KitInputMethodContext currently in use by
 // web_view, or NULL if no input method is being used.
-func (webView *WebView) InputMethodContext() *InputMethodContext {
+func (webView *WebView) InputMethodContext() InputMethodContexter {
 	var _arg0 *C.WebKitWebView            // out
 	var _cret *C.WebKitInputMethodContext // in
 
@@ -761,9 +767,9 @@ func (webView *WebView) InputMethodContext() *InputMethodContext {
 
 	_cret = C.webkit_web_view_get_input_method_context(_arg0)
 
-	var _inputMethodContext *InputMethodContext // out
+	var _inputMethodContext InputMethodContexter // out
 
-	_inputMethodContext = wrapInputMethodContext(externglib.Take(unsafe.Pointer(_cret)))
+	_inputMethodContext = (gextras.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(InputMethodContexter)
 
 	return _inputMethodContext
 }
@@ -884,18 +890,22 @@ func (webView *WebView) Settings() *Settings {
 //
 // When the operation is finished, callback will be called. You must call
 // webkit_web_view_get_snapshot_finish() to get the result of the operation.
-func (webView *WebView) Snapshot(region SnapshotRegion, options SnapshotOptions, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (webView *WebView) Snapshot(ctx context.Context, region SnapshotRegion, options SnapshotOptions, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebView        // out
+	var _arg3 *C.GCancellable         // out
 	var _arg1 C.WebKitSnapshotRegion  // out
 	var _arg2 C.WebKitSnapshotOptions // out
-	var _arg3 *C.GCancellable         // out
 	var _arg4 C.GAsyncReadyCallback   // out
 	var _arg5 C.gpointer
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = C.WebKitSnapshotRegion(region)
 	_arg2 = C.WebKitSnapshotOptions(options)
-	_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg5 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -959,7 +969,7 @@ func (webView *WebView) Title() string {
 // safely be used to determine the security status of the current page only if
 // the current KitTLSErrorsPolicy is WEBKIT_TLS_ERRORS_POLICY_FAIL, in which
 // case subresources that fail certificate verification will be blocked.
-func (webView *WebView) TLSInfo() (*gio.TLSCertificate, gio.TLSCertificateFlags, bool) {
+func (webView *WebView) TLSInfo() (gio.TLSCertificater, gio.TLSCertificateFlags, bool) {
 	var _arg0 *C.WebKitWebView       // out
 	var _arg1 *C.GTlsCertificate     // in
 	var _arg2 C.GTlsCertificateFlags // in
@@ -969,16 +979,11 @@ func (webView *WebView) TLSInfo() (*gio.TLSCertificate, gio.TLSCertificateFlags,
 
 	_cret = C.webkit_web_view_get_tls_info(_arg0, &_arg1, &_arg2)
 
-	var _certificate *gio.TLSCertificate // out
+	var _certificate gio.TLSCertificater // out
 	var _errors gio.TLSCertificateFlags  // out
 	var _ok bool                         // out
 
-	{
-		obj := externglib.Take(unsafe.Pointer(_arg1))
-		_certificate = &gio.TLSCertificate{
-			Object: obj,
-		}
-	}
+	_certificate = (gextras.CastObject(externglib.Take(unsafe.Pointer(_arg1)))).(gio.TLSCertificater)
 	_errors = gio.TLSCertificateFlags(_arg2)
 	if _cret != 0 {
 		_ok = true
@@ -1370,16 +1375,20 @@ func (webView *WebView) RestoreSessionState(state *WebViewSessionState) {
 //
 // When the operation is finished, callback will be called. You can then call
 // webkit_web_view_run_javascript_finish() to get the result of the operation.
-func (webView *WebView) RunJavascript(script string, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (webView *WebView) RunJavascript(ctx context.Context, script string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebView      // out
-	var _arg1 *C.gchar              // out
 	var _arg2 *C.GCancellable       // out
+	var _arg1 *C.gchar              // out
 	var _arg3 C.GAsyncReadyCallback // out
 	var _arg4 C.gpointer
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(script)))
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg4 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -1460,16 +1469,20 @@ func (webView *WebView) RunJavascriptFinish(result gio.AsyncResulter) (*Javascri
 // When the operation is finished, callback will be called. You can then call
 // webkit_web_view_run_javascript_from_gresource_finish() to get the result of
 // the operation.
-func (webView *WebView) RunJavascriptFromGresource(resource string, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (webView *WebView) RunJavascriptFromGresource(ctx context.Context, resource string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebView      // out
-	var _arg1 *C.gchar              // out
 	var _arg2 *C.GCancellable       // out
+	var _arg1 *C.gchar              // out
 	var _arg3 C.GAsyncReadyCallback // out
 	var _arg4 C.gpointer
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(resource)))
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg4 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -1511,18 +1524,22 @@ func (webView *WebView) RunJavascriptFromGresourceFinish(result gio.AsyncResulte
 // When the operation is finished, callback will be called. You can then call
 // webkit_web_view_run_javascript_in_world_finish() to get the result of the
 // operation.
-func (webView *WebView) RunJavascriptInWorld(script string, worldName string, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (webView *WebView) RunJavascriptInWorld(ctx context.Context, script string, worldName string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebView      // out
+	var _arg3 *C.GCancellable       // out
 	var _arg1 *C.gchar              // out
 	var _arg2 *C.gchar              // out
-	var _arg3 *C.GCancellable       // out
 	var _arg4 C.GAsyncReadyCallback // out
 	var _arg5 C.gpointer
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(script)))
 	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(worldName)))
-	_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg5 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -1560,16 +1577,20 @@ func (webView *WebView) RunJavascriptInWorldFinish(result gio.AsyncResulter) (*J
 //
 // When the operation is finished, callback will be called. You can then call
 // webkit_web_view_save_finish() to get the result of the operation.
-func (webView *WebView) Save(saveMode SaveMode, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (webView *WebView) Save(ctx context.Context, saveMode SaveMode, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebView      // out
-	var _arg1 C.WebKitSaveMode      // out
 	var _arg2 *C.GCancellable       // out
+	var _arg1 C.WebKitSaveMode      // out
 	var _arg3 C.GAsyncReadyCallback // out
 	var _arg4 C.gpointer
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = C.WebKitSaveMode(saveMode)
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg4 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -1578,7 +1599,7 @@ func (webView *WebView) Save(saveMode SaveMode, cancellable *gio.Cancellable, ca
 
 // SaveFinish: finish an asynchronous operation started with
 // webkit_web_view_save().
-func (webView *WebView) SaveFinish(result gio.AsyncResulter) (*gio.InputStream, error) {
+func (webView *WebView) SaveFinish(result gio.AsyncResulter) (gio.InputStreamer, error) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.GAsyncResult  // out
 	var _cret *C.GInputStream  // in
@@ -1589,15 +1610,10 @@ func (webView *WebView) SaveFinish(result gio.AsyncResulter) (*gio.InputStream, 
 
 	_cret = C.webkit_web_view_save_finish(_arg0, _arg1, &_cerr)
 
-	var _inputStream *gio.InputStream // out
-	var _goerr error                  // out
+	var _inputStream gio.InputStreamer // out
+	var _goerr error                   // out
 
-	{
-		obj := externglib.AssumeOwnership(unsafe.Pointer(_cret))
-		_inputStream = &gio.InputStream{
-			Object: obj,
-		}
-	}
+	_inputStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
 	_goerr = gerror.Take(unsafe.Pointer(_cerr))
 
 	return _inputStream, _goerr
@@ -1609,18 +1625,22 @@ func (webView *WebView) SaveFinish(result gio.AsyncResulter) (*gio.InputStream, 
 //
 // When the operation is finished, callback will be called. You can then call
 // webkit_web_view_save_to_file_finish() to get the result of the operation.
-func (webView *WebView) SaveToFile(file gio.Filer, saveMode SaveMode, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (webView *WebView) SaveToFile(ctx context.Context, file gio.Filer, saveMode SaveMode, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebView      // out
+	var _arg3 *C.GCancellable       // out
 	var _arg1 *C.GFile              // out
 	var _arg2 C.WebKitSaveMode      // out
-	var _arg3 *C.GCancellable       // out
 	var _arg4 C.GAsyncReadyCallback // out
 	var _arg5 C.gpointer
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.GFile)(unsafe.Pointer((file).(gextras.Nativer).Native()))
 	_arg2 = C.WebKitSaveMode(saveMode)
-	_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg5 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -1653,16 +1673,20 @@ func (webView *WebView) SaveToFileFinish(result gio.AsyncResulter) error {
 // NULL as callback. When the operation is finished, callback will be called.
 // You can then call webkit_web_view_send_message_to_page_finish() to get the
 // message reply.
-func (webView *WebView) SendMessageToPage(message *UserMessage, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (webView *WebView) SendMessageToPage(ctx context.Context, message *UserMessage, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebView      // out
-	var _arg1 *C.WebKitUserMessage  // out
 	var _arg2 *C.GCancellable       // out
+	var _arg1 *C.WebKitUserMessage  // out
 	var _arg3 C.GAsyncReadyCallback // out
 	var _arg4 C.gpointer
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.WebKitUserMessage)(unsafe.Pointer(message.Native()))
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg4 = C.gpointer(gbox.AssignOnce(callback))
 

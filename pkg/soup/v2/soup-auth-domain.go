@@ -27,7 +27,7 @@ func init() {
 
 // AuthDomainFilter: prototype for a AuthDomain filter; see
 // soup_auth_domain_set_filter() for details.
-type AuthDomainFilter func(domain *AuthDomain, msg *Message) (ok bool)
+type AuthDomainFilter func(domain AuthDomainer, msg *Message) (ok bool)
 
 //export _gotk4_soup2_AuthDomainFilter
 func _gotk4_soup2_AuthDomainFilter(arg0 *C.SoupAuthDomain, arg1 *C.SoupMessage, arg2 C.gpointer) (cret C.gboolean) {
@@ -36,10 +36,10 @@ func _gotk4_soup2_AuthDomainFilter(arg0 *C.SoupAuthDomain, arg1 *C.SoupMessage, 
 		panic(`callback not found`)
 	}
 
-	var domain *AuthDomain // out
-	var msg *Message       // out
+	var domain AuthDomainer // out
+	var msg *Message        // out
 
-	domain = wrapAuthDomain(externglib.Take(unsafe.Pointer(arg0)))
+	domain = (gextras.CastObject(externglib.Take(unsafe.Pointer(arg0)))).(AuthDomainer)
 	msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
 
 	fn := v.(AuthDomainFilter)
@@ -67,7 +67,7 @@ func _gotk4_soup2_AuthDomainFilter(arg0 *C.SoupAuthDomain, arg1 *C.SoupMessage, 
 // accounts on other servers might be compromised as well. For many of the cases
 // where Server is used, this is not really relevant, but it may still be worth
 // considering.
-type AuthDomainGenericAuthCallback func(domain *AuthDomain, msg *Message, username string) (ok bool)
+type AuthDomainGenericAuthCallback func(domain AuthDomainer, msg *Message, username string) (ok bool)
 
 //export _gotk4_soup2_AuthDomainGenericAuthCallback
 func _gotk4_soup2_AuthDomainGenericAuthCallback(arg0 *C.SoupAuthDomain, arg1 *C.SoupMessage, arg2 *C.char, arg3 C.gpointer) (cret C.gboolean) {
@@ -76,11 +76,11 @@ func _gotk4_soup2_AuthDomainGenericAuthCallback(arg0 *C.SoupAuthDomain, arg1 *C.
 		panic(`callback not found`)
 	}
 
-	var domain *AuthDomain // out
-	var msg *Message       // out
-	var username string    // out
+	var domain AuthDomainer // out
+	var msg *Message        // out
+	var username string     // out
 
-	domain = wrapAuthDomain(externglib.Take(unsafe.Pointer(arg0)))
+	domain = (gextras.CastObject(externglib.Take(unsafe.Pointer(arg0)))).(AuthDomainer)
 	msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
 	username = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
 	defer C.free(unsafe.Pointer(arg2))

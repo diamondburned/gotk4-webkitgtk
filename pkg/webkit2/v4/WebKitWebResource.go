@@ -3,9 +3,12 @@
 package webkit2
 
 import (
+	"context"
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	externglib "github.com/gotk3/gotk3/glib"
@@ -46,14 +49,18 @@ func marshalWebResourcer(p uintptr) (interface{}, error) {
 //
 // When the operation is finished, callback will be called. You can then call
 // webkit_web_resource_get_data_finish() to get the result of the operation.
-func (resource *WebResource) Data(cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (resource *WebResource) Data(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebResource  // out
 	var _arg1 *C.GCancellable       // out
 	var _arg2 C.GAsyncReadyCallback // out
 	var _arg3 C.gpointer
 
 	_arg0 = (*C.WebKitWebResource)(unsafe.Pointer(resource.Native()))
-	_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg3 = C.gpointer(gbox.AssignOnce(callback))
 

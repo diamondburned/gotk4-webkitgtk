@@ -3,11 +3,14 @@
 package webkit2
 
 import (
+	"context"
 	"fmt"
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4-webkitgtk/pkg/soup/v2"
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
@@ -112,16 +115,20 @@ func marshalCookieManagerer(p uintptr) (interface{}, error) {
 //
 // When the operation is finished, callback will be called. You can then call
 // webkit_cookie_manager_add_cookie_finish() to get the result of the operation.
-func (cookieManager *CookieManager) AddCookie(cookie *soup.Cookie, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (cookieManager *CookieManager) AddCookie(ctx context.Context, cookie *soup.Cookie, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitCookieManager // out
-	var _arg1 *C.SoupCookie          // out
 	var _arg2 *C.GCancellable        // out
+	var _arg1 *C.SoupCookie          // out
 	var _arg3 C.GAsyncReadyCallback  // out
 	var _arg4 C.gpointer
 
 	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg4 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -163,16 +170,20 @@ func (cookieManager *CookieManager) DeleteAllCookies() {
 // When the operation is finished, callback will be called. You can then call
 // webkit_cookie_manager_delete_cookie_finish() to get the result of the
 // operation.
-func (cookieManager *CookieManager) DeleteCookie(cookie *soup.Cookie, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (cookieManager *CookieManager) DeleteCookie(ctx context.Context, cookie *soup.Cookie, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitCookieManager // out
-	var _arg1 *C.SoupCookie          // out
 	var _arg2 *C.GCancellable        // out
+	var _arg1 *C.SoupCookie          // out
 	var _arg3 C.GAsyncReadyCallback  // out
 	var _arg4 C.gpointer
 
 	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg4 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -221,14 +232,18 @@ func (cookieManager *CookieManager) DeleteCookiesForDomain(domain string) {
 // When the operation is finished, callback will be called. You can then call
 // webkit_cookie_manager_get_accept_policy_finish() to get the result of the
 // operation.
-func (cookieManager *CookieManager) AcceptPolicy(cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (cookieManager *CookieManager) AcceptPolicy(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitCookieManager // out
 	var _arg1 *C.GCancellable        // out
 	var _arg2 C.GAsyncReadyCallback  // out
 	var _arg3 C.gpointer
 
 	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
-	_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg3 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -263,20 +278,57 @@ func (cookieManager *CookieManager) AcceptPolicyFinish(result gio.AsyncResulter)
 // When the operation is finished, callback will be called. You can then call
 // webkit_cookie_manager_get_cookies_finish() to get the result of the
 // operation.
-func (cookieManager *CookieManager) Cookies(uri string, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (cookieManager *CookieManager) Cookies(ctx context.Context, uri string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitCookieManager // out
-	var _arg1 *C.gchar               // out
 	var _arg2 *C.GCancellable        // out
+	var _arg1 *C.gchar               // out
 	var _arg3 C.GAsyncReadyCallback  // out
 	var _arg4 C.gpointer
 
 	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(uri)))
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg4 = C.gpointer(gbox.AssignOnce(callback))
 
 	C.webkit_cookie_manager_get_cookies(_arg0, _arg1, _arg2, _arg3, _arg4)
+}
+
+// CookiesFinish: finish an asynchronous operation started with
+// webkit_cookie_manager_get_cookies(). The return value is a List of Cookie
+// instances which should be released with g_list_free_full() and
+// soup_cookie_free().
+func (cookieManager *CookieManager) CookiesFinish(result gio.AsyncResulter) (*externglib.List, error) {
+	var _arg0 *C.WebKitCookieManager // out
+	var _arg1 *C.GAsyncResult        // out
+	var _cret *C.GList               // in
+	var _cerr *C.GError              // in
+
+	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+
+	_cret = C.webkit_cookie_manager_get_cookies_finish(_arg0, _arg1, &_cerr)
+
+	var _list *externglib.List // out
+	var _goerr error           // out
+
+	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
+	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
+		src := (*C.SoupCookie)(_p)
+		var dst soup.Cookie // out
+		dst = *(*soup.Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
+		return dst
+	})
+	_list.AttachFinalizer(func(v uintptr) {
+		C.soup_cookie_free((*C.SoupCookie)(unsafe.Pointer(v)))
+	})
+	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+
+	return _list, _goerr
 }
 
 // DomainsWithCookies: asynchronously get the list of domains for which
@@ -287,14 +339,18 @@ func (cookieManager *CookieManager) Cookies(uri string, cancellable *gio.Cancell
 // the operation.
 //
 // Deprecated: Use webkit_website_data_manager_fetch() instead.
-func (cookieManager *CookieManager) DomainsWithCookies(cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (cookieManager *CookieManager) DomainsWithCookies(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitCookieManager // out
 	var _arg1 *C.GCancellable        // out
 	var _arg2 C.GAsyncReadyCallback  // out
 	var _arg3 C.gpointer
 
 	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
-	_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg3 = C.gpointer(gbox.AssignOnce(callback))
 

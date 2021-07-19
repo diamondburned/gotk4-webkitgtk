@@ -151,6 +151,10 @@ type InputMethodContextOverrider interface {
 	// TRUE is returned, then no further processing should be done for the key
 	// event.
 	FilterKeyEvent(keyEvent *gdk.EventKey) bool
+	// Preedit: get the current preedit string for the context, and a list of
+	// WebKitInputMethodUnderline to apply to the string. The string will be
+	// displayed inserted at cursor_offset.
+	Preedit() (string, *externglib.List, uint)
 	// NotifyCursorArea: notify context that cursor area changed in input
 	// associated.
 	NotifyCursorArea(x int, y int, width int, height int)
@@ -189,6 +193,9 @@ type InputMethodContexter interface {
 	// InputPurpose: get the value of the KitInputMethodContext:input-purpose
 	// property.
 	InputPurpose() InputPurpose
+	// Preedit: get the current preedit string for the context, and a list of
+	// WebKitInputMethodUnderline to apply to the string.
+	Preedit() (string, *externglib.List, uint)
 	// NotifyCursorArea: notify context that cursor area changed in input
 	// associated.
 	NotifyCursorArea(x int, y int, width int, height int)
@@ -276,6 +283,40 @@ func (context *InputMethodContext) InputPurpose() InputPurpose {
 	_inputPurpose = InputPurpose(_cret)
 
 	return _inputPurpose
+}
+
+// Preedit: get the current preedit string for the context, and a list of
+// WebKitInputMethodUnderline to apply to the string. The string will be
+// displayed inserted at cursor_offset.
+func (context *InputMethodContext) Preedit() (string, *externglib.List, uint) {
+	var _arg0 *C.WebKitInputMethodContext // out
+	var _arg1 *C.char                     // in
+	var _arg2 *C.GList                    // in
+	var _arg3 C.guint                     // in
+
+	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
+
+	C.webkit_input_method_context_get_preedit(_arg0, &_arg1, &_arg2, &_arg3)
+
+	var _text string                 // out
+	var _underlines *externglib.List // out
+	var _cursorOffset uint           // out
+
+	_text = C.GoString((*C.gchar)(unsafe.Pointer(_arg1)))
+	defer C.free(unsafe.Pointer(_arg1))
+	_underlines = externglib.WrapList(uintptr(unsafe.Pointer(_arg2)))
+	_underlines.DataWrapper(func(_p unsafe.Pointer) interface{} {
+		src := (*C.WebKitInputMethodUnderline)(_p)
+		var dst *InputMethodUnderline // out
+		dst = (*InputMethodUnderline)(gextras.NewStructNative(unsafe.Pointer(src)))
+		return dst
+	})
+	_underlines.AttachFinalizer(func(v uintptr) {
+		C.webkit_input_method_underline_free((*C.WebKitInputMethodUnderline)(unsafe.Pointer(v)))
+	})
+	_cursorOffset = uint(_arg3)
+
+	return _text, _underlines, _cursorOffset
 }
 
 // NotifyCursorArea: notify context that cursor area changed in input

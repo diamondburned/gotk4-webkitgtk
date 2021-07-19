@@ -105,6 +105,28 @@ func (menu *ContextMenu) ItemAtPosition(position uint) *ContextMenuItem {
 	return _contextMenuItem
 }
 
+// Items returns the item list of menu.
+func (menu *ContextMenu) Items() *externglib.List {
+	var _arg0 *C.WebKitContextMenu // out
+	var _cret *C.GList             // in
+
+	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
+
+	_cret = C.webkit_context_menu_get_items(_arg0)
+
+	var _list *externglib.List // out
+
+	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
+	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
+		src := (*C.WebKitContextMenuItem)(_p)
+		var dst ContextMenuItem // out
+		dst = *wrapContextMenuItem(externglib.Take(unsafe.Pointer(src)))
+		return dst
+	})
+
+	return _list
+}
+
 // NItems gets the length of the menu.
 func (menu *ContextMenu) NItems() uint {
 	var _arg0 *C.WebKitContextMenu // out

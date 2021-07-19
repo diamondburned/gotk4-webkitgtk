@@ -2,10 +2,8 @@ module github.com/diamondburned/gotk4-webkitgtk
 
 go 1.17
 
-replace github.com/diamondburned/gotk4 => ../gotk4
-
 require (
-	github.com/diamondburned/gotk4 v0.0.0-20210716064220-07ac6b2e1c40
+	github.com/diamondburned/gotk4 v0.0.0-20210719000705-8769fdd215fb
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
 

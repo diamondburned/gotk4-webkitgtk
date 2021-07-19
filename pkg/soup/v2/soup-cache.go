@@ -98,7 +98,7 @@ func NewCache(cacheDir string, cacheType CacheType) *Cache {
 	return _cache
 }
 
-// Clear: will remove all entries in the cache plus all the cache files.
+// Clear will remove all entries in the cache plus all the cache files.
 func (cache *Cache) Clear() {
 	var _arg0 *C.SoupCache // out
 

@@ -3,10 +3,13 @@
 package soup
 
 import (
+	"context"
 	"fmt"
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
@@ -211,7 +214,7 @@ func (addr1 *Address) EqualByName(addr2 *Address) bool {
 
 // Gsockaddr creates a new Address corresponding to addr (which is assumed to
 // only have one socket address associated with it).
-func (addr *Address) Gsockaddr() *gio.SocketAddress {
+func (addr *Address) Gsockaddr() gio.SocketAddresser {
 	var _arg0 *C.SoupAddress    // out
 	var _cret *C.GSocketAddress // in
 
@@ -219,17 +222,9 @@ func (addr *Address) Gsockaddr() *gio.SocketAddress {
 
 	_cret = C.soup_address_get_gsockaddr(_arg0)
 
-	var _socketAddress *gio.SocketAddress // out
+	var _socketAddress gio.SocketAddresser // out
 
-	{
-		obj := externglib.AssumeOwnership(unsafe.Pointer(_cret))
-		_socketAddress = &gio.SocketAddress{
-			Object: obj,
-			SocketConnectable: gio.SocketConnectable{
-				Object: obj,
-			},
-		}
-	}
+	_socketAddress = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.SocketAddresser)
 
 	return _socketAddress
 }
@@ -359,16 +354,20 @@ func (addr *Address) IsResolved() bool {
 // redundant DNS queries being made). But it is not safe to call from multiple
 // threads, or with different async_contexts, or mixed with calls to
 // soup_address_resolve_sync().
-func (addr *Address) ResolveAsync(asyncContext *glib.MainContext, cancellable *gio.Cancellable, callback AddressCallback) {
+func (addr *Address) ResolveAsync(ctx context.Context, asyncContext *glib.MainContext, callback AddressCallback) {
 	var _arg0 *C.SoupAddress        // out
-	var _arg1 *C.GMainContext       // out
 	var _arg2 *C.GCancellable       // out
+	var _arg1 *C.GMainContext       // out
 	var _arg3 C.SoupAddressCallback // out
 	var _arg4 C.gpointer
 
 	_arg0 = (*C.SoupAddress)(unsafe.Pointer(addr.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.GMainContext)(gextras.StructNative(unsafe.Pointer(asyncContext)))
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg3 = (*[0]byte)(C._gotk4_soup2_AddressCallback)
 	_arg4 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -385,13 +384,17 @@ func (addr *Address) ResolveAsync(asyncContext *glib.MainContext, cancellable *g
 // It is safe to call this more than once, even from different threads, but it
 // is not safe to mix calls to soup_address_resolve_sync() with calls to
 // soup_address_resolve_async() on the same address.
-func (addr *Address) ResolveSync(cancellable *gio.Cancellable) uint {
+func (addr *Address) ResolveSync(ctx context.Context) uint {
 	var _arg0 *C.SoupAddress  // out
 	var _arg1 *C.GCancellable // out
 	var _cret C.guint         // in
 
 	_arg0 = (*C.SoupAddress)(unsafe.Pointer(addr.Native()))
-	_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 
 	_cret = C.soup_address_resolve_sync(_arg0, _arg1)
 

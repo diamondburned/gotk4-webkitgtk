@@ -6,7 +6,6 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	externglib "github.com/gotk3/gotk3/glib"
 )
 
@@ -38,27 +37,6 @@ func marshalFormSubmissionRequester(p uintptr) (interface{}, error) {
 	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
 	obj := externglib.Take(unsafe.Pointer(val))
 	return wrapFormSubmissionRequest(obj), nil
-}
-
-// TextFields: get a Table with the values of the text fields contained in the
-// form associated to request. Note that fields will be missing if the form
-// contains multiple text input elements with the same name, so this function
-// does not reliably return all text fields.
-//
-// Deprecated: Use webkit_form_submission_request_list_text_fields() instead.
-func (request *FormSubmissionRequest) TextFields() *glib.HashTable {
-	var _arg0 *C.WebKitFormSubmissionRequest // out
-	var _cret *C.GHashTable                  // in
-
-	_arg0 = (*C.WebKitFormSubmissionRequest)(unsafe.Pointer(request.Native()))
-
-	_cret = C.webkit_form_submission_request_get_text_fields(_arg0)
-
-	var _hashTable *glib.HashTable // out
-
-	_hashTable = (*glib.HashTable)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-
-	return _hashTable
 }
 
 // Submit: continue the form submission.

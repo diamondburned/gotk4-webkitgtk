@@ -3,10 +3,12 @@
 package webkit2
 
 import (
+	"context"
 	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
@@ -68,14 +70,18 @@ func NewUserContentFilterStore(storagePath string) *UserContentFilterStore {
 // When the operation is finished, callback will be invoked, which then can use
 // webkit_user_content_filter_store_fetch_identifiers_finish() to obtain the
 // list of filter identifiers.
-func (store *UserContentFilterStore) FetchIdentifiers(cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (store *UserContentFilterStore) FetchIdentifiers(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitUserContentFilterStore // out
 	var _arg1 *C.GCancellable                 // out
 	var _arg2 C.GAsyncReadyCallback           // out
 	var _arg3 C.gpointer
 
 	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(store.Native()))
-	_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg3 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -136,16 +142,20 @@ func (store *UserContentFilterStore) Path() string {
 // When the operation is finished, callback will be invoked, which then can use
 // webkit_user_content_filter_store_load_finish() to obtain the resulting
 // filter.
-func (store *UserContentFilterStore) Load(identifier string, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (store *UserContentFilterStore) Load(ctx context.Context, identifier string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitUserContentFilterStore // out
-	var _arg1 *C.gchar                        // out
 	var _arg2 *C.GCancellable                 // out
+	var _arg1 *C.gchar                        // out
 	var _arg3 C.GAsyncReadyCallback           // out
 	var _arg4 C.gpointer
 
 	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(store.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(identifier)))
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg4 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -183,16 +193,20 @@ func (store *UserContentFilterStore) LoadFinish(result gio.AsyncResulter) (*User
 // When the operation is finished, callback will be invoked, which then can use
 // webkit_user_content_filter_store_remove_finish() to check whether the removal
 // was successful.
-func (store *UserContentFilterStore) Remove(identifier string, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (store *UserContentFilterStore) Remove(ctx context.Context, identifier string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitUserContentFilterStore // out
-	var _arg1 *C.gchar                        // out
 	var _arg2 *C.GCancellable                 // out
+	var _arg1 *C.gchar                        // out
 	var _arg3 C.GAsyncReadyCallback           // out
 	var _arg4 C.gpointer
 
 	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(store.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(identifier)))
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg4 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -251,18 +265,22 @@ func (store *UserContentFilterStore) SaveFinish(result gio.AsyncResulter) (*User
 // When the operation is finished, callback will be invoked, which then can use
 // webkit_user_content_filter_store_save_finish() to obtain the resulting
 // filter.
-func (store *UserContentFilterStore) SaveFromFile(identifier string, file gio.Filer, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (store *UserContentFilterStore) SaveFromFile(ctx context.Context, identifier string, file gio.Filer, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitUserContentFilterStore // out
+	var _arg3 *C.GCancellable                 // out
 	var _arg1 *C.gchar                        // out
 	var _arg2 *C.GFile                        // out
-	var _arg3 *C.GCancellable                 // out
 	var _arg4 C.GAsyncReadyCallback           // out
 	var _arg5 C.gpointer
 
 	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(store.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(identifier)))
 	_arg2 = (*C.GFile)(unsafe.Pointer((file).(gextras.Nativer).Native()))
-	_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg5 = C.gpointer(gbox.AssignOnce(callback))
 

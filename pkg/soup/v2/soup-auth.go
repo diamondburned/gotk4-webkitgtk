@@ -6,7 +6,6 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	externglib "github.com/gotk3/gotk3/glib"
 )
 
@@ -44,10 +43,6 @@ type AuthOverrider interface {
 	// auth types (eg, NTLM), the auth may be sendable (eg, as an authentication
 	// request) even before it is authenticated.
 	IsReady(msg *Message) bool
-	// Update updates auth with the information from msg and auth_header,
-	// possibly un-authenticating it. As with soup_auth_new(), this is normally
-	// only used by Session.
-	Update(msg *Message, authHeader *glib.HashTable) bool
 }
 
 // Auth: abstract base class for handling authentication. Specific HTTP

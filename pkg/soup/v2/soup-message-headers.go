@@ -10,7 +10,6 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	externglib "github.com/gotk3/gotk3/glib"
 )
 
@@ -310,47 +309,6 @@ func (hdrs *MessageHeaders) Get(name string) string {
 	return _utf8
 }
 
-// ContentDisposition looks up the "Content-Disposition" header in hdrs, parses
-// it, and returns its value in *disposition and *params. params can be NULL if
-// you are only interested in the disposition-type.
-//
-// In HTTP, the most common use of this header is to set a disposition-type of
-// "attachment", to suggest to the browser that a response should be saved to
-// disk rather than displayed in the browser. If params contains a "filename"
-// parameter, this is a suggestion of a filename to use. (If the parameter value
-// in the header contains an absolute or relative path, libsoup will truncate it
-// down to just the final path component, so you do not need to test this
-// yourself.)
-//
-// Content-Disposition is also used in "multipart/form-data", however this is
-// handled automatically by Multipart and the associated form methods.
-func (hdrs *MessageHeaders) ContentDisposition() (string, *glib.HashTable, bool) {
-	var _arg0 *C.SoupMessageHeaders // out
-	var _arg1 *C.char               // in
-	var _arg2 *C.GHashTable         // in
-	var _cret C.gboolean            // in
-
-	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
-
-	_cret = C.soup_message_headers_get_content_disposition(_arg0, &_arg1, &_arg2)
-
-	var _disposition string     // out
-	var _params *glib.HashTable // out
-	var _ok bool                // out
-
-	_disposition = C.GoString((*C.gchar)(unsafe.Pointer(_arg1)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_params = (*glib.HashTable)(gextras.NewStructNative(unsafe.Pointer(_arg2)))
-	runtime.SetFinalizer(_params, func(v *glib.HashTable) {
-		C.free(gextras.StructNative(unsafe.Pointer(v)))
-	})
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _disposition, _params, _ok
-}
-
 // ContentLength gets the message body length that hdrs declare. This will only
 // be non-0 if soup_message_headers_get_encoding() returns
 // SOUP_ENCODING_CONTENT_LENGTH.
@@ -396,30 +354,6 @@ func (hdrs *MessageHeaders) ContentRange() (start int64, end int64, totalLength 
 	}
 
 	return _start, _end, _totalLength, _ok
-}
-
-// ContentType looks up the "Content-Type" header in hdrs, parses it, and
-// returns its value in *content_type and *params. params can be NULL if you are
-// only interested in the content type itself.
-func (hdrs *MessageHeaders) ContentType() (*glib.HashTable, string) {
-	var _arg0 *C.SoupMessageHeaders // out
-	var _arg1 *C.GHashTable         // in
-	var _cret *C.char               // in
-
-	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
-
-	_cret = C.soup_message_headers_get_content_type(_arg0, &_arg1)
-
-	var _params *glib.HashTable // out
-	var _utf8 string            // out
-
-	_params = (*glib.HashTable)(gextras.NewStructNative(unsafe.Pointer(_arg1)))
-	runtime.SetFinalizer(_params, func(v *glib.HashTable) {
-		C.free(gextras.StructNative(unsafe.Pointer(v)))
-	})
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-
-	return _params, _utf8
 }
 
 // Encoding gets the message body encoding that hdrs declare. This may not
@@ -655,23 +589,6 @@ func (hdrs *MessageHeaders) Replace(name string, value string) {
 	C.soup_message_headers_replace(_arg0, _arg1, _arg2)
 }
 
-// SetContentDisposition sets the "Content-Disposition" header in hdrs to
-// disposition, optionally with additional parameters specified in params.
-//
-// See soup_message_headers_get_content_disposition() for a discussion of how
-// Content-Disposition is used in HTTP.
-func (hdrs *MessageHeaders) SetContentDisposition(disposition string, params *glib.HashTable) {
-	var _arg0 *C.SoupMessageHeaders // out
-	var _arg1 *C.char               // out
-	var _arg2 *C.GHashTable         // out
-
-	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(disposition)))
-	_arg2 = (*C.GHashTable)(gextras.StructNative(unsafe.Pointer(params)))
-
-	C.soup_message_headers_set_content_disposition(_arg0, _arg1, _arg2)
-}
-
 // SetContentLength sets the message body length that hdrs will declare, and
 // sets hdrs's encoding to SOUP_ENCODING_CONTENT_LENGTH.
 //
@@ -711,20 +628,6 @@ func (hdrs *MessageHeaders) SetContentRange(start int64, end int64, totalLength 
 	_arg3 = C.goffset(totalLength)
 
 	C.soup_message_headers_set_content_range(_arg0, _arg1, _arg2, _arg3)
-}
-
-// SetContentType sets the "Content-Type" header in hdrs to content_type,
-// optionally with additional parameters specified in params.
-func (hdrs *MessageHeaders) SetContentType(contentType string, params *glib.HashTable) {
-	var _arg0 *C.SoupMessageHeaders // out
-	var _arg1 *C.char               // out
-	var _arg2 *C.GHashTable         // out
-
-	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(contentType)))
-	_arg2 = (*C.GHashTable)(gextras.StructNative(unsafe.Pointer(params)))
-
-	C.soup_message_headers_set_content_type(_arg0, _arg1, _arg2)
 }
 
 // SetEncoding sets the message body encoding that hdrs will declare. In

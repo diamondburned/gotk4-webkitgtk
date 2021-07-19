@@ -3,11 +3,13 @@
 package webkit2
 
 import (
+	"context"
 	"fmt"
 	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
@@ -115,20 +117,59 @@ func (manager *WebsiteDataManager) ClearFinish(result gio.AsyncResulter) error {
 // When the operation is finished, callback will be called. You can then call
 // webkit_website_data_manager_fetch_finish() to get the result of the
 // operation.
-func (manager *WebsiteDataManager) Fetch(types WebsiteDataTypes, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (manager *WebsiteDataManager) Fetch(ctx context.Context, types WebsiteDataTypes, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
-	var _arg1 C.WebKitWebsiteDataTypes    // out
 	var _arg2 *C.GCancellable             // out
+	var _arg1 C.WebKitWebsiteDataTypes    // out
 	var _arg3 C.GAsyncReadyCallback       // out
 	var _arg4 C.gpointer
 
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = C.WebKitWebsiteDataTypes(types)
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg4 = C.gpointer(gbox.AssignOnce(callback))
 
 	C.webkit_website_data_manager_fetch(_arg0, _arg1, _arg2, _arg3, _arg4)
+}
+
+// FetchFinish: finish an asynchronous operation started with
+// webkit_website_data_manager_fetch().
+func (manager *WebsiteDataManager) FetchFinish(result gio.AsyncResulter) (*externglib.List, error) {
+	var _arg0 *C.WebKitWebsiteDataManager // out
+	var _arg1 *C.GAsyncResult             // out
+	var _cret *C.GList                    // in
+	var _cerr *C.GError                   // in
+
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+
+	_cret = C.webkit_website_data_manager_fetch_finish(_arg0, _arg1, &_cerr)
+
+	var _list *externglib.List // out
+	var _goerr error           // out
+
+	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
+	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
+		src := (*C.WebKitWebsiteData)(_p)
+		var dst *WebsiteData // out
+		dst = (*WebsiteData)(gextras.NewStructNative(unsafe.Pointer(src)))
+		C.webkit_website_data_ref(src)
+		runtime.SetFinalizer(dst, func(v *WebsiteData) {
+			C.webkit_website_data_unref((*C.WebKitWebsiteData)(gextras.StructNative(unsafe.Pointer(v))))
+		})
+		return dst
+	})
+	_list.AttachFinalizer(func(v uintptr) {
+		C.webkit_website_data_unref((*C.WebKitWebsiteData)(unsafe.Pointer(v)))
+	})
+	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+
+	return _list, _goerr
 }
 
 // BaseCacheDirectory: get the KitWebsiteDataManager:base-cache-directory
@@ -249,8 +290,8 @@ func (manager *WebsiteDataManager) IndexeddbDirectory() string {
 	return _utf8
 }
 
-// ItpDirectory: get the KitWebsiteDataManager:itp-directory property.
-func (manager *WebsiteDataManager) ItpDirectory() string {
+// ITPDirectory: get the KitWebsiteDataManager:itp-directory property.
+func (manager *WebsiteDataManager) ITPDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
 
@@ -265,9 +306,9 @@ func (manager *WebsiteDataManager) ItpDirectory() string {
 	return _utf8
 }
 
-// ItpEnabled: get whether Intelligent Tracking Prevention (ITP) is enabled or
+// ITPEnabled: get whether Intelligent Tracking Prevention (ITP) is enabled or
 // not.
-func (manager *WebsiteDataManager) ItpEnabled() bool {
+func (manager *WebsiteDataManager) ITPEnabled() bool {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret C.gboolean                  // in
 
@@ -284,25 +325,64 @@ func (manager *WebsiteDataManager) ItpEnabled() bool {
 	return _ok
 }
 
-// ItpSummary: asynchronously get the list of KitITPThirdParty seen for manager.
+// ITPSummary: asynchronously get the list of KitITPThirdParty seen for manager.
 // Every KitITPThirdParty contains the list of KitITPFirstParty under which it
 // has been seen.
 //
 // When the operation is finished, callback will be called. You can then call
 // webkit_website_data_manager_get_itp_summary_finish() to get the result of the
 // operation.
-func (manager *WebsiteDataManager) ItpSummary(cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (manager *WebsiteDataManager) ITPSummary(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 *C.GCancellable             // out
 	var _arg2 C.GAsyncReadyCallback       // out
 	var _arg3 C.gpointer
 
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
-	_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg3 = C.gpointer(gbox.AssignOnce(callback))
 
 	C.webkit_website_data_manager_get_itp_summary(_arg0, _arg1, _arg2, _arg3)
+}
+
+// ITPSummaryFinish: finish an asynchronous operation started with
+// webkit_website_data_manager_get_itp_summary().
+func (manager *WebsiteDataManager) ITPSummaryFinish(result gio.AsyncResulter) (*externglib.List, error) {
+	var _arg0 *C.WebKitWebsiteDataManager // out
+	var _arg1 *C.GAsyncResult             // out
+	var _cret *C.GList                    // in
+	var _cerr *C.GError                   // in
+
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+
+	_cret = C.webkit_website_data_manager_get_itp_summary_finish(_arg0, _arg1, &_cerr)
+
+	var _list *externglib.List // out
+	var _goerr error           // out
+
+	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
+	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
+		src := (*C.WebKitITPThirdParty)(_p)
+		var dst *ITPThirdParty // out
+		dst = (*ITPThirdParty)(gextras.NewStructNative(unsafe.Pointer(src)))
+		C.webkit_itp_third_party_ref(src)
+		runtime.SetFinalizer(dst, func(v *ITPThirdParty) {
+			C.webkit_itp_third_party_unref((*C.WebKitITPThirdParty)(gextras.StructNative(unsafe.Pointer(v))))
+		})
+		return dst
+	})
+	_list.AttachFinalizer(func(v uintptr) {
+		C.webkit_itp_third_party_unref((*C.WebKitITPThirdParty)(unsafe.Pointer(v)))
+	})
+	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+
+	return _list, _goerr
 }
 
 // LocalStorageDirectory: get the KitWebsiteDataManager:local-storage-directory
@@ -448,14 +528,14 @@ func (manager *WebsiteDataManager) RemoveFinish(result gio.AsyncResulter) error 
 	return _goerr
 }
 
-// SetItpEnabled: enable or disable Intelligent Tracking Prevention (ITP). When
+// SetITPEnabled: enable or disable Intelligent Tracking Prevention (ITP). When
 // ITP is enabled resource load statistics are collected and used to decide
 // whether to allow or block third-party cookies and prevent user tracking. Note
 // that while ITP is enabled the accept policy
 // WEBKIT_COOKIE_POLICY_ACCEPT_NO_THIRD_PARTY is ignored and
 // WEBKIT_COOKIE_POLICY_ACCEPT_ALWAYS is used instead. See also
 // webkit_cookie_manager_set_accept_policy().
-func (manager *WebsiteDataManager) SetItpEnabled(enabled bool) {
+func (manager *WebsiteDataManager) SetITPEnabled(enabled bool) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 C.gboolean                  // out
 
@@ -618,6 +698,32 @@ func (itpThirdParty *ITPThirdParty) Domain() string {
 	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
 
 	return _utf8
+}
+
+// FirstParties: get the list of KitITPFirstParty under which itp_third_party
+// has been seen.
+func (itpThirdParty *ITPThirdParty) FirstParties() *externglib.List {
+	var _arg0 *C.WebKitITPThirdParty // out
+	var _cret *C.GList               // in
+
+	_arg0 = (*C.WebKitITPThirdParty)(gextras.StructNative(unsafe.Pointer(itpThirdParty)))
+
+	_cret = C.webkit_itp_third_party_get_first_parties(_arg0)
+
+	var _list *externglib.List // out
+
+	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
+	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
+		src := (*C.WebKitITPFirstParty)(_p)
+		var dst *ITPFirstParty // out
+		dst = (*ITPFirstParty)(gextras.NewStructNative(unsafe.Pointer(src)))
+		runtime.SetFinalizer(dst, func(v *ITPFirstParty) {
+			C.webkit_itp_first_party_unref((*C.WebKitITPFirstParty)(gextras.StructNative(unsafe.Pointer(v))))
+		})
+		return dst
+	})
+
+	return _list
 }
 
 // Ref: atomically increments the reference count of itp_third_party by one.

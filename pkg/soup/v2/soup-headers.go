@@ -3,11 +3,9 @@
 package soup
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -35,115 +33,6 @@ func HeaderContains(header string, token string) bool {
 	}
 
 	return _ok
-}
-
-// HeaderFreeParamList frees param_list.
-func HeaderFreeParamList(paramList *glib.HashTable) {
-	var _arg1 *C.GHashTable // out
-
-	_arg1 = (*C.GHashTable)(gextras.StructNative(unsafe.Pointer(paramList)))
-
-	C.soup_header_free_param_list(_arg1)
-}
-
-// HeaderParseParamList parses a header which is a comma-delimited list of
-// something like: <literal>token [ "=" ( token | quoted-string ) ]</literal>.
-//
-// Tokens that don't have an associated value will still be added to the
-// resulting hash table, but with a NULL value.
-//
-// This also handles RFC5987 encoding (which in HTTP is mostly used for giving
-// UTF8-encoded filenames in the Content-Disposition header).
-func HeaderParseParamList(header string) *glib.HashTable {
-	var _arg1 *C.char       // out
-	var _cret *C.GHashTable // in
-
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(header)))
-
-	_cret = C.soup_header_parse_param_list(_arg1)
-
-	var _hashTable *glib.HashTable // out
-
-	_hashTable = (*glib.HashTable)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_hashTable, func(v *glib.HashTable) {
-		C.free(gextras.StructNative(unsafe.Pointer(v)))
-	})
-
-	return _hashTable
-}
-
-// HeaderParseParamListStrict: strict version of soup_header_parse_param_list()
-// that bails out if there are duplicate parameters. Note that this function
-// will treat RFC5987-encoded parameters as duplicated if an ASCII version is
-// also present. For header fields that might contain RFC5987-encoded
-// parameters, use soup_header_parse_param_list() instead.
-func HeaderParseParamListStrict(header string) *glib.HashTable {
-	var _arg1 *C.char       // out
-	var _cret *C.GHashTable // in
-
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(header)))
-
-	_cret = C.soup_header_parse_param_list_strict(_arg1)
-
-	var _hashTable *glib.HashTable // out
-
-	_hashTable = (*glib.HashTable)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_hashTable, func(v *glib.HashTable) {
-		C.free(gextras.StructNative(unsafe.Pointer(v)))
-	})
-
-	return _hashTable
-}
-
-// HeaderParseSemiParamList parses a header which is a semicolon-delimited list
-// of something like: <literal>token [ "=" ( token | quoted-string )
-// ]</literal>.
-//
-// Tokens that don't have an associated value will still be added to the
-// resulting hash table, but with a NULL value.
-//
-// This also handles RFC5987 encoding (which in HTTP is mostly used for giving
-// UTF8-encoded filenames in the Content-Disposition header).
-func HeaderParseSemiParamList(header string) *glib.HashTable {
-	var _arg1 *C.char       // out
-	var _cret *C.GHashTable // in
-
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(header)))
-
-	_cret = C.soup_header_parse_semi_param_list(_arg1)
-
-	var _hashTable *glib.HashTable // out
-
-	_hashTable = (*glib.HashTable)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_hashTable, func(v *glib.HashTable) {
-		C.free(gextras.StructNative(unsafe.Pointer(v)))
-	})
-
-	return _hashTable
-}
-
-// HeaderParseSemiParamListStrict: strict version of
-// soup_header_parse_semi_param_list() that bails out if there are duplicate
-// parameters. Note that this function will treat RFC5987-encoded parameters as
-// duplicated if an ASCII version is also present. For header fields that might
-// contain RFC5987-encoded parameters, use soup_header_parse_semi_param_list()
-// instead.
-func HeaderParseSemiParamListStrict(header string) *glib.HashTable {
-	var _arg1 *C.char       // out
-	var _cret *C.GHashTable // in
-
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(header)))
-
-	_cret = C.soup_header_parse_semi_param_list_strict(_arg1)
-
-	var _hashTable *glib.HashTable // out
-
-	_hashTable = (*glib.HashTable)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_hashTable, func(v *glib.HashTable) {
-		C.free(gextras.StructNative(unsafe.Pointer(v)))
-	})
-
-	return _hashTable
 }
 
 // HeadersParse parses the headers of an HTTP request or response in str and

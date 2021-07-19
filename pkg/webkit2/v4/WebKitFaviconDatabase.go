@@ -3,11 +3,13 @@
 package webkit2
 
 import (
+	"context"
 	"fmt"
 	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
@@ -101,16 +103,20 @@ func (database *FaviconDatabase) Clear() {
 // KitWebContext associated with this KitFaviconDatabase before attempting to
 // use this function; otherwise, webkit_favicon_database_get_favicon_finish()
 // will return WEBKIT_FAVICON_DATABASE_ERROR_NOT_INITIALIZED.
-func (database *FaviconDatabase) Favicon(pageUri string, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (database *FaviconDatabase) Favicon(ctx context.Context, pageUri string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitFaviconDatabase // out
-	var _arg1 *C.gchar                 // out
 	var _arg2 *C.GCancellable          // out
+	var _arg1 *C.gchar                 // out
 	var _arg3 C.GAsyncReadyCallback    // out
 	var _arg4 C.gpointer
 
 	_arg0 = (*C.WebKitFaviconDatabase)(unsafe.Pointer(database.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(pageUri)))
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg4 = C.gpointer(gbox.AssignOnce(callback))
 

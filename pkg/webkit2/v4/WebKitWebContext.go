@@ -3,10 +3,14 @@
 package webkit2
 
 import (
+	"context"
 	"fmt"
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
+	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
@@ -361,18 +365,55 @@ func (context *WebContext) GeolocationManager() *GeolocationManager {
 // webkit_web_context_get_plugins_finish() to get the result of the operation.
 //
 // Deprecated: since version 2.32.
-func (context *WebContext) Plugins(cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (context *WebContext) Plugins(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebContext   // out
 	var _arg1 *C.GCancellable       // out
 	var _arg2 C.GAsyncReadyCallback // out
 	var _arg3 C.gpointer
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
-	_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg3 = C.gpointer(gbox.AssignOnce(callback))
 
 	C.webkit_web_context_get_plugins(_arg0, _arg1, _arg2, _arg3)
+}
+
+// PluginsFinish: finish an asynchronous operation started with
+// webkit_web_context_get_plugins.
+//
+// Deprecated: since version 2.32.
+func (context *WebContext) PluginsFinish(result gio.AsyncResulter) (*externglib.List, error) {
+	var _arg0 *C.WebKitWebContext // out
+	var _arg1 *C.GAsyncResult     // out
+	var _cret *C.GList            // in
+	var _cerr *C.GError           // in
+
+	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+
+	_cret = C.webkit_web_context_get_plugins_finish(_arg0, _arg1, &_cerr)
+
+	var _list *externglib.List // out
+	var _goerr error           // out
+
+	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
+	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
+		src := (*C.WebKitPlugin)(_p)
+		var dst Plugin // out
+		dst = *wrapPlugin(externglib.AssumeOwnership(unsafe.Pointer(src)))
+		return dst
+	})
+	_list.AttachFinalizer(func(v uintptr) {
+		C.g_object_unref(C.gpointer(uintptr(unsafe.Pointer(v))))
+	})
+	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+
+	return _list, _goerr
 }
 
 // ProcessModel returns the current process model. For more information about

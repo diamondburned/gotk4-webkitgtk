@@ -3,6 +3,7 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
@@ -53,6 +54,34 @@ func (plugin *Plugin) Description() string {
 	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
 
 	return _utf8
+}
+
+// MIMEInfoList: get information about MIME types handled by the plugin, as a
+// list of KitMimeInfo.
+//
+// Deprecated: since version 2.32.
+func (plugin *Plugin) MIMEInfoList() *externglib.List {
+	var _arg0 *C.WebKitPlugin // out
+	var _cret *C.GList        // in
+
+	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(plugin.Native()))
+
+	_cret = C.webkit_plugin_get_mime_info_list(_arg0)
+
+	var _list *externglib.List // out
+
+	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
+	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
+		src := (*C.WebKitMimeInfo)(_p)
+		var dst *MIMEInfo // out
+		dst = (*MIMEInfo)(gextras.NewStructNative(unsafe.Pointer(src)))
+		runtime.SetFinalizer(dst, func(v *MIMEInfo) {
+			C.webkit_mime_info_unref((*C.WebKitMimeInfo)(gextras.StructNative(unsafe.Pointer(v))))
+		})
+		return dst
+	})
+
+	return _list
 }
 
 // Name: deprecated: since version 2.32.

@@ -1,5 +1,9 @@
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/diamondburned/gotk4 v0.0.0-20210718230843-25dfbfc8c5e5 h1:V8sMWmjnza4XMr0RL7cRmeloR05DxdT3szNQfUlrI38=
+github.com/diamondburned/gotk4 v0.0.0-20210718230843-25dfbfc8c5e5/go.mod h1:WbOkeM91aOubLbxqcbYwd7q/HCKxAmqObvT5Dhpzm1Y=
+github.com/diamondburned/gotk4 v0.0.0-20210719000705-8769fdd215fb h1:CNMoVt9eCQOAxxfAI1bGHatmew3BnCDyMBB+3bu6ZOE=
+github.com/diamondburned/gotk4 v0.0.0-20210719000705-8769fdd215fb/go.mod h1:WbOkeM91aOubLbxqcbYwd7q/HCKxAmqObvT5Dhpzm1Y=
 github.com/diamondburned/gotk4/pkg v0.0.0-20210716064220-07ac6b2e1c40/go.mod h1:g3UzDkxWTTcv0McQlKXeBScFhLywsH+GgwJSL7iQqk0=
 github.com/fatih/color v1.10.0 h1:s36xzo75JdqLaaWoiEHk767eHiwo0598uUxyfiPkDsg=
 github.com/fatih/color v1.10.0/go.mod h1:ELkj/draVOlAH/xkhN6mQ50Qd0MPOk5AAr3maGEBuJM=

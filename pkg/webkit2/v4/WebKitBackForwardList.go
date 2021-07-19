@@ -55,6 +55,52 @@ func (backForwardList *BackForwardList) BackItem() *BackForwardListItem {
 	return _backForwardListItem
 }
 
+func (backForwardList *BackForwardList) BackList() *externglib.List {
+	var _arg0 *C.WebKitBackForwardList // out
+	var _cret *C.GList                 // in
+
+	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(backForwardList.Native()))
+
+	_cret = C.webkit_back_forward_list_get_back_list(_arg0)
+
+	var _list *externglib.List // out
+
+	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
+	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
+		src := (*C.WebKitBackForwardListItem)(_p)
+		var dst BackForwardListItem // out
+		dst = *wrapBackForwardListItem(externglib.Take(unsafe.Pointer(src)))
+		return dst
+	})
+	_list.AttachFinalizer(nil)
+
+	return _list
+}
+
+func (backForwardList *BackForwardList) BackListWithLimit(limit uint) *externglib.List {
+	var _arg0 *C.WebKitBackForwardList // out
+	var _arg1 C.guint                  // out
+	var _cret *C.GList                 // in
+
+	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(backForwardList.Native()))
+	_arg1 = C.guint(limit)
+
+	_cret = C.webkit_back_forward_list_get_back_list_with_limit(_arg0, _arg1)
+
+	var _list *externglib.List // out
+
+	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
+	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
+		src := (*C.WebKitBackForwardListItem)(_p)
+		var dst BackForwardListItem // out
+		dst = *wrapBackForwardListItem(externglib.Take(unsafe.Pointer(src)))
+		return dst
+	})
+	_list.AttachFinalizer(nil)
+
+	return _list
+}
+
 // CurrentItem returns the current item in back_forward_list.
 func (backForwardList *BackForwardList) CurrentItem() *BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList     // out
@@ -85,6 +131,52 @@ func (backForwardList *BackForwardList) ForwardItem() *BackForwardListItem {
 	_backForwardListItem = wrapBackForwardListItem(externglib.Take(unsafe.Pointer(_cret)))
 
 	return _backForwardListItem
+}
+
+func (backForwardList *BackForwardList) ForwardList() *externglib.List {
+	var _arg0 *C.WebKitBackForwardList // out
+	var _cret *C.GList                 // in
+
+	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(backForwardList.Native()))
+
+	_cret = C.webkit_back_forward_list_get_forward_list(_arg0)
+
+	var _list *externglib.List // out
+
+	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
+	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
+		src := (*C.WebKitBackForwardListItem)(_p)
+		var dst BackForwardListItem // out
+		dst = *wrapBackForwardListItem(externglib.Take(unsafe.Pointer(src)))
+		return dst
+	})
+	_list.AttachFinalizer(nil)
+
+	return _list
+}
+
+func (backForwardList *BackForwardList) ForwardListWithLimit(limit uint) *externglib.List {
+	var _arg0 *C.WebKitBackForwardList // out
+	var _arg1 C.guint                  // out
+	var _cret *C.GList                 // in
+
+	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(backForwardList.Native()))
+	_arg1 = C.guint(limit)
+
+	_cret = C.webkit_back_forward_list_get_forward_list_with_limit(_arg0, _arg1)
+
+	var _list *externglib.List // out
+
+	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
+	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
+		src := (*C.WebKitBackForwardListItem)(_p)
+		var dst BackForwardListItem // out
+		dst = *wrapBackForwardListItem(externglib.Take(unsafe.Pointer(src)))
+		return dst
+	})
+	_list.AttachFinalizer(nil)
+
+	return _list
 }
 
 func (backForwardList *BackForwardList) Length() uint {

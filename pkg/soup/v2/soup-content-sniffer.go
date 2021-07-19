@@ -3,11 +3,9 @@
 package soup
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	externglib "github.com/gotk3/gotk3/glib"
 )
 
@@ -31,9 +29,6 @@ type ContentSnifferOverrider interface {
 	// BufferSize gets the number of bytes sniffer needs in order to properly
 	// sniff a buffer.
 	BufferSize() uint
-	// Sniff sniffs buffer to determine its Content-Type. The result may also be
-	// influenced by the Content-Type declared in msg's response headers.
-	Sniff(msg *Message, buffer *Buffer) (*glib.HashTable, string)
 }
 
 type ContentSniffer struct {
@@ -87,32 +82,4 @@ func (sniffer *ContentSniffer) BufferSize() uint {
 	_gsize = uint(_cret)
 
 	return _gsize
-}
-
-// Sniff sniffs buffer to determine its Content-Type. The result may also be
-// influenced by the Content-Type declared in msg's response headers.
-func (sniffer *ContentSniffer) Sniff(msg *Message, buffer *Buffer) (*glib.HashTable, string) {
-	var _arg0 *C.SoupContentSniffer // out
-	var _arg1 *C.SoupMessage        // out
-	var _arg2 *C.SoupBuffer         // out
-	var _arg3 *C.GHashTable         // in
-	var _cret *C.char               // in
-
-	_arg0 = (*C.SoupContentSniffer)(unsafe.Pointer(sniffer.Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg2 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(buffer)))
-
-	_cret = C.soup_content_sniffer_sniff(_arg0, _arg1, _arg2, &_arg3)
-
-	var _params *glib.HashTable // out
-	var _utf8 string            // out
-
-	_params = (*glib.HashTable)(gextras.NewStructNative(unsafe.Pointer(_arg3)))
-	runtime.SetFinalizer(_params, func(v *glib.HashTable) {
-		C.free(gextras.StructNative(unsafe.Pointer(v)))
-	})
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	defer C.free(unsafe.Pointer(_cret))
-
-	return _params, _utf8
 }

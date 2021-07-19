@@ -5,7 +5,6 @@ package webkit2
 import (
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	"github.com/diamondburned/gotk4/pkg/gtk/v3"
 	externglib "github.com/gotk3/gotk3/glib"
@@ -93,7 +92,7 @@ func (printCustomWidget *PrintCustomWidget) Title() string {
 // called from KitPrintCustomWidget::apply or KitPrintCustomWidget::update
 // callbacks, but it will be NULL if called after the
 // KitPrintCustomWidget::apply signal is emitted.
-func (printCustomWidget *PrintCustomWidget) Widget() *gtk.Widget {
+func (printCustomWidget *PrintCustomWidget) Widget() gtk.Widgetter {
 	var _arg0 *C.WebKitPrintCustomWidget // out
 	var _cret *C.GtkWidget               // in
 
@@ -101,22 +100,9 @@ func (printCustomWidget *PrintCustomWidget) Widget() *gtk.Widget {
 
 	_cret = C.webkit_print_custom_widget_get_widget(_arg0)
 
-	var _widget *gtk.Widget // out
+	var _widget gtk.Widgetter // out
 
-	{
-		obj := externglib.Take(unsafe.Pointer(_cret))
-		_widget = &gtk.Widget{
-			InitiallyUnowned: externglib.InitiallyUnowned{
-				Object: obj,
-			},
-			ImplementorIface: atk.ImplementorIface{
-				Object: obj,
-			},
-			Buildable: gtk.Buildable{
-				Object: obj,
-			},
-		}
-	}
+	_widget = (gextras.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(gtk.Widgetter)
 
 	return _widget
 }

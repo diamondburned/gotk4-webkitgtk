@@ -3,9 +3,12 @@
 package soup
 
 import (
+	"context"
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
@@ -47,15 +50,15 @@ type RequestOverrider interface {
 	//
 	// Note that you cannot use this method with Requests attached to a
 	// SessionAsync.
-	Send(cancellable *gio.Cancellable) (*gio.InputStream, error)
+	Send(ctx context.Context) (gio.InputStreamer, error)
 	// SendAsync begins an asynchronously request for the URI pointed to by
 	// request.
 	//
 	// Note that you cannot use this method with Requests attached to a
 	// SessionSync.
-	SendAsync(cancellable *gio.Cancellable, callback gio.AsyncReadyCallback)
+	SendAsync(ctx context.Context, callback gio.AsyncReadyCallback)
 	// SendFinish gets the result of a soup_request_send_async().
-	SendFinish(result gio.AsyncResulter) (*gio.InputStream, error)
+	SendFinish(result gio.AsyncResulter) (gio.InputStreamer, error)
 }
 
 // Request: request to retrieve a particular URI.
@@ -158,26 +161,25 @@ func (request *Request) URI() *URI {
 //
 // Note that you cannot use this method with Requests attached to a
 // SessionAsync.
-func (request *Request) Send(cancellable *gio.Cancellable) (*gio.InputStream, error) {
+func (request *Request) Send(ctx context.Context) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupRequest  // out
 	var _arg1 *C.GCancellable // out
 	var _cret *C.GInputStream // in
 	var _cerr *C.GError       // in
 
 	_arg0 = (*C.SoupRequest)(unsafe.Pointer(request.Native()))
-	_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 
 	_cret = C.soup_request_send(_arg0, _arg1, &_cerr)
 
-	var _inputStream *gio.InputStream // out
-	var _goerr error                  // out
+	var _inputStream gio.InputStreamer // out
+	var _goerr error                   // out
 
-	{
-		obj := externglib.AssumeOwnership(unsafe.Pointer(_cret))
-		_inputStream = &gio.InputStream{
-			Object: obj,
-		}
-	}
+	_inputStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
 	_goerr = gerror.Take(unsafe.Pointer(_cerr))
 
 	return _inputStream, _goerr
@@ -186,14 +188,18 @@ func (request *Request) Send(cancellable *gio.Cancellable) (*gio.InputStream, er
 // SendAsync begins an asynchronously request for the URI pointed to by request.
 //
 // Note that you cannot use this method with Requests attached to a SessionSync.
-func (request *Request) SendAsync(cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (request *Request) SendAsync(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.SoupRequest        // out
 	var _arg1 *C.GCancellable       // out
 	var _arg2 C.GAsyncReadyCallback // out
 	var _arg3 C.gpointer
 
 	_arg0 = (*C.SoupRequest)(unsafe.Pointer(request.Native()))
-	_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg3 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -201,7 +207,7 @@ func (request *Request) SendAsync(cancellable *gio.Cancellable, callback gio.Asy
 }
 
 // SendFinish gets the result of a soup_request_send_async().
-func (request *Request) SendFinish(result gio.AsyncResulter) (*gio.InputStream, error) {
+func (request *Request) SendFinish(result gio.AsyncResulter) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupRequest  // out
 	var _arg1 *C.GAsyncResult // out
 	var _cret *C.GInputStream // in
@@ -212,15 +218,10 @@ func (request *Request) SendFinish(result gio.AsyncResulter) (*gio.InputStream, 
 
 	_cret = C.soup_request_send_finish(_arg0, _arg1, &_cerr)
 
-	var _inputStream *gio.InputStream // out
-	var _goerr error                  // out
+	var _inputStream gio.InputStreamer // out
+	var _goerr error                   // out
 
-	{
-		obj := externglib.AssumeOwnership(unsafe.Pointer(_cret))
-		_inputStream = &gio.InputStream{
-			Object: obj,
-		}
-	}
+	_inputStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
 	_goerr = gerror.Take(unsafe.Pointer(_cerr))
 
 	return _inputStream, _goerr

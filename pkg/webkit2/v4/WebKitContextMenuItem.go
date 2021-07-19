@@ -189,7 +189,7 @@ func (item *ContextMenuItem) Action() *gtk.Action {
 }
 
 // Gaction gets the action associated to item as a #GAction.
-func (item *ContextMenuItem) Gaction() *gio.Action {
+func (item *ContextMenuItem) Gaction() gio.Actioner {
 	var _arg0 *C.WebKitContextMenuItem // out
 	var _cret *C.GAction               // in
 
@@ -197,14 +197,9 @@ func (item *ContextMenuItem) Gaction() *gio.Action {
 
 	_cret = C.webkit_context_menu_item_get_gaction(_arg0)
 
-	var _action *gio.Action // out
+	var _action gio.Actioner // out
 
-	{
-		obj := externglib.Take(unsafe.Pointer(_cret))
-		_action = &gio.Action{
-			Object: obj,
-		}
-	}
+	_action = (gextras.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(gio.Actioner)
 
 	return _action
 }

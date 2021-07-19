@@ -3,11 +3,13 @@
 package soup
 
 import (
+	"context"
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	externglib "github.com/gotk3/gotk3/glib"
 )
@@ -26,7 +28,7 @@ func init() {
 }
 
 // ProxyResolverCallback: deprecated: Use SoupProxyURIResolver instead.
-type ProxyResolverCallback func(proxyResolver *ProxyResolver, msg *Message, arg uint, addr *Address)
+type ProxyResolverCallback func(proxyResolver ProxyResolverer, msg *Message, arg uint, addr *Address)
 
 //export _gotk4_soup2_ProxyResolverCallback
 func _gotk4_soup2_ProxyResolverCallback(arg0 *C.SoupProxyResolver, arg1 *C.SoupMessage, arg2 C.guint, arg3 *C.SoupAddress, arg4 C.gpointer) {
@@ -35,12 +37,12 @@ func _gotk4_soup2_ProxyResolverCallback(arg0 *C.SoupProxyResolver, arg1 *C.SoupM
 		panic(`callback not found`)
 	}
 
-	var proxyResolver *ProxyResolver // out
-	var msg *Message                 // out
-	var arg uint                     // out
-	var addr *Address                // out
+	var proxyResolver ProxyResolverer // out
+	var msg *Message                  // out
+	var arg uint                      // out
+	var addr *Address                 // out
 
-	proxyResolver = wrapProxyResolver(externglib.Take(unsafe.Pointer(arg0)))
+	proxyResolver = (gextras.CastObject(externglib.Take(unsafe.Pointer(arg0)))).(ProxyResolverer)
 	msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
 	arg = uint(arg2)
 	addr = wrapAddress(externglib.Take(unsafe.Pointer(arg3)))
@@ -56,10 +58,10 @@ func _gotk4_soup2_ProxyResolverCallback(arg0 *C.SoupProxyResolver, arg1 *C.SoupM
 type ProxyResolverOverrider interface {
 	// ProxyAsync: deprecated: Use SoupProxyURIResolver.get_proxy_uri_async
 	// instead.
-	ProxyAsync(msg *Message, asyncContext *glib.MainContext, cancellable *gio.Cancellable, callback ProxyResolverCallback)
+	ProxyAsync(ctx context.Context, msg *Message, asyncContext *glib.MainContext, callback ProxyResolverCallback)
 	// ProxySync: deprecated: Use SoupProxyURIResolver.get_proxy_uri_sync()
 	// instead.
-	ProxySync(msg *Message, cancellable *gio.Cancellable) (*Address, uint)
+	ProxySync(ctx context.Context, msg *Message) (*Address, uint)
 }
 
 type ProxyResolver struct {
@@ -72,10 +74,10 @@ var _ gextras.Nativer = (*ProxyResolver)(nil)
 type ProxyResolverer interface {
 	// ProxyAsync: deprecated: Use SoupProxyURIResolver.get_proxy_uri_async
 	// instead.
-	ProxyAsync(msg *Message, asyncContext *glib.MainContext, cancellable *gio.Cancellable, callback ProxyResolverCallback)
+	ProxyAsync(ctx context.Context, msg *Message, asyncContext *glib.MainContext, callback ProxyResolverCallback)
 	// ProxySync: deprecated: Use SoupProxyURIResolver.get_proxy_uri_sync()
 	// instead.
-	ProxySync(msg *Message, cancellable *gio.Cancellable) (*Address, uint)
+	ProxySync(ctx context.Context, msg *Message) (*Address, uint)
 }
 
 var _ ProxyResolverer = (*ProxyResolver)(nil)
@@ -95,18 +97,22 @@ func marshalProxyResolverer(p uintptr) (interface{}, error) {
 }
 
 // ProxyAsync: deprecated: Use SoupProxyURIResolver.get_proxy_uri_async instead.
-func (proxyResolver *ProxyResolver) ProxyAsync(msg *Message, asyncContext *glib.MainContext, cancellable *gio.Cancellable, callback ProxyResolverCallback) {
+func (proxyResolver *ProxyResolver) ProxyAsync(ctx context.Context, msg *Message, asyncContext *glib.MainContext, callback ProxyResolverCallback) {
 	var _arg0 *C.SoupProxyResolver        // out
+	var _arg3 *C.GCancellable             // out
 	var _arg1 *C.SoupMessage              // out
 	var _arg2 *C.GMainContext             // out
-	var _arg3 *C.GCancellable             // out
 	var _arg4 C.SoupProxyResolverCallback // out
 	var _arg5 C.gpointer
 
 	_arg0 = (*C.SoupProxyResolver)(unsafe.Pointer(proxyResolver.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 	_arg2 = (*C.GMainContext)(gextras.StructNative(unsafe.Pointer(asyncContext)))
-	_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg4 = (*[0]byte)(C._gotk4_soup2_ProxyResolverCallback)
 	_arg5 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -114,16 +120,20 @@ func (proxyResolver *ProxyResolver) ProxyAsync(msg *Message, asyncContext *glib.
 }
 
 // ProxySync: deprecated: Use SoupProxyURIResolver.get_proxy_uri_sync() instead.
-func (proxyResolver *ProxyResolver) ProxySync(msg *Message, cancellable *gio.Cancellable) (*Address, uint) {
+func (proxyResolver *ProxyResolver) ProxySync(ctx context.Context, msg *Message) (*Address, uint) {
 	var _arg0 *C.SoupProxyResolver // out
-	var _arg1 *C.SoupMessage       // out
 	var _arg2 *C.GCancellable      // out
+	var _arg1 *C.SoupMessage       // out
 	var _arg3 *C.SoupAddress       // in
 	var _cret C.guint              // in
 
 	_arg0 = (*C.SoupProxyResolver)(unsafe.Pointer(proxyResolver.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 
 	_cret = C.soup_proxy_resolver_get_proxy_sync(_arg0, _arg1, _arg2, &_arg3)
 

@@ -7,7 +7,6 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	externglib "github.com/gotk3/gotk3/glib"
 )
 
@@ -411,18 +410,6 @@ func (uri *URI) SetQuery(query string) {
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(query)))
 
 	C.soup_uri_set_query(_arg0, _arg1)
-}
-
-// SetQueryFromForm sets uri's query to the result of encoding form according to
-// the HTML form rules. See soup_form_encode_hash() for more information.
-func (uri *URI) SetQueryFromForm(form *glib.HashTable) {
-	var _arg0 *C.SoupURI    // out
-	var _arg1 *C.GHashTable // out
-
-	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
-	_arg1 = (*C.GHashTable)(gextras.StructNative(unsafe.Pointer(form)))
-
-	C.soup_uri_set_query_from_form(_arg0, _arg1)
 }
 
 // SetScheme sets uri's scheme to scheme. This will also set uri's port to the

@@ -16,6 +16,7 @@ import (
 	"github.com/diamondburned/gotk4/gir/cmd/gir_generate/genutil"
 	"github.com/diamondburned/gotk4/gir/girgen"
 	"github.com/diamondburned/gotk4/gir/girgen/logger"
+	"github.com/diamondburned/gotk4/gir/girgen/strcases"
 	"golang.org/x/sync/semaphore"
 )
 
@@ -56,6 +57,10 @@ func main() {
 	if listPkg {
 		return
 	}
+
+	strcases.AddPascalSpecials([]string{
+		"Itp",
+	})
 
 	gen := girgen.NewGenerator(repos, genutil.ModulePath(webkitgtkModule, overrides))
 	gen.Logger = log.New(os.Stderr, "girgen: ", log.Lmsgprefix)

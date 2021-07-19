@@ -46,7 +46,7 @@ func marshalRequestFiler(p uintptr) (interface{}, error) {
 }
 
 // File gets a #GFile corresponding to file's URI
-func (file *RequestFile) File() *gio.File {
+func (file *RequestFile) File() gio.Filer {
 	var _arg0 *C.SoupRequestFile // out
 	var _cret *C.GFile           // in
 
@@ -54,14 +54,9 @@ func (file *RequestFile) File() *gio.File {
 
 	_cret = C.soup_request_file_get_file(_arg0)
 
-	var _ret *gio.File // out
+	var _ret gio.Filer // out
 
-	{
-		obj := externglib.AssumeOwnership(unsafe.Pointer(_cret))
-		_ret = &gio.File{
-			Object: obj,
-		}
-	}
+	_ret = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.Filer)
 
 	return _ret
 }

@@ -5,9 +5,7 @@ package soup
 import (
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	externglib "github.com/gotk3/gotk3/glib"
 )
 
@@ -28,8 +26,6 @@ func init() {
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type WebsocketExtensionOverrider interface {
-	// Configure configures extension with the given params
-	Configure(connectionType WebsocketConnectionType, params *glib.HashTable) error
 	// RequestParams: get the parameters strings to be included in the request
 	// header. If the extension doesn't include any parameter in the request,
 	// this function returns NULL.
@@ -48,8 +44,6 @@ var _ gextras.Nativer = (*WebsocketExtension)(nil)
 
 // WebsocketExtensioner describes WebsocketExtension's abstract methods.
 type WebsocketExtensioner interface {
-	// Configure configures extension with the given params
-	Configure(connectionType WebsocketConnectionType, params *glib.HashTable) error
 	// RequestParams: get the parameters strings to be included in the request
 	// header.
 	RequestParams() string
@@ -70,26 +64,6 @@ func marshalWebsocketExtensioner(p uintptr) (interface{}, error) {
 	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
 	obj := externglib.Take(unsafe.Pointer(val))
 	return wrapWebsocketExtension(obj), nil
-}
-
-// Configure configures extension with the given params
-func (extension *WebsocketExtension) Configure(connectionType WebsocketConnectionType, params *glib.HashTable) error {
-	var _arg0 *C.SoupWebsocketExtension     // out
-	var _arg1 C.SoupWebsocketConnectionType // out
-	var _arg2 *C.GHashTable                 // out
-	var _cerr *C.GError                     // in
-
-	_arg0 = (*C.SoupWebsocketExtension)(unsafe.Pointer(extension.Native()))
-	_arg1 = C.SoupWebsocketConnectionType(connectionType)
-	_arg2 = (*C.GHashTable)(gextras.StructNative(unsafe.Pointer(params)))
-
-	C.soup_websocket_extension_configure(_arg0, _arg1, _arg2, &_cerr)
-
-	var _goerr error // out
-
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
-
-	return _goerr
 }
 
 // RequestParams: get the parameters strings to be included in the request

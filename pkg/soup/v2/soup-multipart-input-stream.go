@@ -3,9 +3,12 @@
 package soup
 
 import (
+	"context"
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
@@ -113,26 +116,25 @@ func (multipart *MultipartInputStream) Headers() *MessageHeaders {
 // used to obtain the headers for the first part. A read of 0 bytes indicates
 // the end of the part; a new call to this function should be done at that
 // point, to obtain the next part.
-func (multipart *MultipartInputStream) NextPart(cancellable *gio.Cancellable) (*gio.InputStream, error) {
+func (multipart *MultipartInputStream) NextPart(ctx context.Context) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupMultipartInputStream // out
 	var _arg1 *C.GCancellable             // out
 	var _cret *C.GInputStream             // in
 	var _cerr *C.GError                   // in
 
 	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(multipart.Native()))
-	_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 
 	_cret = C.soup_multipart_input_stream_next_part(_arg0, _arg1, &_cerr)
 
-	var _inputStream *gio.InputStream // out
-	var _goerr error                  // out
+	var _inputStream gio.InputStreamer // out
+	var _goerr error                   // out
 
-	{
-		obj := externglib.AssumeOwnership(unsafe.Pointer(_cret))
-		_inputStream = &gio.InputStream{
-			Object: obj,
-		}
-	}
+	_inputStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
 	_goerr = gerror.Take(unsafe.Pointer(_cerr))
 
 	return _inputStream, _goerr
@@ -140,16 +142,20 @@ func (multipart *MultipartInputStream) NextPart(cancellable *gio.Cancellable) (*
 
 // NextPartAsync obtains a Stream for the next request. See
 // soup_multipart_input_stream_next_part() for details on the workflow.
-func (multipart *MultipartInputStream) NextPartAsync(ioPriority int, cancellable *gio.Cancellable, callback gio.AsyncReadyCallback) {
+func (multipart *MultipartInputStream) NextPartAsync(ctx context.Context, ioPriority int, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.SoupMultipartInputStream // out
-	var _arg1 C.int                       // out
 	var _arg2 *C.GCancellable             // out
+	var _arg1 C.int                       // out
 	var _arg3 C.GAsyncReadyCallback       // out
 	var _arg4 C.gpointer
 
 	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(multipart.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
 	_arg1 = C.int(ioPriority)
-	_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 	_arg4 = C.gpointer(gbox.AssignOnce(callback))
 
@@ -157,7 +163,7 @@ func (multipart *MultipartInputStream) NextPartAsync(ioPriority int, cancellable
 }
 
 // NextPartFinish finishes an asynchronous request for the next part.
-func (multipart *MultipartInputStream) NextPartFinish(result gio.AsyncResulter) (*gio.InputStream, error) {
+func (multipart *MultipartInputStream) NextPartFinish(result gio.AsyncResulter) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupMultipartInputStream // out
 	var _arg1 *C.GAsyncResult             // out
 	var _cret *C.GInputStream             // in
@@ -168,15 +174,10 @@ func (multipart *MultipartInputStream) NextPartFinish(result gio.AsyncResulter) 
 
 	_cret = C.soup_multipart_input_stream_next_part_finish(_arg0, _arg1, &_cerr)
 
-	var _inputStream *gio.InputStream // out
-	var _goerr error                  // out
+	var _inputStream gio.InputStreamer // out
+	var _goerr error                   // out
 
-	{
-		obj := externglib.AssumeOwnership(unsafe.Pointer(_cret))
-		_inputStream = &gio.InputStream{
-			Object: obj,
-		}
-	}
+	_inputStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
 	_goerr = gerror.Take(unsafe.Pointer(_cerr))
 
 	return _inputStream, _goerr

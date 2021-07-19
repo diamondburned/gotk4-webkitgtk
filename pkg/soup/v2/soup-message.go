@@ -10,7 +10,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
-	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	externglib "github.com/gotk3/gotk3/glib"
 )
 
@@ -341,18 +340,6 @@ func NewMessageFromURI(method string, uri *URI) *Message {
 	return _message
 }
 
-func (msg *Message) ContentSniffed(contentType string, params *glib.HashTable) {
-	var _arg0 *C.SoupMessage // out
-	var _arg1 *C.char        // out
-	var _arg2 *C.GHashTable  // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(contentType)))
-	_arg2 = (*C.GHashTable)(gextras.StructNative(unsafe.Pointer(params)))
-
-	C.soup_message_content_sniffed(_arg0, _arg1, _arg2)
-}
-
 // DisableFeature: this disables the actions of SessionFeature<!-- -->s with the
 // given feature_type (or a subclass of that type) on msg, so that msg is
 // processed as though the feature(s) hadn't been added to the session. Eg,
@@ -454,7 +441,7 @@ func (msg *Message) HttpVersion() HTTPVersion {
 //
 // <note><para>This is only meaningful with messages processed by a Session and
 // is not useful for messages received by a Server</para></note>
-func (msg *Message) HttpsStatus() (*gio.TLSCertificate, gio.TLSCertificateFlags, bool) {
+func (msg *Message) HttpsStatus() (gio.TLSCertificater, gio.TLSCertificateFlags, bool) {
 	var _arg0 *C.SoupMessage         // out
 	var _arg1 *C.GTlsCertificate     // in
 	var _arg2 C.GTlsCertificateFlags // in
@@ -464,16 +451,11 @@ func (msg *Message) HttpsStatus() (*gio.TLSCertificate, gio.TLSCertificateFlags,
 
 	_cret = C.soup_message_get_https_status(_arg0, &_arg1, &_arg2)
 
-	var _certificate *gio.TLSCertificate // out
+	var _certificate gio.TLSCertificater // out
 	var _errors gio.TLSCertificateFlags  // out
 	var _ok bool                         // out
 
-	{
-		obj := externglib.Take(unsafe.Pointer(_arg1))
-		_certificate = &gio.TLSCertificate{
-			Object: obj,
-		}
-	}
+	_certificate = (gextras.CastObject(externglib.Take(unsafe.Pointer(_arg1)))).(gio.TLSCertificater)
 	_errors = gio.TLSCertificateFlags(_arg2)
 	if _cret != 0 {
 		_ok = true

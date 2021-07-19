@@ -21,7 +21,6 @@ import (
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 // extern void callbackDelete(gpointer);
-// void _gotk4_soup2_ServerCallback(SoupServer*, SoupMessage*, char*, GHashTable*, SoupClientContext*, gpointer);
 // void _gotk4_soup2_ServerWebsocketCallback(SoupServer*, SoupWebsocketConnection*, char*, SoupClientContext*, gpointer);
 import "C"
 
@@ -82,59 +81,6 @@ func (s ServerListenOptions) String() string {
 	}
 
 	return strings.TrimSuffix(builder.String(), "|")
-}
-
-// ServerCallback: callback used to handle requests to a Server.
-//
-// path and query contain the likewise-named components of the Request-URI,
-// subject to certain assumptions. By default, Server decodes all
-// percent-encoding in the URI path, such that "/foo%<!-- -->2Fbar" is treated
-// the same as "/foo/bar". If your server is serving resources in some
-// non-POSIX-filesystem namespace, you may want to distinguish those as two
-// distinct paths. In that case, you can set the SOUP_SERVER_RAW_PATHS property
-// when creating the Server, and it will leave those characters undecoded. (You
-// may want to call soup_uri_normalize() to decode any percent-encoded
-// characters that you aren't handling specially.)
-//
-// query contains the query component of the Request-URI parsed according to the
-// rules for HTML form handling. Although this is the only commonly-used query
-// string format in HTTP, there is nothing that actually requires that HTTP URIs
-// use that format; if your server needs to use some other format, you can just
-// ignore query, and call soup_message_get_uri() and parse the URI's query field
-// yourself.
-//
-// See soup_server_add_handler() and soup_server_add_early_handler() for details
-// of what handlers can/should do.
-type ServerCallback func(server *Server, msg *Message, path string, query *glib.HashTable, client *ClientContext)
-
-//export _gotk4_soup2_ServerCallback
-func _gotk4_soup2_ServerCallback(arg0 *C.SoupServer, arg1 *C.SoupMessage, arg2 *C.char, arg3 *C.GHashTable, arg4 *C.SoupClientContext, arg5 C.gpointer) {
-	v := gbox.Get(uintptr(arg5))
-	if v == nil {
-		panic(`callback not found`)
-	}
-
-	var server *Server        // out
-	var msg *Message          // out
-	var path string           // out
-	var query *glib.HashTable // out
-	var client *ClientContext // out
-
-	server = wrapServer(externglib.Take(unsafe.Pointer(arg0)))
-	msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-	path = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-	defer C.free(unsafe.Pointer(arg2))
-	query = (*glib.HashTable)(gextras.NewStructNative(unsafe.Pointer(arg3)))
-	runtime.SetFinalizer(query, func(v *glib.HashTable) {
-		C.free(gextras.StructNative(unsafe.Pointer(v)))
-	})
-	client = (*ClientContext)(gextras.NewStructNative(unsafe.Pointer(arg4)))
-	runtime.SetFinalizer(client, func(v *ClientContext) {
-		C.free(gextras.StructNative(unsafe.Pointer(v)))
-	})
-
-	fn := v.(ServerCallback)
-	fn(server, msg, path, query, client)
 }
 
 // ServerWebsocketCallback: callback used to handle WebSocket requests to a
@@ -238,91 +184,6 @@ func (server *Server) AddAuthDomain(authDomain AuthDomainer) {
 	_arg1 = (*C.SoupAuthDomain)(unsafe.Pointer((authDomain).(gextras.Nativer).Native()))
 
 	C.soup_server_add_auth_domain(_arg0, _arg1)
-}
-
-// AddEarlyHandler adds an "early" handler to server for requests under path.
-// Note that "normal" and "early" handlers are matched up together, so if you
-// add a normal handler for "/foo" and an early handler for "/foo/bar", then a
-// request to "/foo/bar" (or any path below it) will run only the early handler.
-// (But if you add both handlers at the same path, then both will get run.)
-//
-// For requests under path (that have not already been assigned a status code by
-// a AuthDomain or a signal handler), callback will be invoked after receiving
-// the request headers, but before receiving the request body; the message's
-// Message:method and Message:request-headers fields will be filled in.
-//
-// Early handlers are generally used for processing requests with request bodies
-// in a streaming fashion. If you determine that the request will contain a
-// message body, normally you would call soup_message_body_set_accumulate() on
-// the message's Message:request-body to turn off request-body accumulation, and
-// connect to the message's Message::got-chunk signal to process each chunk as
-// it comes in.
-//
-// To complete the message processing after the full message body has been read,
-// you can either also connect to Message::got-body, or else you can register a
-// non-early handler for path as well. As long as you have not set the
-// Message:status-code by the time Message::got-body is emitted, the non-early
-// handler will be run as well.
-func (server *Server) AddEarlyHandler(path string, callback ServerCallback) {
-	var _arg0 *C.SoupServer        // out
-	var _arg1 *C.char              // out
-	var _arg2 C.SoupServerCallback // out
-	var _arg3 C.gpointer
-	var _arg4 C.GDestroyNotify
-
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
-	_arg2 = (*[0]byte)(C._gotk4_soup2_ServerCallback)
-	_arg3 = C.gpointer(gbox.Assign(callback))
-	_arg4 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
-
-	C.soup_server_add_early_handler(_arg0, _arg1, _arg2, _arg3, _arg4)
-}
-
-// AddHandler adds a handler to server for requests under path. If path is NULL
-// or "/", then this will be the default handler for all requests that don't
-// have a more specific handler. (Note though that if you want to handle
-// requests to the special "*" URI, you must explicitly register a handler for
-// "*"; the default handler will not be used for that case.)
-//
-// For requests under path (that have not already been assigned a status code by
-// a AuthDomain, an early ServerHandler, or a signal handler), callback will be
-// invoked after receiving the request body; the message's Message:method,
-// Message:request-headers, and Message:request-body fields will be filled in.
-//
-// After determining what to do with the request, the callback must at a minimum
-// call soup_message_set_status() (or soup_message_set_status_full()) on the
-// message to set the response status code. Additionally, it may set response
-// headers and/or fill in the response body.
-//
-// If the callback cannot fully fill in the response before returning (eg, if it
-// needs to wait for information from a database, or another network server), it
-// should call soup_server_pause_message() to tell server to not send the
-// response right away. When the response is ready, call
-// soup_server_unpause_message() to cause it to be sent.
-//
-// To send the response body a bit at a time using "chunked" encoding, first
-// call soup_message_headers_set_encoding() to set SOUP_ENCODING_CHUNKED on the
-// Message:response-headers. Then call soup_message_body_append() (or
-// soup_message_body_append_buffer()) to append each chunk as it becomes ready,
-// and soup_server_unpause_message() to make sure it's running. (The server will
-// automatically pause the message if it is using chunked encoding but no more
-// chunks are available.) When you are done, call soup_message_body_complete()
-// to indicate that no more chunks are coming.
-func (server *Server) AddHandler(path string, callback ServerCallback) {
-	var _arg0 *C.SoupServer        // out
-	var _arg1 *C.char              // out
-	var _arg2 C.SoupServerCallback // out
-	var _arg3 C.gpointer
-	var _arg4 C.GDestroyNotify
-
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
-	_arg2 = (*[0]byte)(C._gotk4_soup2_ServerCallback)
-	_arg3 = C.gpointer(gbox.Assign(callback))
-	_arg4 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
-
-	C.soup_server_add_handler(_arg0, _arg1, _arg2, _arg3, _arg4)
 }
 
 // AddWebsocketExtension: add support for a WebSocket extension of the given
@@ -838,7 +699,7 @@ func (client *ClientContext) Address() *Address {
 
 // AuthDomain checks whether the request associated with client has been
 // authenticated, and if so returns the AuthDomain that authenticated it.
-func (client *ClientContext) AuthDomain() *AuthDomain {
+func (client *ClientContext) AuthDomain() AuthDomainer {
 	var _arg0 *C.SoupClientContext // out
 	var _cret *C.SoupAuthDomain    // in
 
@@ -846,9 +707,9 @@ func (client *ClientContext) AuthDomain() *AuthDomain {
 
 	_cret = C.soup_client_context_get_auth_domain(_arg0)
 
-	var _authDomain *AuthDomain // out
+	var _authDomain AuthDomainer // out
 
-	_authDomain = wrapAuthDomain(externglib.Take(unsafe.Pointer(_cret)))
+	_authDomain = (gextras.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(AuthDomainer)
 
 	return _authDomain
 }
@@ -922,7 +783,7 @@ func (client *ClientContext) Host() string {
 
 // LocalAddress retrieves the Address associated with the local end of a
 // connection.
-func (client *ClientContext) LocalAddress() *gio.SocketAddress {
+func (client *ClientContext) LocalAddress() gio.SocketAddresser {
 	var _arg0 *C.SoupClientContext // out
 	var _cret *C.GSocketAddress    // in
 
@@ -930,24 +791,16 @@ func (client *ClientContext) LocalAddress() *gio.SocketAddress {
 
 	_cret = C.soup_client_context_get_local_address(_arg0)
 
-	var _socketAddress *gio.SocketAddress // out
+	var _socketAddress gio.SocketAddresser // out
 
-	{
-		obj := externglib.Take(unsafe.Pointer(_cret))
-		_socketAddress = &gio.SocketAddress{
-			Object: obj,
-			SocketConnectable: gio.SocketConnectable{
-				Object: obj,
-			},
-		}
-	}
+	_socketAddress = (gextras.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(gio.SocketAddresser)
 
 	return _socketAddress
 }
 
 // RemoteAddress retrieves the Address associated with the remote end of a
 // connection.
-func (client *ClientContext) RemoteAddress() *gio.SocketAddress {
+func (client *ClientContext) RemoteAddress() gio.SocketAddresser {
 	var _arg0 *C.SoupClientContext // out
 	var _cret *C.GSocketAddress    // in
 
@@ -955,17 +808,9 @@ func (client *ClientContext) RemoteAddress() *gio.SocketAddress {
 
 	_cret = C.soup_client_context_get_remote_address(_arg0)
 
-	var _socketAddress *gio.SocketAddress // out
+	var _socketAddress gio.SocketAddresser // out
 
-	{
-		obj := externglib.Take(unsafe.Pointer(_cret))
-		_socketAddress = &gio.SocketAddress{
-			Object: obj,
-			SocketConnectable: gio.SocketConnectable{
-				Object: obj,
-			},
-		}
-	}
+	_socketAddress = (gextras.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(gio.SocketAddresser)
 
 	return _socketAddress
 }
@@ -1004,7 +849,7 @@ func (client *ClientContext) Socket() *Socket {
 //
 // Note that when calling this function from C, client will most likely be freed
 // as a side effect.
-func (client *ClientContext) StealConnection() *gio.IOStream {
+func (client *ClientContext) StealConnection() gio.IOStreamer {
 	var _arg0 *C.SoupClientContext // out
 	var _cret *C.GIOStream         // in
 
@@ -1012,14 +857,9 @@ func (client *ClientContext) StealConnection() *gio.IOStream {
 
 	_cret = C.soup_client_context_steal_connection(_arg0)
 
-	var _ioStream *gio.IOStream // out
+	var _ioStream gio.IOStreamer // out
 
-	{
-		obj := externglib.AssumeOwnership(unsafe.Pointer(_cret))
-		_ioStream = &gio.IOStream{
-			Object: obj,
-		}
-	}
+	_ioStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.IOStreamer)
 
 	return _ioStream
 }

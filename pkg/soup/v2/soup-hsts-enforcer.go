@@ -72,6 +72,58 @@ func NewHSTSEnforcer() *HSTSEnforcer {
 	return _hstsEnforcer
 }
 
+// Domains gets a list of domains for which there are policies in enforcer.
+func (hstsEnforcer *HSTSEnforcer) Domains(sessionPolicies bool) *externglib.List {
+	var _arg0 *C.SoupHSTSEnforcer // out
+	var _arg1 C.gboolean          // out
+	var _cret *C.GList            // in
+
+	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(hstsEnforcer.Native()))
+	if sessionPolicies {
+		_arg1 = C.TRUE
+	}
+
+	_cret = C.soup_hsts_enforcer_get_domains(_arg0, _arg1)
+
+	var _list *externglib.List // out
+
+	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
+	_list.AttachFinalizer(func(v uintptr) {
+		C.free(unsafe.Pointer(v))
+	})
+
+	return _list
+}
+
+// Policies gets a list with the policies in enforcer.
+func (hstsEnforcer *HSTSEnforcer) Policies(sessionPolicies bool) *externglib.List {
+	var _arg0 *C.SoupHSTSEnforcer // out
+	var _arg1 C.gboolean          // out
+	var _cret *C.GList            // in
+
+	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(hstsEnforcer.Native()))
+	if sessionPolicies {
+		_arg1 = C.TRUE
+	}
+
+	_cret = C.soup_hsts_enforcer_get_policies(_arg0, _arg1)
+
+	var _list *externglib.List // out
+
+	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
+	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
+		src := (*C.SoupHSTSPolicy)(_p)
+		var dst HSTSPolicy // out
+		dst = *(*HSTSPolicy)(gextras.NewStructNative(unsafe.Pointer(src)))
+		return dst
+	})
+	_list.AttachFinalizer(func(v uintptr) {
+		C.soup_hsts_policy_free((*C.SoupHSTSPolicy)(unsafe.Pointer(v)))
+	})
+
+	return _list
+}
+
 // HasValidPolicy gets whether hsts_enforcer has a currently valid policy for
 // domain.
 func (hstsEnforcer *HSTSEnforcer) HasValidPolicy(domain string) bool {

@@ -155,8 +155,30 @@ func (self *WebsocketConnection) ConnectionType() WebsocketConnectionType {
 	return _websocketConnectionType
 }
 
+// Extensions: get the extensions chosen via negotiation with the peer.
+func (self *WebsocketConnection) Extensions() *externglib.List {
+	var _arg0 *C.SoupWebsocketConnection // out
+	var _cret *C.GList                   // in
+
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+
+	_cret = C.soup_websocket_connection_get_extensions(_arg0)
+
+	var _list *externglib.List // out
+
+	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
+	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
+		src := (*C.SoupWebsocketExtension)(_p)
+		var dst WebsocketExtensioner // out
+		dst = (gextras.CastObject(externglib.Take(unsafe.Pointer(src)))).(WebsocketExtensioner)
+		return dst
+	})
+
+	return _list
+}
+
 // IOStream: get the I/O stream the WebSocket is communicating over.
-func (self *WebsocketConnection) IOStream() *gio.IOStream {
+func (self *WebsocketConnection) IOStream() gio.IOStreamer {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _cret *C.GIOStream               // in
 
@@ -164,14 +186,9 @@ func (self *WebsocketConnection) IOStream() *gio.IOStream {
 
 	_cret = C.soup_websocket_connection_get_io_stream(_arg0)
 
-	var _ioStream *gio.IOStream // out
+	var _ioStream gio.IOStreamer // out
 
-	{
-		obj := externglib.Take(unsafe.Pointer(_cret))
-		_ioStream = &gio.IOStream{
-			Object: obj,
-		}
-	}
+	_ioStream = (gextras.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(gio.IOStreamer)
 
 	return _ioStream
 }
