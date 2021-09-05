@@ -7,7 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -25,8 +25,6 @@ func init() {
 type Plugin struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*Plugin)(nil)
 
 func wrapPlugin(obj *externglib.Object) *Plugin {
 	return &Plugin{
@@ -48,6 +46,7 @@ func (plugin *Plugin) Description() string {
 	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(plugin.Native()))
 
 	_cret = C.webkit_plugin_get_description(_arg0)
+	runtime.KeepAlive(plugin)
 
 	var _utf8 string // out
 
@@ -60,25 +59,30 @@ func (plugin *Plugin) Description() string {
 // list of KitMimeInfo.
 //
 // Deprecated: since version 2.32.
-func (plugin *Plugin) MIMEInfoList() *externglib.List {
+func (plugin *Plugin) MIMEInfoList() []*MIMEInfo {
 	var _arg0 *C.WebKitPlugin // out
 	var _cret *C.GList        // in
 
 	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(plugin.Native()))
 
 	_cret = C.webkit_plugin_get_mime_info_list(_arg0)
+	runtime.KeepAlive(plugin)
 
-	var _list *externglib.List // out
+	var _list []*MIMEInfo // out
 
-	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
-	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
-		src := (*C.WebKitMimeInfo)(_p)
+	_list = make([]*MIMEInfo, 0, gextras.ListSize(unsafe.Pointer(_cret)))
+	gextras.MoveList(unsafe.Pointer(_cret), false, func(v unsafe.Pointer) {
+		src := (*C.WebKitMimeInfo)(v)
 		var dst *MIMEInfo // out
 		dst = (*MIMEInfo)(gextras.NewStructNative(unsafe.Pointer(src)))
-		runtime.SetFinalizer(dst, func(v *MIMEInfo) {
-			C.webkit_mime_info_unref((*C.WebKitMimeInfo)(gextras.StructNative(unsafe.Pointer(v))))
-		})
-		return dst
+		C.webkit_mime_info_ref(src)
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(dst)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.webkit_mime_info_unref((*C.WebKitMimeInfo)(intern.C))
+			},
+		)
+		_list = append(_list, dst)
 	})
 
 	return _list
@@ -92,6 +96,7 @@ func (plugin *Plugin) Name() string {
 	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(plugin.Native()))
 
 	_cret = C.webkit_plugin_get_name(_arg0)
+	runtime.KeepAlive(plugin)
 
 	var _utf8 string // out
 
@@ -108,6 +113,7 @@ func (plugin *Plugin) Path() string {
 	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(plugin.Native()))
 
 	_cret = C.webkit_plugin_get_path(_arg0)
+	runtime.KeepAlive(plugin)
 
 	var _utf8 string // out
 

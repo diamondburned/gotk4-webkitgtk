@@ -3,11 +3,11 @@
 package soup
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -25,8 +25,6 @@ func init() {
 type RequestFile struct {
 	Request
 }
-
-var _ gextras.Nativer = (*RequestFile)(nil)
 
 func wrapRequestFile(obj *externglib.Object) *RequestFile {
 	return &RequestFile{
@@ -53,10 +51,11 @@ func (file *RequestFile) File() gio.Filer {
 	_arg0 = (*C.SoupRequestFile)(unsafe.Pointer(file.Native()))
 
 	_cret = C.soup_request_file_get_file(_arg0)
+	runtime.KeepAlive(file)
 
 	var _ret gio.Filer // out
 
-	_ret = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.Filer)
+	_ret = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.Filer)
 
 	return _ret
 }

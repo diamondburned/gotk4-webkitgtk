@@ -3,16 +3,199 @@
 package soup
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <libsoup/soup.h>
 import "C"
+
+// FORM_MIME_TYPE_MULTIPART: macro containing the value
+// <literal>"multipart/form-data"</literal>; the MIME type used for posting form
+// data that contains files to be uploaded.
+const FORM_MIME_TYPE_MULTIPART = "multipart/form-data"
+
+// FORM_MIME_TYPE_URLENCODED: macro containing the value
+// <literal>"application/x-www-form-urlencoded"</literal>; the default MIME type
+// for POSTing HTML form data.
+const FORM_MIME_TYPE_URLENCODED = "application/x-www-form-urlencoded"
+
+// FormDecode decodes form, which is an urlencoded dataset as defined in the
+// HTML 4.01 spec.
+func FormDecode(encodedForm string) map[string]string {
+	var _arg1 *C.char       // out
+	var _cret *C.GHashTable // in
+
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(encodedForm)))
+	defer C.free(unsafe.Pointer(_arg1))
+
+	_cret = C.soup_form_decode(_arg1)
+	runtime.KeepAlive(encodedForm)
+
+	var _hashTable map[string]string // out
+
+	_hashTable = make(map[string]string, gextras.HashTableSize(unsafe.Pointer(_cret)))
+	gextras.MoveHashTable(unsafe.Pointer(_cret), true, func(k, v unsafe.Pointer) {
+		ksrc := *(**C.gchar)(k)
+		vsrc := *(**C.gchar)(v)
+		var kdst string // out
+		var vdst string // out
+		kdst = C.GoString((*C.gchar)(unsafe.Pointer(ksrc)))
+		vdst = C.GoString((*C.gchar)(unsafe.Pointer(vsrc)))
+		_hashTable[kdst] = vdst
+	})
+
+	return _hashTable
+}
+
+// FormDecodeMultipart decodes the "multipart/form-data" request in msg; this is
+// a convenience method for the case when you have a single file upload control
+// in a form. (Or when you don't have any file upload controls, but are still
+// using "multipart/form-data" anyway.) Pass the name of the file upload control
+// in file_control_name, and soup_form_decode_multipart() will extract the
+// uploaded file data into filename, content_type, and file. All of the other
+// form control data will be returned (as strings, as with soup_form_decode())
+// in the returned Table.
+//
+// You may pass NULL for filename, content_type and/or file if you do not care
+// about those fields. soup_form_decode_multipart() may also return NULL in
+// those fields if the client did not provide that information. You must free
+// the returned filename and content-type with g_free(), and the returned file
+// data with soup_buffer_free().
+//
+// If you have a form with more than one file upload control, you will need to
+// decode it manually, using soup_multipart_new_from_message() and
+// soup_multipart_get_part().
+func FormDecodeMultipart(msg *Message, fileControlName string) (filename string, contentType string, file *Buffer, hashTable map[string]string) {
+	var _arg1 *C.SoupMessage // out
+	var _arg2 *C.char        // out
+	var _arg3 *C.char        // in
+	var _arg4 *C.char        // in
+	var _arg5 *C.SoupBuffer  // in
+	var _cret *C.GHashTable  // in
+
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	if fileControlName != "" {
+		_arg2 = (*C.char)(unsafe.Pointer(C.CString(fileControlName)))
+		defer C.free(unsafe.Pointer(_arg2))
+	}
+
+	_cret = C.soup_form_decode_multipart(_arg1, _arg2, &_arg3, &_arg4, &_arg5)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(fileControlName)
+
+	var _filename string             // out
+	var _contentType string          // out
+	var _file *Buffer                // out
+	var _hashTable map[string]string // out
+
+	if _arg3 != nil {
+		_filename = C.GoString((*C.gchar)(unsafe.Pointer(_arg3)))
+		defer C.free(unsafe.Pointer(_arg3))
+	}
+	if _arg4 != nil {
+		_contentType = C.GoString((*C.gchar)(unsafe.Pointer(_arg4)))
+		defer C.free(unsafe.Pointer(_arg4))
+	}
+	if _arg5 != nil {
+		_file = (*Buffer)(gextras.NewStructNative(unsafe.Pointer(_arg5)))
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(_file)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.soup_buffer_free((*C.SoupBuffer)(intern.C))
+			},
+		)
+	}
+	if _cret != nil {
+		_hashTable = make(map[string]string, gextras.HashTableSize(unsafe.Pointer(_cret)))
+		gextras.MoveHashTable(unsafe.Pointer(_cret), true, func(k, v unsafe.Pointer) {
+			ksrc := *(**C.gchar)(k)
+			vsrc := *(**C.gchar)(v)
+			var kdst string // out
+			var vdst string // out
+			kdst = C.GoString((*C.gchar)(unsafe.Pointer(ksrc)))
+			vdst = C.GoString((*C.gchar)(unsafe.Pointer(vsrc)))
+			_hashTable[kdst] = vdst
+		})
+	}
+
+	return _filename, _contentType, _file, _hashTable
+}
+
+// FormEncodeHash encodes form_data_set into a value of type
+// "application/x-www-form-urlencoded", as defined in the HTML 4.01 spec.
+//
+// Note that the HTML spec states that "The control names/values are listed in
+// the order they appear in the document." Since this method takes a hash table,
+// it cannot enforce that; if you care about the ordering of the form fields,
+// use soup_form_encode_datalist().
+func FormEncodeHash(formDataSet map[string]string) string {
+	var _arg1 *C.GHashTable // out
+	var _cret *C.char       // in
+
+	_arg1 = C.g_hash_table_new_full(nil, nil, (*[0]byte)(C.free), (*[0]byte)(C.free))
+	for ksrc, vsrc := range formDataSet {
+		var kdst *C.gchar // out
+		var vdst *C.gchar // out
+		kdst = (*C.gchar)(unsafe.Pointer(C.CString(ksrc)))
+		defer C.free(unsafe.Pointer(kdst))
+		vdst = (*C.gchar)(unsafe.Pointer(C.CString(vsrc)))
+		defer C.free(unsafe.Pointer(vdst))
+		C.g_hash_table_insert(_arg1, C.gpointer(unsafe.Pointer(kdst)), C.gpointer(unsafe.Pointer(vdst)))
+	}
+	defer C.g_hash_table_unref(_arg1)
+
+	_cret = C.soup_form_encode_hash(_arg1)
+	runtime.KeepAlive(formDataSet)
+
+	var _utf8 string // out
+
+	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	defer C.free(unsafe.Pointer(_cret))
+
+	return _utf8
+}
+
+// FormRequestNewFromHash creates a new SoupMessage and sets it up to send
+// form_data_set to uri via method, as with soup_form_request_new().
+func FormRequestNewFromHash(method string, uri string, formDataSet map[string]string) *Message {
+	var _arg1 *C.char        // out
+	var _arg2 *C.char        // out
+	var _arg3 *C.GHashTable  // out
+	var _cret *C.SoupMessage // in
+
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(method)))
+	defer C.free(unsafe.Pointer(_arg1))
+	_arg2 = (*C.char)(unsafe.Pointer(C.CString(uri)))
+	defer C.free(unsafe.Pointer(_arg2))
+	_arg3 = C.g_hash_table_new_full(nil, nil, (*[0]byte)(C.free), (*[0]byte)(C.free))
+	for ksrc, vsrc := range formDataSet {
+		var kdst *C.gchar // out
+		var vdst *C.gchar // out
+		kdst = (*C.gchar)(unsafe.Pointer(C.CString(ksrc)))
+		defer C.free(unsafe.Pointer(kdst))
+		vdst = (*C.gchar)(unsafe.Pointer(C.CString(vsrc)))
+		defer C.free(unsafe.Pointer(vdst))
+		C.g_hash_table_insert(_arg3, C.gpointer(unsafe.Pointer(kdst)), C.gpointer(unsafe.Pointer(vdst)))
+	}
+	defer C.g_hash_table_unref(_arg3)
+
+	_cret = C.soup_form_request_new_from_hash(_arg1, _arg2, _arg3)
+	runtime.KeepAlive(method)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(formDataSet)
+
+	var _message *Message // out
+
+	_message = wrapMessage(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+
+	return _message
+}
 
 // FormRequestNewFromMultipart creates a new SoupMessage and sets it up to send
 // multipart to uri via POST.
@@ -31,9 +214,12 @@ func FormRequestNewFromMultipart(uri string, multipart *Multipart) *Message {
 	var _cret *C.SoupMessage   // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(uri)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.SoupMultipart)(gextras.StructNative(unsafe.Pointer(multipart)))
 
 	_cret = C.soup_form_request_new_from_multipart(_arg1, _arg2)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(multipart)
 
 	var _message *Message // out
 

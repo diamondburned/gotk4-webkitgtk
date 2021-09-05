@@ -4,10 +4,12 @@ package soup
 
 import (
 	"fmt"
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -198,6 +200,18 @@ func (w WebsocketError) String() string {
 	}
 }
 
+func WebsocketErrorGetQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.soup_websocket_error_get_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+
+	return _quark
+}
+
 // WebsocketState: state of the WebSocket connection.
 type WebsocketState int
 
@@ -242,23 +256,31 @@ func (w WebsocketState) String() string {
 func WebsocketClientPrepareHandshake(msg *Message, origin string, protocols []string) {
 	var _arg1 *C.SoupMessage // out
 	var _arg2 *C.char        // out
-	var _arg3 **C.char
+	var _arg3 **C.char       // out
 
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg2 = (*C.char)(unsafe.Pointer(C.CString(origin)))
+	if origin != "" {
+		_arg2 = (*C.char)(unsafe.Pointer(C.CString(origin)))
+		defer C.free(unsafe.Pointer(_arg2))
+	}
 	{
 		_arg3 = (**C.char)(C.malloc(C.ulong(len(protocols)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg3))
 		{
 			out := unsafe.Slice(_arg3, len(protocols)+1)
 			var zero *C.char
 			out[len(protocols)] = zero
 			for i := range protocols {
 				out[i] = (*C.char)(unsafe.Pointer(C.CString(protocols[i])))
+				defer C.free(unsafe.Pointer(out[i]))
 			}
 		}
 	}
 
 	C.soup_websocket_client_prepare_handshake(_arg1, _arg2, _arg3)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(origin)
+	runtime.KeepAlive(protocols)
 }
 
 // WebsocketClientVerifyHandshake looks at the response status code and headers
@@ -280,10 +302,13 @@ func WebsocketClientVerifyHandshake(msg *Message) error {
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	C.soup_websocket_client_verify_handshake(_arg1, &_cerr)
+	runtime.KeepAlive(msg)
 
 	var _goerr error // out
 
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _goerr
 }
@@ -309,28 +334,38 @@ func WebsocketClientVerifyHandshake(msg *Message) error {
 func WebsocketServerCheckHandshake(msg *Message, origin string, protocols []string) error {
 	var _arg1 *C.SoupMessage // out
 	var _arg2 *C.char        // out
-	var _arg3 **C.char
-	var _cerr *C.GError // in
+	var _arg3 **C.char       // out
+	var _cerr *C.GError      // in
 
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg2 = (*C.char)(unsafe.Pointer(C.CString(origin)))
+	if origin != "" {
+		_arg2 = (*C.char)(unsafe.Pointer(C.CString(origin)))
+		defer C.free(unsafe.Pointer(_arg2))
+	}
 	{
 		_arg3 = (**C.char)(C.malloc(C.ulong(len(protocols)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg3))
 		{
 			out := unsafe.Slice(_arg3, len(protocols)+1)
 			var zero *C.char
 			out[len(protocols)] = zero
 			for i := range protocols {
 				out[i] = (*C.char)(unsafe.Pointer(C.CString(protocols[i])))
+				defer C.free(unsafe.Pointer(out[i]))
 			}
 		}
 	}
 
 	C.soup_websocket_server_check_handshake(_arg1, _arg2, _arg3, &_cerr)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(origin)
+	runtime.KeepAlive(protocols)
 
 	var _goerr error // out
 
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _goerr
 }
@@ -354,24 +389,32 @@ func WebsocketServerCheckHandshake(msg *Message, origin string, protocols []stri
 func WebsocketServerProcessHandshake(msg *Message, expectedOrigin string, protocols []string) bool {
 	var _arg1 *C.SoupMessage // out
 	var _arg2 *C.char        // out
-	var _arg3 **C.char
-	var _cret C.gboolean // in
+	var _arg3 **C.char       // out
+	var _cret C.gboolean     // in
 
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg2 = (*C.char)(unsafe.Pointer(C.CString(expectedOrigin)))
+	if expectedOrigin != "" {
+		_arg2 = (*C.char)(unsafe.Pointer(C.CString(expectedOrigin)))
+		defer C.free(unsafe.Pointer(_arg2))
+	}
 	{
 		_arg3 = (**C.char)(C.malloc(C.ulong(len(protocols)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg3))
 		{
 			out := unsafe.Slice(_arg3, len(protocols)+1)
 			var zero *C.char
 			out[len(protocols)] = zero
 			for i := range protocols {
 				out[i] = (*C.char)(unsafe.Pointer(C.CString(protocols[i])))
+				defer C.free(unsafe.Pointer(out[i]))
 			}
 		}
 	}
 
 	_cret = C.soup_websocket_server_process_handshake(_arg1, _arg2, _arg3)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(expectedOrigin)
+	runtime.KeepAlive(protocols)
 
 	var _ok bool // out
 

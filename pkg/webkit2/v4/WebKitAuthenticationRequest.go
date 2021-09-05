@@ -8,7 +8,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -88,8 +88,6 @@ type AuthenticationRequest struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*AuthenticationRequest)(nil)
-
 func wrapAuthenticationRequest(obj *externglib.Object) *AuthenticationRequest {
 	return &AuthenticationRequest{
 		Object: obj,
@@ -109,9 +107,13 @@ func (request *AuthenticationRequest) Authenticate(credential *Credential) {
 	var _arg1 *C.WebKitCredential            // out
 
 	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(request.Native()))
-	_arg1 = (*C.WebKitCredential)(gextras.StructNative(unsafe.Pointer(credential)))
+	if credential != nil {
+		_arg1 = (*C.WebKitCredential)(gextras.StructNative(unsafe.Pointer(credential)))
+	}
 
 	C.webkit_authentication_request_authenticate(_arg0, _arg1)
+	runtime.KeepAlive(request)
+	runtime.KeepAlive(credential)
 }
 
 // CanSaveCredentials: determine whether the authentication method associated
@@ -128,6 +130,7 @@ func (request *AuthenticationRequest) CanSaveCredentials() bool {
 	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_authentication_request_can_save_credentials(_arg0)
+	runtime.KeepAlive(request)
 
 	var _ok bool // out
 
@@ -147,6 +150,7 @@ func (request *AuthenticationRequest) Cancel() {
 	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(request.Native()))
 
 	C.webkit_authentication_request_cancel(_arg0)
+	runtime.KeepAlive(request)
 }
 
 // Host: get the host that this authentication challenge is applicable to.
@@ -157,6 +161,7 @@ func (request *AuthenticationRequest) Host() string {
 	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_authentication_request_get_host(_arg0)
+	runtime.KeepAlive(request)
 
 	var _utf8 string // out
 
@@ -166,17 +171,18 @@ func (request *AuthenticationRequest) Host() string {
 }
 
 // Port: get the port that this authentication challenge is applicable to.
-func (request *AuthenticationRequest) Port() uint {
+func (request *AuthenticationRequest) Port() uint32 {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.guint                        // in
 
 	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_authentication_request_get_port(_arg0)
+	runtime.KeepAlive(request)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -191,13 +197,17 @@ func (request *AuthenticationRequest) ProposedCredential() *Credential {
 	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_authentication_request_get_proposed_credential(_arg0)
+	runtime.KeepAlive(request)
 
 	var _credential *Credential // out
 
 	_credential = (*Credential)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_credential, func(v *Credential) {
-		C.webkit_credential_free((*C.WebKitCredential)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_credential)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_credential_free((*C.WebKitCredential)(intern.C))
+		},
+	)
 
 	return _credential
 }
@@ -210,6 +220,7 @@ func (request *AuthenticationRequest) Realm() string {
 	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_authentication_request_get_realm(_arg0)
+	runtime.KeepAlive(request)
 
 	var _utf8 string // out
 
@@ -226,6 +237,7 @@ func (request *AuthenticationRequest) Scheme() AuthenticationScheme {
 	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_authentication_request_get_scheme(_arg0)
+	runtime.KeepAlive(request)
 
 	var _authenticationScheme AuthenticationScheme // out
 
@@ -243,14 +255,17 @@ func (request *AuthenticationRequest) SecurityOrigin() *SecurityOrigin {
 	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_authentication_request_get_security_origin(_arg0)
+	runtime.KeepAlive(request)
 
 	var _securityOrigin *SecurityOrigin // out
 
 	_securityOrigin = (*SecurityOrigin)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_security_origin_ref(_cret)
-	runtime.SetFinalizer(_securityOrigin, func(v *SecurityOrigin) {
-		C.webkit_security_origin_unref((*C.WebKitSecurityOrigin)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_securityOrigin)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_security_origin_unref((*C.WebKitSecurityOrigin)(intern.C))
+		},
+	)
 
 	return _securityOrigin
 }
@@ -264,6 +279,7 @@ func (request *AuthenticationRequest) IsForProxy() bool {
 	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_authentication_request_is_for_proxy(_arg0)
+	runtime.KeepAlive(request)
 
 	var _ok bool // out
 
@@ -283,6 +299,7 @@ func (request *AuthenticationRequest) IsRetry() bool {
 	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_authentication_request_is_retry(_arg0)
+	runtime.KeepAlive(request)
 
 	var _ok bool // out
 
@@ -309,6 +326,8 @@ func (request *AuthenticationRequest) SetCanSaveCredentials(enabled bool) {
 	}
 
 	C.webkit_authentication_request_set_can_save_credentials(_arg0, _arg1)
+	runtime.KeepAlive(request)
+	runtime.KeepAlive(enabled)
 }
 
 // SetProposedCredential: set the KitCredential of the proposed authentication
@@ -326,4 +345,6 @@ func (request *AuthenticationRequest) SetProposedCredential(credential *Credenti
 	_arg1 = (*C.WebKitCredential)(gextras.StructNative(unsafe.Pointer(credential)))
 
 	C.webkit_authentication_request_set_proposed_credential(_arg0, _arg1)
+	runtime.KeepAlive(request)
+	runtime.KeepAlive(credential)
 }

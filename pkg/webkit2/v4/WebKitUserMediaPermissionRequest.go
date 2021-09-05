@@ -3,10 +3,10 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -28,6 +28,7 @@ func UserMediaPermissionIsForAudioDevice(request *UserMediaPermissionRequest) bo
 	_arg1 = (*C.WebKitUserMediaPermissionRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_user_media_permission_is_for_audio_device(_arg1)
+	runtime.KeepAlive(request)
 
 	var _ok bool // out
 
@@ -45,6 +46,7 @@ func UserMediaPermissionIsForVideoDevice(request *UserMediaPermissionRequest) bo
 	_arg1 = (*C.WebKitUserMediaPermissionRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_user_media_permission_is_for_video_device(_arg1)
+	runtime.KeepAlive(request)
 
 	var _ok bool // out
 
@@ -60,8 +62,6 @@ type UserMediaPermissionRequest struct {
 
 	PermissionRequest
 }
-
-var _ gextras.Nativer = (*UserMediaPermissionRequest)(nil)
 
 func wrapUserMediaPermissionRequest(obj *externglib.Object) *UserMediaPermissionRequest {
 	return &UserMediaPermissionRequest{

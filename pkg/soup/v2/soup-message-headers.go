@@ -10,7 +10,7 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -114,7 +114,7 @@ const (
 )
 
 func marshalExpectation(p uintptr) (interface{}, error) {
-	return Expectation(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return Expectation(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
 }
 
 // String returns the names in string for Expectation.
@@ -145,6 +145,11 @@ func (e Expectation) String() string {
 	return strings.TrimSuffix(builder.String(), "|")
 }
 
+// Has returns true if e contains other.
+func (e Expectation) Has(other Expectation) bool {
+	return (e & other) == other
+}
+
 // MessageHeadersForeachFunc: callback passed to soup_message_headers_foreach().
 type MessageHeadersForeachFunc func(name string, value string)
 
@@ -168,14 +173,20 @@ func _gotk4_soup2_MessageHeadersForeachFunc(arg0 *C.char, arg1 *C.char, arg2 C.g
 }
 
 // MessageHeaders: HTTP message headers associated with a request or response.
+//
+// An instance of this type is always passed by reference.
 type MessageHeaders struct {
-	nocopy gextras.NoCopy
+	*messageHeaders
+}
+
+// messageHeaders is the struct that's finalized.
+type messageHeaders struct {
 	native *C.SoupMessageHeaders
 }
 
 func marshalMessageHeaders(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &MessageHeaders{native: (*C.SoupMessageHeaders)(unsafe.Pointer(b))}, nil
+	return &MessageHeaders{&messageHeaders{(*C.SoupMessageHeaders)(unsafe.Pointer(b))}}, nil
 }
 
 // NewMessageHeaders constructs a struct MessageHeaders.
@@ -186,13 +197,17 @@ func NewMessageHeaders(typ MessageHeadersType) *MessageHeaders {
 	_arg1 = C.SoupMessageHeadersType(typ)
 
 	_cret = C.soup_message_headers_new(_arg1)
+	runtime.KeepAlive(typ)
 
 	var _messageHeaders *MessageHeaders // out
 
 	_messageHeaders = (*MessageHeaders)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_messageHeaders, func(v *MessageHeaders) {
-		C.soup_message_headers_free((*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_messageHeaders)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_message_headers_free((*C.SoupMessageHeaders)(intern.C))
+		},
+	)
 
 	return _messageHeaders
 }
@@ -211,9 +226,14 @@ func (hdrs *MessageHeaders) Append(name string, value string) {
 
 	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(value)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	C.soup_message_headers_append(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(name)
+	runtime.KeepAlive(value)
 }
 
 // CleanConnectionHeaders removes all the headers listed in the Connection
@@ -224,6 +244,7 @@ func (hdrs *MessageHeaders) CleanConnectionHeaders() {
 	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
 
 	C.soup_message_headers_clean_connection_headers(_arg0)
+	runtime.KeepAlive(hdrs)
 }
 
 // Clear clears hdrs.
@@ -233,6 +254,7 @@ func (hdrs *MessageHeaders) Clear() {
 	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
 
 	C.soup_message_headers_clear(_arg0)
+	runtime.KeepAlive(hdrs)
 }
 
 // Foreach calls func once for each header value in hdrs.
@@ -257,15 +279,8 @@ func (hdrs *MessageHeaders) Foreach(fn MessageHeadersForeachFunc) {
 	defer gbox.Delete(uintptr(_arg2))
 
 	C.soup_message_headers_foreach(_arg0, _arg1, _arg2)
-}
-
-// Free frees hdrs.
-func (hdrs *MessageHeaders) free() {
-	var _arg0 *C.SoupMessageHeaders // out
-
-	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
-
-	C.soup_message_headers_free(_arg0)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(fn)
 }
 
 // FreeRanges frees the array of ranges returned from
@@ -278,6 +293,8 @@ func (hdrs *MessageHeaders) FreeRanges(ranges *Range) {
 	_arg1 = (*C.SoupRange)(gextras.StructNative(unsafe.Pointer(ranges)))
 
 	C.soup_message_headers_free_ranges(_arg0, _arg1)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(ranges)
 }
 
 // Get gets the value of header name in hdrs.
@@ -299,14 +316,67 @@ func (hdrs *MessageHeaders) Get(name string) string {
 
 	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.soup_message_headers_get(_arg0, _arg1)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(name)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
+}
+
+// ContentDisposition looks up the "Content-Disposition" header in hdrs, parses
+// it, and returns its value in *disposition and *params. params can be NULL if
+// you are only interested in the disposition-type.
+//
+// In HTTP, the most common use of this header is to set a disposition-type of
+// "attachment", to suggest to the browser that a response should be saved to
+// disk rather than displayed in the browser. If params contains a "filename"
+// parameter, this is a suggestion of a filename to use. (If the parameter value
+// in the header contains an absolute or relative path, libsoup will truncate it
+// down to just the final path component, so you do not need to test this
+// yourself.)
+//
+// Content-Disposition is also used in "multipart/form-data", however this is
+// handled automatically by Multipart and the associated form methods.
+func (hdrs *MessageHeaders) ContentDisposition() (string, map[string]string, bool) {
+	var _arg0 *C.SoupMessageHeaders // out
+	var _arg1 *C.char               // in
+	var _arg2 *C.GHashTable         // in
+	var _cret C.gboolean            // in
+
+	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
+
+	_cret = C.soup_message_headers_get_content_disposition(_arg0, &_arg1, &_arg2)
+	runtime.KeepAlive(hdrs)
+
+	var _disposition string       // out
+	var _params map[string]string // out
+	var _ok bool                  // out
+
+	_disposition = C.GoString((*C.gchar)(unsafe.Pointer(_arg1)))
+	defer C.free(unsafe.Pointer(_arg1))
+	_params = make(map[string]string, gextras.HashTableSize(unsafe.Pointer(_arg2)))
+	gextras.MoveHashTable(unsafe.Pointer(_arg2), true, func(k, v unsafe.Pointer) {
+		ksrc := *(**C.gchar)(k)
+		vsrc := *(**C.gchar)(v)
+		var kdst string // out
+		var vdst string // out
+		kdst = C.GoString((*C.gchar)(unsafe.Pointer(ksrc)))
+		vdst = C.GoString((*C.gchar)(unsafe.Pointer(vsrc)))
+		_params[kdst] = vdst
+	})
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _disposition, _params, _ok
 }
 
 // ContentLength gets the message body length that hdrs declare. This will only
@@ -319,6 +389,7 @@ func (hdrs *MessageHeaders) ContentLength() int64 {
 	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
 
 	_cret = C.soup_message_headers_get_content_length(_arg0)
+	runtime.KeepAlive(hdrs)
 
 	var _gint64 int64 // out
 
@@ -340,6 +411,7 @@ func (hdrs *MessageHeaders) ContentRange() (start int64, end int64, totalLength 
 	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
 
 	_cret = C.soup_message_headers_get_content_range(_arg0, &_arg1, &_arg2, &_arg3)
+	runtime.KeepAlive(hdrs)
 
 	var _start int64       // out
 	var _end int64         // out
@@ -356,6 +428,41 @@ func (hdrs *MessageHeaders) ContentRange() (start int64, end int64, totalLength 
 	return _start, _end, _totalLength, _ok
 }
 
+// ContentType looks up the "Content-Type" header in hdrs, parses it, and
+// returns its value in *content_type and *params. params can be NULL if you are
+// only interested in the content type itself.
+func (hdrs *MessageHeaders) ContentType() (map[string]string, string) {
+	var _arg0 *C.SoupMessageHeaders // out
+	var _arg1 *C.GHashTable         // in
+	var _cret *C.char               // in
+
+	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
+
+	_cret = C.soup_message_headers_get_content_type(_arg0, &_arg1)
+	runtime.KeepAlive(hdrs)
+
+	var _params map[string]string // out
+	var _utf8 string              // out
+
+	if _arg1 != nil {
+		_params = make(map[string]string, gextras.HashTableSize(unsafe.Pointer(_arg1)))
+		gextras.MoveHashTable(unsafe.Pointer(_arg1), true, func(k, v unsafe.Pointer) {
+			ksrc := *(**C.gchar)(k)
+			vsrc := *(**C.gchar)(v)
+			var kdst string // out
+			var vdst string // out
+			kdst = C.GoString((*C.gchar)(unsafe.Pointer(ksrc)))
+			vdst = C.GoString((*C.gchar)(unsafe.Pointer(vsrc)))
+			_params[kdst] = vdst
+		})
+	}
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
+
+	return _params, _utf8
+}
+
 // Encoding gets the message body encoding that hdrs declare. This may not
 // always correspond to the encoding used on the wire; eg, a HEAD response may
 // declare a Content-Length or Transfer-Encoding, but it will never actually
@@ -367,6 +474,7 @@ func (hdrs *MessageHeaders) Encoding() Encoding {
 	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
 
 	_cret = C.soup_message_headers_get_encoding(_arg0)
+	runtime.KeepAlive(hdrs)
 
 	var _encoding Encoding // out
 
@@ -385,6 +493,7 @@ func (hdrs *MessageHeaders) Expectations() Expectation {
 	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
 
 	_cret = C.soup_message_headers_get_expectations(_arg0)
+	runtime.KeepAlive(hdrs)
 
 	var _expectation Expectation // out
 
@@ -401,6 +510,7 @@ func (hdrs *MessageHeaders) HeadersType() MessageHeadersType {
 	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
 
 	_cret = C.soup_message_headers_get_headers_type(_arg0)
+	runtime.KeepAlive(hdrs)
 
 	var _messageHeadersType MessageHeadersType // out
 
@@ -427,12 +537,17 @@ func (hdrs *MessageHeaders) List(name string) string {
 
 	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.soup_message_headers_get_list(_arg0, _arg1)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(name)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -452,12 +567,17 @@ func (hdrs *MessageHeaders) One(name string) string {
 
 	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.soup_message_headers_get_one(_arg0, _arg1)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(name)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -489,17 +609,19 @@ func (hdrs *MessageHeaders) One(name string) string {
 func (hdrs *MessageHeaders) Ranges(totalLength int64) ([]Range, bool) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 C.goffset             // out
-	var _arg2 *C.SoupRange
-	var _arg3 C.int      // in
-	var _cret C.gboolean // in
+	var _arg2 *C.SoupRange          // in
+	var _arg3 C.int                 // in
+	var _cret C.gboolean            // in
 
 	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
 	_arg1 = C.goffset(totalLength)
 
 	_cret = C.soup_message_headers_get_ranges(_arg0, _arg1, &_arg2, &_arg3)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(totalLength)
 
-	var _ranges []Range
-	var _ok bool // out
+	var _ranges []Range // out
+	var _ok bool        // out
 
 	defer C.free(unsafe.Pointer(_arg2))
 	_ranges = make([]Range, _arg3)
@@ -524,9 +646,14 @@ func (hdrs *MessageHeaders) HeaderContains(name string, token string) bool {
 
 	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(token)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	_cret = C.soup_message_headers_header_contains(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(name)
+	runtime.KeepAlive(token)
 
 	var _ok bool // out
 
@@ -547,9 +674,14 @@ func (hdrs *MessageHeaders) HeaderEquals(name string, value string) bool {
 
 	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(value)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	_cret = C.soup_message_headers_header_equals(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(name)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 
@@ -568,8 +700,11 @@ func (hdrs *MessageHeaders) Remove(name string) {
 
 	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.soup_message_headers_remove(_arg0, _arg1)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(name)
 }
 
 // Replace replaces the value of the header name in hdrs with value. (See also
@@ -584,9 +719,47 @@ func (hdrs *MessageHeaders) Replace(name string, value string) {
 
 	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(value)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	C.soup_message_headers_replace(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(name)
+	runtime.KeepAlive(value)
+}
+
+// SetContentDisposition sets the "Content-Disposition" header in hdrs to
+// disposition, optionally with additional parameters specified in params.
+//
+// See soup_message_headers_get_content_disposition() for a discussion of how
+// Content-Disposition is used in HTTP.
+func (hdrs *MessageHeaders) SetContentDisposition(disposition string, params map[string]string) {
+	var _arg0 *C.SoupMessageHeaders // out
+	var _arg1 *C.char               // out
+	var _arg2 *C.GHashTable         // out
+
+	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(disposition)))
+	defer C.free(unsafe.Pointer(_arg1))
+	if params != nil {
+		_arg2 = C.g_hash_table_new_full(nil, nil, (*[0]byte)(C.free), (*[0]byte)(C.free))
+		for ksrc, vsrc := range params {
+			var kdst *C.gchar // out
+			var vdst *C.gchar // out
+			kdst = (*C.gchar)(unsafe.Pointer(C.CString(ksrc)))
+			defer C.free(unsafe.Pointer(kdst))
+			vdst = (*C.gchar)(unsafe.Pointer(C.CString(vsrc)))
+			defer C.free(unsafe.Pointer(vdst))
+			C.g_hash_table_insert(_arg2, C.gpointer(unsafe.Pointer(kdst)), C.gpointer(unsafe.Pointer(vdst)))
+		}
+		defer C.g_hash_table_unref(_arg2)
+	}
+
+	C.soup_message_headers_set_content_disposition(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(disposition)
+	runtime.KeepAlive(params)
 }
 
 // SetContentLength sets the message body length that hdrs will declare, and
@@ -607,6 +780,8 @@ func (hdrs *MessageHeaders) SetContentLength(contentLength int64) {
 	_arg1 = C.goffset(contentLength)
 
 	C.soup_message_headers_set_content_length(_arg0, _arg1)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(contentLength)
 }
 
 // SetContentRange sets hdrs's Content-Range header according to the given
@@ -628,6 +803,40 @@ func (hdrs *MessageHeaders) SetContentRange(start int64, end int64, totalLength 
 	_arg3 = C.goffset(totalLength)
 
 	C.soup_message_headers_set_content_range(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(start)
+	runtime.KeepAlive(end)
+	runtime.KeepAlive(totalLength)
+}
+
+// SetContentType sets the "Content-Type" header in hdrs to content_type,
+// optionally with additional parameters specified in params.
+func (hdrs *MessageHeaders) SetContentType(contentType string, params map[string]string) {
+	var _arg0 *C.SoupMessageHeaders // out
+	var _arg1 *C.char               // out
+	var _arg2 *C.GHashTable         // out
+
+	_arg0 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(contentType)))
+	defer C.free(unsafe.Pointer(_arg1))
+	if params != nil {
+		_arg2 = C.g_hash_table_new_full(nil, nil, (*[0]byte)(C.free), (*[0]byte)(C.free))
+		for ksrc, vsrc := range params {
+			var kdst *C.gchar // out
+			var vdst *C.gchar // out
+			kdst = (*C.gchar)(unsafe.Pointer(C.CString(ksrc)))
+			defer C.free(unsafe.Pointer(kdst))
+			vdst = (*C.gchar)(unsafe.Pointer(C.CString(vsrc)))
+			defer C.free(unsafe.Pointer(vdst))
+			C.g_hash_table_insert(_arg2, C.gpointer(unsafe.Pointer(kdst)), C.gpointer(unsafe.Pointer(vdst)))
+		}
+		defer C.g_hash_table_unref(_arg2)
+	}
+
+	C.soup_message_headers_set_content_type(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(contentType)
+	runtime.KeepAlive(params)
 }
 
 // SetEncoding sets the message body encoding that hdrs will declare. In
@@ -641,6 +850,8 @@ func (hdrs *MessageHeaders) SetEncoding(encoding Encoding) {
 	_arg1 = C.SoupEncoding(encoding)
 
 	C.soup_message_headers_set_encoding(_arg0, _arg1)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(encoding)
 }
 
 // SetExpectations sets hdrs's "Expect" header according to expectations.
@@ -660,6 +871,8 @@ func (hdrs *MessageHeaders) SetExpectations(expectations Expectation) {
 	_arg1 = C.SoupExpectation(expectations)
 
 	C.soup_message_headers_set_expectations(_arg0, _arg1)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(expectations)
 }
 
 // SetRange sets hdrs's Range header to request the indicated range. start and
@@ -677,12 +890,15 @@ func (hdrs *MessageHeaders) SetRange(start int64, end int64) {
 	_arg2 = C.goffset(end)
 
 	C.soup_message_headers_set_range(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(start)
+	runtime.KeepAlive(end)
 }
 
 // SetRanges sets hdrs's Range header to request the indicated ranges. (If you
 // only want to request a single range, you can use
 // soup_message_headers_set_range().)
-func (hdrs *MessageHeaders) SetRanges(ranges *Range, length int) {
+func (hdrs *MessageHeaders) SetRanges(ranges *Range, length int32) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.SoupRange          // out
 	var _arg2 C.int                 // out
@@ -692,6 +908,9 @@ func (hdrs *MessageHeaders) SetRanges(ranges *Range, length int) {
 	_arg2 = C.int(length)
 
 	C.soup_message_headers_set_ranges(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(hdrs)
+	runtime.KeepAlive(ranges)
+	runtime.KeepAlive(length)
 }
 
 // MessageHeadersIter: opaque type used to iterate over a SoupMessageHeaders
@@ -701,8 +920,14 @@ func (hdrs *MessageHeaders) SetRanges(ranges *Range, length int) {
 // soup_message_headers_iter_next() to fetch data from it.
 //
 // You may not modify the headers while iterating over them.
+//
+// An instance of this type is always passed by reference.
 type MessageHeadersIter struct {
-	nocopy gextras.NoCopy
+	*messageHeadersIter
+}
+
+// messageHeadersIter is the struct that's finalized.
+type messageHeadersIter struct {
 	native *C.SoupMessageHeadersIter
 }
 
@@ -719,6 +944,7 @@ func (iter *MessageHeadersIter) Next() (name string, value string, ok bool) {
 	_arg0 = (*C.SoupMessageHeadersIter)(gextras.StructNative(unsafe.Pointer(iter)))
 
 	_cret = C.soup_message_headers_iter_next(_arg0, &_arg1, &_arg2)
+	runtime.KeepAlive(iter)
 
 	var _name string  // out
 	var _value string // out
@@ -741,6 +967,7 @@ func MessageHeadersIterInit(hdrs *MessageHeaders) MessageHeadersIter {
 	_arg2 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(hdrs)))
 
 	C.soup_message_headers_iter_init(&_arg1, _arg2)
+	runtime.KeepAlive(hdrs)
 
 	var _iter MessageHeadersIter // out
 
@@ -762,9 +989,31 @@ func MessageHeadersIterInit(hdrs *MessageHeaders) MessageHeadersIter {
 // If end is -1 and start is negative, then it represents a "suffix range",
 // referring to the last -start bytes of the resource body. (Eg, the last 500
 // bytes would be start = -500 and end = -1.)
+//
+// An instance of this type is always passed by reference.
 type Range struct {
-	nocopy gextras.NoCopy
+	*_range
+}
+
+// _range is the struct that's finalized.
+type _range struct {
 	native *C.SoupRange
+}
+
+// NewRange creates a new Range instance from the given
+// fields.
+func NewRange(start, end int64) Range {
+	var f0 C.goffset // out
+	f0 = C.goffset(start)
+	var f1 C.goffset // out
+	f1 = C.goffset(end)
+
+	v := C.SoupRange{
+		start: f0,
+		end:   f1,
+	}
+
+	return *(*Range)(gextras.NewStructNative(unsafe.Pointer(&v)))
 }
 
 // Start: start of the range

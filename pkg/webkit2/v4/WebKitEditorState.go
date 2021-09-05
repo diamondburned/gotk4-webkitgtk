@@ -4,11 +4,11 @@ package webkit2
 
 import (
 	"fmt"
+	"runtime"
 	"strings"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -42,7 +42,7 @@ const (
 )
 
 func marshalEditorTypingAttributes(p uintptr) (interface{}, error) {
-	return EditorTypingAttributes(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return EditorTypingAttributes(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
 }
 
 // String returns the names in string for EditorTypingAttributes.
@@ -79,11 +79,14 @@ func (e EditorTypingAttributes) String() string {
 	return strings.TrimSuffix(builder.String(), "|")
 }
 
+// Has returns true if e contains other.
+func (e EditorTypingAttributes) Has(other EditorTypingAttributes) bool {
+	return (e & other) == other
+}
+
 type EditorState struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*EditorState)(nil)
 
 func wrapEditorState(obj *externglib.Object) *EditorState {
 	return &EditorState{
@@ -101,17 +104,18 @@ func marshalEditorStater(p uintptr) (interface{}, error) {
 // If there is a selection, this returns the typing attributes of the selected
 // text. Note that in case of a selection, typing attributes are considered
 // active only when they are present throughout the selection.
-func (editorState *EditorState) TypingAttributes() uint {
+func (editorState *EditorState) TypingAttributes() uint32 {
 	var _arg0 *C.WebKitEditorState // out
 	var _cret C.guint              // in
 
 	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(editorState.Native()))
 
 	_cret = C.webkit_editor_state_get_typing_attributes(_arg0)
+	runtime.KeepAlive(editorState)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -124,6 +128,7 @@ func (editorState *EditorState) IsCopyAvailable() bool {
 	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(editorState.Native()))
 
 	_cret = C.webkit_editor_state_is_copy_available(_arg0)
+	runtime.KeepAlive(editorState)
 
 	var _ok bool // out
 
@@ -142,6 +147,7 @@ func (editorState *EditorState) IsCutAvailable() bool {
 	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(editorState.Native()))
 
 	_cret = C.webkit_editor_state_is_cut_available(_arg0)
+	runtime.KeepAlive(editorState)
 
 	var _ok bool // out
 
@@ -160,6 +166,7 @@ func (editorState *EditorState) IsPasteAvailable() bool {
 	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(editorState.Native()))
 
 	_cret = C.webkit_editor_state_is_paste_available(_arg0)
+	runtime.KeepAlive(editorState)
 
 	var _ok bool // out
 
@@ -178,6 +185,7 @@ func (editorState *EditorState) IsRedoAvailable() bool {
 	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(editorState.Native()))
 
 	_cret = C.webkit_editor_state_is_redo_available(_arg0)
+	runtime.KeepAlive(editorState)
 
 	var _ok bool // out
 
@@ -196,6 +204,7 @@ func (editorState *EditorState) IsUndoAvailable() bool {
 	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(editorState.Native()))
 
 	_cret = C.webkit_editor_state_is_undo_available(_arg0)
+	runtime.KeepAlive(editorState)
 
 	var _ok bool // out
 

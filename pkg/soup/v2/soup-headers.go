@@ -3,6 +3,7 @@
 package soup
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
@@ -22,9 +23,13 @@ func HeaderContains(header string, token string) bool {
 	var _cret C.gboolean // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(header)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(token)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	_cret = C.soup_header_contains(_arg1, _arg2)
+	runtime.KeepAlive(header)
+	runtime.KeepAlive(token)
 
 	var _ok bool // out
 
@@ -35,22 +40,258 @@ func HeaderContains(header string, token string) bool {
 	return _ok
 }
 
+// HeaderFreeParamList frees param_list.
+func HeaderFreeParamList(paramList map[string]string) {
+	var _arg1 *C.GHashTable // out
+
+	_arg1 = C.g_hash_table_new_full(nil, nil, (*[0]byte)(C.free), (*[0]byte)(C.free))
+	for ksrc, vsrc := range paramList {
+		var kdst *C.gchar // out
+		var vdst *C.gchar // out
+		kdst = (*C.gchar)(unsafe.Pointer(C.CString(ksrc)))
+		defer C.free(unsafe.Pointer(kdst))
+		vdst = (*C.gchar)(unsafe.Pointer(C.CString(vsrc)))
+		defer C.free(unsafe.Pointer(vdst))
+		C.g_hash_table_insert(_arg1, C.gpointer(unsafe.Pointer(kdst)), C.gpointer(unsafe.Pointer(vdst)))
+	}
+	defer C.g_hash_table_unref(_arg1)
+
+	C.soup_header_free_param_list(_arg1)
+	runtime.KeepAlive(paramList)
+}
+
+// HeaderParseList parses a header whose content is described by RFC2616 as
+// "#something", where "something" does not itself contain commas, except as
+// part of quoted-strings.
+func HeaderParseList(header string) []string {
+	var _arg1 *C.char   // out
+	var _cret *C.GSList // in
+
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(header)))
+	defer C.free(unsafe.Pointer(_arg1))
+
+	_cret = C.soup_header_parse_list(_arg1)
+	runtime.KeepAlive(header)
+
+	var _sList []string // out
+
+	_sList = make([]string, 0, gextras.SListSize(unsafe.Pointer(_cret)))
+	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
+		src := (*C.gchar)(v)
+		var dst string // out
+		dst = C.GoString((*C.gchar)(unsafe.Pointer(src)))
+		defer C.free(unsafe.Pointer(src))
+		_sList = append(_sList, dst)
+	})
+
+	return _sList
+}
+
+// HeaderParseParamList parses a header which is a comma-delimited list of
+// something like: <literal>token [ "=" ( token | quoted-string ) ]</literal>.
+//
+// Tokens that don't have an associated value will still be added to the
+// resulting hash table, but with a NULL value.
+//
+// This also handles RFC5987 encoding (which in HTTP is mostly used for giving
+// UTF8-encoded filenames in the Content-Disposition header).
+func HeaderParseParamList(header string) map[string]string {
+	var _arg1 *C.char       // out
+	var _cret *C.GHashTable // in
+
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(header)))
+	defer C.free(unsafe.Pointer(_arg1))
+
+	_cret = C.soup_header_parse_param_list(_arg1)
+	runtime.KeepAlive(header)
+
+	var _hashTable map[string]string // out
+
+	_hashTable = make(map[string]string, gextras.HashTableSize(unsafe.Pointer(_cret)))
+	gextras.MoveHashTable(unsafe.Pointer(_cret), true, func(k, v unsafe.Pointer) {
+		ksrc := *(**C.gchar)(k)
+		vsrc := *(**C.gchar)(v)
+		var kdst string // out
+		var vdst string // out
+		kdst = C.GoString((*C.gchar)(unsafe.Pointer(ksrc)))
+		defer C.free(unsafe.Pointer(ksrc))
+		vdst = C.GoString((*C.gchar)(unsafe.Pointer(vsrc)))
+		defer C.free(unsafe.Pointer(vsrc))
+		_hashTable[kdst] = vdst
+	})
+
+	return _hashTable
+}
+
+// HeaderParseParamListStrict: strict version of soup_header_parse_param_list()
+// that bails out if there are duplicate parameters. Note that this function
+// will treat RFC5987-encoded parameters as duplicated if an ASCII version is
+// also present. For header fields that might contain RFC5987-encoded
+// parameters, use soup_header_parse_param_list() instead.
+func HeaderParseParamListStrict(header string) map[string]string {
+	var _arg1 *C.char       // out
+	var _cret *C.GHashTable // in
+
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(header)))
+	defer C.free(unsafe.Pointer(_arg1))
+
+	_cret = C.soup_header_parse_param_list_strict(_arg1)
+	runtime.KeepAlive(header)
+
+	var _hashTable map[string]string // out
+
+	if _cret != nil {
+		_hashTable = make(map[string]string, gextras.HashTableSize(unsafe.Pointer(_cret)))
+		gextras.MoveHashTable(unsafe.Pointer(_cret), true, func(k, v unsafe.Pointer) {
+			ksrc := *(**C.gchar)(k)
+			vsrc := *(**C.gchar)(v)
+			var kdst string // out
+			var vdst string // out
+			kdst = C.GoString((*C.gchar)(unsafe.Pointer(ksrc)))
+			defer C.free(unsafe.Pointer(ksrc))
+			vdst = C.GoString((*C.gchar)(unsafe.Pointer(vsrc)))
+			defer C.free(unsafe.Pointer(vsrc))
+			_hashTable[kdst] = vdst
+		})
+	}
+
+	return _hashTable
+}
+
+// HeaderParseQualityList parses a header whose content is a list of items with
+// optional "qvalue"s (eg, Accept, Accept-Charset, Accept-Encoding,
+// Accept-Language, TE).
+//
+// If unacceptable is not NULL, then on return, it will contain the items with
+// qvalue 0. Either way, those items will be removed from the main list.
+func HeaderParseQualityList(header string) (unacceptable []string, sList []string) {
+	var _arg1 *C.char   // out
+	var _arg2 *C.GSList // in
+	var _cret *C.GSList // in
+
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(header)))
+	defer C.free(unsafe.Pointer(_arg1))
+
+	_cret = C.soup_header_parse_quality_list(_arg1, &_arg2)
+	runtime.KeepAlive(header)
+
+	var _unacceptable []string // out
+	var _sList []string        // out
+
+	if _arg2 != nil {
+		_unacceptable = make([]string, 0, gextras.SListSize(unsafe.Pointer(_arg2)))
+		gextras.MoveSList(unsafe.Pointer(_arg2), true, func(v unsafe.Pointer) {
+			src := (*C.gchar)(v)
+			var dst string // out
+			dst = C.GoString((*C.gchar)(unsafe.Pointer(src)))
+			_unacceptable = append(_unacceptable, dst)
+		})
+	}
+	_sList = make([]string, 0, gextras.SListSize(unsafe.Pointer(_cret)))
+	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
+		src := (*C.gchar)(v)
+		var dst string // out
+		dst = C.GoString((*C.gchar)(unsafe.Pointer(src)))
+		defer C.free(unsafe.Pointer(src))
+		_sList = append(_sList, dst)
+	})
+
+	return _unacceptable, _sList
+}
+
+// HeaderParseSemiParamList parses a header which is a semicolon-delimited list
+// of something like: <literal>token [ "=" ( token | quoted-string )
+// ]</literal>.
+//
+// Tokens that don't have an associated value will still be added to the
+// resulting hash table, but with a NULL value.
+//
+// This also handles RFC5987 encoding (which in HTTP is mostly used for giving
+// UTF8-encoded filenames in the Content-Disposition header).
+func HeaderParseSemiParamList(header string) map[string]string {
+	var _arg1 *C.char       // out
+	var _cret *C.GHashTable // in
+
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(header)))
+	defer C.free(unsafe.Pointer(_arg1))
+
+	_cret = C.soup_header_parse_semi_param_list(_arg1)
+	runtime.KeepAlive(header)
+
+	var _hashTable map[string]string // out
+
+	_hashTable = make(map[string]string, gextras.HashTableSize(unsafe.Pointer(_cret)))
+	gextras.MoveHashTable(unsafe.Pointer(_cret), true, func(k, v unsafe.Pointer) {
+		ksrc := *(**C.gchar)(k)
+		vsrc := *(**C.gchar)(v)
+		var kdst string // out
+		var vdst string // out
+		kdst = C.GoString((*C.gchar)(unsafe.Pointer(ksrc)))
+		defer C.free(unsafe.Pointer(ksrc))
+		vdst = C.GoString((*C.gchar)(unsafe.Pointer(vsrc)))
+		defer C.free(unsafe.Pointer(vsrc))
+		_hashTable[kdst] = vdst
+	})
+
+	return _hashTable
+}
+
+// HeaderParseSemiParamListStrict: strict version of
+// soup_header_parse_semi_param_list() that bails out if there are duplicate
+// parameters. Note that this function will treat RFC5987-encoded parameters as
+// duplicated if an ASCII version is also present. For header fields that might
+// contain RFC5987-encoded parameters, use soup_header_parse_semi_param_list()
+// instead.
+func HeaderParseSemiParamListStrict(header string) map[string]string {
+	var _arg1 *C.char       // out
+	var _cret *C.GHashTable // in
+
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(header)))
+	defer C.free(unsafe.Pointer(_arg1))
+
+	_cret = C.soup_header_parse_semi_param_list_strict(_arg1)
+	runtime.KeepAlive(header)
+
+	var _hashTable map[string]string // out
+
+	if _cret != nil {
+		_hashTable = make(map[string]string, gextras.HashTableSize(unsafe.Pointer(_cret)))
+		gextras.MoveHashTable(unsafe.Pointer(_cret), true, func(k, v unsafe.Pointer) {
+			ksrc := *(**C.gchar)(k)
+			vsrc := *(**C.gchar)(v)
+			var kdst string // out
+			var vdst string // out
+			kdst = C.GoString((*C.gchar)(unsafe.Pointer(ksrc)))
+			defer C.free(unsafe.Pointer(ksrc))
+			vdst = C.GoString((*C.gchar)(unsafe.Pointer(vsrc)))
+			defer C.free(unsafe.Pointer(vsrc))
+			_hashTable[kdst] = vdst
+		})
+	}
+
+	return _hashTable
+}
+
 // HeadersParse parses the headers of an HTTP request or response in str and
 // stores the results in dest. Beware that dest may be modified even on failure.
 //
 // This is a low-level method; normally you would use
 // soup_headers_parse_request() or soup_headers_parse_response().
-func HeadersParse(str string, len int, dest *MessageHeaders) bool {
+func HeadersParse(str string, len int32, dest *MessageHeaders) bool {
 	var _arg1 *C.char               // out
 	var _arg2 C.int                 // out
 	var _arg3 *C.SoupMessageHeaders // out
 	var _cret C.gboolean            // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(str)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.int(len)
 	_arg3 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(dest)))
 
 	_cret = C.soup_headers_parse(_arg1, _arg2, _arg3)
+	runtime.KeepAlive(str)
+	runtime.KeepAlive(len)
+	runtime.KeepAlive(dest)
 
 	var _ok bool // out
 
@@ -65,7 +306,7 @@ func HeadersParse(str string, len int, dest *MessageHeaders) bool {
 // the results in req_method, req_path, ver, and req_headers.
 //
 // Beware that req_headers may be modified even on failure.
-func HeadersParseRequest(str string, len int, reqHeaders *MessageHeaders) (reqMethod string, reqPath string, ver HTTPVersion, guint uint) {
+func HeadersParseRequest(str string, len int32, reqHeaders *MessageHeaders) (reqMethod string, reqPath string, ver HTTPVersion, guint uint32) {
 	var _arg1 *C.char               // out
 	var _arg2 C.int                 // out
 	var _arg3 *C.SoupMessageHeaders // out
@@ -75,22 +316,30 @@ func HeadersParseRequest(str string, len int, reqHeaders *MessageHeaders) (reqMe
 	var _cret C.guint               // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(str)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.int(len)
 	_arg3 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(reqHeaders)))
 
 	_cret = C.soup_headers_parse_request(_arg1, _arg2, _arg3, &_arg4, &_arg5, &_arg6)
+	runtime.KeepAlive(str)
+	runtime.KeepAlive(len)
+	runtime.KeepAlive(reqHeaders)
 
 	var _reqMethod string // out
 	var _reqPath string   // out
 	var _ver HTTPVersion  // out
-	var _guint uint       // out
+	var _guint uint32     // out
 
-	_reqMethod = C.GoString((*C.gchar)(unsafe.Pointer(_arg4)))
-	defer C.free(unsafe.Pointer(_arg4))
-	_reqPath = C.GoString((*C.gchar)(unsafe.Pointer(_arg5)))
-	defer C.free(unsafe.Pointer(_arg5))
+	if _arg4 != nil {
+		_reqMethod = C.GoString((*C.gchar)(unsafe.Pointer(_arg4)))
+		defer C.free(unsafe.Pointer(_arg4))
+	}
+	if _arg5 != nil {
+		_reqPath = C.GoString((*C.gchar)(unsafe.Pointer(_arg5)))
+		defer C.free(unsafe.Pointer(_arg5))
+	}
 	_ver = HTTPVersion(_arg6)
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _reqMethod, _reqPath, _ver, _guint
 }
@@ -99,7 +348,7 @@ func HeadersParseRequest(str string, len int, reqHeaders *MessageHeaders) (reqMe
 // the results in ver, status_code, reason_phrase, and headers.
 //
 // Beware that headers may be modified even on failure.
-func HeadersParseResponse(str string, len int, headers *MessageHeaders) (HTTPVersion, uint, string, bool) {
+func HeadersParseResponse(str string, len int32, headers *MessageHeaders) (HTTPVersion, uint32, string, bool) {
 	var _arg1 *C.char               // out
 	var _arg2 C.int                 // out
 	var _arg3 *C.SoupMessageHeaders // out
@@ -109,20 +358,26 @@ func HeadersParseResponse(str string, len int, headers *MessageHeaders) (HTTPVer
 	var _cret C.gboolean            // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(str)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.int(len)
 	_arg3 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(headers)))
 
 	_cret = C.soup_headers_parse_response(_arg1, _arg2, _arg3, &_arg4, &_arg5, &_arg6)
+	runtime.KeepAlive(str)
+	runtime.KeepAlive(len)
+	runtime.KeepAlive(headers)
 
 	var _ver HTTPVersion     // out
-	var _statusCode uint     // out
+	var _statusCode uint32   // out
 	var _reasonPhrase string // out
 	var _ok bool             // out
 
 	_ver = HTTPVersion(_arg4)
-	_statusCode = uint(_arg5)
-	_reasonPhrase = C.GoString((*C.gchar)(unsafe.Pointer(_arg6)))
-	defer C.free(unsafe.Pointer(_arg6))
+	_statusCode = uint32(_arg5)
+	if _arg6 != nil {
+		_reasonPhrase = C.GoString((*C.gchar)(unsafe.Pointer(_arg6)))
+		defer C.free(unsafe.Pointer(_arg6))
+	}
 	if _cret != 0 {
 		_ok = true
 	}
@@ -133,7 +388,7 @@ func HeadersParseResponse(str string, len int, headers *MessageHeaders) (HTTPVer
 // HeadersParseStatusLine parses the HTTP Status-Line string in status_line into
 // ver, status_code, and reason_phrase. status_line must be terminated by either
 // "\0" or "\r\n".
-func HeadersParseStatusLine(statusLine string) (HTTPVersion, uint, string, bool) {
+func HeadersParseStatusLine(statusLine string) (HTTPVersion, uint32, string, bool) {
 	var _arg1 *C.char           // out
 	var _arg2 C.SoupHTTPVersion // in
 	var _arg3 C.guint           // in
@@ -141,18 +396,22 @@ func HeadersParseStatusLine(statusLine string) (HTTPVersion, uint, string, bool)
 	var _cret C.gboolean        // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(statusLine)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.soup_headers_parse_status_line(_arg1, &_arg2, &_arg3, &_arg4)
+	runtime.KeepAlive(statusLine)
 
 	var _ver HTTPVersion     // out
-	var _statusCode uint     // out
+	var _statusCode uint32   // out
 	var _reasonPhrase string // out
 	var _ok bool             // out
 
 	_ver = HTTPVersion(_arg2)
-	_statusCode = uint(_arg3)
-	_reasonPhrase = C.GoString((*C.gchar)(unsafe.Pointer(_arg4)))
-	defer C.free(unsafe.Pointer(_arg4))
+	_statusCode = uint32(_arg3)
+	if _arg4 != nil {
+		_reasonPhrase = C.GoString((*C.gchar)(unsafe.Pointer(_arg4)))
+		defer C.free(unsafe.Pointer(_arg4))
+	}
 	if _cret != 0 {
 		_ok = true
 	}

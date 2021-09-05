@@ -5,8 +5,7 @@ package webkit2
 import (
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -26,8 +25,6 @@ type DeviceInfoPermissionRequest struct {
 
 	PermissionRequest
 }
-
-var _ gextras.Nativer = (*DeviceInfoPermissionRequest)(nil)
 
 func wrapDeviceInfoPermissionRequest(obj *externglib.Object) *DeviceInfoPermissionRequest {
 	return &DeviceInfoPermissionRequest{

@@ -3,6 +3,7 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 )
 
@@ -21,13 +22,17 @@ func URIForDisplay(uri string) string {
 	var _cret *C.gchar // in
 
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(uri)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.webkit_uri_for_display(_arg1)
+	runtime.KeepAlive(uri)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	defer C.free(unsafe.Pointer(_cret))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+		defer C.free(unsafe.Pointer(_cret))
+	}
 
 	return _utf8
 }

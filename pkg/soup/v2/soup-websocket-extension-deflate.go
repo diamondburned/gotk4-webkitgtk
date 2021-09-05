@@ -5,8 +5,7 @@ package soup
 import (
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -24,8 +23,6 @@ func init() {
 type WebsocketExtensionDeflate struct {
 	WebsocketExtension
 }
-
-var _ gextras.Nativer = (*WebsocketExtensionDeflate)(nil)
 
 func wrapWebsocketExtensionDeflate(obj *externglib.Object) *WebsocketExtensionDeflate {
 	return &WebsocketExtensionDeflate{

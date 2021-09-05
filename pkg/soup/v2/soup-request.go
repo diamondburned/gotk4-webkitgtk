@@ -11,8 +11,8 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -27,6 +27,12 @@ func init() {
 		{T: externglib.Type(C.soup_request_get_type()), F: marshalRequester},
 	})
 }
+
+// REQUEST_SESSION alias for the Request:session property, qv.
+const REQUEST_SESSION = "session"
+
+// REQUEST_URI alias for the Request:uri property, qv.
+const REQUEST_URI = "uri"
 
 // RequestOverrider contains methods that are overridable.
 //
@@ -68,8 +74,6 @@ type Request struct {
 	gio.Initable
 }
 
-var _ gextras.Nativer = (*Request)(nil)
-
 func wrapRequest(obj *externglib.Object) *Request {
 	return &Request{
 		Object: obj,
@@ -95,6 +99,7 @@ func (request *Request) ContentLength() int64 {
 	_arg0 = (*C.SoupRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.soup_request_get_content_length(_arg0)
+	runtime.KeepAlive(request)
 
 	var _gint64 int64 // out
 
@@ -116,10 +121,13 @@ func (request *Request) ContentType() string {
 	_arg0 = (*C.SoupRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.soup_request_get_content_type(_arg0)
+	runtime.KeepAlive(request)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -132,6 +140,7 @@ func (request *Request) Session() *Session {
 	_arg0 = (*C.SoupRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.soup_request_get_session(_arg0)
+	runtime.KeepAlive(request)
 
 	var _session *Session // out
 
@@ -148,6 +157,7 @@ func (request *Request) URI() *URI {
 	_arg0 = (*C.SoupRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.soup_request_get_uri(_arg0)
+	runtime.KeepAlive(request)
 
 	var _urI *URI // out
 
@@ -175,12 +185,16 @@ func (request *Request) Send(ctx context.Context) (gio.InputStreamer, error) {
 	}
 
 	_cret = C.soup_request_send(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(request)
+	runtime.KeepAlive(ctx)
 
 	var _inputStream gio.InputStreamer // out
 	var _goerr error                   // out
 
-	_inputStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	_inputStream = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _inputStream, _goerr
 }
@@ -200,10 +214,15 @@ func (request *Request) SendAsync(ctx context.Context, callback gio.AsyncReadyCa
 		defer runtime.KeepAlive(cancellable)
 		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
-	_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	if callback != nil {
+		_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.soup_request_send_async(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(request)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(callback)
 }
 
 // SendFinish gets the result of a soup_request_send_async().
@@ -214,15 +233,19 @@ func (request *Request) SendFinish(result gio.AsyncResulter) (gio.InputStreamer,
 	var _cerr *C.GError       // in
 
 	_arg0 = (*C.SoupRequest)(unsafe.Pointer(request.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.soup_request_send_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(request)
+	runtime.KeepAlive(result)
 
 	var _inputStream gio.InputStreamer // out
 	var _goerr error                   // out
 
-	_inputStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	_inputStream = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _inputStream, _goerr
 }

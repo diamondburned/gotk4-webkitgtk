@@ -3,10 +3,10 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -24,8 +24,6 @@ func init() {
 type BackForwardListItem struct {
 	externglib.InitiallyUnowned
 }
-
-var _ gextras.Nativer = (*BackForwardListItem)(nil)
 
 func wrapBackForwardListItem(obj *externglib.Object) *BackForwardListItem {
 	return &BackForwardListItem{
@@ -49,6 +47,7 @@ func (listItem *BackForwardListItem) OriginalURI() string {
 	_arg0 = (*C.WebKitBackForwardListItem)(unsafe.Pointer(listItem.Native()))
 
 	_cret = C.webkit_back_forward_list_item_get_original_uri(_arg0)
+	runtime.KeepAlive(listItem)
 
 	var _utf8 string // out
 
@@ -64,6 +63,7 @@ func (listItem *BackForwardListItem) Title() string {
 	_arg0 = (*C.WebKitBackForwardListItem)(unsafe.Pointer(listItem.Native()))
 
 	_cret = C.webkit_back_forward_list_item_get_title(_arg0)
+	runtime.KeepAlive(listItem)
 
 	var _utf8 string // out
 
@@ -82,6 +82,7 @@ func (listItem *BackForwardListItem) URI() string {
 	_arg0 = (*C.WebKitBackForwardListItem)(unsafe.Pointer(listItem.Native()))
 
 	_cret = C.webkit_back_forward_list_item_get_uri(_arg0)
+	runtime.KeepAlive(listItem)
 
 	var _utf8 string // out
 

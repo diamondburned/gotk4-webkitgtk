@@ -7,8 +7,8 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -26,8 +26,6 @@ func init() {
 type ContextMenu struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*ContextMenu)(nil)
 
 func wrapContextMenu(obj *externglib.Object) *ContextMenu {
 	return &ContextMenu{
@@ -60,6 +58,31 @@ func NewContextMenu() *ContextMenu {
 	return _contextMenu
 }
 
+// NewContextMenuWithItems creates a new KitContextMenu object to be used as a
+// submenu of an existing KitContextMenu with the given initial items. See also
+// webkit_context_menu_new()
+func NewContextMenuWithItems(items []ContextMenuItem) *ContextMenu {
+	var _arg1 *C.GList             // out
+	var _cret *C.WebKitContextMenu // in
+
+	for i := len(items) - 1; i >= 0; i-- {
+		src := items[i]
+		var dst *C.WebKitContextMenuItem // out
+		dst = (*C.WebKitContextMenuItem)(unsafe.Pointer((&src).Native()))
+		_arg1 = C.g_list_prepend(_arg1, C.gpointer(unsafe.Pointer(dst)))
+	}
+	defer C.g_list_free(_arg1)
+
+	_cret = C.webkit_context_menu_new_with_items(_arg1)
+	runtime.KeepAlive(items)
+
+	var _contextMenu *ContextMenu // out
+
+	_contextMenu = wrapContextMenu(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+
+	return _contextMenu
+}
+
 // Append adds item at the end of the menu.
 func (menu *ContextMenu) Append(item *ContextMenuItem) {
 	var _arg0 *C.WebKitContextMenu     // out
@@ -69,6 +92,8 @@ func (menu *ContextMenu) Append(item *ContextMenuItem) {
 	_arg1 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
 
 	C.webkit_context_menu_append(_arg0, _arg1)
+	runtime.KeepAlive(menu)
+	runtime.KeepAlive(item)
 }
 
 // First gets the first item in the menu.
@@ -79,6 +104,7 @@ func (menu *ContextMenu) First() *ContextMenuItem {
 	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
 
 	_cret = C.webkit_context_menu_first(_arg0)
+	runtime.KeepAlive(menu)
 
 	var _contextMenuItem *ContextMenuItem // out
 
@@ -88,7 +114,7 @@ func (menu *ContextMenu) First() *ContextMenuItem {
 }
 
 // ItemAtPosition gets the item at the given position in the menu.
-func (menu *ContextMenu) ItemAtPosition(position uint) *ContextMenuItem {
+func (menu *ContextMenu) ItemAtPosition(position uint32) *ContextMenuItem {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _arg1 C.guint                  // out
 	var _cret *C.WebKitContextMenuItem // in
@@ -97,6 +123,8 @@ func (menu *ContextMenu) ItemAtPosition(position uint) *ContextMenuItem {
 	_arg1 = C.guint(position)
 
 	_cret = C.webkit_context_menu_get_item_at_position(_arg0, _arg1)
+	runtime.KeepAlive(menu)
+	runtime.KeepAlive(position)
 
 	var _contextMenuItem *ContextMenuItem // out
 
@@ -106,39 +134,41 @@ func (menu *ContextMenu) ItemAtPosition(position uint) *ContextMenuItem {
 }
 
 // Items returns the item list of menu.
-func (menu *ContextMenu) Items() *externglib.List {
+func (menu *ContextMenu) Items() []ContextMenuItem {
 	var _arg0 *C.WebKitContextMenu // out
 	var _cret *C.GList             // in
 
 	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
 
 	_cret = C.webkit_context_menu_get_items(_arg0)
+	runtime.KeepAlive(menu)
 
-	var _list *externglib.List // out
+	var _list []ContextMenuItem // out
 
-	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
-	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
-		src := (*C.WebKitContextMenuItem)(_p)
+	_list = make([]ContextMenuItem, 0, gextras.ListSize(unsafe.Pointer(_cret)))
+	gextras.MoveList(unsafe.Pointer(_cret), false, func(v unsafe.Pointer) {
+		src := (*C.WebKitContextMenuItem)(v)
 		var dst ContextMenuItem // out
 		dst = *wrapContextMenuItem(externglib.Take(unsafe.Pointer(src)))
-		return dst
+		_list = append(_list, dst)
 	})
 
 	return _list
 }
 
 // NItems gets the length of the menu.
-func (menu *ContextMenu) NItems() uint {
+func (menu *ContextMenu) NItems() uint32 {
 	var _arg0 *C.WebKitContextMenu // out
 	var _cret C.guint              // in
 
 	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
 
 	_cret = C.webkit_context_menu_get_n_items(_arg0)
+	runtime.KeepAlive(menu)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -153,13 +183,18 @@ func (menu *ContextMenu) UserData() *glib.Variant {
 	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
 
 	_cret = C.webkit_context_menu_get_user_data(_arg0)
+	runtime.KeepAlive(menu)
 
 	var _variant *glib.Variant // out
 
 	_variant = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_variant, func(v *glib.Variant) {
-		C.g_variant_unref((*C.GVariant)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	C.g_variant_ref(_cret)
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_variant)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.g_variant_unref((*C.GVariant)(intern.C))
+		},
+	)
 
 	return _variant
 }
@@ -167,7 +202,7 @@ func (menu *ContextMenu) UserData() *glib.Variant {
 // Insert inserts item into the menu at the given position. If position is
 // negative, or is larger than the number of items in the KitContextMenu, the
 // item is added on to the end of the menu. The first position is 0.
-func (menu *ContextMenu) Insert(item *ContextMenuItem, position int) {
+func (menu *ContextMenu) Insert(item *ContextMenuItem, position int32) {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _arg1 *C.WebKitContextMenuItem // out
 	var _arg2 C.gint                   // out
@@ -177,6 +212,9 @@ func (menu *ContextMenu) Insert(item *ContextMenuItem, position int) {
 	_arg2 = C.gint(position)
 
 	C.webkit_context_menu_insert(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(menu)
+	runtime.KeepAlive(item)
+	runtime.KeepAlive(position)
 }
 
 // Last gets the last item in the menu.
@@ -187,6 +225,7 @@ func (menu *ContextMenu) Last() *ContextMenuItem {
 	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
 
 	_cret = C.webkit_context_menu_last(_arg0)
+	runtime.KeepAlive(menu)
 
 	var _contextMenuItem *ContextMenuItem // out
 
@@ -198,7 +237,7 @@ func (menu *ContextMenu) Last() *ContextMenuItem {
 // MoveItem moves item to the given position in the menu. If position is
 // negative, or is larger than the number of items in the KitContextMenu, the
 // item is added on to the end of the menu. The first position is 0.
-func (menu *ContextMenu) MoveItem(item *ContextMenuItem, position int) {
+func (menu *ContextMenu) MoveItem(item *ContextMenuItem, position int32) {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _arg1 *C.WebKitContextMenuItem // out
 	var _arg2 C.gint                   // out
@@ -208,6 +247,9 @@ func (menu *ContextMenu) MoveItem(item *ContextMenuItem, position int) {
 	_arg2 = C.gint(position)
 
 	C.webkit_context_menu_move_item(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(menu)
+	runtime.KeepAlive(item)
+	runtime.KeepAlive(position)
 }
 
 // Prepend adds item at the beginning of the menu.
@@ -219,6 +261,8 @@ func (menu *ContextMenu) Prepend(item *ContextMenuItem) {
 	_arg1 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
 
 	C.webkit_context_menu_prepend(_arg0, _arg1)
+	runtime.KeepAlive(menu)
+	runtime.KeepAlive(item)
 }
 
 // Remove removes item from the menu. See also webkit_context_menu_remove_all()
@@ -231,6 +275,8 @@ func (menu *ContextMenu) Remove(item *ContextMenuItem) {
 	_arg1 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
 
 	C.webkit_context_menu_remove(_arg0, _arg1)
+	runtime.KeepAlive(menu)
+	runtime.KeepAlive(item)
 }
 
 // RemoveAll removes all items of the menu.
@@ -240,6 +286,7 @@ func (menu *ContextMenu) RemoveAll() {
 	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
 
 	C.webkit_context_menu_remove_all(_arg0)
+	runtime.KeepAlive(menu)
 }
 
 // SetUserData sets user data to menu. This function can be used from a Web
@@ -254,4 +301,6 @@ func (menu *ContextMenu) SetUserData(userData *glib.Variant) {
 	_arg1 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(userData)))
 
 	C.webkit_context_menu_set_user_data(_arg0, _arg1)
+	runtime.KeepAlive(menu)
+	runtime.KeepAlive(userData)
 }

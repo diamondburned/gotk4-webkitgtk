@@ -7,7 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -22,14 +22,19 @@ func init() {
 	})
 }
 
+// ApplicationInfo: instance of this type is always passed by reference.
 type ApplicationInfo struct {
-	nocopy gextras.NoCopy
+	*applicationInfo
+}
+
+// applicationInfo is the struct that's finalized.
+type applicationInfo struct {
 	native *C.WebKitApplicationInfo
 }
 
 func marshalApplicationInfo(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &ApplicationInfo{native: (*C.WebKitApplicationInfo)(unsafe.Pointer(b))}, nil
+	return &ApplicationInfo{&applicationInfo{(*C.WebKitApplicationInfo)(unsafe.Pointer(b))}}, nil
 }
 
 // NewApplicationInfo constructs a struct ApplicationInfo.
@@ -41,10 +46,12 @@ func NewApplicationInfo() *ApplicationInfo {
 	var _applicationInfo *ApplicationInfo // out
 
 	_applicationInfo = (*ApplicationInfo)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_application_info_ref(_cret)
-	runtime.SetFinalizer(_applicationInfo, func(v *ApplicationInfo) {
-		C.webkit_application_info_unref((*C.WebKitApplicationInfo)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_applicationInfo)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_application_info_unref((*C.WebKitApplicationInfo)(intern.C))
+		},
+	)
 
 	return _applicationInfo
 }
@@ -58,6 +65,7 @@ func (info *ApplicationInfo) Name() string {
 	_arg0 = (*C.WebKitApplicationInfo)(gextras.StructNative(unsafe.Pointer(info)))
 
 	_cret = C.webkit_application_info_get_name(_arg0)
+	runtime.KeepAlive(info)
 
 	var _utf8 string // out
 
@@ -77,6 +85,7 @@ func (info *ApplicationInfo) Version() (major uint64, minor uint64, micro uint64
 	_arg0 = (*C.WebKitApplicationInfo)(gextras.StructNative(unsafe.Pointer(info)))
 
 	C.webkit_application_info_get_version(_arg0, &_arg1, &_arg2, &_arg3)
+	runtime.KeepAlive(info)
 
 	var _major uint64 // out
 	var _minor uint64 // out
@@ -89,27 +98,6 @@ func (info *ApplicationInfo) Version() (major uint64, minor uint64, micro uint64
 	return _major, _minor, _micro
 }
 
-// Ref: atomically increments the reference count of info by one. This function
-// is MT-safe and may be called from any thread.
-func (info *ApplicationInfo) ref() *ApplicationInfo {
-	var _arg0 *C.WebKitApplicationInfo // out
-	var _cret *C.WebKitApplicationInfo // in
-
-	_arg0 = (*C.WebKitApplicationInfo)(gextras.StructNative(unsafe.Pointer(info)))
-
-	_cret = C.webkit_application_info_ref(_arg0)
-
-	var _applicationInfo *ApplicationInfo // out
-
-	_applicationInfo = (*ApplicationInfo)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_application_info_ref(_cret)
-	runtime.SetFinalizer(_applicationInfo, func(v *ApplicationInfo) {
-		C.webkit_application_info_unref((*C.WebKitApplicationInfo)(gextras.StructNative(unsafe.Pointer(v))))
-	})
-
-	return _applicationInfo
-}
-
 // SetName: set the name of the application. If not provided, or NULL is passed,
 // g_get_prgname() will be used.
 func (info *ApplicationInfo) SetName(name string) {
@@ -118,8 +106,11 @@ func (info *ApplicationInfo) SetName(name string) {
 
 	_arg0 = (*C.WebKitApplicationInfo)(gextras.StructNative(unsafe.Pointer(info)))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_application_info_set_name(_arg0, _arg1)
+	runtime.KeepAlive(info)
+	runtime.KeepAlive(name)
 }
 
 // SetVersion: set the application version. If the application doesn't use the
@@ -139,15 +130,8 @@ func (info *ApplicationInfo) SetVersion(major uint64, minor uint64, micro uint64
 	_arg3 = C.guint64(micro)
 
 	C.webkit_application_info_set_version(_arg0, _arg1, _arg2, _arg3)
-}
-
-// Unref: atomically decrements the reference count of info by one. If the
-// reference count drops to 0, all memory allocated by the KitApplicationInfo is
-// released. This function is MT-safe and may be called from any thread.
-func (info *ApplicationInfo) unref() {
-	var _arg0 *C.WebKitApplicationInfo // out
-
-	_arg0 = (*C.WebKitApplicationInfo)(gextras.StructNative(unsafe.Pointer(info)))
-
-	C.webkit_application_info_unref(_arg0)
+	runtime.KeepAlive(info)
+	runtime.KeepAlive(major)
+	runtime.KeepAlive(minor)
+	runtime.KeepAlive(micro)
 }

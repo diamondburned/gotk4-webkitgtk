@@ -5,9 +5,8 @@ package soup
 import (
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -25,8 +24,6 @@ func init() {
 type RequestData struct {
 	Request
 }
-
-var _ gextras.Nativer = (*RequestData)(nil)
 
 func wrapRequestData(obj *externglib.Object) *RequestData {
 	return &RequestData{

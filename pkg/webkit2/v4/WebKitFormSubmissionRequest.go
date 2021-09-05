@@ -3,10 +3,12 @@
 package webkit2
 
 import (
+	"runtime"
+	"runtime/cgo"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -25,8 +27,6 @@ type FormSubmissionRequest struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*FormSubmissionRequest)(nil)
-
 func wrapFormSubmissionRequest(obj *externglib.Object) *FormSubmissionRequest {
 	return &FormSubmissionRequest{
 		Object: obj,
@@ -39,6 +39,39 @@ func marshalFormSubmissionRequester(p uintptr) (interface{}, error) {
 	return wrapFormSubmissionRequest(obj), nil
 }
 
+// TextFields: get a Table with the values of the text fields contained in the
+// form associated to request. Note that fields will be missing if the form
+// contains multiple text input elements with the same name, so this function
+// does not reliably return all text fields.
+//
+// Deprecated: Use webkit_form_submission_request_list_text_fields() instead.
+func (request *FormSubmissionRequest) TextFields() map[cgo.Handle]cgo.Handle {
+	var _arg0 *C.WebKitFormSubmissionRequest // out
+	var _cret *C.GHashTable                  // in
+
+	_arg0 = (*C.WebKitFormSubmissionRequest)(unsafe.Pointer(request.Native()))
+
+	_cret = C.webkit_form_submission_request_get_text_fields(_arg0)
+	runtime.KeepAlive(request)
+
+	var _hashTable map[cgo.Handle]cgo.Handle // out
+
+	if _cret != nil {
+		_hashTable = make(map[cgo.Handle]cgo.Handle, gextras.HashTableSize(unsafe.Pointer(_cret)))
+		gextras.MoveHashTable(unsafe.Pointer(_cret), false, func(k, v unsafe.Pointer) {
+			ksrc := *(**C.gpointer)(k)
+			vsrc := *(**C.gpointer)(v)
+			var kdst cgo.Handle // out
+			var vdst cgo.Handle // out
+			kdst = (cgo.Handle)(unsafe.Pointer(ksrc))
+			vdst = (cgo.Handle)(unsafe.Pointer(vsrc))
+			_hashTable[kdst] = vdst
+		})
+	}
+
+	return _hashTable
+}
+
 // Submit: continue the form submission.
 func (request *FormSubmissionRequest) Submit() {
 	var _arg0 *C.WebKitFormSubmissionRequest // out
@@ -46,4 +79,5 @@ func (request *FormSubmissionRequest) Submit() {
 	_arg0 = (*C.WebKitFormSubmissionRequest)(unsafe.Pointer(request.Native()))
 
 	C.webkit_form_submission_request_submit(_arg0)
+	runtime.KeepAlive(request)
 }

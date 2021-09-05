@@ -3,10 +3,10 @@
 package soup
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -50,10 +50,10 @@ type SessionFeature struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*SessionFeature)(nil)
-
 // SessionFeaturer describes SessionFeature's abstract methods.
 type SessionFeaturer interface {
+	externglib.Objector
+
 	// AddFeature adds a "sub-feature" of type type to the base feature feature.
 	AddFeature(typ externglib.Type) bool
 	Attach(session *Session)
@@ -91,6 +91,8 @@ func (feature *SessionFeature) AddFeature(typ externglib.Type) bool {
 	_arg1 = C.GType(typ)
 
 	_cret = C.soup_session_feature_add_feature(_arg0, _arg1)
+	runtime.KeepAlive(feature)
+	runtime.KeepAlive(typ)
 
 	var _ok bool // out
 
@@ -109,6 +111,8 @@ func (feature *SessionFeature) Attach(session *Session) {
 	_arg1 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
 
 	C.soup_session_feature_attach(_arg0, _arg1)
+	runtime.KeepAlive(feature)
+	runtime.KeepAlive(session)
 }
 
 func (feature *SessionFeature) Detach(session *Session) {
@@ -119,6 +123,8 @@ func (feature *SessionFeature) Detach(session *Session) {
 	_arg1 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
 
 	C.soup_session_feature_detach(_arg0, _arg1)
+	runtime.KeepAlive(feature)
+	runtime.KeepAlive(session)
 }
 
 // HasFeature tests if feature has a "sub-feature" of type type. See
@@ -132,6 +138,8 @@ func (feature *SessionFeature) HasFeature(typ externglib.Type) bool {
 	_arg1 = C.GType(typ)
 
 	_cret = C.soup_session_feature_has_feature(_arg0, _arg1)
+	runtime.KeepAlive(feature)
+	runtime.KeepAlive(typ)
 
 	var _ok bool // out
 
@@ -153,6 +161,8 @@ func (feature *SessionFeature) RemoveFeature(typ externglib.Type) bool {
 	_arg1 = C.GType(typ)
 
 	_cret = C.soup_session_feature_remove_feature(_arg0, _arg1)
+	runtime.KeepAlive(feature)
+	runtime.KeepAlive(typ)
 
 	var _ok bool // out
 

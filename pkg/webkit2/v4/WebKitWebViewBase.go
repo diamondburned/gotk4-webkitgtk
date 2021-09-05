@@ -6,9 +6,8 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gtk/v3"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -27,8 +26,6 @@ type WebViewBase struct {
 	gtk.Container
 }
 
-var _ gextras.Nativer = (*WebViewBase)(nil)
-
 func wrapWebViewBase(obj *externglib.Object) *WebViewBase {
 	return &WebViewBase{
 		Container: gtk.Container{
@@ -42,6 +39,7 @@ func wrapWebViewBase(obj *externglib.Object) *WebViewBase {
 				Buildable: gtk.Buildable{
 					Object: obj,
 				},
+				Object: obj,
 			},
 		},
 	}

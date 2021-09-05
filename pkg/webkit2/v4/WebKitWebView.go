@@ -10,15 +10,16 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
+	"github.com/diamondburned/gotk4/pkg/cairo"
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v3"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
+	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v3"
-	"github.com/gotk3/gotk3/cairo"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -255,7 +256,7 @@ const (
 )
 
 func marshalSnapshotOptions(p uintptr) (interface{}, error) {
-	return SnapshotOptions(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return SnapshotOptions(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
 }
 
 // String returns the names in string for SnapshotOptions.
@@ -288,6 +289,11 @@ func (s SnapshotOptions) String() string {
 	return strings.TrimSuffix(builder.String(), "|")
 }
 
+// Has returns true if s contains other.
+func (s SnapshotOptions) Has(other SnapshotOptions) bool {
+	return (s & other) == other
+}
+
 // WebViewOverrider contains methods that are overridable.
 //
 // As of right now, interface overriding and subclassing is not supported
@@ -303,7 +309,7 @@ type WebViewOverrider interface {
 	LoadChanged(loadEvent LoadEvent)
 	LoadFailed(loadEvent LoadEvent, failingUri string, err error) bool
 	LoadFailedWithTLSErrors(failingUri string, certificate gio.TLSCertificater, errors gio.TLSCertificateFlags) bool
-	MouseTargetChanged(hitTestResult *HitTestResult, modifiers uint)
+	MouseTargetChanged(hitTestResult *HitTestResult, modifiers uint32)
 	PermissionRequest(permissionRequest PermissionRequester) bool
 	Print(printOperation *PrintOperation) bool
 	ReadyToShow()
@@ -324,8 +330,6 @@ type WebView struct {
 	WebViewBase
 }
 
-var _ gextras.Nativer = (*WebView)(nil)
-
 func wrapWebView(obj *externglib.Object) *WebView {
 	return &WebView{
 		WebViewBase: WebViewBase{
@@ -340,6 +344,7 @@ func wrapWebView(obj *externglib.Object) *WebView {
 					Buildable: gtk.Buildable{
 						Object: obj,
 					},
+					Object: obj,
 				},
 			},
 		},
@@ -380,6 +385,7 @@ func NewWebViewWithContext(context *WebContext) *WebView {
 	_arg1 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_web_view_new_with_context(_arg1)
+	runtime.KeepAlive(context)
 
 	var _webView *WebView // out
 
@@ -408,6 +414,7 @@ func NewWebViewWithRelatedView(webView *WebView) *WebView {
 	_arg1 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_new_with_related_view(_arg1)
+	runtime.KeepAlive(webView)
 
 	var _webView *WebView // out
 
@@ -426,6 +433,7 @@ func NewWebViewWithSettings(settings *Settings) *WebView {
 	_arg1 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_web_view_new_with_settings(_arg1)
+	runtime.KeepAlive(settings)
 
 	var _webView *WebView // out
 
@@ -444,6 +452,7 @@ func NewWebViewWithUserContentManager(userContentManager *UserContentManager) *W
 	_arg1 = (*C.WebKitUserContentManager)(unsafe.Pointer(userContentManager.Native()))
 
 	_cret = C.webkit_web_view_new_with_user_content_manager(_arg1)
+	runtime.KeepAlive(userContentManager)
 
 	var _webView *WebView // out
 
@@ -472,10 +481,17 @@ func (webView *WebView) CanExecuteEditingCommand(ctx context.Context, command st
 		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(command)))
-	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	defer C.free(unsafe.Pointer(_arg1))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_web_view_can_execute_editing_command(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(command)
+	runtime.KeepAlive(callback)
 }
 
 // CanExecuteEditingCommandFinish: finish an asynchronous operation started with
@@ -486,13 +502,17 @@ func (webView *WebView) CanExecuteEditingCommandFinish(result gio.AsyncResulter)
 	var _cerr *C.GError        // in
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	C.webkit_web_view_can_execute_editing_command_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(result)
 
 	var _goerr error // out
 
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _goerr
 }
@@ -505,6 +525,7 @@ func (webView *WebView) CanGoBack() bool {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_can_go_back(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _ok bool // out
 
@@ -523,6 +544,7 @@ func (webView *WebView) CanGoForward() bool {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_can_go_forward(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _ok bool // out
 
@@ -541,8 +563,11 @@ func (webView *WebView) CanShowMIMEType(mimeType string) bool {
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(mimeType)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.webkit_web_view_can_show_mime_type(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(mimeType)
 
 	var _ok bool // out
 
@@ -561,8 +586,11 @@ func (webView *WebView) DownloadURI(uri string) *Download {
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(uri)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.webkit_web_view_download_uri(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(uri)
 
 	var _download *Download // out
 
@@ -580,8 +608,11 @@ func (webView *WebView) ExecuteEditingCommand(command string) {
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(command)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_web_view_execute_editing_command(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(command)
 }
 
 // ExecuteEditingCommandWithArgument: request to execute the given command with
@@ -595,9 +626,14 @@ func (webView *WebView) ExecuteEditingCommandWithArgument(command string, argume
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(command)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(argument)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	C.webkit_web_view_execute_editing_command_with_argument(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(command)
+	runtime.KeepAlive(argument)
 }
 
 // AutomationPresentationType: get the presentation type of KitWebView when
@@ -609,6 +645,7 @@ func (webView *WebView) AutomationPresentationType() AutomationBrowsingContextPr
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_automation_presentation_type(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _automationBrowsingContextPresentation AutomationBrowsingContextPresentation // out
 
@@ -626,6 +663,7 @@ func (webView *WebView) BackForwardList() *BackForwardList {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_back_forward_list(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _backForwardList *BackForwardList // out
 
@@ -644,6 +682,7 @@ func (webView *WebView) BackgroundColor() gdk.RGBA {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	C.webkit_web_view_get_background_color(_arg0, &_arg1)
+	runtime.KeepAlive(webView)
 
 	var _rgba gdk.RGBA // out
 
@@ -660,6 +699,7 @@ func (webView *WebView) Context() *WebContext {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_context(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _webContext *WebContext // out
 
@@ -676,6 +716,7 @@ func (webView *WebView) CustomCharset() string {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_custom_charset(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _utf8 string // out
 
@@ -692,6 +733,7 @@ func (webView *WebView) EditorState() *EditorState {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_editor_state(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _editorState *EditorState // out
 
@@ -711,6 +753,7 @@ func (webView *WebView) EstimatedLoadProgress() float64 {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_estimated_load_progress(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _gdouble float64 // out
 
@@ -729,10 +772,12 @@ func (webView *WebView) Favicon() *cairo.Surface {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_favicon(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _surface *cairo.Surface // out
 
 	_surface = cairo.WrapSurface(uintptr(unsafe.Pointer(_cret)))
+	C.cairo_surface_reference(_cret)
 	runtime.SetFinalizer(_surface, func(v *cairo.Surface) {
 		C.cairo_surface_destroy((*C.cairo_surface_t)(unsafe.Pointer(v.Native())))
 	})
@@ -749,6 +794,7 @@ func (webView *WebView) FindController() *FindController {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_find_controller(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _findController *FindController // out
 
@@ -766,10 +812,13 @@ func (webView *WebView) InputMethodContext() InputMethodContexter {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_input_method_context(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _inputMethodContext InputMethodContexter // out
 
-	_inputMethodContext = (gextras.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(InputMethodContexter)
+	if _cret != nil {
+		_inputMethodContext = (externglib.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(InputMethodContexter)
+	}
 
 	return _inputMethodContext
 }
@@ -782,6 +831,7 @@ func (webView *WebView) Inspector() *WebInspector {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_inspector(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _webInspector *WebInspector // out
 
@@ -798,6 +848,7 @@ func (webView *WebView) IsMuted() bool {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_is_muted(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _ok bool // out
 
@@ -816,6 +867,7 @@ func (webView *WebView) MainResource() *WebResource {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_main_resource(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _webResource *WebResource // out
 
@@ -832,6 +884,7 @@ func (webView *WebView) PageID() uint64 {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_page_id(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _guint64 uint64 // out
 
@@ -848,14 +901,17 @@ func (webView *WebView) SessionState() *WebViewSessionState {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_session_state(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _webViewSessionState *WebViewSessionState // out
 
 	_webViewSessionState = (*WebViewSessionState)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_web_view_session_state_ref(_cret)
-	runtime.SetFinalizer(_webViewSessionState, func(v *WebViewSessionState) {
-		C.webkit_web_view_session_state_unref((*C.WebKitWebViewSessionState)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_webViewSessionState)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_web_view_session_state_unref((*C.WebKitWebViewSessionState)(intern.C))
+		},
+	)
 
 	return _webViewSessionState
 }
@@ -877,6 +933,7 @@ func (webView *WebView) Settings() *Settings {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_settings(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _settings *Settings // out
 
@@ -906,10 +963,17 @@ func (webView *WebView) Snapshot(ctx context.Context, region SnapshotRegion, opt
 	}
 	_arg1 = C.WebKitSnapshotRegion(region)
 	_arg2 = C.WebKitSnapshotOptions(options)
-	_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg5 = C.gpointer(gbox.AssignOnce(callback))
+	if callback != nil {
+		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg5 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_web_view_get_snapshot(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(region)
+	runtime.KeepAlive(options)
+	runtime.KeepAlive(callback)
 }
 
 // SnapshotFinish finishes an asynchronous operation started with
@@ -921,19 +985,22 @@ func (webView *WebView) SnapshotFinish(result gio.AsyncResulter) (*cairo.Surface
 	var _cerr *C.GError          // in
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.webkit_web_view_get_snapshot_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(result)
 
 	var _surface *cairo.Surface // out
 	var _goerr error            // out
 
 	_surface = cairo.WrapSurface(uintptr(unsafe.Pointer(_cret)))
-	C.cairo_surface_reference(_cret)
 	runtime.SetFinalizer(_surface, func(v *cairo.Surface) {
 		C.cairo_surface_destroy((*C.cairo_surface_t)(unsafe.Pointer(v.Native())))
 	})
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _surface, _goerr
 }
@@ -948,6 +1015,7 @@ func (webView *WebView) Title() string {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_title(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _utf8 string // out
 
@@ -978,12 +1046,13 @@ func (webView *WebView) TLSInfo() (gio.TLSCertificater, gio.TLSCertificateFlags,
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_tls_info(_arg0, &_arg1, &_arg2)
+	runtime.KeepAlive(webView)
 
 	var _certificate gio.TLSCertificater // out
 	var _errors gio.TLSCertificateFlags  // out
 	var _ok bool                         // out
 
-	_certificate = (gextras.CastObject(externglib.Take(unsafe.Pointer(_arg1)))).(gio.TLSCertificater)
+	_certificate = (externglib.CastObject(externglib.Take(unsafe.Pointer(_arg1)))).(gio.TLSCertificater)
 	_errors = gio.TLSCertificateFlags(_arg2)
 	if _cret != 0 {
 		_ok = true
@@ -1029,6 +1098,7 @@ func (webView *WebView) URI() string {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_uri(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _utf8 string // out
 
@@ -1045,6 +1115,7 @@ func (webView *WebView) UserContentManager() *UserContentManager {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_user_content_manager(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _userContentManager *UserContentManager // out
 
@@ -1063,6 +1134,7 @@ func (webView *WebView) WebsiteDataManager() *WebsiteDataManager {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_website_data_manager(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _websiteDataManager *WebsiteDataManager // out
 
@@ -1083,6 +1155,7 @@ func (webView *WebView) WebsitePolicies() *WebsitePolicies {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_website_policies(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _websitePolicies *WebsitePolicies // out
 
@@ -1100,6 +1173,7 @@ func (webView *WebView) WindowProperties() *WindowProperties {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_window_properties(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _windowProperties *WindowProperties // out
 
@@ -1117,6 +1191,7 @@ func (webView *WebView) ZoomLevel() float64 {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_get_zoom_level(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _gdouble float64 // out
 
@@ -1133,6 +1208,7 @@ func (webView *WebView) GoBack() {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	C.webkit_web_view_go_back(_arg0)
+	runtime.KeepAlive(webView)
 }
 
 // GoForward loads the next history item. You can monitor the load operation by
@@ -1143,6 +1219,7 @@ func (webView *WebView) GoForward() {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	C.webkit_web_view_go_forward(_arg0)
+	runtime.KeepAlive(webView)
 }
 
 // GoToBackForwardListItem loads the specific history item list_item. You can
@@ -1155,6 +1232,8 @@ func (webView *WebView) GoToBackForwardListItem(listItem *BackForwardListItem) {
 	_arg1 = (*C.WebKitBackForwardListItem)(unsafe.Pointer(listItem.Native()))
 
 	C.webkit_web_view_go_to_back_forward_list_item(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(listItem)
 }
 
 // IsControlledByAutomation: get whether a KitWebView was created with
@@ -1167,6 +1246,7 @@ func (webView *WebView) IsControlledByAutomation() bool {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_is_controlled_by_automation(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _ok bool // out
 
@@ -1184,6 +1264,7 @@ func (webView *WebView) IsEditable() bool {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_is_editable(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _ok bool // out
 
@@ -1206,6 +1287,7 @@ func (webView *WebView) IsEphemeral() bool {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_is_ephemeral(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _ok bool // out
 
@@ -1229,6 +1311,7 @@ func (webView *WebView) IsLoading() bool {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_is_loading(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _ok bool // out
 
@@ -1250,6 +1333,7 @@ func (webView *WebView) IsPlayingAudio() bool {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_web_view_is_playing_audio(_arg0)
+	runtime.KeepAlive(webView)
 
 	var _ok bool // out
 
@@ -1274,10 +1358,54 @@ func (webView *WebView) LoadAlternateHtml(content string, contentUri string, bas
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(content)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(contentUri)))
-	_arg3 = (*C.gchar)(unsafe.Pointer(C.CString(baseUri)))
+	defer C.free(unsafe.Pointer(_arg2))
+	if baseUri != "" {
+		_arg3 = (*C.gchar)(unsafe.Pointer(C.CString(baseUri)))
+		defer C.free(unsafe.Pointer(_arg3))
+	}
 
 	C.webkit_web_view_load_alternate_html(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(content)
+	runtime.KeepAlive(contentUri)
+	runtime.KeepAlive(baseUri)
+}
+
+// LoadBytes: load the specified bytes into web_view using the given mime_type
+// and encoding. When mime_type is NULL, it defaults to "text/html". When
+// encoding is NULL, it defaults to "UTF-8". When base_uri is NULL, it defaults
+// to "about:blank". You can monitor the load operation by connecting to
+// KitWebView::load-changed signal.
+func (webView *WebView) LoadBytes(bytes *glib.Bytes, mimeType string, encoding string, baseUri string) {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 *C.GBytes        // out
+	var _arg2 *C.gchar         // out
+	var _arg3 *C.gchar         // out
+	var _arg4 *C.gchar         // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.GBytes)(gextras.StructNative(unsafe.Pointer(bytes)))
+	if mimeType != "" {
+		_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(mimeType)))
+		defer C.free(unsafe.Pointer(_arg2))
+	}
+	if encoding != "" {
+		_arg3 = (*C.gchar)(unsafe.Pointer(C.CString(encoding)))
+		defer C.free(unsafe.Pointer(_arg3))
+	}
+	if baseUri != "" {
+		_arg4 = (*C.gchar)(unsafe.Pointer(C.CString(baseUri)))
+		defer C.free(unsafe.Pointer(_arg4))
+	}
+
+	C.webkit_web_view_load_bytes(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(bytes)
+	runtime.KeepAlive(mimeType)
+	runtime.KeepAlive(encoding)
+	runtime.KeepAlive(baseUri)
 }
 
 // LoadHtml: load the given content string with the specified base_uri. If
@@ -1296,9 +1424,16 @@ func (webView *WebView) LoadHtml(content string, baseUri string) {
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(content)))
-	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(baseUri)))
+	defer C.free(unsafe.Pointer(_arg1))
+	if baseUri != "" {
+		_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(baseUri)))
+		defer C.free(unsafe.Pointer(_arg2))
+	}
 
 	C.webkit_web_view_load_html(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(content)
+	runtime.KeepAlive(baseUri)
 }
 
 // LoadPlainText: load the specified plain_text string into web_view. The mime
@@ -1310,8 +1445,11 @@ func (webView *WebView) LoadPlainText(plainText string) {
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(plainText)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_web_view_load_plain_text(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(plainText)
 }
 
 // LoadRequest requests loading of the specified KitURIRequest. You can monitor
@@ -1324,6 +1462,8 @@ func (webView *WebView) LoadRequest(request *URIRequest) {
 	_arg1 = (*C.WebKitURIRequest)(unsafe.Pointer(request.Native()))
 
 	C.webkit_web_view_load_request(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(request)
 }
 
 // LoadURI requests loading of the specified URI string. You can monitor the
@@ -1334,8 +1474,11 @@ func (webView *WebView) LoadURI(uri string) {
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(uri)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_web_view_load_uri(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(uri)
 }
 
 // Reload reloads the current contents of web_view. See also
@@ -1346,6 +1489,7 @@ func (webView *WebView) Reload() {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	C.webkit_web_view_reload(_arg0)
+	runtime.KeepAlive(webView)
 }
 
 // ReloadBypassCache reloads the current contents of web_view without using any
@@ -1356,6 +1500,7 @@ func (webView *WebView) ReloadBypassCache() {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	C.webkit_web_view_reload_bypass_cache(_arg0)
+	runtime.KeepAlive(webView)
 }
 
 // RestoreSessionState: restore the web_view session state from state
@@ -1367,6 +1512,8 @@ func (webView *WebView) RestoreSessionState(state *WebViewSessionState) {
 	_arg1 = (*C.WebKitWebViewSessionState)(gextras.StructNative(unsafe.Pointer(state)))
 
 	C.webkit_web_view_restore_session_state(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(state)
 }
 
 // RunJavascript: asynchronously run script in the context of the current page
@@ -1389,10 +1536,17 @@ func (webView *WebView) RunJavascript(ctx context.Context, script string, callba
 		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(script)))
-	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	defer C.free(unsafe.Pointer(_arg1))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_web_view_run_javascript(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(script)
+	runtime.KeepAlive(callback)
 }
 
 // RunJavascriptFinish: finish an asynchronous operation started with
@@ -1446,19 +1600,25 @@ func (webView *WebView) RunJavascriptFinish(result gio.AsyncResulter) (*Javascri
 	var _cerr *C.GError                 // in
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.webkit_web_view_run_javascript_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(result)
 
 	var _javascriptResult *JavascriptResult // out
 	var _goerr error                        // out
 
 	_javascriptResult = (*JavascriptResult)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_javascript_result_ref(_cret)
-	runtime.SetFinalizer(_javascriptResult, func(v *JavascriptResult) {
-		C.webkit_javascript_result_unref((*C.WebKitJavascriptResult)(gextras.StructNative(unsafe.Pointer(v))))
-	})
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_javascriptResult)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_javascript_result_unref((*C.WebKitJavascriptResult)(intern.C))
+		},
+	)
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _javascriptResult, _goerr
 }
@@ -1483,10 +1643,17 @@ func (webView *WebView) RunJavascriptFromGresource(ctx context.Context, resource
 		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(resource)))
-	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	defer C.free(unsafe.Pointer(_arg1))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_web_view_run_javascript_from_gresource(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(resource)
+	runtime.KeepAlive(callback)
 }
 
 // RunJavascriptFromGresourceFinish: finish an asynchronous operation started
@@ -1500,19 +1667,25 @@ func (webView *WebView) RunJavascriptFromGresourceFinish(result gio.AsyncResulte
 	var _cerr *C.GError                 // in
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.webkit_web_view_run_javascript_from_gresource_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(result)
 
 	var _javascriptResult *JavascriptResult // out
 	var _goerr error                        // out
 
 	_javascriptResult = (*JavascriptResult)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_javascript_result_ref(_cret)
-	runtime.SetFinalizer(_javascriptResult, func(v *JavascriptResult) {
-		C.webkit_javascript_result_unref((*C.WebKitJavascriptResult)(gextras.StructNative(unsafe.Pointer(v))))
-	})
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_javascriptResult)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_javascript_result_unref((*C.WebKitJavascriptResult)(intern.C))
+		},
+	)
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _javascriptResult, _goerr
 }
@@ -1539,11 +1712,20 @@ func (webView *WebView) RunJavascriptInWorld(ctx context.Context, script string,
 		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(script)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(worldName)))
-	_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg5 = C.gpointer(gbox.AssignOnce(callback))
+	defer C.free(unsafe.Pointer(_arg2))
+	if callback != nil {
+		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg5 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_web_view_run_javascript_in_world(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(script)
+	runtime.KeepAlive(worldName)
+	runtime.KeepAlive(callback)
 }
 
 // RunJavascriptInWorldFinish: finish an asynchronous operation started with
@@ -1555,19 +1737,25 @@ func (webView *WebView) RunJavascriptInWorldFinish(result gio.AsyncResulter) (*J
 	var _cerr *C.GError                 // in
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.webkit_web_view_run_javascript_in_world_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(result)
 
 	var _javascriptResult *JavascriptResult // out
 	var _goerr error                        // out
 
 	_javascriptResult = (*JavascriptResult)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_javascript_result_ref(_cret)
-	runtime.SetFinalizer(_javascriptResult, func(v *JavascriptResult) {
-		C.webkit_javascript_result_unref((*C.WebKitJavascriptResult)(gextras.StructNative(unsafe.Pointer(v))))
-	})
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_javascriptResult)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_javascript_result_unref((*C.WebKitJavascriptResult)(intern.C))
+		},
+	)
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _javascriptResult, _goerr
 }
@@ -1591,10 +1779,16 @@ func (webView *WebView) Save(ctx context.Context, saveMode SaveMode, callback gi
 		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
 	_arg1 = C.WebKitSaveMode(saveMode)
-	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_web_view_save(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(saveMode)
+	runtime.KeepAlive(callback)
 }
 
 // SaveFinish: finish an asynchronous operation started with
@@ -1606,15 +1800,19 @@ func (webView *WebView) SaveFinish(result gio.AsyncResulter) (gio.InputStreamer,
 	var _cerr *C.GError        // in
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.webkit_web_view_save_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(result)
 
 	var _inputStream gio.InputStreamer // out
 	var _goerr error                   // out
 
-	_inputStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	_inputStream = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _inputStream, _goerr
 }
@@ -1639,12 +1837,19 @@ func (webView *WebView) SaveToFile(ctx context.Context, file gio.Filer, saveMode
 		defer runtime.KeepAlive(cancellable)
 		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
-	_arg1 = (*C.GFile)(unsafe.Pointer((file).(gextras.Nativer).Native()))
+	_arg1 = (*C.GFile)(unsafe.Pointer(file.Native()))
 	_arg2 = C.WebKitSaveMode(saveMode)
-	_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg5 = C.gpointer(gbox.AssignOnce(callback))
+	if callback != nil {
+		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg5 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_web_view_save_to_file(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(file)
+	runtime.KeepAlive(saveMode)
+	runtime.KeepAlive(callback)
 }
 
 // SaveToFileFinish: finish an asynchronous operation started with
@@ -1655,13 +1860,17 @@ func (webView *WebView) SaveToFileFinish(result gio.AsyncResulter) error {
 	var _cerr *C.GError        // in
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	C.webkit_web_view_save_to_file_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(result)
 
 	var _goerr error // out
 
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _goerr
 }
@@ -1687,10 +1896,16 @@ func (webView *WebView) SendMessageToPage(ctx context.Context, message *UserMess
 		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
 	_arg1 = (*C.WebKitUserMessage)(unsafe.Pointer(message.Native()))
-	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_web_view_send_message_to_page(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(message)
+	runtime.KeepAlive(callback)
 }
 
 // SendMessageToPageFinish: finish an asynchronous operation started with
@@ -1702,15 +1917,19 @@ func (webView *WebView) SendMessageToPageFinish(result gio.AsyncResulter) (*User
 	var _cerr *C.GError            // in
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.webkit_web_view_send_message_to_page_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(result)
 
 	var _userMessage *UserMessage // out
 	var _goerr error              // out
 
 	_userMessage = wrapUserMessage(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _userMessage, _goerr
 }
@@ -1746,6 +1965,8 @@ func (webView *WebView) SetBackgroundColor(rgba *gdk.RGBA) {
 	_arg1 = (*C.GdkRGBA)(gextras.StructNative(unsafe.Pointer(rgba)))
 
 	C.webkit_web_view_set_background_color(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(rgba)
 }
 
 // SetCustomCharset sets the current custom character encoding override of
@@ -1758,9 +1979,14 @@ func (webView *WebView) SetCustomCharset(charset string) {
 	var _arg1 *C.gchar         // out
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(charset)))
+	if charset != "" {
+		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(charset)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
 
 	C.webkit_web_view_set_custom_charset(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(charset)
 }
 
 // SetEditable sets whether the user is allowed to edit the HTML document.
@@ -1783,6 +2009,8 @@ func (webView *WebView) SetEditable(editable bool) {
 	}
 
 	C.webkit_web_view_set_editable(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(editable)
 }
 
 // SetInputMethodContext: set the KitInputMethodContext to be used by web_view,
@@ -1793,9 +2021,13 @@ func (webView *WebView) SetInputMethodContext(context InputMethodContexter) {
 	var _arg1 *C.WebKitInputMethodContext // out
 
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.WebKitInputMethodContext)(unsafe.Pointer((context).(gextras.Nativer).Native()))
+	if context != nil {
+		_arg1 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
+	}
 
 	C.webkit_web_view_set_input_method_context(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(context)
 }
 
 // SetIsMuted sets the mute state of web_view.
@@ -1809,6 +2041,8 @@ func (webView *WebView) SetIsMuted(muted bool) {
 	}
 
 	C.webkit_web_view_set_is_muted(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(muted)
 }
 
 // SetSettings sets the KitSettings to be applied to web_view. The existing
@@ -1823,6 +2057,8 @@ func (webView *WebView) SetSettings(settings *Settings) {
 	_arg1 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	C.webkit_web_view_set_settings(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(settings)
 }
 
 // SetZoomLevel: set the zoom level of web_view, i.e. the factor by which the
@@ -1835,6 +2071,8 @@ func (webView *WebView) SetZoomLevel(zoomLevel float64) {
 	_arg1 = C.gdouble(zoomLevel)
 
 	C.webkit_web_view_set_zoom_level(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(zoomLevel)
 }
 
 // StopLoading stops any ongoing loading operation in web_view. This method does
@@ -1847,6 +2085,7 @@ func (webView *WebView) StopLoading() {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	C.webkit_web_view_stop_loading(_arg0)
+	runtime.KeepAlive(webView)
 }
 
 // TryClose tries to close the web_view. This will fire the onbeforeunload event
@@ -1859,4 +2098,5 @@ func (webView *WebView) TryClose() {
 	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	C.webkit_web_view_try_close(_arg0)
+	runtime.KeepAlive(webView)
 }

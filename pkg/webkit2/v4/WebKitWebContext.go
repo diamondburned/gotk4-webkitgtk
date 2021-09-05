@@ -12,9 +12,9 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -139,8 +139,6 @@ type WebContext struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*WebContext)(nil)
-
 func wrapWebContext(obj *externglib.Object) *WebContext {
 	return &WebContext{
 		Object: obj,
@@ -193,6 +191,7 @@ func NewWebContextWithWebsiteDataManager(manager *WebsiteDataManager) *WebContex
 	_arg1 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_web_context_new_with_website_data_manager(_arg1)
+	runtime.KeepAlive(manager)
 
 	var _webContext *WebContext // out
 
@@ -216,11 +215,15 @@ func (context *WebContext) AddPathToSandbox(path string, readOnly bool) {
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
+	defer C.free(unsafe.Pointer(_arg1))
 	if readOnly {
 		_arg2 = C.TRUE
 	}
 
 	C.webkit_web_context_add_path_to_sandbox(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(path)
+	runtime.KeepAlive(readOnly)
 }
 
 // AllowTLSCertificateForHost: ignore further TLS errors on the host for the
@@ -231,10 +234,14 @@ func (context *WebContext) AllowTLSCertificateForHost(certificate gio.TLSCertifi
 	var _arg2 *C.gchar            // out
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
-	_arg1 = (*C.GTlsCertificate)(unsafe.Pointer((certificate).(gextras.Nativer).Native()))
+	_arg1 = (*C.GTlsCertificate)(unsafe.Pointer(certificate.Native()))
 	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(host)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	C.webkit_web_context_allow_tls_certificate_for_host(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(certificate)
+	runtime.KeepAlive(host)
 }
 
 // ClearCache clears all resources currently cached. See also
@@ -245,6 +252,7 @@ func (context *WebContext) ClearCache() {
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	C.webkit_web_context_clear_cache(_arg0)
+	runtime.KeepAlive(context)
 }
 
 // DownloadURI requests downloading of the specified URI string. The download
@@ -258,8 +266,11 @@ func (context *WebContext) DownloadURI(uri string) *Download {
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(uri)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.webkit_web_context_download_uri(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(uri)
 
 	var _download *Download // out
 
@@ -278,6 +289,7 @@ func (context *WebContext) CacheModel() CacheModel {
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_web_context_get_cache_model(_arg0)
+	runtime.KeepAlive(context)
 
 	var _cacheModel CacheModel // out
 
@@ -295,6 +307,7 @@ func (context *WebContext) CookieManager() *CookieManager {
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_web_context_get_cookie_manager(_arg0)
+	runtime.KeepAlive(context)
 
 	var _cookieManager *CookieManager // out
 
@@ -314,6 +327,7 @@ func (context *WebContext) FaviconDatabase() *FaviconDatabase {
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_web_context_get_favicon_database(_arg0)
+	runtime.KeepAlive(context)
 
 	var _faviconDatabase *FaviconDatabase // out
 
@@ -335,6 +349,7 @@ func (context *WebContext) FaviconDatabaseDirectory() string {
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_web_context_get_favicon_database_directory(_arg0)
+	runtime.KeepAlive(context)
 
 	var _utf8 string // out
 
@@ -351,6 +366,7 @@ func (context *WebContext) GeolocationManager() *GeolocationManager {
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_web_context_get_geolocation_manager(_arg0)
+	runtime.KeepAlive(context)
 
 	var _geolocationManager *GeolocationManager // out
 
@@ -377,41 +393,47 @@ func (context *WebContext) Plugins(ctx context.Context, callback gio.AsyncReadyC
 		defer runtime.KeepAlive(cancellable)
 		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
-	_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	if callback != nil {
+		_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_web_context_get_plugins(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(callback)
 }
 
 // PluginsFinish: finish an asynchronous operation started with
 // webkit_web_context_get_plugins.
 //
 // Deprecated: since version 2.32.
-func (context *WebContext) PluginsFinish(result gio.AsyncResulter) (*externglib.List, error) {
+func (context *WebContext) PluginsFinish(result gio.AsyncResulter) ([]Plugin, error) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 *C.GAsyncResult     // out
 	var _cret *C.GList            // in
 	var _cerr *C.GError           // in
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.webkit_web_context_get_plugins_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(result)
 
-	var _list *externglib.List // out
-	var _goerr error           // out
+	var _list []Plugin // out
+	var _goerr error   // out
 
-	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
-	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
-		src := (*C.WebKitPlugin)(_p)
+	_list = make([]Plugin, 0, gextras.ListSize(unsafe.Pointer(_cret)))
+	gextras.MoveList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
+		src := (*C.WebKitPlugin)(v)
 		var dst Plugin // out
 		dst = *wrapPlugin(externglib.AssumeOwnership(unsafe.Pointer(src)))
-		return dst
+		_list = append(_list, dst)
 	})
-	_list.AttachFinalizer(func(v uintptr) {
-		C.g_object_unref(C.gpointer(uintptr(unsafe.Pointer(v))))
-	})
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _list, _goerr
 }
@@ -425,6 +447,7 @@ func (context *WebContext) ProcessModel() ProcessModel {
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_web_context_get_process_model(_arg0)
+	runtime.KeepAlive(context)
 
 	var _processModel ProcessModel // out
 
@@ -441,6 +464,7 @@ func (context *WebContext) SandboxEnabled() bool {
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_web_context_get_sandbox_enabled(_arg0)
+	runtime.KeepAlive(context)
 
 	var _ok bool // out
 
@@ -459,6 +483,7 @@ func (context *WebContext) SecurityManager() *SecurityManager {
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_web_context_get_security_manager(_arg0)
+	runtime.KeepAlive(context)
 
 	var _securityManager *SecurityManager // out
 
@@ -476,6 +501,7 @@ func (context *WebContext) SpellCheckingEnabled() bool {
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_web_context_get_spell_checking_enabled(_arg0)
+	runtime.KeepAlive(context)
 
 	var _ok bool // out
 
@@ -493,13 +519,14 @@ func (context *WebContext) SpellCheckingEnabled() bool {
 // format of the languages in the list.
 func (context *WebContext) SpellCheckingLanguages() []string {
 	var _arg0 *C.WebKitWebContext // out
-	var _cret **C.gchar
+	var _cret **C.gchar           // in
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_web_context_get_spell_checking_languages(_arg0)
+	runtime.KeepAlive(context)
 
-	var _utf8s []string
+	var _utf8s []string // out
 
 	{
 		var i int
@@ -512,7 +539,6 @@ func (context *WebContext) SpellCheckingLanguages() []string {
 		_utf8s = make([]string, i)
 		for i := range src {
 			_utf8s[i] = C.GoString((*C.gchar)(unsafe.Pointer(src[i])))
-			defer C.free(unsafe.Pointer(src[i]))
 		}
 	}
 
@@ -529,6 +555,7 @@ func (context *WebContext) TLSErrorsPolicy() TLSErrorsPolicy {
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_web_context_get_tls_errors_policy(_arg0)
+	runtime.KeepAlive(context)
 
 	var _tlsErrorsPolicy TLSErrorsPolicy // out
 
@@ -546,6 +573,7 @@ func (context *WebContext) UseSystemAppearanceForScrollbars() bool {
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_web_context_get_use_system_appearance_for_scrollbars(_arg0)
+	runtime.KeepAlive(context)
 
 	var _ok bool // out
 
@@ -563,17 +591,18 @@ func (context *WebContext) UseSystemAppearanceForScrollbars() bool {
 // webkit_web_context_set_web_process_count_limit().
 //
 // Deprecated: since version 2.26.
-func (context *WebContext) WebProcessCountLimit() uint {
+func (context *WebContext) WebProcessCountLimit() uint32 {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret C.guint             // in
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_web_context_get_web_process_count_limit(_arg0)
+	runtime.KeepAlive(context)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -586,12 +615,54 @@ func (context *WebContext) WebsiteDataManager() *WebsiteDataManager {
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_web_context_get_website_data_manager(_arg0)
+	runtime.KeepAlive(context)
 
 	var _websiteDataManager *WebsiteDataManager // out
 
 	_websiteDataManager = wrapWebsiteDataManager(externglib.Take(unsafe.Pointer(_cret)))
 
 	return _websiteDataManager
+}
+
+// InitializeNotificationPermissions sets initial desktop notification
+// permissions for the context. allowed_origins and disallowed_origins must each
+// be #GList of KitSecurityOrigin objects representing origins that will,
+// respectively, either always or never have permission to show desktop
+// notifications. No KitNotificationPermissionRequest will ever be generated for
+// any of the security origins represented in allowed_origins or
+// disallowed_origins. This function is necessary because some webpages
+// proactively check whether they have permission to display notifications
+// without ever creating a permission request.
+//
+// This function only affects web processes that have not already been created.
+// The best time to call it is when handling
+// KitWebContext::initialize-notification-permissions so as to ensure that new
+// web processes receive the most recent set of permissions.
+func (context *WebContext) InitializeNotificationPermissions(allowedOrigins []*SecurityOrigin, disallowedOrigins []*SecurityOrigin) {
+	var _arg0 *C.WebKitWebContext // out
+	var _arg1 *C.GList            // out
+	var _arg2 *C.GList            // out
+
+	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
+	for i := len(allowedOrigins) - 1; i >= 0; i-- {
+		src := allowedOrigins[i]
+		var dst *C.WebKitSecurityOrigin // out
+		dst = (*C.WebKitSecurityOrigin)(gextras.StructNative(unsafe.Pointer(src)))
+		_arg1 = C.g_list_prepend(_arg1, C.gpointer(unsafe.Pointer(dst)))
+	}
+	defer C.g_list_free(_arg1)
+	for i := len(disallowedOrigins) - 1; i >= 0; i-- {
+		src := disallowedOrigins[i]
+		var dst *C.WebKitSecurityOrigin // out
+		dst = (*C.WebKitSecurityOrigin)(gextras.StructNative(unsafe.Pointer(src)))
+		_arg2 = C.g_list_prepend(_arg2, C.gpointer(unsafe.Pointer(dst)))
+	}
+	defer C.g_list_free(_arg2)
+
+	C.webkit_web_context_initialize_notification_permissions(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(allowedOrigins)
+	runtime.KeepAlive(disallowedOrigins)
 }
 
 // IsAutomationAllowed: get whether automation is allowed in context. See also
@@ -603,6 +674,7 @@ func (context *WebContext) IsAutomationAllowed() bool {
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_web_context_is_automation_allowed(_arg0)
+	runtime.KeepAlive(context)
 
 	var _ok bool // out
 
@@ -621,6 +693,7 @@ func (context *WebContext) IsEphemeral() bool {
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_web_context_is_ephemeral(_arg0)
+	runtime.KeepAlive(context)
 
 	var _ok bool // out
 
@@ -640,8 +713,11 @@ func (context *WebContext) PrefetchDns(hostname string) {
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(hostname)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_web_context_prefetch_dns(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(hostname)
 }
 
 // RegisterURIScheme: register scheme in context, so that when an URI request
@@ -688,11 +764,15 @@ func (context *WebContext) RegisterURIScheme(scheme string, callback URISchemeRe
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*[0]byte)(C._gotk4_webkit24_URISchemeRequestCallback)
 	_arg3 = C.gpointer(gbox.Assign(callback))
 	_arg4 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
 
 	C.webkit_web_context_register_uri_scheme(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(scheme)
+	runtime.KeepAlive(callback)
 }
 
 // SendMessageToAllExtensions: send message to all KitWebExtension<!-- -->s
@@ -705,6 +785,8 @@ func (context *WebContext) SendMessageToAllExtensions(message *UserMessage) {
 	_arg1 = (*C.WebKitUserMessage)(unsafe.Pointer(message.Native()))
 
 	C.webkit_web_context_send_message_to_all_extensions(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(message)
 }
 
 // SetAdditionalPluginsDirectory: set an additional directory where WebKit will
@@ -717,8 +799,11 @@ func (context *WebContext) SetAdditionalPluginsDirectory(directory string) {
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(directory)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_web_context_set_additional_plugins_directory(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(directory)
 }
 
 // SetAutomationAllowed: set whether automation is allowed in context. When
@@ -740,6 +825,8 @@ func (context *WebContext) SetAutomationAllowed(allowed bool) {
 	}
 
 	C.webkit_web_context_set_automation_allowed(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(allowed)
 }
 
 // SetCacheModel specifies a usage model for WebViews, which WebKit will use to
@@ -767,6 +854,8 @@ func (context *WebContext) SetCacheModel(cacheModel CacheModel) {
 	_arg1 = C.WebKitCacheModel(cacheModel)
 
 	C.webkit_web_context_set_cache_model(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(cacheModel)
 }
 
 // SetDiskCacheDirectory: set the directory where disk cache files will be
@@ -785,8 +874,11 @@ func (context *WebContext) SetDiskCacheDirectory(directory string) {
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(directory)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_web_context_set_disk_cache_directory(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(directory)
 }
 
 // SetFaviconDatabaseDirectory: set the directory path to be used to store the
@@ -801,9 +893,14 @@ func (context *WebContext) SetFaviconDatabaseDirectory(path string) {
 	var _arg1 *C.gchar            // out
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(path)))
+	if path != "" {
+		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(path)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
 
 	C.webkit_web_context_set_favicon_database_directory(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(path)
 }
 
 // SetNetworkProxySettings: set the network proxy settings to be used by
@@ -825,9 +922,14 @@ func (context *WebContext) SetNetworkProxySettings(proxyMode NetworkProxyMode, p
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 	_arg1 = C.WebKitNetworkProxyMode(proxyMode)
-	_arg2 = (*C.WebKitNetworkProxySettings)(gextras.StructNative(unsafe.Pointer(proxySettings)))
+	if proxySettings != nil {
+		_arg2 = (*C.WebKitNetworkProxySettings)(gextras.StructNative(unsafe.Pointer(proxySettings)))
+	}
 
 	C.webkit_web_context_set_network_proxy_settings(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(proxyMode)
+	runtime.KeepAlive(proxySettings)
 }
 
 // SetPreferredLanguages: set the list of preferred languages, sorted from most
@@ -836,22 +938,26 @@ func (context *WebContext) SetNetworkProxySettings(proxyMode NetworkProxyMode, p
 // started by the KitWebContext.
 func (context *WebContext) SetPreferredLanguages(languages []string) {
 	var _arg0 *C.WebKitWebContext // out
-	var _arg1 **C.gchar
+	var _arg1 **C.gchar           // out
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 	{
 		_arg1 = (**C.gchar)(C.malloc(C.ulong(len(languages)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg1))
 		{
 			out := unsafe.Slice(_arg1, len(languages)+1)
 			var zero *C.gchar
 			out[len(languages)] = zero
 			for i := range languages {
 				out[i] = (*C.gchar)(unsafe.Pointer(C.CString(languages[i])))
+				defer C.free(unsafe.Pointer(out[i]))
 			}
 		}
 	}
 
 	C.webkit_web_context_set_preferred_languages(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(languages)
 }
 
 // SetProcessModel specifies a process model for WebViews, which WebKit will use
@@ -878,6 +984,8 @@ func (context *WebContext) SetProcessModel(processModel ProcessModel) {
 	_arg1 = C.WebKitProcessModel(processModel)
 
 	C.webkit_web_context_set_process_model(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(processModel)
 }
 
 // SetSandboxEnabled: set whether WebKit subprocesses will be sandboxed,
@@ -897,6 +1005,8 @@ func (context *WebContext) SetSandboxEnabled(enabled bool) {
 	}
 
 	C.webkit_web_context_set_sandbox_enabled(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(enabled)
 }
 
 // SetSpellCheckingEnabled: enable or disable the spell checking feature.
@@ -910,6 +1020,8 @@ func (context *WebContext) SetSpellCheckingEnabled(enabled bool) {
 	}
 
 	C.webkit_web_context_set_spell_checking_enabled(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(enabled)
 }
 
 // SetSpellCheckingLanguages: set the list of spell checking languages to be
@@ -924,22 +1036,26 @@ func (context *WebContext) SetSpellCheckingEnabled(enabled bool) {
 // in order to properly enable the spell checking feature in WebKit.
 func (context *WebContext) SetSpellCheckingLanguages(languages []string) {
 	var _arg0 *C.WebKitWebContext // out
-	var _arg1 **C.gchar
+	var _arg1 **C.gchar           // out
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 	{
 		_arg1 = (**C.gchar)(C.malloc(C.ulong(len(languages)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg1))
 		{
 			out := unsafe.Slice(_arg1, len(languages)+1)
 			var zero *C.gchar
 			out[len(languages)] = zero
 			for i := range languages {
 				out[i] = (*C.gchar)(unsafe.Pointer(C.CString(languages[i])))
+				defer C.free(unsafe.Pointer(out[i]))
 			}
 		}
 	}
 
 	C.webkit_web_context_set_spell_checking_languages(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(languages)
 }
 
 // SetTLSErrorsPolicy: set the TLS errors policy of context as policy
@@ -953,6 +1069,8 @@ func (context *WebContext) SetTLSErrorsPolicy(policy TLSErrorsPolicy) {
 	_arg1 = C.WebKitTLSErrorsPolicy(policy)
 
 	C.webkit_web_context_set_tls_errors_policy(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(policy)
 }
 
 // SetUseSystemAppearanceForScrollbars: set the
@@ -967,6 +1085,8 @@ func (context *WebContext) SetUseSystemAppearanceForScrollbars(enabled bool) {
 	}
 
 	C.webkit_web_context_set_use_system_appearance_for_scrollbars(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(enabled)
 }
 
 // SetWebExtensionsDirectory: set the directory where WebKit will look for Web
@@ -980,8 +1100,11 @@ func (context *WebContext) SetWebExtensionsDirectory(directory string) {
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(directory)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_web_context_set_web_extensions_directory(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(directory)
 }
 
 // SetWebExtensionsInitializationUserData: set user data to be passed to Web
@@ -998,6 +1121,8 @@ func (context *WebContext) SetWebExtensionsInitializationUserData(userData *glib
 	_arg1 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(userData)))
 
 	C.webkit_web_context_set_web_extensions_initialization_user_data(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(userData)
 }
 
 // SetWebProcessCountLimit sets the maximum number of web processes that can be
@@ -1007,7 +1132,7 @@ func (context *WebContext) SetWebExtensionsInitializationUserData(userData *glib
 // This function is now deprecated and does nothing for security reasons.
 //
 // Deprecated: since version 2.26.
-func (context *WebContext) SetWebProcessCountLimit(limit uint) {
+func (context *WebContext) SetWebProcessCountLimit(limit uint32) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 C.guint             // out
 
@@ -1015,6 +1140,8 @@ func (context *WebContext) SetWebProcessCountLimit(limit uint) {
 	_arg1 = C.guint(limit)
 
 	C.webkit_web_context_set_web_process_count_limit(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(limit)
 }
 
 // WebContextGetDefault gets the default web context

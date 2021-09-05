@@ -3,11 +3,11 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gtk/v3"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -35,8 +35,6 @@ type PrintCustomWidget struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*PrintCustomWidget)(nil)
-
 func wrapPrintCustomWidget(obj *externglib.Object) *PrintCustomWidget {
 	return &PrintCustomWidget{
 		Object: obj,
@@ -58,10 +56,13 @@ func NewPrintCustomWidget(widget gtk.Widgetter, title string) *PrintCustomWidget
 	var _arg2 *C.char                    // out
 	var _cret *C.WebKitPrintCustomWidget // in
 
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer((widget).(gextras.Nativer).Native()))
+	_arg1 = (*C.GtkWidget)(unsafe.Pointer(widget.Native()))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(title)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	_cret = C.webkit_print_custom_widget_new(_arg1, _arg2)
+	runtime.KeepAlive(widget)
+	runtime.KeepAlive(title)
 
 	var _printCustomWidget *PrintCustomWidget // out
 
@@ -79,6 +80,7 @@ func (printCustomWidget *PrintCustomWidget) Title() string {
 	_arg0 = (*C.WebKitPrintCustomWidget)(unsafe.Pointer(printCustomWidget.Native()))
 
 	_cret = C.webkit_print_custom_widget_get_title(_arg0)
+	runtime.KeepAlive(printCustomWidget)
 
 	var _utf8 string // out
 
@@ -99,10 +101,11 @@ func (printCustomWidget *PrintCustomWidget) Widget() gtk.Widgetter {
 	_arg0 = (*C.WebKitPrintCustomWidget)(unsafe.Pointer(printCustomWidget.Native()))
 
 	_cret = C.webkit_print_custom_widget_get_widget(_arg0)
+	runtime.KeepAlive(printCustomWidget)
 
 	var _widget gtk.Widgetter // out
 
-	_widget = (gextras.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(gtk.Widgetter)
+	_widget = (externglib.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(gtk.Widgetter)
 
 	return _widget
 }

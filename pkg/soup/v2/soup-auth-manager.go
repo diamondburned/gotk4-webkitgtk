@@ -3,10 +3,11 @@
 package soup
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -35,8 +36,6 @@ type AuthManager struct {
 	SessionFeature
 }
 
-var _ gextras.Nativer = (*AuthManager)(nil)
-
 func wrapAuthManager(obj *externglib.Object) *AuthManager {
 	return &AuthManager{
 		Object: obj,
@@ -59,6 +58,7 @@ func (manager *AuthManager) ClearCachedCredentials() {
 	_arg0 = (*C.SoupAuthManager)(unsafe.Pointer(manager.Native()))
 
 	C.soup_auth_manager_clear_cached_credentials(_arg0)
+	runtime.KeepAlive(manager)
 }
 
 // UseAuth records that auth is to be used under uri, as though a
@@ -76,7 +76,10 @@ func (manager *AuthManager) UseAuth(uri *URI, auth Auther) {
 
 	_arg0 = (*C.SoupAuthManager)(unsafe.Pointer(manager.Native()))
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
-	_arg2 = (*C.SoupAuth)(unsafe.Pointer((auth).(gextras.Nativer).Native()))
+	_arg2 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
 
 	C.soup_auth_manager_use_auth(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(auth)
 }

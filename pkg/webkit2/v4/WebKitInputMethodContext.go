@@ -9,8 +9,8 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v3"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -94,12 +94,12 @@ const (
 	// InputHintUppercaseSentences: suggest to capitalize the first word of each
 	// sentence
 	InputHintUppercaseSentences InputHints = 0b10000
-	// InputHintInhibitOsk: suggest to not show an onscreen keyboard
-	InputHintInhibitOsk InputHints = 0b100000
+	// InputHintInhibitOSK: suggest to not show an onscreen keyboard
+	InputHintInhibitOSK InputHints = 0b100000
 )
 
 func marshalInputHints(p uintptr) (interface{}, error) {
-	return InputHints(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return InputHints(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
 }
 
 // String returns the names in string for InputHints.
@@ -128,8 +128,8 @@ func (i InputHints) String() string {
 			builder.WriteString("UppercaseWords|")
 		case InputHintUppercaseSentences:
 			builder.WriteString("UppercaseSentences|")
-		case InputHintInhibitOsk:
-			builder.WriteString("InhibitOsk|")
+		case InputHintInhibitOSK:
+			builder.WriteString("InhibitOSK|")
 		default:
 			builder.WriteString(fmt.Sprintf("InputHints(0b%b)|", bit))
 		}
@@ -140,13 +140,18 @@ func (i InputHints) String() string {
 	return strings.TrimSuffix(builder.String(), "|")
 }
 
+// Has returns true if i contains other.
+func (i InputHints) Has(other InputHints) bool {
+	return (i & other) == other
+}
+
 // InputMethodContextOverrider contains methods that are overridable.
 //
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type InputMethodContextOverrider interface {
 	Committed(text string)
-	DeleteSurrounding(offset int, nChars uint)
+	DeleteSurrounding(offset int32, nChars uint32)
 	// FilterKeyEvent: allow key_event to be handled by the input method. If
 	// TRUE is returned, then no further processing should be done for the key
 	// event.
@@ -154,10 +159,10 @@ type InputMethodContextOverrider interface {
 	// Preedit: get the current preedit string for the context, and a list of
 	// WebKitInputMethodUnderline to apply to the string. The string will be
 	// displayed inserted at cursor_offset.
-	Preedit() (string, *externglib.List, uint)
+	Preedit() (string, []InputMethodUnderline, uint32)
 	// NotifyCursorArea: notify context that cursor area changed in input
 	// associated.
-	NotifyCursorArea(x int, y int, width int, height int)
+	NotifyCursorArea(x int32, y int32, width int32, height int32)
 	// NotifyFocusIn: notify context that input associated has gained focus.
 	NotifyFocusIn()
 	// NotifyFocusOut: notify context that input associated has lost focus.
@@ -165,7 +170,7 @@ type InputMethodContextOverrider interface {
 	// NotifySurrounding: notify context that the context surrounding the cursor
 	// has changed. If there's no selection selection_index is the same as
 	// cursor_index.
-	NotifySurrounding(text string, length uint, cursorIndex uint, selectionIndex uint)
+	NotifySurrounding(text string, length uint32, cursorIndex uint32, selectionIndex uint32)
 	PreeditChanged()
 	PreeditFinished()
 	PreeditStarted()
@@ -181,10 +186,10 @@ type InputMethodContext struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*InputMethodContext)(nil)
-
 // InputMethodContexter describes InputMethodContext's abstract methods.
 type InputMethodContexter interface {
+	externglib.Objector
+
 	// FilterKeyEvent: allow key_event to be handled by the input method.
 	FilterKeyEvent(keyEvent *gdk.EventKey) bool
 	// InputHints: get the value of the KitInputMethodContext:input-hints
@@ -195,17 +200,17 @@ type InputMethodContexter interface {
 	InputPurpose() InputPurpose
 	// Preedit: get the current preedit string for the context, and a list of
 	// WebKitInputMethodUnderline to apply to the string.
-	Preedit() (string, *externglib.List, uint)
+	Preedit() (string, []InputMethodUnderline, uint32)
 	// NotifyCursorArea: notify context that cursor area changed in input
 	// associated.
-	NotifyCursorArea(x int, y int, width int, height int)
+	NotifyCursorArea(x int32, y int32, width int32, height int32)
 	// NotifyFocusIn: notify context that input associated has gained focus.
 	NotifyFocusIn()
 	// NotifyFocusOut: notify context that input associated has lost focus.
 	NotifyFocusOut()
 	// NotifySurrounding: notify context that the context surrounding the cursor
 	// has changed.
-	NotifySurrounding(text string, length int, cursorIndex uint, selectionIndex uint)
+	NotifySurrounding(text string, length int32, cursorIndex uint32, selectionIndex uint32)
 	// Reset the context.
 	Reset()
 	// SetEnablePreedit: set whether context should enable preedit to display
@@ -242,6 +247,8 @@ func (context *InputMethodContext) FilterKeyEvent(keyEvent *gdk.EventKey) bool {
 	_arg1 = (*C.GdkEventKey)(gextras.StructNative(unsafe.Pointer(keyEvent)))
 
 	_cret = C.webkit_input_method_context_filter_key_event(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(keyEvent)
 
 	var _ok bool // out
 
@@ -260,6 +267,7 @@ func (context *InputMethodContext) InputHints() InputHints {
 	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_input_method_context_get_input_hints(_arg0)
+	runtime.KeepAlive(context)
 
 	var _inputHints InputHints // out
 
@@ -277,6 +285,7 @@ func (context *InputMethodContext) InputPurpose() InputPurpose {
 	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.webkit_input_method_context_get_input_purpose(_arg0)
+	runtime.KeepAlive(context)
 
 	var _inputPurpose InputPurpose // out
 
@@ -288,7 +297,7 @@ func (context *InputMethodContext) InputPurpose() InputPurpose {
 // Preedit: get the current preedit string for the context, and a list of
 // WebKitInputMethodUnderline to apply to the string. The string will be
 // displayed inserted at cursor_offset.
-func (context *InputMethodContext) Preedit() (string, *externglib.List, uint) {
+func (context *InputMethodContext) Preedit() (string, []InputMethodUnderline, uint32) {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _arg1 *C.char                     // in
 	var _arg2 *C.GList                    // in
@@ -297,31 +306,33 @@ func (context *InputMethodContext) Preedit() (string, *externglib.List, uint) {
 	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
 
 	C.webkit_input_method_context_get_preedit(_arg0, &_arg1, &_arg2, &_arg3)
+	runtime.KeepAlive(context)
 
-	var _text string                 // out
-	var _underlines *externglib.List // out
-	var _cursorOffset uint           // out
+	var _text string                       // out
+	var _underlines []InputMethodUnderline // out
+	var _cursorOffset uint32               // out
 
-	_text = C.GoString((*C.gchar)(unsafe.Pointer(_arg1)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_underlines = externglib.WrapList(uintptr(unsafe.Pointer(_arg2)))
-	_underlines.DataWrapper(func(_p unsafe.Pointer) interface{} {
-		src := (*C.WebKitInputMethodUnderline)(_p)
-		var dst *InputMethodUnderline // out
-		dst = (*InputMethodUnderline)(gextras.NewStructNative(unsafe.Pointer(src)))
-		return dst
-	})
-	_underlines.AttachFinalizer(func(v uintptr) {
-		C.webkit_input_method_underline_free((*C.WebKitInputMethodUnderline)(unsafe.Pointer(v)))
-	})
-	_cursorOffset = uint(_arg3)
+	if _arg1 != nil {
+		_text = C.GoString((*C.gchar)(unsafe.Pointer(_arg1)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
+	if _arg2 != nil {
+		_underlines = make([]*InputMethodUnderline, 0, gextras.ListSize(unsafe.Pointer(_arg2)))
+		gextras.MoveList(unsafe.Pointer(_arg2), true, func(v unsafe.Pointer) {
+			src := (*C.WebKitInputMethodUnderline)(v)
+			var dst *InputMethodUnderline // out
+			dst = (*InputMethodUnderline)(gextras.NewStructNative(unsafe.Pointer(src)))
+			_underlines = append(_underlines, dst)
+		})
+	}
+	_cursorOffset = uint32(_arg3)
 
 	return _text, _underlines, _cursorOffset
 }
 
 // NotifyCursorArea: notify context that cursor area changed in input
 // associated.
-func (context *InputMethodContext) NotifyCursorArea(x int, y int, width int, height int) {
+func (context *InputMethodContext) NotifyCursorArea(x int32, y int32, width int32, height int32) {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _arg1 C.int                       // out
 	var _arg2 C.int                       // out
@@ -335,6 +346,11 @@ func (context *InputMethodContext) NotifyCursorArea(x int, y int, width int, hei
 	_arg4 = C.int(height)
 
 	C.webkit_input_method_context_notify_cursor_area(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(x)
+	runtime.KeepAlive(y)
+	runtime.KeepAlive(width)
+	runtime.KeepAlive(height)
 }
 
 // NotifyFocusIn: notify context that input associated has gained focus.
@@ -344,6 +360,7 @@ func (context *InputMethodContext) NotifyFocusIn() {
 	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
 
 	C.webkit_input_method_context_notify_focus_in(_arg0)
+	runtime.KeepAlive(context)
 }
 
 // NotifyFocusOut: notify context that input associated has lost focus.
@@ -353,11 +370,12 @@ func (context *InputMethodContext) NotifyFocusOut() {
 	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
 
 	C.webkit_input_method_context_notify_focus_out(_arg0)
+	runtime.KeepAlive(context)
 }
 
 // NotifySurrounding: notify context that the context surrounding the cursor has
 // changed. If there's no selection selection_index is the same as cursor_index.
-func (context *InputMethodContext) NotifySurrounding(text string, length int, cursorIndex uint, selectionIndex uint) {
+func (context *InputMethodContext) NotifySurrounding(text string, length int32, cursorIndex uint32, selectionIndex uint32) {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _arg1 *C.gchar                    // out
 	var _arg2 C.int                       // out
@@ -366,11 +384,17 @@ func (context *InputMethodContext) NotifySurrounding(text string, length int, cu
 
 	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(text)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.int(length)
 	_arg3 = C.guint(cursorIndex)
 	_arg4 = C.guint(selectionIndex)
 
 	C.webkit_input_method_context_notify_surrounding(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(text)
+	runtime.KeepAlive(length)
+	runtime.KeepAlive(cursorIndex)
+	runtime.KeepAlive(selectionIndex)
 }
 
 // Reset the context. This will typically cause the input to clear the preedit
@@ -381,6 +405,7 @@ func (context *InputMethodContext) Reset() {
 	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
 
 	C.webkit_input_method_context_reset(_arg0)
+	runtime.KeepAlive(context)
 }
 
 // SetEnablePreedit: set whether context should enable preedit to display
@@ -395,6 +420,8 @@ func (context *InputMethodContext) SetEnablePreedit(enabled bool) {
 	}
 
 	C.webkit_input_method_context_set_enable_preedit(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(enabled)
 }
 
 func (context *InputMethodContext) SetInputHints(hints InputHints) {
@@ -405,6 +432,8 @@ func (context *InputMethodContext) SetInputHints(hints InputHints) {
 	_arg1 = C.WebKitInputHints(hints)
 
 	C.webkit_input_method_context_set_input_hints(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(hints)
 }
 
 // SetInputPurpose: set the value of the KitInputMethodContext:input-purpose
@@ -417,20 +446,27 @@ func (context *InputMethodContext) SetInputPurpose(purpose InputPurpose) {
 	_arg1 = C.WebKitInputPurpose(purpose)
 
 	C.webkit_input_method_context_set_input_purpose(_arg0, _arg1)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(purpose)
 }
 
+// InputMethodUnderline: instance of this type is always passed by reference.
 type InputMethodUnderline struct {
-	nocopy gextras.NoCopy
+	*inputMethodUnderline
+}
+
+// inputMethodUnderline is the struct that's finalized.
+type inputMethodUnderline struct {
 	native *C.WebKitInputMethodUnderline
 }
 
 func marshalInputMethodUnderline(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &InputMethodUnderline{native: (*C.WebKitInputMethodUnderline)(unsafe.Pointer(b))}, nil
+	return &InputMethodUnderline{&inputMethodUnderline{(*C.WebKitInputMethodUnderline)(unsafe.Pointer(b))}}, nil
 }
 
 // NewInputMethodUnderline constructs a struct InputMethodUnderline.
-func NewInputMethodUnderline(startOffset uint, endOffset uint) *InputMethodUnderline {
+func NewInputMethodUnderline(startOffset uint32, endOffset uint32) *InputMethodUnderline {
 	var _arg1 C.guint                       // out
 	var _arg2 C.guint                       // out
 	var _cret *C.WebKitInputMethodUnderline // in
@@ -439,13 +475,18 @@ func NewInputMethodUnderline(startOffset uint, endOffset uint) *InputMethodUnder
 	_arg2 = C.guint(endOffset)
 
 	_cret = C.webkit_input_method_underline_new(_arg1, _arg2)
+	runtime.KeepAlive(startOffset)
+	runtime.KeepAlive(endOffset)
 
 	var _inputMethodUnderline *InputMethodUnderline // out
 
 	_inputMethodUnderline = (*InputMethodUnderline)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_inputMethodUnderline, func(v *InputMethodUnderline) {
-		C.webkit_input_method_underline_free((*C.WebKitInputMethodUnderline)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_inputMethodUnderline)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_input_method_underline_free((*C.WebKitInputMethodUnderline)(intern.C))
+		},
+	)
 
 	return _inputMethodUnderline
 }
@@ -458,24 +499,19 @@ func (underline *InputMethodUnderline) Copy() *InputMethodUnderline {
 	_arg0 = (*C.WebKitInputMethodUnderline)(gextras.StructNative(unsafe.Pointer(underline)))
 
 	_cret = C.webkit_input_method_underline_copy(_arg0)
+	runtime.KeepAlive(underline)
 
 	var _inputMethodUnderline *InputMethodUnderline // out
 
 	_inputMethodUnderline = (*InputMethodUnderline)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_inputMethodUnderline, func(v *InputMethodUnderline) {
-		C.webkit_input_method_underline_free((*C.WebKitInputMethodUnderline)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_inputMethodUnderline)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_input_method_underline_free((*C.WebKitInputMethodUnderline)(intern.C))
+		},
+	)
 
 	return _inputMethodUnderline
-}
-
-// Free: free the KitInputMethodUnderline.
-func (underline *InputMethodUnderline) free() {
-	var _arg0 *C.WebKitInputMethodUnderline // out
-
-	_arg0 = (*C.WebKitInputMethodUnderline)(gextras.StructNative(unsafe.Pointer(underline)))
-
-	C.webkit_input_method_underline_free(_arg0)
 }
 
 // SetColor: set the color of the underline. If rgba is NULL the foreground text
@@ -485,7 +521,11 @@ func (underline *InputMethodUnderline) SetColor(rgba *gdk.RGBA) {
 	var _arg1 *C.GdkRGBA                    // out
 
 	_arg0 = (*C.WebKitInputMethodUnderline)(gextras.StructNative(unsafe.Pointer(underline)))
-	_arg1 = (*C.GdkRGBA)(gextras.StructNative(unsafe.Pointer(rgba)))
+	if rgba != nil {
+		_arg1 = (*C.GdkRGBA)(gextras.StructNative(unsafe.Pointer(rgba)))
+	}
 
 	C.webkit_input_method_underline_set_color(_arg0, _arg1)
+	runtime.KeepAlive(underline)
+	runtime.KeepAlive(rgba)
 }

@@ -8,7 +8,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -55,8 +55,6 @@ type AutomationSession struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*AutomationSession)(nil)
-
 func wrapAutomationSession(obj *externglib.Object) *AutomationSession {
 	return &AutomationSession{
 		Object: obj,
@@ -78,13 +76,18 @@ func (session *AutomationSession) ApplicationInfo() *ApplicationInfo {
 	_arg0 = (*C.WebKitAutomationSession)(unsafe.Pointer(session.Native()))
 
 	_cret = C.webkit_automation_session_get_application_info(_arg0)
+	runtime.KeepAlive(session)
 
 	var _applicationInfo *ApplicationInfo // out
 
 	_applicationInfo = (*ApplicationInfo)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_applicationInfo, func(v *ApplicationInfo) {
-		C.webkit_application_info_unref((*C.WebKitApplicationInfo)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	C.webkit_application_info_ref(_cret)
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_applicationInfo)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_application_info_unref((*C.WebKitApplicationInfo)(intern.C))
+		},
+	)
 
 	return _applicationInfo
 }
@@ -97,6 +100,7 @@ func (session *AutomationSession) ID() string {
 	_arg0 = (*C.WebKitAutomationSession)(unsafe.Pointer(session.Native()))
 
 	_cret = C.webkit_automation_session_get_id(_arg0)
+	runtime.KeepAlive(session)
 
 	var _utf8 string // out
 
@@ -121,4 +125,6 @@ func (session *AutomationSession) SetApplicationInfo(info *ApplicationInfo) {
 	_arg1 = (*C.WebKitApplicationInfo)(gextras.StructNative(unsafe.Pointer(info)))
 
 	C.webkit_automation_session_set_application_info(_arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(info)
 }

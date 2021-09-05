@@ -3,11 +3,12 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4-webkitgtk/pkg/soup/v2"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -25,8 +26,6 @@ func init() {
 type URIResponse struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*URIResponse)(nil)
 
 func wrapURIResponse(obj *externglib.Object) *URIResponse {
 	return &URIResponse{
@@ -49,6 +48,7 @@ func (response *URIResponse) ContentLength() uint64 {
 	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(response.Native()))
 
 	_cret = C.webkit_uri_response_get_content_length(_arg0)
+	runtime.KeepAlive(response)
 
 	var _guint64 uint64 // out
 
@@ -65,6 +65,7 @@ func (response *URIResponse) HttpHeaders() *soup.MessageHeaders {
 	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(response.Native()))
 
 	_cret = C.webkit_uri_response_get_http_headers(_arg0)
+	runtime.KeepAlive(response)
 
 	var _messageHeaders *soup.MessageHeaders // out
 
@@ -80,6 +81,7 @@ func (response *URIResponse) MIMEType() string {
 	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(response.Native()))
 
 	_cret = C.webkit_uri_response_get_mime_type(_arg0)
+	runtime.KeepAlive(response)
 
 	var _utf8 string // out
 
@@ -91,17 +93,18 @@ func (response *URIResponse) MIMEType() string {
 // StatusCode: get the status code of the KitURIResponse as returned by the
 // server. It will normally be a KnownStatusCode, for example SOUP_STATUS_OK,
 // though the server can respond with any unsigned integer.
-func (response *URIResponse) StatusCode() uint {
+func (response *URIResponse) StatusCode() uint32 {
 	var _arg0 *C.WebKitURIResponse // out
 	var _cret C.guint              // in
 
 	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(response.Native()))
 
 	_cret = C.webkit_uri_response_get_status_code(_arg0)
+	runtime.KeepAlive(response)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -115,6 +118,7 @@ func (response *URIResponse) SuggestedFilename() string {
 	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(response.Native()))
 
 	_cret = C.webkit_uri_response_get_suggested_filename(_arg0)
+	runtime.KeepAlive(response)
 
 	var _utf8 string // out
 
@@ -130,6 +134,7 @@ func (response *URIResponse) URI() string {
 	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(response.Native()))
 
 	_cret = C.webkit_uri_response_get_uri(_arg0)
+	runtime.KeepAlive(response)
 
 	var _utf8 string // out
 

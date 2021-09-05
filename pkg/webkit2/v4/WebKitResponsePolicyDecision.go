@@ -3,10 +3,10 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -24,8 +24,6 @@ func init() {
 type ResponsePolicyDecision struct {
 	PolicyDecision
 }
-
-var _ gextras.Nativer = (*ResponsePolicyDecision)(nil)
 
 func wrapResponsePolicyDecision(obj *externglib.Object) *ResponsePolicyDecision {
 	return &ResponsePolicyDecision{
@@ -54,6 +52,7 @@ func (decision *ResponsePolicyDecision) Request() *URIRequest {
 	_arg0 = (*C.WebKitResponsePolicyDecision)(unsafe.Pointer(decision.Native()))
 
 	_cret = C.webkit_response_policy_decision_get_request(_arg0)
+	runtime.KeepAlive(decision)
 
 	var _uriRequest *URIRequest // out
 
@@ -70,6 +69,7 @@ func (decision *ResponsePolicyDecision) Response() *URIResponse {
 	_arg0 = (*C.WebKitResponsePolicyDecision)(unsafe.Pointer(decision.Native()))
 
 	_cret = C.webkit_response_policy_decision_get_response(_arg0)
+	runtime.KeepAlive(decision)
 
 	var _uriResponse *URIResponse // out
 
@@ -88,6 +88,7 @@ func (decision *ResponsePolicyDecision) IsMIMETypeSupported() bool {
 	_arg0 = (*C.WebKitResponsePolicyDecision)(unsafe.Pointer(decision.Native()))
 
 	_cret = C.webkit_response_policy_decision_is_mime_type_supported(_arg0)
+	runtime.KeepAlive(decision)
 
 	var _ok bool // out
 

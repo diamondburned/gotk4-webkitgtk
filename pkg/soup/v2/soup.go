@@ -7,8 +7,8 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -112,7 +112,7 @@ const (
 	KnownStatusCodeContinue                     KnownStatusCode = 100
 	KnownStatusCodeSwitchingProtocols           KnownStatusCode = 101
 	KnownStatusCodeProcessing                   KnownStatusCode = 102
-	KnownStatusCodeOk                           KnownStatusCode = 200
+	KnownStatusCodeOK                           KnownStatusCode = 200
 	KnownStatusCodeCreated                      KnownStatusCode = 201
 	KnownStatusCodeAccepted                     KnownStatusCode = 202
 	KnownStatusCodeNonAuthoritative             KnownStatusCode = 203
@@ -199,8 +199,8 @@ func (k KnownStatusCode) String() string {
 		return "SwitchingProtocols"
 	case KnownStatusCodeProcessing:
 		return "Processing"
-	case KnownStatusCodeOk:
-		return "Ok"
+	case KnownStatusCodeOK:
+		return "OK"
 	case KnownStatusCodeCreated:
 		return "Created"
 	case KnownStatusCodeAccepted:
@@ -294,6 +294,18 @@ func (k KnownStatusCode) String() string {
 	}
 }
 
+func RequestErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.soup_request_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+
+	return _quark
+}
+
 type RequesterError int
 
 const (
@@ -315,6 +327,18 @@ func (r RequesterError) String() string {
 	default:
 		return fmt.Sprintf("RequesterError(%d)", r)
 	}
+}
+
+func RequesterErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.soup_requester_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+
+	return _quark
 }
 
 type SameSitePolicy int
@@ -348,6 +372,18 @@ func (s SameSitePolicy) String() string {
 	}
 }
 
+func TLDErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.soup_tld_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+
+	return _quark
+}
+
 type XMLRPCError int
 
 const (
@@ -371,6 +407,18 @@ func (x XMLRPCError) String() string {
 	}
 }
 
+func XMLRPCErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.soup_xmlrpc_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+
+	return _quark
+}
+
 type Cacheability int
 
 const (
@@ -381,7 +429,7 @@ const (
 )
 
 func marshalCacheability(p uintptr) (interface{}, error) {
-	return Cacheability(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return Cacheability(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
 }
 
 // String returns the names in string for Cacheability.
@@ -416,11 +464,26 @@ func (c Cacheability) String() string {
 	return strings.TrimSuffix(builder.String(), "|")
 }
 
+// Has returns true if c contains other.
+func (c Cacheability) Has(other Cacheability) bool {
+	return (c & other) == other
+}
+
+func HttpErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.soup_http_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+
+	return _quark
+}
+
 type AuthBasic struct {
 	Auth
 }
-
-var _ gextras.Nativer = (*AuthBasic)(nil)
 
 func wrapAuthBasic(obj *externglib.Object) *AuthBasic {
 	return &AuthBasic{
@@ -442,8 +505,6 @@ type AuthDigest struct {
 	Auth
 }
 
-var _ gextras.Nativer = (*AuthDigest)(nil)
-
 func wrapAuthDigest(obj *externglib.Object) *AuthDigest {
 	return &AuthDigest{
 		Auth: Auth{
@@ -464,8 +525,6 @@ type AuthNTLM struct {
 	Auth
 }
 
-var _ gextras.Nativer = (*AuthNTLM)(nil)
-
 func wrapAuthNTLM(obj *externglib.Object) *AuthNTLM {
 	return &AuthNTLM{
 		Auth: Auth{
@@ -485,8 +544,6 @@ func (*AuthNTLM) privateAuthNTLM() {}
 type AuthNegotiate struct {
 	Auth
 }
-
-var _ gextras.Nativer = (*AuthNegotiate)(nil)
 
 func wrapAuthNegotiate(obj *externglib.Object) *AuthNegotiate {
 	return &AuthNegotiate{

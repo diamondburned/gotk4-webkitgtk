@@ -3,11 +3,11 @@
 package soup
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -25,6 +25,39 @@ func init() {
 	})
 }
 
+// AUTH_DOMAIN_ADD_PATH alias for the AuthDomain:add-path property. (Shortcut
+// for calling soup_auth_domain_add_path().)
+const AUTH_DOMAIN_ADD_PATH = "add-path"
+
+// AUTH_DOMAIN_FILTER alias for the AuthDomain:filter property. (The
+// AuthDomainFilter for the domain.)
+const AUTH_DOMAIN_FILTER = "filter"
+
+// AUTH_DOMAIN_FILTER_DATA alias for the AuthDomain:filter-data property. (Data
+// to pass to the AuthDomainFilter.)
+const AUTH_DOMAIN_FILTER_DATA = "filter-data"
+
+// AUTH_DOMAIN_GENERIC_AUTH_CALLBACK alias for the
+// AuthDomain:generic-auth-callback property. (The
+// AuthDomainGenericAuthCallback.)
+const AUTH_DOMAIN_GENERIC_AUTH_CALLBACK = "generic-auth-callback"
+
+// AUTH_DOMAIN_GENERIC_AUTH_DATA alias for the AuthDomain:generic-auth-data
+// property. (The data to pass to the AuthDomainGenericAuthCallback.)
+const AUTH_DOMAIN_GENERIC_AUTH_DATA = "generic-auth-data"
+
+// AUTH_DOMAIN_PROXY alias for the AuthDomain:proxy property. (Whether or not
+// this is a proxy auth domain.)
+const AUTH_DOMAIN_PROXY = "proxy"
+
+// AUTH_DOMAIN_REALM alias for the AuthDomain:realm property. (The realm of this
+// auth domain.)
+const AUTH_DOMAIN_REALM = "realm"
+
+// AUTH_DOMAIN_REMOVE_PATH alias for the AuthDomain:remove-path property.
+// (Shortcut for calling soup_auth_domain_remove_path().)
+const AUTH_DOMAIN_REMOVE_PATH = "remove-path"
+
 // AuthDomainFilter: prototype for a AuthDomain filter; see
 // soup_auth_domain_set_filter() for details.
 type AuthDomainFilter func(domain AuthDomainer, msg *Message) (ok bool)
@@ -39,7 +72,7 @@ func _gotk4_soup2_AuthDomainFilter(arg0 *C.SoupAuthDomain, arg1 *C.SoupMessage, 
 	var domain AuthDomainer // out
 	var msg *Message        // out
 
-	domain = (gextras.CastObject(externglib.Take(unsafe.Pointer(arg0)))).(AuthDomainer)
+	domain = (externglib.CastObject(externglib.Take(unsafe.Pointer(arg0)))).(AuthDomainer)
 	msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
 
 	fn := v.(AuthDomainFilter)
@@ -80,7 +113,7 @@ func _gotk4_soup2_AuthDomainGenericAuthCallback(arg0 *C.SoupAuthDomain, arg1 *C.
 	var msg *Message        // out
 	var username string     // out
 
-	domain = (gextras.CastObject(externglib.Take(unsafe.Pointer(arg0)))).(AuthDomainer)
+	domain = (externglib.CastObject(externglib.Take(unsafe.Pointer(arg0)))).(AuthDomainer)
 	msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
 	username = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
 	defer C.free(unsafe.Pointer(arg2))
@@ -118,10 +151,10 @@ type AuthDomain struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*AuthDomain)(nil)
-
 // AuthDomainer describes AuthDomain's abstract methods.
 type AuthDomainer interface {
+	externglib.Objector
+
 	// Accepts checks if msg contains appropriate authorization for domain to
 	// accept it.
 	Accepts(msg *Message) string
@@ -180,11 +213,15 @@ func (domain *AuthDomain) Accepts(msg *Message) string {
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_auth_domain_accepts(_arg0, _arg1)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(msg)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	defer C.free(unsafe.Pointer(_cret))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+		defer C.free(unsafe.Pointer(_cret))
+	}
 
 	return _utf8
 }
@@ -201,8 +238,11 @@ func (domain *AuthDomain) AddPath(path string) {
 
 	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(domain.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.soup_auth_domain_add_path(_arg0, _arg1)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(path)
 }
 
 // Challenge adds a "WWW-Authenticate" or "Proxy-Authenticate" header to msg,
@@ -217,6 +257,8 @@ func (domain *AuthDomain) Challenge(msg *Message) {
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	C.soup_auth_domain_challenge(_arg0, _arg1)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(msg)
 }
 
 // CheckPassword checks if msg authenticates to domain via username and
@@ -231,9 +273,15 @@ func (domain *AuthDomain) CheckPassword(msg *Message, username string, password 
 	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(domain.Native()))
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(username)))
+	defer C.free(unsafe.Pointer(_arg2))
 	_arg3 = (*C.char)(unsafe.Pointer(C.CString(password)))
+	defer C.free(unsafe.Pointer(_arg3))
 
 	_cret = C.soup_auth_domain_check_password(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(username)
+	runtime.KeepAlive(password)
 
 	var _ok bool // out
 
@@ -258,6 +306,8 @@ func (domain *AuthDomain) Covers(msg *Message) bool {
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_auth_domain_covers(_arg0, _arg1)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(msg)
 
 	var _ok bool // out
 
@@ -276,6 +326,7 @@ func (domain *AuthDomain) Realm() string {
 	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(domain.Native()))
 
 	_cret = C.soup_auth_domain_get_realm(_arg0)
+	runtime.KeepAlive(domain)
 
 	var _utf8 string // out
 
@@ -303,8 +354,11 @@ func (domain *AuthDomain) RemovePath(path string) {
 
 	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(domain.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.soup_auth_domain_remove_path(_arg0, _arg1)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(path)
 }
 
 // SetFilter adds filter as an authentication filter to domain. The filter gets
@@ -341,6 +395,8 @@ func (domain *AuthDomain) SetFilter(filter AuthDomainFilter) {
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
 
 	C.soup_auth_domain_set_filter(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(filter)
 }
 
 // SetGenericAuthCallback sets auth_callback as an authentication-handling
@@ -360,6 +416,8 @@ func (domain *AuthDomain) SetGenericAuthCallback(authCallback AuthDomainGenericA
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
 
 	C.soup_auth_domain_set_generic_auth_callback(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(authCallback)
 }
 
 func (domain *AuthDomain) TryGenericAuthCallback(msg *Message, username string) bool {
@@ -371,8 +429,12 @@ func (domain *AuthDomain) TryGenericAuthCallback(msg *Message, username string) 
 	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(domain.Native()))
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(username)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	_cret = C.soup_auth_domain_try_generic_auth_callback(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(username)
 
 	var _ok bool // out
 

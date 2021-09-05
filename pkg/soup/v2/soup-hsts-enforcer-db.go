@@ -3,10 +3,10 @@
 package soup
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -21,11 +21,11 @@ func init() {
 	})
 }
 
+const HSTS_ENFORCER_DB_FILENAME = "filename"
+
 type HSTSEnforcerDB struct {
 	HSTSEnforcer
 }
-
-var _ gextras.Nativer = (*HSTSEnforcerDB)(nil)
 
 func wrapHSTSEnforcerDB(obj *externglib.Object) *HSTSEnforcerDB {
 	return &HSTSEnforcerDB{
@@ -56,8 +56,10 @@ func NewHSTSEnforcerDB(filename string) *HSTSEnforcerDB {
 	var _cret *C.SoupHSTSEnforcer // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(filename)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.soup_hsts_enforcer_db_new(_arg1)
+	runtime.KeepAlive(filename)
 
 	var _hstsEnforcerDB *HSTSEnforcerDB // out
 

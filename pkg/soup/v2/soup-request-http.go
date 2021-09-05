@@ -3,11 +3,11 @@
 package soup
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -25,8 +25,6 @@ func init() {
 type RequestHTTP struct {
 	Request
 }
-
-var _ gextras.Nativer = (*RequestHTTP)(nil)
 
 func wrapRequestHTTP(obj *externglib.Object) *RequestHTTP {
 	return &RequestHTTP{
@@ -53,6 +51,7 @@ func (http *RequestHTTP) Message() *Message {
 	_arg0 = (*C.SoupRequestHTTP)(unsafe.Pointer(http.Native()))
 
 	_cret = C.soup_request_http_get_message(_arg0)
+	runtime.KeepAlive(http)
 
 	var _message *Message // out
 

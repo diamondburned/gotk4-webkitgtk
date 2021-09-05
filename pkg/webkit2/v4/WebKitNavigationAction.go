@@ -8,7 +8,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -69,14 +69,19 @@ func (n NavigationType) String() string {
 	}
 }
 
+// NavigationAction: instance of this type is always passed by reference.
 type NavigationAction struct {
-	nocopy gextras.NoCopy
+	*navigationAction
+}
+
+// navigationAction is the struct that's finalized.
+type navigationAction struct {
 	native *C.WebKitNavigationAction
 }
 
 func marshalNavigationAction(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &NavigationAction{native: (*C.WebKitNavigationAction)(unsafe.Pointer(b))}, nil
+	return &NavigationAction{&navigationAction{(*C.WebKitNavigationAction)(unsafe.Pointer(b))}}, nil
 }
 
 // Copy: make a copy of navigation.
@@ -87,56 +92,53 @@ func (navigation *NavigationAction) Copy() *NavigationAction {
 	_arg0 = (*C.WebKitNavigationAction)(gextras.StructNative(unsafe.Pointer(navigation)))
 
 	_cret = C.webkit_navigation_action_copy(_arg0)
+	runtime.KeepAlive(navigation)
 
 	var _navigationAction *NavigationAction // out
 
 	_navigationAction = (*NavigationAction)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_navigationAction, func(v *NavigationAction) {
-		C.webkit_navigation_action_free((*C.WebKitNavigationAction)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_navigationAction)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_navigation_action_free((*C.WebKitNavigationAction)(intern.C))
+		},
+	)
 
 	return _navigationAction
 }
 
-// Free: free the KitNavigationAction
-func (navigation *NavigationAction) free() {
-	var _arg0 *C.WebKitNavigationAction // out
-
-	_arg0 = (*C.WebKitNavigationAction)(gextras.StructNative(unsafe.Pointer(navigation)))
-
-	C.webkit_navigation_action_free(_arg0)
-}
-
 // Modifiers: return a bitmask of ModifierType values describing the modifier
 // keys that were in effect when the navigation was requested
-func (navigation *NavigationAction) Modifiers() uint {
+func (navigation *NavigationAction) Modifiers() uint32 {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret C.guint                   // in
 
 	_arg0 = (*C.WebKitNavigationAction)(gextras.StructNative(unsafe.Pointer(navigation)))
 
 	_cret = C.webkit_navigation_action_get_modifiers(_arg0)
+	runtime.KeepAlive(navigation)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
 
 // MouseButton: return the number of the mouse button that triggered the
 // navigation, or 0 if the navigation was not started by a mouse event.
-func (navigation *NavigationAction) MouseButton() uint {
+func (navigation *NavigationAction) MouseButton() uint32 {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret C.guint                   // in
 
 	_arg0 = (*C.WebKitNavigationAction)(gextras.StructNative(unsafe.Pointer(navigation)))
 
 	_cret = C.webkit_navigation_action_get_mouse_button(_arg0)
+	runtime.KeepAlive(navigation)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -149,6 +151,7 @@ func (navigation *NavigationAction) NavigationType() NavigationType {
 	_arg0 = (*C.WebKitNavigationAction)(gextras.StructNative(unsafe.Pointer(navigation)))
 
 	_cret = C.webkit_navigation_action_get_navigation_type(_arg0)
+	runtime.KeepAlive(navigation)
 
 	var _navigationType NavigationType // out
 
@@ -170,6 +173,7 @@ func (navigation *NavigationAction) Request() *URIRequest {
 	_arg0 = (*C.WebKitNavigationAction)(gextras.StructNative(unsafe.Pointer(navigation)))
 
 	_cret = C.webkit_navigation_action_get_request(_arg0)
+	runtime.KeepAlive(navigation)
 
 	var _uriRequest *URIRequest // out
 
@@ -186,6 +190,7 @@ func (navigation *NavigationAction) IsRedirect() bool {
 	_arg0 = (*C.WebKitNavigationAction)(gextras.StructNative(unsafe.Pointer(navigation)))
 
 	_cret = C.webkit_navigation_action_is_redirect(_arg0)
+	runtime.KeepAlive(navigation)
 
 	var _ok bool // out
 
@@ -205,6 +210,7 @@ func (navigation *NavigationAction) IsUserGesture() bool {
 	_arg0 = (*C.WebKitNavigationAction)(gextras.StructNative(unsafe.Pointer(navigation)))
 
 	_cret = C.webkit_navigation_action_is_user_gesture(_arg0)
+	runtime.KeepAlive(navigation)
 
 	var _ok bool // out
 

@@ -7,7 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -22,14 +22,19 @@ func init() {
 	})
 }
 
+// MIMEInfo: instance of this type is always passed by reference.
 type MIMEInfo struct {
-	nocopy gextras.NoCopy
+	*mimeInfo
+}
+
+// mimeInfo is the struct that's finalized.
+type mimeInfo struct {
 	native *C.WebKitMimeInfo
 }
 
 func marshalMIMEInfo(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &MIMEInfo{native: (*C.WebKitMimeInfo)(unsafe.Pointer(b))}, nil
+	return &MIMEInfo{&mimeInfo{(*C.WebKitMimeInfo)(unsafe.Pointer(b))}}, nil
 }
 
 // Description: deprecated: since version 2.32.
@@ -40,6 +45,7 @@ func (info *MIMEInfo) Description() string {
 	_arg0 = (*C.WebKitMimeInfo)(gextras.StructNative(unsafe.Pointer(info)))
 
 	_cret = C.webkit_mime_info_get_description(_arg0)
+	runtime.KeepAlive(info)
 
 	var _utf8 string // out
 
@@ -54,13 +60,14 @@ func (info *MIMEInfo) Description() string {
 // Deprecated: since version 2.32.
 func (info *MIMEInfo) Extensions() []string {
 	var _arg0 *C.WebKitMimeInfo // out
-	var _cret **C.gchar
+	var _cret **C.gchar         // in
 
 	_arg0 = (*C.WebKitMimeInfo)(gextras.StructNative(unsafe.Pointer(info)))
 
 	_cret = C.webkit_mime_info_get_extensions(_arg0)
+	runtime.KeepAlive(info)
 
-	var _utf8s []string
+	var _utf8s []string // out
 
 	{
 		var i int
@@ -73,7 +80,6 @@ func (info *MIMEInfo) Extensions() []string {
 		_utf8s = make([]string, i)
 		for i := range src {
 			_utf8s[i] = C.GoString((*C.gchar)(unsafe.Pointer(src[i])))
-			defer C.free(unsafe.Pointer(src[i]))
 		}
 	}
 
@@ -88,46 +94,11 @@ func (info *MIMEInfo) MIMEType() string {
 	_arg0 = (*C.WebKitMimeInfo)(gextras.StructNative(unsafe.Pointer(info)))
 
 	_cret = C.webkit_mime_info_get_mime_type(_arg0)
+	runtime.KeepAlive(info)
 
 	var _utf8 string // out
 
 	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
 
 	return _utf8
-}
-
-// Ref: atomically increments the reference count of info by one. This function
-// is MT-safe and may be called from any thread.
-//
-// Deprecated: since version 2.32.
-func (info *MIMEInfo) ref() *MIMEInfo {
-	var _arg0 *C.WebKitMimeInfo // out
-	var _cret *C.WebKitMimeInfo // in
-
-	_arg0 = (*C.WebKitMimeInfo)(gextras.StructNative(unsafe.Pointer(info)))
-
-	_cret = C.webkit_mime_info_ref(_arg0)
-
-	var _mimeInfo *MIMEInfo // out
-
-	_mimeInfo = (*MIMEInfo)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_mime_info_ref(_cret)
-	runtime.SetFinalizer(_mimeInfo, func(v *MIMEInfo) {
-		C.webkit_mime_info_unref((*C.WebKitMimeInfo)(gextras.StructNative(unsafe.Pointer(v))))
-	})
-
-	return _mimeInfo
-}
-
-// Unref: atomically decrements the reference count of info by one. If the
-// reference count drops to 0, all memory allocated by the KitMimeInfo is
-// released. This function is MT-safe and may be called from any thread.
-//
-// Deprecated: since version 2.32.
-func (info *MIMEInfo) unref() {
-	var _arg0 *C.WebKitMimeInfo // out
-
-	_arg0 = (*C.WebKitMimeInfo)(gextras.StructNative(unsafe.Pointer(info)))
-
-	C.webkit_mime_info_unref(_arg0)
 }

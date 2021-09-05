@@ -3,10 +3,12 @@
 package soup
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -29,6 +31,9 @@ type ContentSnifferOverrider interface {
 	// BufferSize gets the number of bytes sniffer needs in order to properly
 	// sniff a buffer.
 	BufferSize() uint
+	// Sniff sniffs buffer to determine its Content-Type. The result may also be
+	// influenced by the Content-Type declared in msg's response headers.
+	Sniff(msg *Message, buffer *Buffer) (map[string]string, string)
 }
 
 type ContentSniffer struct {
@@ -36,8 +41,6 @@ type ContentSniffer struct {
 
 	SessionFeature
 }
-
-var _ gextras.Nativer = (*ContentSniffer)(nil)
 
 func wrapContentSniffer(obj *externglib.Object) *ContentSniffer {
 	return &ContentSniffer{
@@ -76,10 +79,50 @@ func (sniffer *ContentSniffer) BufferSize() uint {
 	_arg0 = (*C.SoupContentSniffer)(unsafe.Pointer(sniffer.Native()))
 
 	_cret = C.soup_content_sniffer_get_buffer_size(_arg0)
+	runtime.KeepAlive(sniffer)
 
 	var _gsize uint // out
 
 	_gsize = uint(_cret)
 
 	return _gsize
+}
+
+// Sniff sniffs buffer to determine its Content-Type. The result may also be
+// influenced by the Content-Type declared in msg's response headers.
+func (sniffer *ContentSniffer) Sniff(msg *Message, buffer *Buffer) (map[string]string, string) {
+	var _arg0 *C.SoupContentSniffer // out
+	var _arg1 *C.SoupMessage        // out
+	var _arg2 *C.SoupBuffer         // out
+	var _arg3 *C.GHashTable         // in
+	var _cret *C.char               // in
+
+	_arg0 = (*C.SoupContentSniffer)(unsafe.Pointer(sniffer.Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg2 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(buffer)))
+
+	_cret = C.soup_content_sniffer_sniff(_arg0, _arg1, _arg2, &_arg3)
+	runtime.KeepAlive(sniffer)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(buffer)
+
+	var _params map[string]string // out
+	var _utf8 string              // out
+
+	if _arg3 != nil {
+		_params = make(map[string]string, gextras.HashTableSize(unsafe.Pointer(_arg3)))
+		gextras.MoveHashTable(unsafe.Pointer(_arg3), true, func(k, v unsafe.Pointer) {
+			ksrc := *(**C.gchar)(k)
+			vsrc := *(**C.gchar)(v)
+			var kdst string // out
+			var vdst string // out
+			kdst = C.GoString((*C.gchar)(unsafe.Pointer(ksrc)))
+			vdst = C.GoString((*C.gchar)(unsafe.Pointer(vsrc)))
+			_params[kdst] = vdst
+		})
+	}
+	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	defer C.free(unsafe.Pointer(_cret))
+
+	return _params, _utf8
 }

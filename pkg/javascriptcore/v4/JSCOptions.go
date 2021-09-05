@@ -18,6 +18,22 @@ import (
 // gboolean _gotk4_javascriptcore4_OptionsFunc(char*, JSCOptionType, char*, gpointer);
 import "C"
 
+// OPTIONS_USE_DFG allows the DFG JIT to be used if TRUE. Option type:
+// JSC_OPTION_BOOLEAN Default value: TRUE.
+const OPTIONS_USE_DFG = "useDFGJIT"
+
+// OPTIONS_USE_FTL allows the FTL JIT to be used if TRUE. Option type:
+// JSC_OPTION_BOOLEAN Default value: TRUE.
+const OPTIONS_USE_FTL = "useFTLJIT"
+
+// OPTIONS_USE_JIT allows the executable pages to be allocated for JIT and
+// thunks if TRUE. Option type: JSC_OPTION_BOOLEAN Default value: TRUE.
+const OPTIONS_USE_JIT = "useJIT"
+
+// OPTIONS_USE_LLINT allows the LLINT to be used if TRUE. Option type:
+// JSC_OPTION_BOOLEAN Default value: TRUE.
+const OPTIONS_USE_LLINT = "useLLInt"
+
 // OptionType: enum values for options types.
 type OptionType int
 
@@ -79,8 +95,10 @@ func _gotk4_javascriptcore4_OptionsFunc(arg0 *C.char, arg1 C.JSCOptionType, arg2
 	option = C.GoString((*C.gchar)(unsafe.Pointer(arg0)))
 	defer C.free(unsafe.Pointer(arg0))
 	typ = OptionType(arg1)
-	description = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-	defer C.free(unsafe.Pointer(arg2))
+	if arg2 != nil {
+		description = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
+		defer C.free(unsafe.Pointer(arg2))
+	}
 
 	fn := v.(OptionsFunc)
 	ok := fn(option, typ, description)
@@ -103,6 +121,7 @@ func OptionsForeach(function OptionsFunc) {
 	defer gbox.Delete(uintptr(_arg2))
 
 	C.jsc_options_foreach(_arg1, _arg2)
+	runtime.KeepAlive(function)
 }
 
 // OptionsGetBoolean: get option as a #gboolean value.
@@ -112,8 +131,10 @@ func OptionsGetBoolean(option string) (value bool, ok bool) {
 	var _cret C.gboolean // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(option)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.jsc_options_get_boolean(_arg1, &_arg2)
+	runtime.KeepAlive(option)
 
 	var _value bool // out
 	var _ok bool    // out
@@ -135,8 +156,10 @@ func OptionsGetDouble(option string) (float64, bool) {
 	var _cret C.gboolean // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(option)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.jsc_options_get_double(_arg1, &_arg2)
+	runtime.KeepAlive(option)
 
 	var _value float64 // out
 	var _ok bool       // out
@@ -150,19 +173,21 @@ func OptionsGetDouble(option string) (float64, bool) {
 }
 
 // OptionsGetInt: get option as a #gint value.
-func OptionsGetInt(option string) (int, bool) {
+func OptionsGetInt(option string) (int32, bool) {
 	var _arg1 *C.char    // out
 	var _arg2 C.gint     // in
 	var _cret C.gboolean // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(option)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.jsc_options_get_int(_arg1, &_arg2)
+	runtime.KeepAlive(option)
 
-	var _value int // out
-	var _ok bool   // out
+	var _value int32 // out
+	var _ok bool     // out
 
-	_value = int(_arg2)
+	_value = int32(_arg2)
 	if _cret != 0 {
 		_ok = true
 	}
@@ -185,10 +210,12 @@ func OptionsGetOptionGroup() *glib.OptionGroup {
 	var _optionGroup *glib.OptionGroup // out
 
 	_optionGroup = (*glib.OptionGroup)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.g_option_group_ref(_cret)
-	runtime.SetFinalizer(_optionGroup, func(v *glib.OptionGroup) {
-		C.g_option_group_unref((*C.GOptionGroup)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_optionGroup)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.g_option_group_unref((*C.GOptionGroup)(intern.C))
+		},
+	)
 
 	return _optionGroup
 }
@@ -204,8 +231,10 @@ func OptionsGetRangeString(option string) (string, bool) {
 	var _cret C.gboolean // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(option)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.jsc_options_get_range_string(_arg1, &_arg2)
+	runtime.KeepAlive(option)
 
 	var _value string // out
 	var _ok bool      // out
@@ -226,8 +255,10 @@ func OptionsGetSize(option string) (uint, bool) {
 	var _cret C.gboolean // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(option)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.jsc_options_get_size(_arg1, &_arg2)
+	runtime.KeepAlive(option)
 
 	var _value uint // out
 	var _ok bool    // out
@@ -247,8 +278,10 @@ func OptionsGetString(option string) (string, bool) {
 	var _cret C.gboolean // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(option)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.jsc_options_get_string(_arg1, &_arg2)
+	runtime.KeepAlive(option)
 
 	var _value string // out
 	var _ok bool      // out
@@ -263,19 +296,21 @@ func OptionsGetString(option string) (string, bool) {
 }
 
 // OptionsGetUint: get option as a #guint value.
-func OptionsGetUint(option string) (uint, bool) {
+func OptionsGetUint(option string) (uint32, bool) {
 	var _arg1 *C.char    // out
 	var _arg2 C.guint    // in
 	var _cret C.gboolean // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(option)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.jsc_options_get_uint(_arg1, &_arg2)
+	runtime.KeepAlive(option)
 
-	var _value uint // out
-	var _ok bool    // out
+	var _value uint32 // out
+	var _ok bool      // out
 
-	_value = uint(_arg2)
+	_value = uint32(_arg2)
 	if _cret != 0 {
 		_ok = true
 	}
@@ -290,11 +325,14 @@ func OptionsSetBoolean(option string, value bool) bool {
 	var _cret C.gboolean // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(option)))
+	defer C.free(unsafe.Pointer(_arg1))
 	if value {
 		_arg2 = C.TRUE
 	}
 
 	_cret = C.jsc_options_set_boolean(_arg1, _arg2)
+	runtime.KeepAlive(option)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 
@@ -312,9 +350,12 @@ func OptionsSetDouble(option string, value float64) bool {
 	var _cret C.gboolean // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(option)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.gdouble(value)
 
 	_cret = C.jsc_options_set_double(_arg1, _arg2)
+	runtime.KeepAlive(option)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 
@@ -326,15 +367,18 @@ func OptionsSetDouble(option string, value float64) bool {
 }
 
 // OptionsSetInt: set option as a #gint value.
-func OptionsSetInt(option string, value int) bool {
+func OptionsSetInt(option string, value int32) bool {
 	var _arg1 *C.char    // out
 	var _arg2 C.gint     // out
 	var _cret C.gboolean // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(option)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.gint(value)
 
 	_cret = C.jsc_options_set_int(_arg1, _arg2)
+	runtime.KeepAlive(option)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 
@@ -356,9 +400,13 @@ func OptionsSetRangeString(option string, value string) bool {
 	var _cret C.gboolean // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(option)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(value)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	_cret = C.jsc_options_set_range_string(_arg1, _arg2)
+	runtime.KeepAlive(option)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 
@@ -376,9 +424,12 @@ func OptionsSetSize(option string, value uint) bool {
 	var _cret C.gboolean // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(option)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.gsize(value)
 
 	_cret = C.jsc_options_set_size(_arg1, _arg2)
+	runtime.KeepAlive(option)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 
@@ -396,9 +447,13 @@ func OptionsSetString(option string, value string) bool {
 	var _cret C.gboolean // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(option)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(value)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	_cret = C.jsc_options_set_string(_arg1, _arg2)
+	runtime.KeepAlive(option)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 
@@ -410,15 +465,18 @@ func OptionsSetString(option string, value string) bool {
 }
 
 // OptionsSetUint: set option as a #guint value.
-func OptionsSetUint(option string, value uint) bool {
+func OptionsSetUint(option string, value uint32) bool {
 	var _arg1 *C.char    // out
 	var _arg2 C.guint    // out
 	var _cret C.gboolean // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(option)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.guint(value)
 
 	_cret = C.jsc_options_set_uint(_arg1, _arg2)
+	runtime.KeepAlive(option)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 

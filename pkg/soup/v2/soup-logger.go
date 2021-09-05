@@ -4,11 +4,11 @@ package soup
 
 import (
 	"fmt"
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -26,6 +26,12 @@ func init() {
 		{T: externglib.Type(C.soup_logger_get_type()), F: marshalLoggerer},
 	})
 }
+
+// LOGGER_LEVEL alias for the Logger:level property, qv.
+const LOGGER_LEVEL = "level"
+
+// LOGGER_MAX_BODY_SIZE alias for the Logger:max-body-size property, qv.
+const LOGGER_MAX_BODY_SIZE = "max-body-size"
 
 // LoggerLogLevel describes the level of logging output to provide.
 type LoggerLogLevel int
@@ -132,8 +138,6 @@ type Logger struct {
 	SessionFeature
 }
 
-var _ gextras.Nativer = (*Logger)(nil)
-
 func wrapLogger(obj *externglib.Object) *Logger {
 	return &Logger{
 		Object: obj,
@@ -155,7 +159,7 @@ func marshalLoggerer(p uintptr) (interface{}, error) {
 //
 // If you need finer control over what message parts are and aren't logged, use
 // soup_logger_set_request_filter() and soup_logger_set_response_filter().
-func NewLogger(level LoggerLogLevel, maxBodySize int) *Logger {
+func NewLogger(level LoggerLogLevel, maxBodySize int32) *Logger {
 	var _arg1 C.SoupLoggerLogLevel // out
 	var _arg2 C.int                // out
 	var _cret *C.SoupLogger        // in
@@ -164,6 +168,8 @@ func NewLogger(level LoggerLogLevel, maxBodySize int) *Logger {
 	_arg2 = C.int(maxBodySize)
 
 	_cret = C.soup_logger_new(_arg1, _arg2)
+	runtime.KeepAlive(level)
+	runtime.KeepAlive(maxBodySize)
 
 	var _logger *Logger // out
 
@@ -187,6 +193,8 @@ func (logger *Logger) Attach(session *Session) {
 	_arg1 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
 
 	C.soup_logger_attach(_arg0, _arg1)
+	runtime.KeepAlive(logger)
+	runtime.KeepAlive(session)
 }
 
 // Detach stops logger from watching session.
@@ -200,6 +208,8 @@ func (logger *Logger) Detach(session *Session) {
 	_arg1 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
 
 	C.soup_logger_detach(_arg0, _arg1)
+	runtime.KeepAlive(logger)
+	runtime.KeepAlive(session)
 }
 
 // SetPrinter sets up an alternate log printing routine, if you don't want the
@@ -216,6 +226,8 @@ func (logger *Logger) SetPrinter(printer LoggerPrinter) {
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
 
 	C.soup_logger_set_printer(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(logger)
+	runtime.KeepAlive(printer)
 }
 
 // SetRequestFilter sets up a filter to determine the log level for a given
@@ -235,6 +247,8 @@ func (logger *Logger) SetRequestFilter(requestFilter LoggerFilter) {
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
 
 	C.soup_logger_set_request_filter(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(logger)
+	runtime.KeepAlive(requestFilter)
 }
 
 // SetResponseFilter sets up a filter to determine the log level for a given
@@ -254,4 +268,6 @@ func (logger *Logger) SetResponseFilter(responseFilter LoggerFilter) {
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
 
 	C.soup_logger_set_response_filter(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(logger)
+	runtime.KeepAlive(responseFilter)
 }

@@ -3,10 +3,10 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -36,10 +36,10 @@ type PermissionRequest struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*PermissionRequest)(nil)
-
 // PermissionRequester describes PermissionRequest's abstract methods.
 type PermissionRequester interface {
+	externglib.Objector
+
 	// Allow the action which triggered this request.
 	Allow()
 	// Deny the action which triggered this request.
@@ -67,6 +67,7 @@ func (request *PermissionRequest) Allow() {
 	_arg0 = (*C.WebKitPermissionRequest)(unsafe.Pointer(request.Native()))
 
 	C.webkit_permission_request_allow(_arg0)
+	runtime.KeepAlive(request)
 }
 
 // Deny the action which triggered this request.
@@ -76,4 +77,5 @@ func (request *PermissionRequest) Deny() {
 	_arg0 = (*C.WebKitPermissionRequest)(unsafe.Pointer(request.Native()))
 
 	C.webkit_permission_request_deny(_arg0)
+	runtime.KeepAlive(request)
 }

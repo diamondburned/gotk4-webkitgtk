@@ -3,10 +3,10 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -33,8 +33,6 @@ type Download struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*Download)(nil)
-
 func wrapDownload(obj *externglib.Object) *Download {
 	return &Download{
 		Object: obj,
@@ -56,6 +54,7 @@ func (download *Download) Cancel() {
 	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
 
 	C.webkit_download_cancel(_arg0)
+	runtime.KeepAlive(download)
 }
 
 // AllowOverwrite returns the current value of the KitDownload:allow-overwrite
@@ -68,6 +67,7 @@ func (download *Download) AllowOverwrite() bool {
 	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
 
 	_cret = C.webkit_download_get_allow_overwrite(_arg0)
+	runtime.KeepAlive(download)
 
 	var _ok bool // out
 
@@ -88,6 +88,7 @@ func (download *Download) Destination() string {
 	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
 
 	_cret = C.webkit_download_get_destination(_arg0)
+	runtime.KeepAlive(download)
 
 	var _utf8 string // out
 
@@ -106,6 +107,7 @@ func (download *Download) ElapsedTime() float64 {
 	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
 
 	_cret = C.webkit_download_get_elapsed_time(_arg0)
+	runtime.KeepAlive(download)
 
 	var _gdouble float64 // out
 
@@ -124,6 +126,7 @@ func (download *Download) EstimatedProgress() float64 {
 	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
 
 	_cret = C.webkit_download_get_estimated_progress(_arg0)
+	runtime.KeepAlive(download)
 
 	var _gdouble float64 // out
 
@@ -141,6 +144,7 @@ func (download *Download) ReceivedDataLength() uint64 {
 	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
 
 	_cret = C.webkit_download_get_received_data_length(_arg0)
+	runtime.KeepAlive(download)
 
 	var _guint64 uint64 // out
 
@@ -157,6 +161,7 @@ func (download *Download) Request() *URIRequest {
 	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
 
 	_cret = C.webkit_download_get_request(_arg0)
+	runtime.KeepAlive(download)
 
 	var _uriRequest *URIRequest // out
 
@@ -176,6 +181,7 @@ func (download *Download) Response() *URIResponse {
 	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
 
 	_cret = C.webkit_download_get_response(_arg0)
+	runtime.KeepAlive(download)
 
 	var _uriResponse *URIResponse // out
 
@@ -192,6 +198,7 @@ func (download *Download) WebView() *WebView {
 	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
 
 	_cret = C.webkit_download_get_web_view(_arg0)
+	runtime.KeepAlive(download)
 
 	var _webView *WebView // out
 
@@ -213,6 +220,8 @@ func (download *Download) SetAllowOverwrite(allowed bool) {
 	}
 
 	C.webkit_download_set_allow_overwrite(_arg0, _arg1)
+	runtime.KeepAlive(download)
+	runtime.KeepAlive(allowed)
 }
 
 // SetDestination sets the URI to which the downloaded file will be written.
@@ -232,6 +241,9 @@ func (download *Download) SetDestination(uri string) {
 
 	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(uri)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_download_set_destination(_arg0, _arg1)
+	runtime.KeepAlive(download)
+	runtime.KeepAlive(uri)
 }

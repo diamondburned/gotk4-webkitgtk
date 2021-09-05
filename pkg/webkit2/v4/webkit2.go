@@ -4,10 +4,10 @@ package webkit2
 
 import (
 	"fmt"
-	_ "runtime/cgo"
 	"unsafe"
 
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -20,6 +20,102 @@ func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
 		{T: externglib.Type(C.webkit_user_content_filter_error_get_type()), F: marshalUserContentFilterError},
 	})
+}
+
+func DownloadErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_download_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+
+	return _quark
+}
+
+func FaviconDatabaseErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_favicon_database_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+
+	return _quark
+}
+
+func JavascriptErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_javascript_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+
+	return _quark
+}
+
+func NetworkErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_network_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+
+	return _quark
+}
+
+func PluginErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_plugin_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+
+	return _quark
+}
+
+func PolicyErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_policy_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+
+	return _quark
+}
+
+func PrintErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_print_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+
+	return _quark
+}
+
+func SnapshotErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_snapshot_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+
+	return _quark
 }
 
 type UserContentFilterError int
@@ -47,4 +143,28 @@ func (u UserContentFilterError) String() string {
 	default:
 		return fmt.Sprintf("UserContentFilterError(%d)", u)
 	}
+}
+
+func UserContentFilterErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_user_content_filter_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+
+	return _quark
+}
+
+func UserMessageErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_user_message_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+
+	return _quark
 }

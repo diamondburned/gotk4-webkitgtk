@@ -3,10 +3,10 @@
 package soup
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -21,11 +21,13 @@ func init() {
 	})
 }
 
+// COOKIE_JAR_DB_FILENAME alias for the CookieJarDB:filename property. (The
+// cookie-storage filename.)
+const COOKIE_JAR_DB_FILENAME = "filename"
+
 type CookieJarDB struct {
 	CookieJar
 }
-
-var _ gextras.Nativer = (*CookieJarDB)(nil)
 
 func wrapCookieJarDB(obj *externglib.Object) *CookieJarDB {
 	return &CookieJarDB{
@@ -57,11 +59,14 @@ func NewCookieJarDB(filename string, readOnly bool) *CookieJarDB {
 	var _cret *C.SoupCookieJar // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(filename)))
+	defer C.free(unsafe.Pointer(_arg1))
 	if readOnly {
 		_arg2 = C.TRUE
 	}
 
 	_cret = C.soup_cookie_jar_db_new(_arg1, _arg2)
+	runtime.KeepAlive(filename)
+	runtime.KeepAlive(readOnly)
 
 	var _cookieJarDB *CookieJarDB // out
 

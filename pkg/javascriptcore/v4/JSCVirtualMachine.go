@@ -5,8 +5,7 @@ package javascriptcore
 import (
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
@@ -24,8 +23,6 @@ func init() {
 type VirtualMachine struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*VirtualMachine)(nil)
 
 func wrapVirtualMachine(obj *externglib.Object) *VirtualMachine {
 	return &VirtualMachine{

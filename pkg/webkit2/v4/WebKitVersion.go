@@ -7,6 +7,21 @@ package webkit2
 // #include <webkit2/webkit2.h>
 import "C"
 
+// MAJOR_VERSION: like webkit_get_major_version(), but from the headers used at
+// application compile time, rather than from the library linked against at
+// application run time.
+const MAJOR_VERSION = 2
+
+// MICRO_VERSION: like webkit_get_micro_version(), but from the headers used at
+// application compile time, rather than from the library linked against at
+// application run time.
+const MICRO_VERSION = 1
+
+// MINOR_VERSION: like webkit_get_minor_version(), but from the headers used at
+// application compile time, rather than from the library linked against at
+// application run time.
+const MINOR_VERSION = 32
+
 // GetMajorVersion returns the major version number of the WebKit library. (e.g.
 // in WebKit version 1.8.3 this is 1.)
 //
@@ -14,14 +29,14 @@ import "C"
 // code is running against. Contrast with the BKIT_MAJOR_VERSION macro, which
 // represents the major version of the WebKit headers you have included when
 // compiling your code.
-func GetMajorVersion() uint {
+func GetMajorVersion() uint32 {
 	var _cret C.guint // in
 
 	_cret = C.webkit_get_major_version()
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -33,14 +48,14 @@ func GetMajorVersion() uint {
 // code is running against. Contrast with the BKIT_MICRO_VERSION macro, which
 // represents the micro version of the WebKit headers you have included when
 // compiling your code.
-func GetMicroVersion() uint {
+func GetMicroVersion() uint32 {
 	var _cret C.guint // in
 
 	_cret = C.webkit_get_micro_version()
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -52,14 +67,14 @@ func GetMicroVersion() uint {
 // code is running against. Contrast with the BKIT_MINOR_VERSION macro, which
 // represents the minor version of the WebKit headers you have included when
 // compiling your code.
-func GetMinorVersion() uint {
+func GetMinorVersion() uint32 {
 	var _cret C.guint // in
 
 	_cret = C.webkit_get_minor_version()
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }

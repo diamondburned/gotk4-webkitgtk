@@ -4,11 +4,11 @@ package webkit2
 
 import (
 	"fmt"
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gtk/v3"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -55,8 +55,6 @@ type PrintOperation struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*PrintOperation)(nil)
-
 func wrapPrintOperation(obj *externglib.Object) *PrintOperation {
 	return &PrintOperation{
 		Object: obj,
@@ -77,6 +75,7 @@ func NewPrintOperation(webView *WebView) *PrintOperation {
 	_arg1 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
 
 	_cret = C.webkit_print_operation_new(_arg1)
+	runtime.KeepAlive(webView)
 
 	var _printOperation *PrintOperation // out
 
@@ -95,6 +94,7 @@ func (printOperation *PrintOperation) PageSetup() *gtk.PageSetup {
 	_arg0 = (*C.WebKitPrintOperation)(unsafe.Pointer(printOperation.Native()))
 
 	_cret = C.webkit_print_operation_get_page_setup(_arg0)
+	runtime.KeepAlive(printOperation)
 
 	var _pageSetup *gtk.PageSetup // out
 
@@ -118,6 +118,7 @@ func (printOperation *PrintOperation) PrintSettings() *gtk.PrintSettings {
 	_arg0 = (*C.WebKitPrintOperation)(unsafe.Pointer(printOperation.Native()))
 
 	_cret = C.webkit_print_operation_get_print_settings(_arg0)
+	runtime.KeepAlive(printOperation)
 
 	var _printSettings *gtk.PrintSettings // out
 
@@ -145,6 +146,7 @@ func (printOperation *PrintOperation) Print() {
 	_arg0 = (*C.WebKitPrintOperation)(unsafe.Pointer(printOperation.Native()))
 
 	C.webkit_print_operation_print(_arg0)
+	runtime.KeepAlive(printOperation)
 }
 
 // RunDialog: run the print dialog and start printing using the options selected
@@ -166,9 +168,13 @@ func (printOperation *PrintOperation) RunDialog(parent *gtk.Window) PrintOperati
 	var _cret C.WebKitPrintOperationResponse // in
 
 	_arg0 = (*C.WebKitPrintOperation)(unsafe.Pointer(printOperation.Native()))
-	_arg1 = (*C.GtkWindow)(unsafe.Pointer(parent.Native()))
+	if parent != nil {
+		_arg1 = (*C.GtkWindow)(unsafe.Pointer(parent.Native()))
+	}
 
 	_cret = C.webkit_print_operation_run_dialog(_arg0, _arg1)
+	runtime.KeepAlive(printOperation)
+	runtime.KeepAlive(parent)
 
 	var _printOperationResponse PrintOperationResponse // out
 
@@ -188,6 +194,8 @@ func (printOperation *PrintOperation) SetPageSetup(pageSetup *gtk.PageSetup) {
 	_arg1 = (*C.GtkPageSetup)(unsafe.Pointer(pageSetup.Native()))
 
 	C.webkit_print_operation_set_page_setup(_arg0, _arg1)
+	runtime.KeepAlive(printOperation)
+	runtime.KeepAlive(pageSetup)
 }
 
 // SetPrintSettings: set the current print settings of print_operation. Current
@@ -201,4 +209,6 @@ func (printOperation *PrintOperation) SetPrintSettings(printSettings *gtk.PrintS
 	_arg1 = (*C.GtkPrintSettings)(unsafe.Pointer(printSettings.Native()))
 
 	C.webkit_print_operation_set_print_settings(_arg0, _arg1)
+	runtime.KeepAlive(printOperation)
+	runtime.KeepAlive(printSettings)
 }

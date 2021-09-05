@@ -8,7 +8,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -115,14 +115,19 @@ func (u UserStyleLevel) String() string {
 	}
 }
 
+// UserContentFilter: instance of this type is always passed by reference.
 type UserContentFilter struct {
-	nocopy gextras.NoCopy
+	*userContentFilter
+}
+
+// userContentFilter is the struct that's finalized.
+type userContentFilter struct {
 	native *C.WebKitUserContentFilter
 }
 
 func marshalUserContentFilter(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &UserContentFilter{native: (*C.WebKitUserContentFilter)(unsafe.Pointer(b))}, nil
+	return &UserContentFilter{&userContentFilter{(*C.WebKitUserContentFilter)(unsafe.Pointer(b))}}, nil
 }
 
 // Identifier: obtain the identifier previously used to save the
@@ -134,6 +139,7 @@ func (userContentFilter *UserContentFilter) Identifier() string {
 	_arg0 = (*C.WebKitUserContentFilter)(gextras.StructNative(unsafe.Pointer(userContentFilter)))
 
 	_cret = C.webkit_user_content_filter_get_identifier(_arg0)
+	runtime.KeepAlive(userContentFilter)
 
 	var _utf8 string // out
 
@@ -142,47 +148,19 @@ func (userContentFilter *UserContentFilter) Identifier() string {
 	return _utf8
 }
 
-// Ref: atomically increments the reference count of user_content_filter by one.
-// This function is MT-safe and may be called from any thread.
-func (userContentFilter *UserContentFilter) ref() *UserContentFilter {
-	var _arg0 *C.WebKitUserContentFilter // out
-	var _cret *C.WebKitUserContentFilter // in
-
-	_arg0 = (*C.WebKitUserContentFilter)(gextras.StructNative(unsafe.Pointer(userContentFilter)))
-
-	_cret = C.webkit_user_content_filter_ref(_arg0)
-
-	var _userContentFilter *UserContentFilter // out
-
-	_userContentFilter = (*UserContentFilter)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_user_content_filter_ref(_cret)
-	runtime.SetFinalizer(_userContentFilter, func(v *UserContentFilter) {
-		C.webkit_user_content_filter_unref((*C.WebKitUserContentFilter)(gextras.StructNative(unsafe.Pointer(v))))
-	})
-
-	return _userContentFilter
-}
-
-// Unref: atomically decrements the reference count of user_content_filter by
-// one. If the reference count drops to 0, all the memory allocated by the
-// KitUserContentFilter is released. This function is MT-safe and may be called
-// from any thread.
-func (userContentFilter *UserContentFilter) unref() {
-	var _arg0 *C.WebKitUserContentFilter // out
-
-	_arg0 = (*C.WebKitUserContentFilter)(gextras.StructNative(unsafe.Pointer(userContentFilter)))
-
-	C.webkit_user_content_filter_unref(_arg0)
-}
-
+// UserScript: instance of this type is always passed by reference.
 type UserScript struct {
-	nocopy gextras.NoCopy
+	*userScript
+}
+
+// userScript is the struct that's finalized.
+type userScript struct {
 	native *C.WebKitUserScript
 }
 
 func marshalUserScript(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &UserScript{native: (*C.WebKitUserScript)(unsafe.Pointer(b))}, nil
+	return &UserScript{&userScript{(*C.WebKitUserScript)(unsafe.Pointer(b))}}, nil
 }
 
 // NewUserScript constructs a struct UserScript.
@@ -190,45 +168,57 @@ func NewUserScript(source string, injectedFrames UserContentInjectedFrames, inje
 	var _arg1 *C.gchar                          // out
 	var _arg2 C.WebKitUserContentInjectedFrames // out
 	var _arg3 C.WebKitUserScriptInjectionTime   // out
-	var _arg4 **C.gchar
-	var _arg5 **C.gchar
-	var _cret *C.WebKitUserScript // in
+	var _arg4 **C.gchar                         // out
+	var _arg5 **C.gchar                         // out
+	var _cret *C.WebKitUserScript               // in
 
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(source)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.WebKitUserContentInjectedFrames(injectedFrames)
 	_arg3 = C.WebKitUserScriptInjectionTime(injectionTime)
 	{
 		_arg4 = (**C.gchar)(C.malloc(C.ulong(len(allowList)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg4))
 		{
 			out := unsafe.Slice(_arg4, len(allowList)+1)
 			var zero *C.gchar
 			out[len(allowList)] = zero
 			for i := range allowList {
 				out[i] = (*C.gchar)(unsafe.Pointer(C.CString(allowList[i])))
+				defer C.free(unsafe.Pointer(out[i]))
 			}
 		}
 	}
 	{
 		_arg5 = (**C.gchar)(C.malloc(C.ulong(len(blockList)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg5))
 		{
 			out := unsafe.Slice(_arg5, len(blockList)+1)
 			var zero *C.gchar
 			out[len(blockList)] = zero
 			for i := range blockList {
 				out[i] = (*C.gchar)(unsafe.Pointer(C.CString(blockList[i])))
+				defer C.free(unsafe.Pointer(out[i]))
 			}
 		}
 	}
 
 	_cret = C.webkit_user_script_new(_arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(source)
+	runtime.KeepAlive(injectedFrames)
+	runtime.KeepAlive(injectionTime)
+	runtime.KeepAlive(allowList)
+	runtime.KeepAlive(blockList)
 
 	var _userScript *UserScript // out
 
 	_userScript = (*UserScript)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_user_script_ref(_cret)
-	runtime.SetFinalizer(_userScript, func(v *UserScript) {
-		C.webkit_user_script_unref((*C.WebKitUserScript)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_userScript)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_user_script_unref((*C.WebKitUserScript)(intern.C))
+		},
+	)
 
 	return _userScript
 }
@@ -239,90 +229,77 @@ func NewUserScriptForWorld(source string, injectedFrames UserContentInjectedFram
 	var _arg2 C.WebKitUserContentInjectedFrames // out
 	var _arg3 C.WebKitUserScriptInjectionTime   // out
 	var _arg4 *C.gchar                          // out
-	var _arg5 **C.gchar
-	var _arg6 **C.gchar
-	var _cret *C.WebKitUserScript // in
+	var _arg5 **C.gchar                         // out
+	var _arg6 **C.gchar                         // out
+	var _cret *C.WebKitUserScript               // in
 
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(source)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.WebKitUserContentInjectedFrames(injectedFrames)
 	_arg3 = C.WebKitUserScriptInjectionTime(injectionTime)
 	_arg4 = (*C.gchar)(unsafe.Pointer(C.CString(worldName)))
+	defer C.free(unsafe.Pointer(_arg4))
 	{
 		_arg5 = (**C.gchar)(C.malloc(C.ulong(len(allowList)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg5))
 		{
 			out := unsafe.Slice(_arg5, len(allowList)+1)
 			var zero *C.gchar
 			out[len(allowList)] = zero
 			for i := range allowList {
 				out[i] = (*C.gchar)(unsafe.Pointer(C.CString(allowList[i])))
+				defer C.free(unsafe.Pointer(out[i]))
 			}
 		}
 	}
 	{
 		_arg6 = (**C.gchar)(C.malloc(C.ulong(len(blockList)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg6))
 		{
 			out := unsafe.Slice(_arg6, len(blockList)+1)
 			var zero *C.gchar
 			out[len(blockList)] = zero
 			for i := range blockList {
 				out[i] = (*C.gchar)(unsafe.Pointer(C.CString(blockList[i])))
+				defer C.free(unsafe.Pointer(out[i]))
 			}
 		}
 	}
 
 	_cret = C.webkit_user_script_new_for_world(_arg1, _arg2, _arg3, _arg4, _arg5, _arg6)
+	runtime.KeepAlive(source)
+	runtime.KeepAlive(injectedFrames)
+	runtime.KeepAlive(injectionTime)
+	runtime.KeepAlive(worldName)
+	runtime.KeepAlive(allowList)
+	runtime.KeepAlive(blockList)
 
 	var _userScript *UserScript // out
 
 	_userScript = (*UserScript)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_user_script_ref(_cret)
-	runtime.SetFinalizer(_userScript, func(v *UserScript) {
-		C.webkit_user_script_unref((*C.WebKitUserScript)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_userScript)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_user_script_unref((*C.WebKitUserScript)(intern.C))
+		},
+	)
 
 	return _userScript
 }
 
-// Ref: atomically increments the reference count of user_script by one. This
-// function is MT-safe and may be called from any thread.
-func (userScript *UserScript) ref() *UserScript {
-	var _arg0 *C.WebKitUserScript // out
-	var _cret *C.WebKitUserScript // in
-
-	_arg0 = (*C.WebKitUserScript)(gextras.StructNative(unsafe.Pointer(userScript)))
-
-	_cret = C.webkit_user_script_ref(_arg0)
-
-	var _userScript *UserScript // out
-
-	_userScript = (*UserScript)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_user_script_ref(_cret)
-	runtime.SetFinalizer(_userScript, func(v *UserScript) {
-		C.webkit_user_script_unref((*C.WebKitUserScript)(gextras.StructNative(unsafe.Pointer(v))))
-	})
-
-	return _userScript
-}
-
-// Unref: atomically decrements the reference count of user_script by one. If
-// the reference count drops to 0, all memory allocated by KitUserScript is
-// released. This function is MT-safe and may be called from any thread.
-func (userScript *UserScript) unref() {
-	var _arg0 *C.WebKitUserScript // out
-
-	_arg0 = (*C.WebKitUserScript)(gextras.StructNative(unsafe.Pointer(userScript)))
-
-	C.webkit_user_script_unref(_arg0)
-}
-
+// UserStyleSheet: instance of this type is always passed by reference.
 type UserStyleSheet struct {
-	nocopy gextras.NoCopy
+	*userStyleSheet
+}
+
+// userStyleSheet is the struct that's finalized.
+type userStyleSheet struct {
 	native *C.WebKitUserStyleSheet
 }
 
 func marshalUserStyleSheet(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &UserStyleSheet{native: (*C.WebKitUserStyleSheet)(unsafe.Pointer(b))}, nil
+	return &UserStyleSheet{&userStyleSheet{(*C.WebKitUserStyleSheet)(unsafe.Pointer(b))}}, nil
 }
 
 // NewUserStyleSheet constructs a struct UserStyleSheet.
@@ -330,45 +307,57 @@ func NewUserStyleSheet(source string, injectedFrames UserContentInjectedFrames, 
 	var _arg1 *C.gchar                          // out
 	var _arg2 C.WebKitUserContentInjectedFrames // out
 	var _arg3 C.WebKitUserStyleLevel            // out
-	var _arg4 **C.gchar
-	var _arg5 **C.gchar
-	var _cret *C.WebKitUserStyleSheet // in
+	var _arg4 **C.gchar                         // out
+	var _arg5 **C.gchar                         // out
+	var _cret *C.WebKitUserStyleSheet           // in
 
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(source)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.WebKitUserContentInjectedFrames(injectedFrames)
 	_arg3 = C.WebKitUserStyleLevel(level)
 	{
 		_arg4 = (**C.gchar)(C.malloc(C.ulong(len(allowList)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg4))
 		{
 			out := unsafe.Slice(_arg4, len(allowList)+1)
 			var zero *C.gchar
 			out[len(allowList)] = zero
 			for i := range allowList {
 				out[i] = (*C.gchar)(unsafe.Pointer(C.CString(allowList[i])))
+				defer C.free(unsafe.Pointer(out[i]))
 			}
 		}
 	}
 	{
 		_arg5 = (**C.gchar)(C.malloc(C.ulong(len(blockList)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg5))
 		{
 			out := unsafe.Slice(_arg5, len(blockList)+1)
 			var zero *C.gchar
 			out[len(blockList)] = zero
 			for i := range blockList {
 				out[i] = (*C.gchar)(unsafe.Pointer(C.CString(blockList[i])))
+				defer C.free(unsafe.Pointer(out[i]))
 			}
 		}
 	}
 
 	_cret = C.webkit_user_style_sheet_new(_arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(source)
+	runtime.KeepAlive(injectedFrames)
+	runtime.KeepAlive(level)
+	runtime.KeepAlive(allowList)
+	runtime.KeepAlive(blockList)
 
 	var _userStyleSheet *UserStyleSheet // out
 
 	_userStyleSheet = (*UserStyleSheet)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_user_style_sheet_ref(_cret)
-	runtime.SetFinalizer(_userStyleSheet, func(v *UserStyleSheet) {
-		C.webkit_user_style_sheet_unref((*C.WebKitUserStyleSheet)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_userStyleSheet)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_user_style_sheet_unref((*C.WebKitUserStyleSheet)(intern.C))
+		},
+	)
 
 	return _userStyleSheet
 }
@@ -379,78 +368,60 @@ func NewUserStyleSheetForWorld(source string, injectedFrames UserContentInjected
 	var _arg2 C.WebKitUserContentInjectedFrames // out
 	var _arg3 C.WebKitUserStyleLevel            // out
 	var _arg4 *C.gchar                          // out
-	var _arg5 **C.gchar
-	var _arg6 **C.gchar
-	var _cret *C.WebKitUserStyleSheet // in
+	var _arg5 **C.gchar                         // out
+	var _arg6 **C.gchar                         // out
+	var _cret *C.WebKitUserStyleSheet           // in
 
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(source)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.WebKitUserContentInjectedFrames(injectedFrames)
 	_arg3 = C.WebKitUserStyleLevel(level)
 	_arg4 = (*C.gchar)(unsafe.Pointer(C.CString(worldName)))
+	defer C.free(unsafe.Pointer(_arg4))
 	{
 		_arg5 = (**C.gchar)(C.malloc(C.ulong(len(allowList)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg5))
 		{
 			out := unsafe.Slice(_arg5, len(allowList)+1)
 			var zero *C.gchar
 			out[len(allowList)] = zero
 			for i := range allowList {
 				out[i] = (*C.gchar)(unsafe.Pointer(C.CString(allowList[i])))
+				defer C.free(unsafe.Pointer(out[i]))
 			}
 		}
 	}
 	{
 		_arg6 = (**C.gchar)(C.malloc(C.ulong(len(blockList)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg6))
 		{
 			out := unsafe.Slice(_arg6, len(blockList)+1)
 			var zero *C.gchar
 			out[len(blockList)] = zero
 			for i := range blockList {
 				out[i] = (*C.gchar)(unsafe.Pointer(C.CString(blockList[i])))
+				defer C.free(unsafe.Pointer(out[i]))
 			}
 		}
 	}
 
 	_cret = C.webkit_user_style_sheet_new_for_world(_arg1, _arg2, _arg3, _arg4, _arg5, _arg6)
+	runtime.KeepAlive(source)
+	runtime.KeepAlive(injectedFrames)
+	runtime.KeepAlive(level)
+	runtime.KeepAlive(worldName)
+	runtime.KeepAlive(allowList)
+	runtime.KeepAlive(blockList)
 
 	var _userStyleSheet *UserStyleSheet // out
 
 	_userStyleSheet = (*UserStyleSheet)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_user_style_sheet_ref(_cret)
-	runtime.SetFinalizer(_userStyleSheet, func(v *UserStyleSheet) {
-		C.webkit_user_style_sheet_unref((*C.WebKitUserStyleSheet)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_userStyleSheet)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_user_style_sheet_unref((*C.WebKitUserStyleSheet)(intern.C))
+		},
+	)
 
 	return _userStyleSheet
-}
-
-// Ref: atomically increments the reference count of user_style_sheet by one.
-// This function is MT-safe and may be called from any thread.
-func (userStyleSheet *UserStyleSheet) ref() *UserStyleSheet {
-	var _arg0 *C.WebKitUserStyleSheet // out
-	var _cret *C.WebKitUserStyleSheet // in
-
-	_arg0 = (*C.WebKitUserStyleSheet)(gextras.StructNative(unsafe.Pointer(userStyleSheet)))
-
-	_cret = C.webkit_user_style_sheet_ref(_arg0)
-
-	var _userStyleSheet *UserStyleSheet // out
-
-	_userStyleSheet = (*UserStyleSheet)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_user_style_sheet_ref(_cret)
-	runtime.SetFinalizer(_userStyleSheet, func(v *UserStyleSheet) {
-		C.webkit_user_style_sheet_unref((*C.WebKitUserStyleSheet)(gextras.StructNative(unsafe.Pointer(v))))
-	})
-
-	return _userStyleSheet
-}
-
-// Unref: atomically decrements the reference count of user_style_sheet by one.
-// If the reference count drops to 0, all memory allocated by KitUserStyleSheet
-// is released. This function is MT-safe and may be called from any thread.
-func (userStyleSheet *UserStyleSheet) unref() {
-	var _arg0 *C.WebKitUserStyleSheet // out
-
-	_arg0 = (*C.WebKitUserStyleSheet)(gextras.StructNative(unsafe.Pointer(userStyleSheet)))
-
-	C.webkit_user_style_sheet_unref(_arg0)
 }

@@ -11,9 +11,9 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -29,6 +29,34 @@ func init() {
 		{T: externglib.Type(C.soup_address_get_type()), F: marshalAddresser},
 	})
 }
+
+// ADDRESS_ANY_PORT: this can be passed to any Address method that expects a
+// port, to indicate that you don't care what port is used.
+const ADDRESS_ANY_PORT = 0
+
+// ADDRESS_FAMILY alias for the Address:family property. (The AddressFamily for
+// this address.)
+const ADDRESS_FAMILY = "family"
+
+// ADDRESS_NAME alias for the Address:name property. (The hostname for this
+// address.)
+const ADDRESS_NAME = "name"
+
+// ADDRESS_PHYSICAL alias for the Address:physical property. (The stringified IP
+// address for this address.)
+const ADDRESS_PHYSICAL = "physical"
+
+// ADDRESS_PORT alias for the Address:port property. (The port for this
+// address.)
+const ADDRESS_PORT = "port"
+
+// ADDRESS_PROTOCOL alias for the Address:protocol property. (The URI scheme
+// used with this address.)
+const ADDRESS_PROTOCOL = "protocol"
+
+// ADDRESS_SOCKADDR alias for the Address:sockaddr property. (A pointer to the
+// struct sockaddr for this address.)
+const ADDRESS_SOCKADDR = "sockaddr"
 
 // AddressFamily: supported address families.
 type AddressFamily int
@@ -61,7 +89,7 @@ func (a AddressFamily) String() string {
 }
 
 // AddressCallback: callback function passed to soup_address_resolve_async().
-type AddressCallback func(addr *Address, status uint)
+type AddressCallback func(addr *Address, status uint32)
 
 //export _gotk4_soup2_AddressCallback
 func _gotk4_soup2_AddressCallback(arg0 *C.SoupAddress, arg1 C.guint, arg2 C.gpointer) {
@@ -71,10 +99,10 @@ func _gotk4_soup2_AddressCallback(arg0 *C.SoupAddress, arg1 C.guint, arg2 C.gpoi
 	}
 
 	var addr *Address // out
-	var status uint   // out
+	var status uint32 // out
 
 	addr = wrapAddress(externglib.Take(unsafe.Pointer(arg0)))
-	status = uint(arg1)
+	status = uint32(arg1)
 
 	fn := v.(AddressCallback)
 	fn(addr, status)
@@ -85,8 +113,6 @@ type Address struct {
 
 	gio.SocketConnectable
 }
-
-var _ gextras.Nativer = (*Address)(nil)
 
 func wrapAddress(obj *externglib.Object) *Address {
 	return &Address{
@@ -106,15 +132,18 @@ func marshalAddresser(p uintptr) (interface{}, error) {
 // NewAddress creates a Address from name and port. The Address's IP address may
 // not be available right away; the caller can call soup_address_resolve_async()
 // or soup_address_resolve_sync() to force a DNS resolution.
-func NewAddress(name string, port uint) *Address {
+func NewAddress(name string, port uint32) *Address {
 	var _arg1 *C.char        // out
 	var _arg2 C.guint        // out
 	var _cret *C.SoupAddress // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.guint(port)
 
 	_cret = C.soup_address_new(_arg1, _arg2)
+	runtime.KeepAlive(name)
+	runtime.KeepAlive(port)
 
 	var _address *Address // out
 
@@ -126,7 +155,7 @@ func NewAddress(name string, port uint) *Address {
 // NewAddressAny returns a Address corresponding to the "any" address for family
 // (or NULL if family isn't supported), suitable for using as a listening
 // Socket.
-func NewAddressAny(family AddressFamily, port uint) *Address {
+func NewAddressAny(family AddressFamily, port uint32) *Address {
 	var _arg1 C.SoupAddressFamily // out
 	var _arg2 C.guint             // out
 	var _cret *C.SoupAddress      // in
@@ -135,10 +164,14 @@ func NewAddressAny(family AddressFamily, port uint) *Address {
 	_arg2 = C.guint(port)
 
 	_cret = C.soup_address_new_any(_arg1, _arg2)
+	runtime.KeepAlive(family)
+	runtime.KeepAlive(port)
 
 	var _address *Address // out
 
-	_address = wrapAddress(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_address = wrapAddress(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	}
 
 	return _address
 }
@@ -163,6 +196,8 @@ func (addr1 *Address) EqualByIP(addr2 *Address) bool {
 	_arg1 = C.gconstpointer(unsafe.Pointer(addr2.Native()))
 
 	_cret = C.soup_address_equal_by_ip(_arg0, _arg1)
+	runtime.KeepAlive(addr1)
+	runtime.KeepAlive(addr2)
 
 	var _ok bool // out
 
@@ -202,6 +237,8 @@ func (addr1 *Address) EqualByName(addr2 *Address) bool {
 	_arg1 = C.gconstpointer(unsafe.Pointer(addr2.Native()))
 
 	_cret = C.soup_address_equal_by_name(_arg0, _arg1)
+	runtime.KeepAlive(addr1)
+	runtime.KeepAlive(addr2)
 
 	var _ok bool // out
 
@@ -221,10 +258,11 @@ func (addr *Address) Gsockaddr() gio.SocketAddresser {
 	_arg0 = (*C.SoupAddress)(unsafe.Pointer(addr.Native()))
 
 	_cret = C.soup_address_get_gsockaddr(_arg0)
+	runtime.KeepAlive(addr)
 
 	var _socketAddress gio.SocketAddresser // out
 
-	_socketAddress = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.SocketAddresser)
+	_socketAddress = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.SocketAddresser)
 
 	return _socketAddress
 }
@@ -242,10 +280,13 @@ func (addr *Address) Name() string {
 	_arg0 = (*C.SoupAddress)(unsafe.Pointer(addr.Native()))
 
 	_cret = C.soup_address_get_name(_arg0)
+	runtime.KeepAlive(addr)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -264,60 +305,66 @@ func (addr *Address) Physical() string {
 	_arg0 = (*C.SoupAddress)(unsafe.Pointer(addr.Native()))
 
 	_cret = C.soup_address_get_physical(_arg0)
+	runtime.KeepAlive(addr)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
 
 // Port returns the port associated with addr.
-func (addr *Address) Port() uint {
+func (addr *Address) Port() uint32 {
 	var _arg0 *C.SoupAddress // out
 	var _cret C.guint        // in
 
 	_arg0 = (*C.SoupAddress)(unsafe.Pointer(addr.Native()))
 
 	_cret = C.soup_address_get_port(_arg0)
+	runtime.KeepAlive(addr)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
 
 // HashByIP: hash function (for Table) that corresponds to
 // soup_address_equal_by_ip(), qv
-func (addr *Address) HashByIP() uint {
+func (addr *Address) HashByIP() uint32 {
 	var _arg0 C.gconstpointer // out
 	var _cret C.guint         // in
 
 	_arg0 = C.gconstpointer(unsafe.Pointer(addr.Native()))
 
 	_cret = C.soup_address_hash_by_ip(_arg0)
+	runtime.KeepAlive(addr)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
 
 // HashByName: hash function (for Table) that corresponds to
 // soup_address_equal_by_name(), qv
-func (addr *Address) HashByName() uint {
+func (addr *Address) HashByName() uint32 {
 	var _arg0 C.gconstpointer // out
 	var _cret C.guint         // in
 
 	_arg0 = C.gconstpointer(unsafe.Pointer(addr.Native()))
 
 	_cret = C.soup_address_hash_by_name(_arg0)
+	runtime.KeepAlive(addr)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -332,6 +379,7 @@ func (addr *Address) IsResolved() bool {
 	_arg0 = (*C.SoupAddress)(unsafe.Pointer(addr.Native()))
 
 	_cret = C.soup_address_is_resolved(_arg0)
+	runtime.KeepAlive(addr)
 
 	var _ok bool // out
 
@@ -367,11 +415,17 @@ func (addr *Address) ResolveAsync(ctx context.Context, asyncContext *glib.MainCo
 		defer runtime.KeepAlive(cancellable)
 		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
-	_arg1 = (*C.GMainContext)(gextras.StructNative(unsafe.Pointer(asyncContext)))
+	if asyncContext != nil {
+		_arg1 = (*C.GMainContext)(gextras.StructNative(unsafe.Pointer(asyncContext)))
+	}
 	_arg3 = (*[0]byte)(C._gotk4_soup2_AddressCallback)
 	_arg4 = C.gpointer(gbox.AssignOnce(callback))
 
 	C.soup_address_resolve_async(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(addr)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(asyncContext)
+	runtime.KeepAlive(callback)
 }
 
 // ResolveSync: synchronously resolves the missing half of addr, as with
@@ -384,7 +438,7 @@ func (addr *Address) ResolveAsync(ctx context.Context, asyncContext *glib.MainCo
 // It is safe to call this more than once, even from different threads, but it
 // is not safe to mix calls to soup_address_resolve_sync() with calls to
 // soup_address_resolve_async() on the same address.
-func (addr *Address) ResolveSync(ctx context.Context) uint {
+func (addr *Address) ResolveSync(ctx context.Context) uint32 {
 	var _arg0 *C.SoupAddress  // out
 	var _arg1 *C.GCancellable // out
 	var _cret C.guint         // in
@@ -397,10 +451,12 @@ func (addr *Address) ResolveSync(ctx context.Context) uint {
 	}
 
 	_cret = C.soup_address_resolve_sync(_arg0, _arg1)
+	runtime.KeepAlive(addr)
+	runtime.KeepAlive(ctx)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }

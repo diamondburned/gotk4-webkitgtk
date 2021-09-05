@@ -8,7 +8,7 @@ import (
 
 	"github.com/diamondburned/gotk4-webkitgtk/pkg/javascriptcore/v4"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -23,14 +23,19 @@ func init() {
 	})
 }
 
+// JavascriptResult: instance of this type is always passed by reference.
 type JavascriptResult struct {
-	nocopy gextras.NoCopy
+	*javascriptResult
+}
+
+// javascriptResult is the struct that's finalized.
+type javascriptResult struct {
 	native *C.WebKitJavascriptResult
 }
 
 func marshalJavascriptResult(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &JavascriptResult{native: (*C.WebKitJavascriptResult)(unsafe.Pointer(b))}, nil
+	return &JavascriptResult{&javascriptResult{(*C.WebKitJavascriptResult)(unsafe.Pointer(b))}}, nil
 }
 
 // JsValue: get the CValue of js_result.
@@ -41,6 +46,7 @@ func (jsResult *JavascriptResult) JsValue() *javascriptcore.Value {
 	_arg0 = (*C.WebKitJavascriptResult)(gextras.StructNative(unsafe.Pointer(jsResult)))
 
 	_cret = C.webkit_javascript_result_get_js_value(_arg0)
+	runtime.KeepAlive(jsResult)
 
 	var _value *javascriptcore.Value // out
 
@@ -52,36 +58,4 @@ func (jsResult *JavascriptResult) JsValue() *javascriptcore.Value {
 	}
 
 	return _value
-}
-
-// Ref: atomically increments the reference count of js_result by one. This
-// function is MT-safe and may be called from any thread.
-func (jsResult *JavascriptResult) ref() *JavascriptResult {
-	var _arg0 *C.WebKitJavascriptResult // out
-	var _cret *C.WebKitJavascriptResult // in
-
-	_arg0 = (*C.WebKitJavascriptResult)(gextras.StructNative(unsafe.Pointer(jsResult)))
-
-	_cret = C.webkit_javascript_result_ref(_arg0)
-
-	var _javascriptResult *JavascriptResult // out
-
-	_javascriptResult = (*JavascriptResult)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_javascript_result_ref(_cret)
-	runtime.SetFinalizer(_javascriptResult, func(v *JavascriptResult) {
-		C.webkit_javascript_result_unref((*C.WebKitJavascriptResult)(gextras.StructNative(unsafe.Pointer(v))))
-	})
-
-	return _javascriptResult
-}
-
-// Unref: atomically decrements the reference count of js_result by one. If the
-// reference count drops to 0, all memory allocated by the KitJavascriptResult
-// is released. This function is MT-safe and may be called from any thread.
-func (jsResult *JavascriptResult) unref() {
-	var _arg0 *C.WebKitJavascriptResult // out
-
-	_arg0 = (*C.WebKitJavascriptResult)(gextras.StructNative(unsafe.Pointer(jsResult)))
-
-	C.webkit_javascript_result_unref(_arg0)
 }

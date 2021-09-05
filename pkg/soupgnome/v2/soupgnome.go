@@ -7,8 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4-webkitgtk/pkg/soup/v2"
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-gnome-2.4
@@ -30,8 +29,6 @@ type PasswordManagerGNOME struct {
 	soup.SessionFeature
 }
 
-var _ gextras.Nativer = (*PasswordManagerGNOME)(nil)
-
 func wrapPasswordManagerGNOME(obj *externglib.Object) *PasswordManagerGNOME {
 	return &PasswordManagerGNOME{
 		Object: obj,
@@ -52,8 +49,6 @@ func (*PasswordManagerGNOME) privatePasswordManagerGNOME() {}
 type ProxyResolverGNOME struct {
 	soup.ProxyResolverDefault
 }
-
-var _ gextras.Nativer = (*ProxyResolverGNOME)(nil)
 
 func wrapProxyResolverGNOME(obj *externglib.Object) *ProxyResolverGNOME {
 	return &ProxyResolverGNOME{

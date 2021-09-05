@@ -3,10 +3,10 @@
 package javascriptcore
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
@@ -24,8 +24,6 @@ func init() {
 type Class struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*Class)(nil)
 
 func wrapClass(obj *externglib.Object) *Class {
 	return &Class{
@@ -47,6 +45,7 @@ func (jscClass *Class) Name() string {
 	_arg0 = (*C.JSCClass)(unsafe.Pointer(jscClass.Native()))
 
 	_cret = C.jsc_class_get_name(_arg0)
+	runtime.KeepAlive(jscClass)
 
 	var _utf8 string // out
 
@@ -63,6 +62,7 @@ func (jscClass *Class) Parent() *Class {
 	_arg0 = (*C.JSCClass)(unsafe.Pointer(jscClass.Native()))
 
 	_cret = C.jsc_class_get_parent(_arg0)
+	runtime.KeepAlive(jscClass)
 
 	var _class *Class // out
 
@@ -75,7 +75,13 @@ func (jscClass *Class) Parent() *Class {
 // registering a CClass in a CContext to provide a custom implementation for the
 // class. All virtual functions are optional and can be set to NULL to fallback
 // to the default implementation.
+//
+// An instance of this type is always passed by reference.
 type ClassVTable struct {
-	nocopy gextras.NoCopy
+	*classVTable
+}
+
+// classVTable is the struct that's finalized.
+type classVTable struct {
 	native *C.JSCClassVTable
 }

@@ -8,7 +8,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -54,43 +54,58 @@ func (n NetworkProxyMode) String() string {
 	}
 }
 
+// NetworkProxySettings: instance of this type is always passed by reference.
 type NetworkProxySettings struct {
-	nocopy gextras.NoCopy
+	*networkProxySettings
+}
+
+// networkProxySettings is the struct that's finalized.
+type networkProxySettings struct {
 	native *C.WebKitNetworkProxySettings
 }
 
 func marshalNetworkProxySettings(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &NetworkProxySettings{native: (*C.WebKitNetworkProxySettings)(unsafe.Pointer(b))}, nil
+	return &NetworkProxySettings{&networkProxySettings{(*C.WebKitNetworkProxySettings)(unsafe.Pointer(b))}}, nil
 }
 
 // NewNetworkProxySettings constructs a struct NetworkProxySettings.
 func NewNetworkProxySettings(defaultProxyUri string, ignoreHosts []string) *NetworkProxySettings {
-	var _arg1 *C.gchar // out
-	var _arg2 **C.gchar
+	var _arg1 *C.gchar                      // out
+	var _arg2 **C.gchar                     // out
 	var _cret *C.WebKitNetworkProxySettings // in
 
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(defaultProxyUri)))
+	if defaultProxyUri != "" {
+		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(defaultProxyUri)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
 	{
 		_arg2 = (**C.gchar)(C.malloc(C.ulong(len(ignoreHosts)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg2))
 		{
 			out := unsafe.Slice(_arg2, len(ignoreHosts)+1)
 			var zero *C.gchar
 			out[len(ignoreHosts)] = zero
 			for i := range ignoreHosts {
 				out[i] = (*C.gchar)(unsafe.Pointer(C.CString(ignoreHosts[i])))
+				defer C.free(unsafe.Pointer(out[i]))
 			}
 		}
 	}
 
 	_cret = C.webkit_network_proxy_settings_new(_arg1, _arg2)
+	runtime.KeepAlive(defaultProxyUri)
+	runtime.KeepAlive(ignoreHosts)
 
 	var _networkProxySettings *NetworkProxySettings // out
 
 	_networkProxySettings = (*NetworkProxySettings)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_networkProxySettings, func(v *NetworkProxySettings) {
-		C.webkit_network_proxy_settings_free((*C.WebKitNetworkProxySettings)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_networkProxySettings)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_network_proxy_settings_free((*C.WebKitNetworkProxySettings)(intern.C))
+		},
+	)
 
 	return _networkProxySettings
 }
@@ -106,9 +121,14 @@ func (proxySettings *NetworkProxySettings) AddProxyForScheme(scheme string, prox
 
 	_arg0 = (*C.WebKitNetworkProxySettings)(gextras.StructNative(unsafe.Pointer(proxySettings)))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(proxyUri)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	C.webkit_network_proxy_settings_add_proxy_for_scheme(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(proxySettings)
+	runtime.KeepAlive(scheme)
+	runtime.KeepAlive(proxyUri)
 }
 
 // Copy: make a copy of the KitNetworkProxySettings.
@@ -119,22 +139,17 @@ func (proxySettings *NetworkProxySettings) Copy() *NetworkProxySettings {
 	_arg0 = (*C.WebKitNetworkProxySettings)(gextras.StructNative(unsafe.Pointer(proxySettings)))
 
 	_cret = C.webkit_network_proxy_settings_copy(_arg0)
+	runtime.KeepAlive(proxySettings)
 
 	var _networkProxySettings *NetworkProxySettings // out
 
 	_networkProxySettings = (*NetworkProxySettings)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_networkProxySettings, func(v *NetworkProxySettings) {
-		C.webkit_network_proxy_settings_free((*C.WebKitNetworkProxySettings)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_networkProxySettings)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_network_proxy_settings_free((*C.WebKitNetworkProxySettings)(intern.C))
+		},
+	)
 
 	return _networkProxySettings
-}
-
-// Free: free the KitNetworkProxySettings.
-func (proxySettings *NetworkProxySettings) free() {
-	var _arg0 *C.WebKitNetworkProxySettings // out
-
-	_arg0 = (*C.WebKitNetworkProxySettings)(gextras.StructNative(unsafe.Pointer(proxySettings)))
-
-	C.webkit_network_proxy_settings_free(_arg0)
 }

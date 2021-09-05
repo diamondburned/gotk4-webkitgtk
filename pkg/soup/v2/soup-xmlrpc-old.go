@@ -3,10 +3,11 @@
 package soup
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -39,27 +40,33 @@ import "C"
 //
 // Deprecated: Use soup_xmlrpc_build_request() instead.
 func XmlrpcBuildMethodCall(methodName string, params []externglib.Value) string {
-	var _arg1 *C.char // out
-	var _arg2 *C.GValue
+	var _arg1 *C.char   // out
+	var _arg2 *C.GValue // out
 	var _arg3 C.int
 	var _cret *C.char // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(methodName)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg3 = (C.int)(len(params))
 	_arg2 = (*C.GValue)(C.malloc(C.ulong(len(params)) * C.ulong(C.sizeof_GValue)))
+	defer C.free(unsafe.Pointer(_arg2))
 	{
 		out := unsafe.Slice((*C.GValue)(_arg2), len(params))
 		for i := range params {
-			out[i] = *(*C.GValue)(unsafe.Pointer(&(&params[i]).GValue))
+			out[i] = *(*C.GValue)(unsafe.Pointer((&params[i]).Native()))
 		}
 	}
 
 	_cret = C.soup_xmlrpc_build_method_call(_arg1, _arg2, _arg3)
+	runtime.KeepAlive(methodName)
+	runtime.KeepAlive(params)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	defer C.free(unsafe.Pointer(_cret))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+		defer C.free(unsafe.Pointer(_cret))
+	}
 
 	return _utf8
 }
@@ -76,14 +83,17 @@ func XmlrpcBuildMethodResponse(value *externglib.Value) string {
 	var _arg1 *C.GValue // out
 	var _cret *C.char   // in
 
-	_arg1 = (*C.GValue)(unsafe.Pointer(&value.GValue))
+	_arg1 = (*C.GValue)(unsafe.Pointer(value.Native()))
 
 	_cret = C.soup_xmlrpc_build_method_response(_arg1)
+	runtime.KeepAlive(value)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	defer C.free(unsafe.Pointer(_cret))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+		defer C.free(unsafe.Pointer(_cret))
+	}
 
 	return _utf8
 }
@@ -97,22 +107,27 @@ func XmlrpcBuildMethodResponse(value *externglib.Value) string {
 // unset.)
 //
 // Deprecated: Use soup_xmlrpc_parse_response() instead.
-func XmlrpcParseMethodResponse(methodResponse string, length int) (externglib.Value, error) {
+func XmlrpcParseMethodResponse(methodResponse string, length int32) (externglib.Value, error) {
 	var _arg1 *C.char   // out
 	var _arg2 C.int     // out
 	var _arg3 C.GValue  // in
 	var _cerr *C.GError // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(methodResponse)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.int(length)
 
 	C.soup_xmlrpc_parse_method_response(_arg1, _arg2, &_arg3, &_cerr)
+	runtime.KeepAlive(methodResponse)
+	runtime.KeepAlive(length)
 
 	var _value externglib.Value // out
 	var _goerr error            // out
 
 	_value = *externglib.ValueFromNative(unsafe.Pointer((&_arg3)))
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _value, _goerr
 }

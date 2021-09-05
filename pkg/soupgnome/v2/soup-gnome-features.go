@@ -3,7 +3,7 @@
 package soupgnome
 
 import (
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-gnome-2.4
@@ -12,7 +12,7 @@ import (
 // #include <libsoup/soup-gnome.h>
 import "C"
 
-func GnomeFeatures226GetType() externglib.Type {
+func GnomeFeatures226_GetType() externglib.Type {
 	var _cret C.GType // in
 
 	_cret = C.soup_gnome_features_2_26_get_type()

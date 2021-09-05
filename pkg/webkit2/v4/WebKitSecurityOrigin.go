@@ -7,7 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -22,14 +22,19 @@ func init() {
 	})
 }
 
+// SecurityOrigin: instance of this type is always passed by reference.
 type SecurityOrigin struct {
-	nocopy gextras.NoCopy
+	*securityOrigin
+}
+
+// securityOrigin is the struct that's finalized.
+type securityOrigin struct {
 	native *C.WebKitSecurityOrigin
 }
 
 func marshalSecurityOrigin(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &SecurityOrigin{native: (*C.WebKitSecurityOrigin)(unsafe.Pointer(b))}, nil
+	return &SecurityOrigin{&securityOrigin{(*C.WebKitSecurityOrigin)(unsafe.Pointer(b))}}, nil
 }
 
 // NewSecurityOrigin constructs a struct SecurityOrigin.
@@ -40,18 +45,25 @@ func NewSecurityOrigin(protocol string, host string, port uint16) *SecurityOrigi
 	var _cret *C.WebKitSecurityOrigin // in
 
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(protocol)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(host)))
+	defer C.free(unsafe.Pointer(_arg2))
 	_arg3 = C.guint16(port)
 
 	_cret = C.webkit_security_origin_new(_arg1, _arg2, _arg3)
+	runtime.KeepAlive(protocol)
+	runtime.KeepAlive(host)
+	runtime.KeepAlive(port)
 
 	var _securityOrigin *SecurityOrigin // out
 
 	_securityOrigin = (*SecurityOrigin)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_security_origin_ref(_cret)
-	runtime.SetFinalizer(_securityOrigin, func(v *SecurityOrigin) {
-		C.webkit_security_origin_unref((*C.WebKitSecurityOrigin)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_securityOrigin)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_security_origin_unref((*C.WebKitSecurityOrigin)(intern.C))
+		},
+	)
 
 	return _securityOrigin
 }
@@ -62,16 +74,20 @@ func NewSecurityOriginForURI(uri string) *SecurityOrigin {
 	var _cret *C.WebKitSecurityOrigin // in
 
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(uri)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.webkit_security_origin_new_for_uri(_arg1)
+	runtime.KeepAlive(uri)
 
 	var _securityOrigin *SecurityOrigin // out
 
 	_securityOrigin = (*SecurityOrigin)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_security_origin_ref(_cret)
-	runtime.SetFinalizer(_securityOrigin, func(v *SecurityOrigin) {
-		C.webkit_security_origin_unref((*C.WebKitSecurityOrigin)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_securityOrigin)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_security_origin_unref((*C.WebKitSecurityOrigin)(intern.C))
+		},
+	)
 
 	return _securityOrigin
 }
@@ -85,10 +101,13 @@ func (origin *SecurityOrigin) Host() string {
 	_arg0 = (*C.WebKitSecurityOrigin)(gextras.StructNative(unsafe.Pointer(origin)))
 
 	_cret = C.webkit_security_origin_get_host(_arg0)
+	runtime.KeepAlive(origin)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -104,6 +123,7 @@ func (origin *SecurityOrigin) Port() uint16 {
 	_arg0 = (*C.WebKitSecurityOrigin)(gextras.StructNative(unsafe.Pointer(origin)))
 
 	_cret = C.webkit_security_origin_get_port(_arg0)
+	runtime.KeepAlive(origin)
 
 	var _guint16 uint16 // out
 
@@ -120,10 +140,13 @@ func (origin *SecurityOrigin) Protocol() string {
 	_arg0 = (*C.WebKitSecurityOrigin)(gextras.StructNative(unsafe.Pointer(origin)))
 
 	_cret = C.webkit_security_origin_get_protocol(_arg0)
+	runtime.KeepAlive(origin)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -140,6 +163,7 @@ func (origin *SecurityOrigin) IsOpaque() bool {
 	_arg0 = (*C.WebKitSecurityOrigin)(gextras.StructNative(unsafe.Pointer(origin)))
 
 	_cret = C.webkit_security_origin_is_opaque(_arg0)
+	runtime.KeepAlive(origin)
 
 	var _ok bool // out
 
@@ -148,27 +172,6 @@ func (origin *SecurityOrigin) IsOpaque() bool {
 	}
 
 	return _ok
-}
-
-// Ref: atomically increments the reference count of origin by one. This
-// function is MT-safe and may be called from any thread.
-func (origin *SecurityOrigin) ref() *SecurityOrigin {
-	var _arg0 *C.WebKitSecurityOrigin // out
-	var _cret *C.WebKitSecurityOrigin // in
-
-	_arg0 = (*C.WebKitSecurityOrigin)(gextras.StructNative(unsafe.Pointer(origin)))
-
-	_cret = C.webkit_security_origin_ref(_arg0)
-
-	var _securityOrigin *SecurityOrigin // out
-
-	_securityOrigin = (*SecurityOrigin)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_security_origin_ref(_cret)
-	runtime.SetFinalizer(_securityOrigin, func(v *SecurityOrigin) {
-		C.webkit_security_origin_unref((*C.WebKitSecurityOrigin)(gextras.StructNative(unsafe.Pointer(v))))
-	})
-
-	return _securityOrigin
 }
 
 // String gets a string representation of origin. The string representation is a
@@ -180,22 +183,14 @@ func (origin *SecurityOrigin) String() string {
 	_arg0 = (*C.WebKitSecurityOrigin)(gextras.StructNative(unsafe.Pointer(origin)))
 
 	_cret = C.webkit_security_origin_to_string(_arg0)
+	runtime.KeepAlive(origin)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	defer C.free(unsafe.Pointer(_cret))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+		defer C.free(unsafe.Pointer(_cret))
+	}
 
 	return _utf8
-}
-
-// Unref: atomically decrements the reference count of origin by one. If the
-// reference count drops to 0, all memory allocated by KitSecurityOrigin is
-// released. This function is MT-safe and may be called from any thread.
-func (origin *SecurityOrigin) unref() {
-	var _arg0 *C.WebKitSecurityOrigin // out
-
-	_arg0 = (*C.WebKitSecurityOrigin)(gextras.StructNative(unsafe.Pointer(origin)))
-
-	C.webkit_security_origin_unref(_arg0)
 }

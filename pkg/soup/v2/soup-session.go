@@ -12,9 +12,9 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -24,6 +24,7 @@ import (
 // void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
 // void _gotk4_soup2_AddressCallback(SoupAddress*, guint, gpointer);
 // void _gotk4_soup2_SessionCallback(SoupSession*, SoupMessage*, gpointer);
+// void _gotk4_soup2_SessionConnectProgressCallback(SoupSession*, GSocketClientEvent, GIOStream*, gpointer);
 import "C"
 
 func init() {
@@ -32,6 +33,81 @@ func init() {
 		{T: externglib.Type(C.soup_session_get_type()), F: marshalSessioner},
 	})
 }
+
+// SESSION_ACCEPT_LANGUAGE alias for the Session:accept-language property, qv.
+const SESSION_ACCEPT_LANGUAGE = "accept-language"
+
+// SESSION_ACCEPT_LANGUAGE_AUTO alias for the Session:accept-language-auto
+// property, qv.
+const SESSION_ACCEPT_LANGUAGE_AUTO = "accept-language-auto"
+
+// SESSION_ADD_FEATURE alias for the Session:add-feature property, qv.
+const SESSION_ADD_FEATURE = "add-feature"
+
+// SESSION_ADD_FEATURE_BY_TYPE alias for the Session:add-feature-by-type
+// property, qv.
+const SESSION_ADD_FEATURE_BY_TYPE = "add-feature-by-type"
+
+// SESSION_ASYNC_CONTEXT alias for the Session:async-context property, qv.
+const SESSION_ASYNC_CONTEXT = "async-context"
+
+// SESSION_HTTPS_ALIASES alias for the Session:https-aliases property, qv.
+const SESSION_HTTPS_ALIASES = "https-aliases"
+
+// SESSION_HTTP_ALIASES alias for the Session:http-aliases property, qv.
+const SESSION_HTTP_ALIASES = "http-aliases"
+
+// SESSION_IDLE_TIMEOUT alias for the Session:idle-timeout property, qv.
+const SESSION_IDLE_TIMEOUT = "idle-timeout"
+
+// SESSION_LOCAL_ADDRESS alias for the Session:local-address property, qv.
+const SESSION_LOCAL_ADDRESS = "local-address"
+
+// SESSION_MAX_CONNS alias for the Session:max-conns property, qv.
+const SESSION_MAX_CONNS = "max-conns"
+
+// SESSION_MAX_CONNS_PER_HOST alias for the Session:max-conns-per-host property,
+// qv.
+const SESSION_MAX_CONNS_PER_HOST = "max-conns-per-host"
+
+// SESSION_PROXY_RESOLVER alias for the Session:proxy-resolver property, qv.
+const SESSION_PROXY_RESOLVER = "proxy-resolver"
+
+// SESSION_PROXY_URI alias for the Session:proxy-uri property, qv.
+const SESSION_PROXY_URI = "proxy-uri"
+
+// SESSION_REMOVE_FEATURE_BY_TYPE alias for the Session:remove-feature-by-type
+// property, qv.
+const SESSION_REMOVE_FEATURE_BY_TYPE = "remove-feature-by-type"
+
+// SESSION_SSL_CA_FILE alias for the Session:ssl-ca-file property, qv.
+const SESSION_SSL_CA_FILE = "ssl-ca-file"
+
+// SESSION_SSL_STRICT alias for the Session:ssl-strict property, qv.
+const SESSION_SSL_STRICT = "ssl-strict"
+
+// SESSION_SSL_USE_SYSTEM_CA_FILE alias for the Session:ssl-use-system-ca-file
+// property, qv.
+const SESSION_SSL_USE_SYSTEM_CA_FILE = "ssl-use-system-ca-file"
+
+// SESSION_TIMEOUT alias for the Session:timeout property, qv.
+const SESSION_TIMEOUT = "timeout"
+
+// SESSION_TLS_DATABASE alias for the Session:tls-database property, qv.
+const SESSION_TLS_DATABASE = "tls-database"
+
+// SESSION_TLS_INTERACTION alias for the Session:tls-interaction property, qv.
+const SESSION_TLS_INTERACTION = "tls-interaction"
+
+// SESSION_USER_AGENT alias for the Session:user-agent property, qv.
+const SESSION_USER_AGENT = "user-agent"
+
+// SESSION_USE_NTLM alias for the Session:use-ntlm property, qv.
+const SESSION_USE_NTLM = "use-ntlm"
+
+// SESSION_USE_THREAD_CONTEXT alias for the Session:use-thread-context property,
+// qv.
+const SESSION_USE_THREAD_CONTEXT = "use-thread-context"
 
 // RequestError: Request error.
 type RequestError int
@@ -106,7 +182,7 @@ func _gotk4_soup2_SessionConnectProgressCallback(arg0 *C.SoupSession, arg1 C.GSo
 
 	session = wrapSession(externglib.Take(unsafe.Pointer(arg0)))
 	event = gio.SocketClientEvent(arg1)
-	connection = (gextras.CastObject(externglib.Take(unsafe.Pointer(arg2)))).(gio.IOStreamer)
+	connection = (externglib.CastObject(externglib.Take(unsafe.Pointer(arg2)))).(gio.IOStreamer)
 
 	fn := v.(SessionConnectProgressCallback)
 	fn(session, event, connection)
@@ -139,7 +215,7 @@ type SessionOverrider interface {
 	// soup_session_cancel_message() returns. The plain Session does not have
 	// this behavior; cancelling an asynchronous message will merely queue its
 	// callback to be run after returning to the main loop.
-	CancelMessage(msg *Message, statusCode uint)
+	CancelMessage(msg *Message, statusCode uint32)
 	FlushQueue()
 	Kick()
 	// QueueMessage queues the message msg for asynchronously sending the
@@ -177,14 +253,12 @@ type SessionOverrider interface {
 	// Contrast this method with soup_session_send(), which also synchronously
 	// sends a message, but returns before reading the response body, and allows
 	// you to read the response via a Stream.
-	SendMessage(msg *Message) uint
+	SendMessage(msg *Message) uint32
 }
 
 type Session struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*Session)(nil)
 
 func wrapSession(obj *externglib.Object) *Session {
 	return &Session{
@@ -224,6 +298,7 @@ func (session *Session) Abort() {
 	_arg0 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
 
 	C.soup_session_abort(_arg0)
+	runtime.KeepAlive(session)
 }
 
 // AddFeature adds feature's functionality to session. You can also add a
@@ -237,9 +312,11 @@ func (session *Session) AddFeature(feature SessionFeaturer) {
 	var _arg1 *C.SoupSessionFeature // out
 
 	_arg0 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
-	_arg1 = (*C.SoupSessionFeature)(unsafe.Pointer((feature).(gextras.Nativer).Native()))
+	_arg1 = (*C.SoupSessionFeature)(unsafe.Pointer(feature.Native()))
 
 	C.soup_session_add_feature(_arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(feature)
 }
 
 // AddFeatureByType: if feature_type is the type of a class that implements
@@ -264,6 +341,8 @@ func (session *Session) AddFeatureByType(featureType externglib.Type) {
 	_arg1 = C.GType(featureType)
 
 	C.soup_session_add_feature_by_type(_arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(featureType)
 }
 
 // CancelMessage causes session to immediately finish processing msg (regardless
@@ -285,7 +364,7 @@ func (session *Session) AddFeatureByType(featureType externglib.Type) {
 // soup_session_cancel_message() returns. The plain Session does not have this
 // behavior; cancelling an asynchronous message will merely queue its callback
 // to be run after returning to the main loop.
-func (session *Session) CancelMessage(msg *Message, statusCode uint) {
+func (session *Session) CancelMessage(msg *Message, statusCode uint32) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
 	var _arg2 C.guint        // out
@@ -295,6 +374,45 @@ func (session *Session) CancelMessage(msg *Message, statusCode uint) {
 	_arg2 = C.guint(statusCode)
 
 	C.soup_session_cancel_message(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(statusCode)
+}
+
+// ConnectAsync: start a connection to uri. The operation can be monitored by
+// providing a progress_callback and finishes when the connection is done or an
+// error ocurred.
+//
+// Call soup_session_connect_finish() to get the OStream to communicate with the
+// server.
+func (session *Session) ConnectAsync(ctx context.Context, uri *URI, progressCallback SessionConnectProgressCallback, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.SoupSession                       // out
+	var _arg2 *C.GCancellable                      // out
+	var _arg1 *C.SoupURI                           // out
+	var _arg3 C.SoupSessionConnectProgressCallback // out
+	var _arg4 C.GAsyncReadyCallback                // out
+	var _arg5 C.gpointer
+
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
+	if progressCallback != nil {
+	}
+	if callback != nil {
+		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg5 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.soup_session_connect_async(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(progressCallback)
+	runtime.KeepAlive(callback)
 }
 
 // ConnectFinish gets the OStream created for the connection to communicate with
@@ -306,15 +424,19 @@ func (session *Session) ConnectFinish(result gio.AsyncResulter) (gio.IOStreamer,
 	var _cerr *C.GError       // in
 
 	_arg0 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.soup_session_connect_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(result)
 
 	var _ioStream gio.IOStreamer // out
 	var _goerr error             // out
 
-	_ioStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.IOStreamer)
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	_ioStream = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.IOStreamer)
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _ioStream, _goerr
 }
@@ -332,13 +454,20 @@ func (session *Session) AsyncContext() *glib.MainContext {
 	_arg0 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
 
 	_cret = C.soup_session_get_async_context(_arg0)
+	runtime.KeepAlive(session)
 
 	var _mainContext *glib.MainContext // out
 
-	_mainContext = (*glib.MainContext)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_mainContext, func(v *glib.MainContext) {
-		C.g_main_context_unref((*C.GMainContext)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	if _cret != nil {
+		_mainContext = (*glib.MainContext)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+		C.g_main_context_ref(_cret)
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(_mainContext)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.g_main_context_unref((*C.GMainContext)(intern.C))
+			},
+		)
+	}
 
 	return _mainContext
 }
@@ -355,10 +484,14 @@ func (session *Session) Feature(featureType externglib.Type) SessionFeaturer {
 	_arg1 = C.GType(featureType)
 
 	_cret = C.soup_session_get_feature(_arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(featureType)
 
 	var _sessionFeature SessionFeaturer // out
 
-	_sessionFeature = (gextras.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(SessionFeaturer)
+	if _cret != nil {
+		_sessionFeature = (externglib.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(SessionFeaturer)
+	}
 
 	return _sessionFeature
 }
@@ -380,12 +513,45 @@ func (session *Session) FeatureForMessage(featureType externglib.Type, msg *Mess
 	_arg2 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_session_get_feature_for_message(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(featureType)
+	runtime.KeepAlive(msg)
 
 	var _sessionFeature SessionFeaturer // out
 
-	_sessionFeature = (gextras.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(SessionFeaturer)
+	if _cret != nil {
+		_sessionFeature = (externglib.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(SessionFeaturer)
+	}
 
 	return _sessionFeature
+}
+
+// Features generates a list of session's features of type feature_type. (If you
+// want to see all features, you can pass SOUP_TYPE_SESSION_FEATURE for
+// feature_type.)
+func (session *Session) Features(featureType externglib.Type) []SessionFeaturer {
+	var _arg0 *C.SoupSession // out
+	var _arg1 C.GType        // out
+	var _cret *C.GSList      // in
+
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
+	_arg1 = C.GType(featureType)
+
+	_cret = C.soup_session_get_features(_arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(featureType)
+
+	var _sList []SessionFeaturer // out
+
+	_sList = make([]SessionFeaturer, 0, gextras.SListSize(unsafe.Pointer(_cret)))
+	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
+		src := (*C.SoupSessionFeature)(v)
+		var dst SessionFeaturer // out
+		dst = (externglib.CastObject(externglib.Take(unsafe.Pointer(src)))).(SessionFeaturer)
+		_sList = append(_sList, dst)
+	})
+
+	return _sList
 }
 
 // HasFeature tests if session has at a feature of type feature_type (which can
@@ -400,6 +566,8 @@ func (session *Session) HasFeature(featureType externglib.Type) bool {
 	_arg1 = C.GType(featureType)
 
 	_cret = C.soup_session_has_feature(_arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(featureType)
 
 	var _ok bool // out
 
@@ -423,6 +591,8 @@ func (session *Session) PauseMessage(msg *Message) {
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	C.soup_session_pause_message(_arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(msg)
 }
 
 // PrefetchDns tells session that an URI from the given hostname may be
@@ -446,10 +616,17 @@ func (session *Session) PrefetchDns(ctx context.Context, hostname string, callba
 		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(hostname)))
-	_arg3 = (*[0]byte)(C._gotk4_soup2_AddressCallback)
-	_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	defer C.free(unsafe.Pointer(_arg1))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_soup2_AddressCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.soup_session_prefetch_dns(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(hostname)
+	runtime.KeepAlive(callback)
 }
 
 // PrepareForURI tells session that uri may be requested shortly, and so the
@@ -466,6 +643,8 @@ func (session *Session) PrepareForURI(uri *URI) {
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	C.soup_session_prepare_for_uri(_arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(uri)
 }
 
 // QueueMessage queues the message msg for asynchronously sending the request
@@ -494,10 +673,16 @@ func (session *Session) QueueMessage(msg *Message, callback SessionCallback) {
 
 	_arg0 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg2 = (*[0]byte)(C._gotk4_soup2_SessionCallback)
-	_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	C.g_object_ref(C.gpointer(msg.Native()))
+	if callback != nil {
+		_arg2 = (*[0]byte)(C._gotk4_soup2_SessionCallback)
+		_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.soup_session_queue_message(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(callback)
 }
 
 // RedirectMessage updates msg's URI according to its status code and "Location"
@@ -520,6 +705,8 @@ func (session *Session) RedirectMessage(msg *Message) bool {
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_session_redirect_message(_arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(msg)
 
 	var _ok bool // out
 
@@ -536,9 +723,11 @@ func (session *Session) RemoveFeature(feature SessionFeaturer) {
 	var _arg1 *C.SoupSessionFeature // out
 
 	_arg0 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
-	_arg1 = (*C.SoupSessionFeature)(unsafe.Pointer((feature).(gextras.Nativer).Native()))
+	_arg1 = (*C.SoupSessionFeature)(unsafe.Pointer(feature.Native()))
 
 	C.soup_session_remove_feature(_arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(feature)
 }
 
 // RemoveFeatureByType removes all features of type feature_type (or any
@@ -553,6 +742,8 @@ func (session *Session) RemoveFeatureByType(featureType externglib.Type) {
 	_arg1 = C.GType(featureType)
 
 	C.soup_session_remove_feature_by_type(_arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(featureType)
 }
 
 // Request creates a Request for retrieving uri_string.
@@ -564,14 +755,19 @@ func (session *Session) Request(uriString string) (*Request, error) {
 
 	_arg0 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(uriString)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.soup_session_request(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(uriString)
 
 	var _request *Request // out
 	var _goerr error      // out
 
 	_request = wrapRequest(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _request, _goerr
 }
@@ -588,15 +784,22 @@ func (session *Session) RequestHttp(method string, uriString string) (*RequestHT
 
 	_arg0 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(method)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(uriString)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	_cret = C.soup_session_request_http(_arg0, _arg1, _arg2, &_cerr)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(method)
+	runtime.KeepAlive(uriString)
 
 	var _requestHTTP *RequestHTTP // out
 	var _goerr error              // out
 
 	_requestHTTP = wrapRequestHTTP(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _requestHTTP, _goerr
 }
@@ -613,15 +816,21 @@ func (session *Session) RequestHttpURI(method string, uri *URI) (*RequestHTTP, e
 
 	_arg0 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(method)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	_cret = C.soup_session_request_http_uri(_arg0, _arg1, _arg2, &_cerr)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(method)
+	runtime.KeepAlive(uri)
 
 	var _requestHTTP *RequestHTTP // out
 	var _goerr error              // out
 
 	_requestHTTP = wrapRequestHTTP(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _requestHTTP, _goerr
 }
@@ -637,12 +846,16 @@ func (session *Session) RequestURI(uri *URI) (*Request, error) {
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	_cret = C.soup_session_request_uri(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(uri)
 
 	var _request *Request // out
 	var _goerr error      // out
 
 	_request = wrapRequest(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _request, _goerr
 }
@@ -657,6 +870,8 @@ func (session *Session) RequeueMessage(msg *Message) {
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	C.soup_session_requeue_message(_arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(msg)
 }
 
 // Send: synchronously sends msg and waits for the beginning of a response. On
@@ -698,12 +913,17 @@ func (session *Session) Send(ctx context.Context, msg *Message) (gio.InputStream
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_session_send(_arg0, _arg1, _arg2, &_cerr)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(msg)
 
 	var _inputStream gio.InputStreamer // out
 	var _goerr error                   // out
 
-	_inputStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	_inputStream = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _inputStream, _goerr
 }
@@ -736,10 +956,16 @@ func (session *Session) SendAsync(ctx context.Context, msg *Message, callback gi
 		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.soup_session_send_async(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(callback)
 }
 
 // SendFinish gets the response to a soup_session_send_async() call and (if
@@ -751,15 +977,19 @@ func (session *Session) SendFinish(result gio.AsyncResulter) (gio.InputStreamer,
 	var _cerr *C.GError       // in
 
 	_arg0 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.soup_session_send_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(result)
 
 	var _inputStream gio.InputStreamer // out
 	var _goerr error                   // out
 
-	_inputStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	_inputStream = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _inputStream, _goerr
 }
@@ -776,7 +1006,7 @@ func (session *Session) SendFinish(result gio.AsyncResulter) (gio.InputStreamer,
 // Contrast this method with soup_session_send(), which also synchronously sends
 // a message, but returns before reading the response body, and allows you to
 // read the response via a Stream.
-func (session *Session) SendMessage(msg *Message) uint {
+func (session *Session) SendMessage(msg *Message) uint32 {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
 	var _cret C.guint        // in
@@ -785,10 +1015,12 @@ func (session *Session) SendMessage(msg *Message) uint {
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_session_send_message(_arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(msg)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -810,10 +1042,12 @@ func (session *Session) StealConnection(msg *Message) gio.IOStreamer {
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_session_steal_connection(_arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(msg)
 
 	var _ioStream gio.IOStreamer // out
 
-	_ioStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.IOStreamer)
+	_ioStream = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.IOStreamer)
 
 	return _ioStream
 }
@@ -835,6 +1069,8 @@ func (session *Session) UnpauseMessage(msg *Message) {
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	C.soup_session_unpause_message(_arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(msg)
 }
 
 // WebsocketConnectAsync: asynchronously creates a WebsocketConnection to
@@ -854,11 +1090,11 @@ func (session *Session) UnpauseMessage(msg *Message) {
 // response, and soup_session_websocket_connect_finish() will return
 // SOUP_WEBSOCKET_ERROR_NOT_WEBSOCKET.
 func (session *Session) WebsocketConnectAsync(ctx context.Context, msg *Message, origin string, protocols []string, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.SoupSession  // out
-	var _arg4 *C.GCancellable // out
-	var _arg1 *C.SoupMessage  // out
-	var _arg2 *C.char         // out
-	var _arg3 **C.char
+	var _arg0 *C.SoupSession        // out
+	var _arg4 *C.GCancellable       // out
+	var _arg1 *C.SoupMessage        // out
+	var _arg2 *C.char               // out
+	var _arg3 **C.char              // out
 	var _arg5 C.GAsyncReadyCallback // out
 	var _arg6 C.gpointer
 
@@ -869,22 +1105,35 @@ func (session *Session) WebsocketConnectAsync(ctx context.Context, msg *Message,
 		_arg4 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg2 = (*C.char)(unsafe.Pointer(C.CString(origin)))
+	if origin != "" {
+		_arg2 = (*C.char)(unsafe.Pointer(C.CString(origin)))
+		defer C.free(unsafe.Pointer(_arg2))
+	}
 	{
 		_arg3 = (**C.char)(C.malloc(C.ulong(len(protocols)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg3))
 		{
 			out := unsafe.Slice(_arg3, len(protocols)+1)
 			var zero *C.char
 			out[len(protocols)] = zero
 			for i := range protocols {
 				out[i] = (*C.char)(unsafe.Pointer(C.CString(protocols[i])))
+				defer C.free(unsafe.Pointer(out[i]))
 			}
 		}
 	}
-	_arg5 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg6 = C.gpointer(gbox.AssignOnce(callback))
+	if callback != nil {
+		_arg5 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg6 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.soup_session_websocket_connect_async(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(origin)
+	runtime.KeepAlive(protocols)
+	runtime.KeepAlive(callback)
 }
 
 // WebsocketConnectFinish gets the WebsocketConnection response to a
@@ -897,15 +1146,19 @@ func (session *Session) WebsocketConnectFinish(result gio.AsyncResulter) (*Webso
 	var _cerr *C.GError                  // in
 
 	_arg0 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.soup_session_websocket_connect_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(result)
 
 	var _websocketConnection *WebsocketConnection // out
 	var _goerr error                              // out
 
 	_websocketConnection = wrapWebsocketConnection(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _websocketConnection, _goerr
 }
@@ -922,6 +1175,8 @@ func (session *Session) WouldRedirect(msg *Message) bool {
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_session_would_redirect(_arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(msg)
 
 	var _ok bool // out
 

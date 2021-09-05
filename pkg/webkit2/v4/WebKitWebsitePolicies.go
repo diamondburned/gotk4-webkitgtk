@@ -4,10 +4,10 @@ package webkit2
 
 import (
 	"fmt"
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -58,8 +58,6 @@ type WebsitePolicies struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*WebsitePolicies)(nil)
-
 func wrapWebsitePolicies(obj *externglib.Object) *WebsitePolicies {
 	return &WebsitePolicies{
 		Object: obj,
@@ -93,6 +91,7 @@ func (policies *WebsitePolicies) AutoplayPolicy() AutoplayPolicy {
 	_arg0 = (*C.WebKitWebsitePolicies)(unsafe.Pointer(policies.Native()))
 
 	_cret = C.webkit_website_policies_get_autoplay_policy(_arg0)
+	runtime.KeepAlive(policies)
 
 	var _autoplayPolicy AutoplayPolicy // out
 

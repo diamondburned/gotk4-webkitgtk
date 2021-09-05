@@ -3,11 +3,11 @@
 package soup
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -23,6 +23,14 @@ func init() {
 		{T: externglib.Type(C.soup_auth_domain_basic_get_type()), F: marshalAuthDomainBasiccer},
 	})
 }
+
+// AUTH_DOMAIN_BASIC_AUTH_CALLBACK alias for the AuthDomainBasic:auth-callback
+// property. (The AuthDomainBasicAuthCallback.)
+const AUTH_DOMAIN_BASIC_AUTH_CALLBACK = "auth-callback"
+
+// AUTH_DOMAIN_BASIC_AUTH_DATA alias for the AuthDomainBasic:auth-data property.
+// (The data to pass to the AuthDomainBasicAuthCallback.)
+const AUTH_DOMAIN_BASIC_AUTH_DATA = "auth-data"
 
 // AuthDomainBasicAuthCallback: callback used by AuthDomainBasic for
 // authentication purposes. The application should verify that username and
@@ -72,8 +80,6 @@ type AuthDomainBasic struct {
 	AuthDomain
 }
 
-var _ gextras.Nativer = (*AuthDomainBasic)(nil)
-
 func wrapAuthDomainBasic(obj *externglib.Object) *AuthDomainBasic {
 	return &AuthDomainBasic{
 		AuthDomain: AuthDomain{
@@ -108,4 +114,6 @@ func (domain *AuthDomainBasic) SetAuthCallback(callback AuthDomainBasicAuthCallb
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
 
 	C.soup_auth_domain_basic_set_auth_callback(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(callback)
 }

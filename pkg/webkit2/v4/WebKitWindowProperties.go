@@ -3,11 +3,12 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v3"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -25,8 +26,6 @@ func init() {
 type WindowProperties struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*WindowProperties)(nil)
 
 func wrapWindowProperties(obj *externglib.Object) *WindowProperties {
 	return &WindowProperties{
@@ -49,6 +48,7 @@ func (windowProperties *WindowProperties) Fullscreen() bool {
 	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(windowProperties.Native()))
 
 	_cret = C.webkit_window_properties_get_fullscreen(_arg0)
+	runtime.KeepAlive(windowProperties)
 
 	var _ok bool // out
 
@@ -67,6 +67,7 @@ func (windowProperties *WindowProperties) Geometry() gdk.Rectangle {
 	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(windowProperties.Native()))
 
 	C.webkit_window_properties_get_geometry(_arg0, &_arg1)
+	runtime.KeepAlive(windowProperties)
 
 	var _geometry gdk.Rectangle // out
 
@@ -84,6 +85,7 @@ func (windowProperties *WindowProperties) LocationbarVisible() bool {
 	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(windowProperties.Native()))
 
 	_cret = C.webkit_window_properties_get_locationbar_visible(_arg0)
+	runtime.KeepAlive(windowProperties)
 
 	var _ok bool // out
 
@@ -103,6 +105,7 @@ func (windowProperties *WindowProperties) MenubarVisible() bool {
 	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(windowProperties.Native()))
 
 	_cret = C.webkit_window_properties_get_menubar_visible(_arg0)
+	runtime.KeepAlive(windowProperties)
 
 	var _ok bool // out
 
@@ -121,6 +124,7 @@ func (windowProperties *WindowProperties) Resizable() bool {
 	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(windowProperties.Native()))
 
 	_cret = C.webkit_window_properties_get_resizable(_arg0)
+	runtime.KeepAlive(windowProperties)
 
 	var _ok bool // out
 
@@ -140,6 +144,7 @@ func (windowProperties *WindowProperties) ScrollbarsVisible() bool {
 	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(windowProperties.Native()))
 
 	_cret = C.webkit_window_properties_get_scrollbars_visible(_arg0)
+	runtime.KeepAlive(windowProperties)
 
 	var _ok bool // out
 
@@ -159,6 +164,7 @@ func (windowProperties *WindowProperties) StatusbarVisible() bool {
 	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(windowProperties.Native()))
 
 	_cret = C.webkit_window_properties_get_statusbar_visible(_arg0)
+	runtime.KeepAlive(windowProperties)
 
 	var _ok bool // out
 
@@ -178,6 +184,7 @@ func (windowProperties *WindowProperties) ToolbarVisible() bool {
 	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(windowProperties.Native()))
 
 	_cret = C.webkit_window_properties_get_toolbar_visible(_arg0)
+	runtime.KeepAlive(windowProperties)
 
 	var _ok bool // out
 

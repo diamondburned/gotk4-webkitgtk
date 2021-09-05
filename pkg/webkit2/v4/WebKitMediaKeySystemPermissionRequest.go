@@ -3,10 +3,10 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -30,6 +30,7 @@ func MediaKeySystemPermissionGetName(request *MediaKeySystemPermissionRequest) s
 	_arg1 = (*C.WebKitMediaKeySystemPermissionRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_media_key_system_permission_get_name(_arg1)
+	runtime.KeepAlive(request)
 
 	var _utf8 string // out
 
@@ -43,8 +44,6 @@ type MediaKeySystemPermissionRequest struct {
 
 	PermissionRequest
 }
-
-var _ gextras.Nativer = (*MediaKeySystemPermissionRequest)(nil)
 
 func wrapMediaKeySystemPermissionRequest(obj *externglib.Object) *MediaKeySystemPermissionRequest {
 	return &MediaKeySystemPermissionRequest{

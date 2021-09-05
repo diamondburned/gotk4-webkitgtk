@@ -3,10 +3,10 @@
 package javascriptcore
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
@@ -24,8 +24,6 @@ func init() {
 type WeakValue struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*WeakValue)(nil)
 
 func wrapWeakValue(obj *externglib.Object) *WeakValue {
 	return &WeakValue{
@@ -48,6 +46,7 @@ func NewWeakValue(value *Value) *WeakValue {
 	_arg1 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 
 	_cret = C.jsc_weak_value_new(_arg1)
+	runtime.KeepAlive(value)
 
 	var _weakValue *WeakValue // out
 
@@ -64,6 +63,7 @@ func (weakValue *WeakValue) Value() *Value {
 	_arg0 = (*C.JSCWeakValue)(unsafe.Pointer(weakValue.Native()))
 
 	_cret = C.jsc_weak_value_get_value(_arg0)
+	runtime.KeepAlive(weakValue)
 
 	var _value *Value // out
 

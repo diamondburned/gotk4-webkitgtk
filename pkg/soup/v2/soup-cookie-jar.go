@@ -4,10 +4,11 @@ package soup
 
 import (
 	"fmt"
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -22,6 +23,13 @@ func init() {
 		{T: externglib.Type(C.soup_cookie_jar_get_type()), F: marshalCookieJarrer},
 	})
 }
+
+// COOKIE_JAR_ACCEPT_POLICY alias for the CookieJar:accept-policy property.
+const COOKIE_JAR_ACCEPT_POLICY = "accept-policy"
+
+// COOKIE_JAR_READ_ONLY alias for the CookieJar:read-only property. (Whether or
+// not the cookie jar is read-only.)
+const COOKIE_JAR_READ_ONLY = "read-only"
 
 // CookieJarAcceptPolicy: policy for accepting or rejecting cookies returned in
 // responses.
@@ -102,8 +110,6 @@ type CookieJar struct {
 	SessionFeature
 }
 
-var _ gextras.Nativer = (*CookieJar)(nil)
-
 func wrapCookieJar(obj *externglib.Object) *CookieJar {
 	return &CookieJar{
 		Object: obj,
@@ -144,8 +150,11 @@ func (jar *CookieJar) AddCookie(cookie *Cookie) {
 
 	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
 	_arg1 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
+	runtime.SetFinalizer(gextras.StructIntern(unsafe.Pointer(cookie)), nil)
 
 	C.soup_cookie_jar_add_cookie(_arg0, _arg1)
+	runtime.KeepAlive(jar)
+	runtime.KeepAlive(cookie)
 }
 
 // AddCookieFull adds cookie to jar, emitting the 'changed' signal if we are
@@ -167,10 +176,19 @@ func (jar *CookieJar) AddCookieFull(cookie *Cookie, uri *URI, firstParty *URI) {
 
 	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
 	_arg1 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
-	_arg2 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
-	_arg3 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(firstParty)))
+	runtime.SetFinalizer(gextras.StructIntern(unsafe.Pointer(cookie)), nil)
+	if uri != nil {
+		_arg2 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
+	}
+	if firstParty != nil {
+		_arg3 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(firstParty)))
+	}
 
 	C.soup_cookie_jar_add_cookie_full(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(jar)
+	runtime.KeepAlive(cookie)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(firstParty)
 }
 
 // AddCookieWithFirstParty adds cookie to jar, emitting the 'changed' signal if
@@ -192,8 +210,43 @@ func (jar *CookieJar) AddCookieWithFirstParty(firstParty *URI, cookie *Cookie) {
 	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(firstParty)))
 	_arg2 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
+	runtime.SetFinalizer(gextras.StructIntern(unsafe.Pointer(cookie)), nil)
 
 	C.soup_cookie_jar_add_cookie_with_first_party(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(jar)
+	runtime.KeepAlive(firstParty)
+	runtime.KeepAlive(cookie)
+}
+
+// AllCookies constructs a List with every cookie inside the jar. The cookies in
+// the list are a copy of the original, so you have to free them when you are
+// done with them.
+func (jar *CookieJar) AllCookies() []Cookie {
+	var _arg0 *C.SoupCookieJar // out
+	var _cret *C.GSList        // in
+
+	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
+
+	_cret = C.soup_cookie_jar_all_cookies(_arg0)
+	runtime.KeepAlive(jar)
+
+	var _sList []Cookie // out
+
+	_sList = make([]Cookie, 0, gextras.SListSize(unsafe.Pointer(_cret)))
+	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
+		src := (*C.SoupCookie)(v)
+		var dst Cookie // out
+		dst = *(*Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(&dst)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.soup_cookie_free((*C.SoupCookie)(intern.C))
+			},
+		)
+		_sList = append(_sList, dst)
+	})
+
+	return _sList
 }
 
 // DeleteCookie deletes cookie from jar, emitting the 'changed' signal.
@@ -205,6 +258,8 @@ func (jar *CookieJar) DeleteCookie(cookie *Cookie) {
 	_arg1 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 
 	C.soup_cookie_jar_delete_cookie(_arg0, _arg1)
+	runtime.KeepAlive(jar)
+	runtime.KeepAlive(cookie)
 }
 
 // AcceptPolicy gets jar's CookieJarAcceptPolicy
@@ -215,12 +270,119 @@ func (jar *CookieJar) AcceptPolicy() CookieJarAcceptPolicy {
 	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
 
 	_cret = C.soup_cookie_jar_get_accept_policy(_arg0)
+	runtime.KeepAlive(jar)
 
 	var _cookieJarAcceptPolicy CookieJarAcceptPolicy // out
 
 	_cookieJarAcceptPolicy = CookieJarAcceptPolicy(_cret)
 
 	return _cookieJarAcceptPolicy
+}
+
+// CookieList retrieves the list of cookies that would be sent with a request to
+// uri as a List of Cookie objects.
+//
+// If for_http is TRUE, the return value will include cookies marked "HttpOnly"
+// (that is, cookies that the server wishes to keep hidden from client-side
+// scripting operations such as the JavaScript document.cookies property). Since
+// CookieJar sets the Cookie header itself when making the actual HTTP request,
+// you should almost certainly be setting for_http to FALSE if you are calling
+// this.
+func (jar *CookieJar) CookieList(uri *URI, forHttp bool) []Cookie {
+	var _arg0 *C.SoupCookieJar // out
+	var _arg1 *C.SoupURI       // out
+	var _arg2 C.gboolean       // out
+	var _cret *C.GSList        // in
+
+	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
+	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
+	if forHttp {
+		_arg2 = C.TRUE
+	}
+
+	_cret = C.soup_cookie_jar_get_cookie_list(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(jar)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(forHttp)
+
+	var _sList []Cookie // out
+
+	_sList = make([]Cookie, 0, gextras.SListSize(unsafe.Pointer(_cret)))
+	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
+		src := (*C.SoupCookie)(v)
+		var dst Cookie // out
+		dst = *(*Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(&dst)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.soup_cookie_free((*C.SoupCookie)(intern.C))
+			},
+		)
+		_sList = append(_sList, dst)
+	})
+
+	return _sList
+}
+
+// CookieListWithSameSiteInfo: this is an extended version of
+// soup_cookie_jar_get_cookie_list() that provides more information required to
+// use SameSite cookies. See the SameSite cookies spec
+// (https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00) for more
+// detailed information.
+func (jar *CookieJar) CookieListWithSameSiteInfo(uri *URI, topLevel *URI, siteForCookies *URI, forHttp bool, isSafeMethod bool, isTopLevelNavigation bool) []Cookie {
+	var _arg0 *C.SoupCookieJar // out
+	var _arg1 *C.SoupURI       // out
+	var _arg2 *C.SoupURI       // out
+	var _arg3 *C.SoupURI       // out
+	var _arg4 C.gboolean       // out
+	var _arg5 C.gboolean       // out
+	var _arg6 C.gboolean       // out
+	var _cret *C.GSList        // in
+
+	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
+	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
+	if topLevel != nil {
+		_arg2 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(topLevel)))
+	}
+	if siteForCookies != nil {
+		_arg3 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(siteForCookies)))
+	}
+	if forHttp {
+		_arg4 = C.TRUE
+	}
+	if isSafeMethod {
+		_arg5 = C.TRUE
+	}
+	if isTopLevelNavigation {
+		_arg6 = C.TRUE
+	}
+
+	_cret = C.soup_cookie_jar_get_cookie_list_with_same_site_info(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6)
+	runtime.KeepAlive(jar)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(topLevel)
+	runtime.KeepAlive(siteForCookies)
+	runtime.KeepAlive(forHttp)
+	runtime.KeepAlive(isSafeMethod)
+	runtime.KeepAlive(isTopLevelNavigation)
+
+	var _sList []Cookie // out
+
+	_sList = make([]Cookie, 0, gextras.SListSize(unsafe.Pointer(_cret)))
+	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
+		src := (*C.SoupCookie)(v)
+		var dst Cookie // out
+		dst = *(*Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(&dst)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.soup_cookie_free((*C.SoupCookie)(intern.C))
+			},
+		)
+		_sList = append(_sList, dst)
+	})
+
+	return _sList
 }
 
 // Cookies retrieves (in Cookie-header form) the list of cookies that would be
@@ -245,11 +407,16 @@ func (jar *CookieJar) Cookies(uri *URI, forHttp bool) string {
 	}
 
 	_cret = C.soup_cookie_jar_get_cookies(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(jar)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(forHttp)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	defer C.free(unsafe.Pointer(_cret))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+		defer C.free(unsafe.Pointer(_cret))
+	}
 
 	return _utf8
 }
@@ -262,6 +429,7 @@ func (jar *CookieJar) IsPersistent() bool {
 	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
 
 	_cret = C.soup_cookie_jar_is_persistent(_arg0)
+	runtime.KeepAlive(jar)
 
 	var _ok bool // out
 
@@ -282,6 +450,7 @@ func (jar *CookieJar) Save() {
 	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
 
 	C.soup_cookie_jar_save(_arg0)
+	runtime.KeepAlive(jar)
 }
 
 // SetAcceptPolicy sets policy as the cookie acceptance policy for jar.
@@ -293,6 +462,8 @@ func (jar *CookieJar) SetAcceptPolicy(policy CookieJarAcceptPolicy) {
 	_arg1 = C.SoupCookieJarAcceptPolicy(policy)
 
 	C.soup_cookie_jar_set_accept_policy(_arg0, _arg1)
+	runtime.KeepAlive(jar)
+	runtime.KeepAlive(policy)
 }
 
 // SetCookie adds cookie to jar, exactly as though it had appeared in a
@@ -311,8 +482,12 @@ func (jar *CookieJar) SetCookie(uri *URI, cookie string) {
 	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(cookie)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	C.soup_cookie_jar_set_cookie(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(jar)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(cookie)
 }
 
 // SetCookieWithFirstParty adds cookie to jar, exactly as though it had appeared
@@ -329,6 +504,11 @@ func (jar *CookieJar) SetCookieWithFirstParty(uri *URI, firstParty *URI, cookie 
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 	_arg2 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(firstParty)))
 	_arg3 = (*C.char)(unsafe.Pointer(C.CString(cookie)))
+	defer C.free(unsafe.Pointer(_arg3))
 
 	C.soup_cookie_jar_set_cookie_with_first_party(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(jar)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(firstParty)
+	runtime.KeepAlive(cookie)
 }

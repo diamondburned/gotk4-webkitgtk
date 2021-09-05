@@ -3,11 +3,11 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gtk/v3"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -25,8 +25,6 @@ func init() {
 type FileChooserRequest struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*FileChooserRequest)(nil)
 
 func wrapFileChooserRequest(obj *externglib.Object) *FileChooserRequest {
 	return &FileChooserRequest{
@@ -50,6 +48,7 @@ func (request *FileChooserRequest) Cancel() {
 	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(request.Native()))
 
 	C.webkit_file_chooser_request_cancel(_arg0)
+	runtime.KeepAlive(request)
 }
 
 // MIMETypes: get the list of MIME types the file chooser dialog should handle,
@@ -60,13 +59,14 @@ func (request *FileChooserRequest) Cancel() {
 // only one.
 func (request *FileChooserRequest) MIMETypes() []string {
 	var _arg0 *C.WebKitFileChooserRequest // out
-	var _cret **C.gchar
+	var _cret **C.gchar                   // in
 
 	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_file_chooser_request_get_mime_types(_arg0)
+	runtime.KeepAlive(request)
 
-	var _utf8s []string
+	var _utf8s []string // out
 
 	{
 		var i int
@@ -79,7 +79,6 @@ func (request *FileChooserRequest) MIMETypes() []string {
 		_utf8s = make([]string, i)
 		for i := range src {
 			_utf8s[i] = C.GoString((*C.gchar)(unsafe.Pointer(src[i])))
-			defer C.free(unsafe.Pointer(src[i]))
 		}
 	}
 
@@ -101,6 +100,7 @@ func (request *FileChooserRequest) MIMETypesFilter() *gtk.FileFilter {
 	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_file_chooser_request_get_mime_types_filter(_arg0)
+	runtime.KeepAlive(request)
 
 	var _fileFilter *gtk.FileFilter // out
 
@@ -113,6 +113,7 @@ func (request *FileChooserRequest) MIMETypesFilter() *gtk.FileFilter {
 			Buildable: gtk.Buildable{
 				Object: obj,
 			},
+			Object: obj,
 		}
 	}
 
@@ -129,6 +130,7 @@ func (request *FileChooserRequest) SelectMultiple() bool {
 	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_file_chooser_request_get_select_multiple(_arg0)
+	runtime.KeepAlive(request)
 
 	var _ok bool // out
 
@@ -150,13 +152,14 @@ func (request *FileChooserRequest) SelectMultiple() bool {
 // like pre-selecting the files from a previous request.
 func (request *FileChooserRequest) SelectedFiles() []string {
 	var _arg0 *C.WebKitFileChooserRequest // out
-	var _cret **C.gchar
+	var _cret **C.gchar                   // in
 
 	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_file_chooser_request_get_selected_files(_arg0)
+	runtime.KeepAlive(request)
 
-	var _utf8s []string
+	var _utf8s []string // out
 
 	{
 		var i int
@@ -169,7 +172,6 @@ func (request *FileChooserRequest) SelectedFiles() []string {
 		_utf8s = make([]string, i)
 		for i := range src {
 			_utf8s[i] = C.GoString((*C.gchar)(unsafe.Pointer(src[i])))
-			defer C.free(unsafe.Pointer(src[i]))
 		}
 	}
 
@@ -180,20 +182,24 @@ func (request *FileChooserRequest) SelectedFiles() []string {
 // request.
 func (request *FileChooserRequest) SelectFiles(files []string) {
 	var _arg0 *C.WebKitFileChooserRequest // out
-	var _arg1 **C.gchar
+	var _arg1 **C.gchar                   // out
 
 	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(request.Native()))
 	{
 		_arg1 = (**C.gchar)(C.malloc(C.ulong(len(files)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg1))
 		{
 			out := unsafe.Slice(_arg1, len(files)+1)
 			var zero *C.gchar
 			out[len(files)] = zero
 			for i := range files {
 				out[i] = (*C.gchar)(unsafe.Pointer(C.CString(files[i])))
+				defer C.free(unsafe.Pointer(out[i]))
 			}
 		}
 	}
 
 	C.webkit_file_chooser_request_select_files(_arg0, _arg1)
+	runtime.KeepAlive(request)
+	runtime.KeepAlive(files)
 }

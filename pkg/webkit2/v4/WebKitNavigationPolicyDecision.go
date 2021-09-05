@@ -3,10 +3,11 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -24,8 +25,6 @@ func init() {
 type NavigationPolicyDecision struct {
 	PolicyDecision
 }
-
-var _ gextras.Nativer = (*NavigationPolicyDecision)(nil)
 
 func wrapNavigationPolicyDecision(obj *externglib.Object) *NavigationPolicyDecision {
 	return &NavigationPolicyDecision{
@@ -50,6 +49,7 @@ func (decision *NavigationPolicyDecision) FrameName() string {
 	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(decision.Native()))
 
 	_cret = C.webkit_navigation_policy_decision_get_frame_name(_arg0)
+	runtime.KeepAlive(decision)
 
 	var _utf8 string // out
 
@@ -63,17 +63,18 @@ func (decision *NavigationPolicyDecision) FrameName() string {
 //
 // Deprecated: Use webkit_navigation_policy_decision_get_navigation_action()
 // instead.
-func (decision *NavigationPolicyDecision) Modifiers() uint {
+func (decision *NavigationPolicyDecision) Modifiers() uint32 {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret C.guint                           // in
 
 	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(decision.Native()))
 
 	_cret = C.webkit_navigation_policy_decision_get_modifiers(_arg0)
+	runtime.KeepAlive(decision)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -83,17 +84,18 @@ func (decision *NavigationPolicyDecision) Modifiers() uint {
 //
 // Deprecated: Use webkit_navigation_policy_decision_get_navigation_action()
 // instead.
-func (decision *NavigationPolicyDecision) MouseButton() uint {
+func (decision *NavigationPolicyDecision) MouseButton() uint32 {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret C.guint                           // in
 
 	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(decision.Native()))
 
 	_cret = C.webkit_navigation_policy_decision_get_mouse_button(_arg0)
+	runtime.KeepAlive(decision)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -107,6 +109,7 @@ func (decision *NavigationPolicyDecision) NavigationAction() *NavigationAction {
 	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(decision.Native()))
 
 	_cret = C.webkit_navigation_policy_decision_get_navigation_action(_arg0)
+	runtime.KeepAlive(decision)
 
 	var _navigationAction *NavigationAction // out
 
@@ -127,6 +130,7 @@ func (decision *NavigationPolicyDecision) NavigationType() NavigationType {
 	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(decision.Native()))
 
 	_cret = C.webkit_navigation_policy_decision_get_navigation_type(_arg0)
+	runtime.KeepAlive(decision)
 
 	var _navigationType NavigationType // out
 
@@ -146,6 +150,7 @@ func (decision *NavigationPolicyDecision) Request() *URIRequest {
 	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(decision.Native()))
 
 	_cret = C.webkit_navigation_policy_decision_get_request(_arg0)
+	runtime.KeepAlive(decision)
 
 	var _uriRequest *URIRequest // out
 

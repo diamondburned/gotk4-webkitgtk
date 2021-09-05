@@ -7,7 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -22,14 +22,19 @@ func init() {
 	})
 }
 
+// OptionMenuItem: instance of this type is always passed by reference.
 type OptionMenuItem struct {
-	nocopy gextras.NoCopy
+	*optionMenuItem
+}
+
+// optionMenuItem is the struct that's finalized.
+type optionMenuItem struct {
 	native *C.WebKitOptionMenuItem
 }
 
 func marshalOptionMenuItem(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &OptionMenuItem{native: (*C.WebKitOptionMenuItem)(unsafe.Pointer(b))}, nil
+	return &OptionMenuItem{&optionMenuItem{(*C.WebKitOptionMenuItem)(unsafe.Pointer(b))}}, nil
 }
 
 // Copy: make a copy of the KitOptionMenuItem.
@@ -40,24 +45,19 @@ func (item *OptionMenuItem) Copy() *OptionMenuItem {
 	_arg0 = (*C.WebKitOptionMenuItem)(gextras.StructNative(unsafe.Pointer(item)))
 
 	_cret = C.webkit_option_menu_item_copy(_arg0)
+	runtime.KeepAlive(item)
 
 	var _optionMenuItem *OptionMenuItem // out
 
 	_optionMenuItem = (*OptionMenuItem)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_optionMenuItem, func(v *OptionMenuItem) {
-		C.webkit_option_menu_item_free((*C.WebKitOptionMenuItem)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_optionMenuItem)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_option_menu_item_free((*C.WebKitOptionMenuItem)(intern.C))
+		},
+	)
 
 	return _optionMenuItem
-}
-
-// Free: free the KitOptionMenuItem.
-func (item *OptionMenuItem) free() {
-	var _arg0 *C.WebKitOptionMenuItem // out
-
-	_arg0 = (*C.WebKitOptionMenuItem)(gextras.StructNative(unsafe.Pointer(item)))
-
-	C.webkit_option_menu_item_free(_arg0)
 }
 
 // Label: get the label of a KitOptionMenuItem.
@@ -68,6 +68,7 @@ func (item *OptionMenuItem) Label() string {
 	_arg0 = (*C.WebKitOptionMenuItem)(gextras.StructNative(unsafe.Pointer(item)))
 
 	_cret = C.webkit_option_menu_item_get_label(_arg0)
+	runtime.KeepAlive(item)
 
 	var _utf8 string // out
 
@@ -84,6 +85,7 @@ func (item *OptionMenuItem) Tooltip() string {
 	_arg0 = (*C.WebKitOptionMenuItem)(gextras.StructNative(unsafe.Pointer(item)))
 
 	_cret = C.webkit_option_menu_item_get_tooltip(_arg0)
+	runtime.KeepAlive(item)
 
 	var _utf8 string // out
 
@@ -100,6 +102,7 @@ func (item *OptionMenuItem) IsEnabled() bool {
 	_arg0 = (*C.WebKitOptionMenuItem)(gextras.StructNative(unsafe.Pointer(item)))
 
 	_cret = C.webkit_option_menu_item_is_enabled(_arg0)
+	runtime.KeepAlive(item)
 
 	var _ok bool // out
 
@@ -118,6 +121,7 @@ func (item *OptionMenuItem) IsGroupChild() bool {
 	_arg0 = (*C.WebKitOptionMenuItem)(gextras.StructNative(unsafe.Pointer(item)))
 
 	_cret = C.webkit_option_menu_item_is_group_child(_arg0)
+	runtime.KeepAlive(item)
 
 	var _ok bool // out
 
@@ -136,6 +140,7 @@ func (item *OptionMenuItem) IsGroupLabel() bool {
 	_arg0 = (*C.WebKitOptionMenuItem)(gextras.StructNative(unsafe.Pointer(item)))
 
 	_cret = C.webkit_option_menu_item_is_group_label(_arg0)
+	runtime.KeepAlive(item)
 
 	var _ok bool // out
 
@@ -154,6 +159,7 @@ func (item *OptionMenuItem) IsSelected() bool {
 	_arg0 = (*C.WebKitOptionMenuItem)(gextras.StructNative(unsafe.Pointer(item)))
 
 	_cret = C.webkit_option_menu_item_is_selected(_arg0)
+	runtime.KeepAlive(item)
 
 	var _ok bool // out
 

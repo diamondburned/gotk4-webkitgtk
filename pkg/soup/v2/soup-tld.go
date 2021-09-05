@@ -4,10 +4,11 @@ package soup
 
 import (
 	"fmt"
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -72,8 +73,10 @@ func TldDomainIsPublicSuffix(domain string) bool {
 	var _cret C.gboolean // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(domain)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.soup_tld_domain_is_public_suffix(_arg1)
+	runtime.KeepAlive(domain)
 
 	var _ok bool // out
 
@@ -102,14 +105,18 @@ func TldGetBaseDomain(hostname string) (string, error) {
 	var _cerr *C.GError // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(hostname)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.soup_tld_get_base_domain(_arg1, &_cerr)
+	runtime.KeepAlive(hostname)
 
 	var _utf8 string // out
 	var _goerr error // out
 
 	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _utf8, _goerr
 }

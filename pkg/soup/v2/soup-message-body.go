@@ -9,7 +9,8 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -76,40 +77,44 @@ func (m MemoryUse) String() string {
 //
 // data is a #char because that's generally convenient; in some situations you
 // may need to cast it to #guchar or another type.
+//
+// An instance of this type is always passed by reference.
 type Buffer struct {
-	nocopy gextras.NoCopy
+	*buffer
+}
+
+// buffer is the struct that's finalized.
+type buffer struct {
 	native *C.SoupBuffer
 }
 
 func marshalBuffer(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &Buffer{native: (*C.SoupBuffer)(unsafe.Pointer(b))}, nil
+	return &Buffer{&buffer{(*C.SoupBuffer)(unsafe.Pointer(b))}}, nil
 }
 
-// NewBufferTake constructs a struct Buffer.
-func NewBufferTake(data []byte) *Buffer {
-	var _arg1 *C.guchar
+// NewBuffer constructs a struct Buffer.
+func NewBuffer(data []byte) *Buffer {
+	var _arg1 *C.guchar // out
 	var _arg2 C.gsize
 	var _cret *C.SoupBuffer // in
 
 	_arg2 = (C.gsize)(len(data))
 	_arg1 = (*C.guchar)(C.malloc(C.ulong(len(data)) * C.ulong(C.sizeof_guchar)))
-	defer C.free(unsafe.Pointer(_arg1))
-	{
-		out := unsafe.Slice((*C.guchar)(_arg1), len(data))
-		for i := range data {
-			out[i] = C.guchar(data[i])
-		}
-	}
+	copy(unsafe.Slice((*byte)(_arg1)), data)
 
 	_cret = C.soup_buffer_new_take(_arg1, _arg2)
+	runtime.KeepAlive(data)
 
 	var _buffer *Buffer // out
 
 	_buffer = (*Buffer)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_buffer, func(v *Buffer) {
-		C.soup_buffer_free((*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_buffer)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_buffer_free((*C.SoupBuffer)(intern.C))
+		},
+	)
 
 	return _buffer
 }
@@ -133,26 +138,44 @@ func (buffer *Buffer) Copy() *Buffer {
 	_arg0 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(buffer)))
 
 	_cret = C.soup_buffer_copy(_arg0)
+	runtime.KeepAlive(buffer)
 
 	var _ret *Buffer // out
 
 	_ret = (*Buffer)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_ret, func(v *Buffer) {
-		C.soup_buffer_free((*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_ret)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_buffer_free((*C.SoupBuffer)(intern.C))
+		},
+	)
 
 	return _ret
 }
 
-// Free frees buffer. (In reality, as described in the documentation for
-// soup_buffer_copy(), this is actually an "unref" operation, and may or may not
-// actually free buffer.)
-func (buffer *Buffer) free() {
+// AsBytes creates a #GBytes pointing to the same memory as buffer. The #GBytes
+// will hold a reference on buffer to ensure that it is not freed while the
+// #GBytes is still valid.
+func (buffer *Buffer) AsBytes() *glib.Bytes {
 	var _arg0 *C.SoupBuffer // out
+	var _cret *C.GBytes     // in
 
 	_arg0 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(buffer)))
 
-	C.soup_buffer_free(_arg0)
+	_cret = C.soup_buffer_get_as_bytes(_arg0)
+	runtime.KeepAlive(buffer)
+
+	var _bytes *glib.Bytes // out
+
+	_bytes = (*glib.Bytes)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_bytes)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.g_bytes_unref((*C.GBytes)(intern.C))
+		},
+	)
+
+	return _bytes
 }
 
 // Data: this function exists for use by language bindings, because it's not
@@ -160,19 +183,18 @@ func (buffer *Buffer) free() {
 // Buffer.
 func (buffer *Buffer) Data() []byte {
 	var _arg0 *C.SoupBuffer // out
-	var _arg1 *C.guint8
-	var _arg2 C.gsize // in
+	var _arg1 *C.guint8     // in
+	var _arg2 C.gsize       // in
 
 	_arg0 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(buffer)))
 
 	C.soup_buffer_get_data(_arg0, &_arg1, &_arg2)
+	runtime.KeepAlive(buffer)
 
-	var _data []byte
+	var _data []byte // out
 
-	_data = unsafe.Slice((*byte)(unsafe.Pointer(_arg1)), _arg2)
-	runtime.SetFinalizer(&_data, func(v *[]byte) {
-		C.free(unsafe.Pointer(&(*v)[0]))
-	})
+	_data = make([]byte, _arg2)
+	copy(_data, unsafe.Slice((*byte)(unsafe.Pointer(_arg1)), _arg2))
 
 	return _data
 }
@@ -186,6 +208,7 @@ func (buffer *Buffer) Owner() cgo.Handle {
 	_arg0 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(buffer)))
 
 	_cret = C.soup_buffer_get_owner(_arg0)
+	runtime.KeepAlive(buffer)
 
 	var _gpointer cgo.Handle // out
 
@@ -208,13 +231,19 @@ func (parent *Buffer) NewSubbuffer(offset uint, length uint) *Buffer {
 	_arg2 = C.gsize(length)
 
 	_cret = C.soup_buffer_new_subbuffer(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(parent)
+	runtime.KeepAlive(offset)
+	runtime.KeepAlive(length)
 
 	var _buffer *Buffer // out
 
 	_buffer = (*Buffer)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_buffer, func(v *Buffer) {
-		C.soup_buffer_free((*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_buffer)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_buffer_free((*C.SoupBuffer)(intern.C))
+		},
+	)
 
 	return _buffer
 }
@@ -231,14 +260,20 @@ func (parent *Buffer) NewSubbuffer(offset uint, length uint) *Buffer {
 //
 // As an added bonus, when data is filled in, it is always terminated with a
 // '\0' byte (which is not reflected in length).
+//
+// An instance of this type is always passed by reference.
 type MessageBody struct {
-	nocopy gextras.NoCopy
+	*messageBody
+}
+
+// messageBody is the struct that's finalized.
+type messageBody struct {
 	native *C.SoupMessageBody
 }
 
 func marshalMessageBody(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &MessageBody{native: (*C.SoupMessageBody)(unsafe.Pointer(b))}, nil
+	return &MessageBody{&messageBody{(*C.SoupMessageBody)(unsafe.Pointer(b))}}, nil
 }
 
 // NewMessageBody constructs a struct MessageBody.
@@ -250,9 +285,12 @@ func NewMessageBody() *MessageBody {
 	var _messageBody *MessageBody // out
 
 	_messageBody = (*MessageBody)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_messageBody, func(v *MessageBody) {
-		C.soup_message_body_free((*C.SoupMessageBody)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_messageBody)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_message_body_free((*C.SoupMessageBody)(intern.C))
+		},
+	)
 
 	return _messageBody
 }
@@ -282,30 +320,28 @@ func (body *MessageBody) AppendBuffer(buffer *Buffer) {
 	_arg1 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(buffer)))
 
 	C.soup_message_body_append_buffer(_arg0, _arg1)
+	runtime.KeepAlive(body)
+	runtime.KeepAlive(buffer)
 }
 
-// AppendTake appends length bytes from data to body.
+// Append appends length bytes from data to body.
 //
 // This function is exactly equivalent to soup_message_body_append() with
 // SOUP_MEMORY_TAKE as second argument; it exists mainly for convenience and
 // simplifying language bindings.
-func (body *MessageBody) AppendTake(data []byte) {
+func (body *MessageBody) Append(data []byte) {
 	var _arg0 *C.SoupMessageBody // out
-	var _arg1 *C.guchar
+	var _arg1 *C.guchar          // out
 	var _arg2 C.gsize
 
 	_arg0 = (*C.SoupMessageBody)(gextras.StructNative(unsafe.Pointer(body)))
 	_arg2 = (C.gsize)(len(data))
 	_arg1 = (*C.guchar)(C.malloc(C.ulong(len(data)) * C.ulong(C.sizeof_guchar)))
-	defer C.free(unsafe.Pointer(_arg1))
-	{
-		out := unsafe.Slice((*C.guchar)(_arg1), len(data))
-		for i := range data {
-			out[i] = C.guchar(data[i])
-		}
-	}
+	copy(unsafe.Slice((*byte)(_arg1)), data)
 
 	C.soup_message_body_append_take(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(body)
+	runtime.KeepAlive(data)
 }
 
 // Complete tags body as being complete; Call this when using chunked encoding
@@ -316,6 +352,7 @@ func (body *MessageBody) Complete() {
 	_arg0 = (*C.SoupMessageBody)(gextras.StructNative(unsafe.Pointer(body)))
 
 	C.soup_message_body_complete(_arg0)
+	runtime.KeepAlive(body)
 }
 
 // Flatten fills in body's data field with a buffer containing all of the data
@@ -327,25 +364,19 @@ func (body *MessageBody) Flatten() *Buffer {
 	_arg0 = (*C.SoupMessageBody)(gextras.StructNative(unsafe.Pointer(body)))
 
 	_cret = C.soup_message_body_flatten(_arg0)
+	runtime.KeepAlive(body)
 
 	var _buffer *Buffer // out
 
 	_buffer = (*Buffer)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_buffer, func(v *Buffer) {
-		C.soup_buffer_free((*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_buffer)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_buffer_free((*C.SoupBuffer)(intern.C))
+		},
+	)
 
 	return _buffer
-}
-
-// Free frees body. You will not normally need to use this, as Message frees its
-// associated message bodies automatically.
-func (body *MessageBody) free() {
-	var _arg0 *C.SoupMessageBody // out
-
-	_arg0 = (*C.SoupMessageBody)(gextras.StructNative(unsafe.Pointer(body)))
-
-	C.soup_message_body_free(_arg0)
 }
 
 // Accumulate gets the accumulate flag on body; see
@@ -357,6 +388,7 @@ func (body *MessageBody) Accumulate() bool {
 	_arg0 = (*C.SoupMessageBody)(gextras.StructNative(unsafe.Pointer(body)))
 
 	_cret = C.soup_message_body_get_accumulate(_arg0)
+	runtime.KeepAlive(body)
 
 	var _ok bool // out
 
@@ -388,13 +420,20 @@ func (body *MessageBody) Chunk(offset int64) *Buffer {
 	_arg1 = C.goffset(offset)
 
 	_cret = C.soup_message_body_get_chunk(_arg0, _arg1)
+	runtime.KeepAlive(body)
+	runtime.KeepAlive(offset)
 
 	var _buffer *Buffer // out
 
-	_buffer = (*Buffer)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_buffer, func(v *Buffer) {
-		C.soup_buffer_free((*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	if _cret != nil {
+		_buffer = (*Buffer)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(_buffer)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.soup_buffer_free((*C.SoupBuffer)(intern.C))
+			},
+		)
+	}
 
 	return _buffer
 }
@@ -413,6 +452,8 @@ func (body *MessageBody) GotChunk(chunk *Buffer) {
 	_arg1 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(chunk)))
 
 	C.soup_message_body_got_chunk(_arg0, _arg1)
+	runtime.KeepAlive(body)
+	runtime.KeepAlive(chunk)
 }
 
 // SetAccumulate sets or clears the accumulate flag on body. (The default value
@@ -450,6 +491,8 @@ func (body *MessageBody) SetAccumulate(accumulate bool) {
 	}
 
 	C.soup_message_body_set_accumulate(_arg0, _arg1)
+	runtime.KeepAlive(body)
+	runtime.KeepAlive(accumulate)
 }
 
 // Truncate deletes all of the data in body.
@@ -459,6 +502,7 @@ func (body *MessageBody) Truncate() {
 	_arg0 = (*C.SoupMessageBody)(gextras.StructNative(unsafe.Pointer(body)))
 
 	C.soup_message_body_truncate(_arg0)
+	runtime.KeepAlive(body)
 }
 
 // WroteChunk handles the MessageBody part of writing a chunk of data to the
@@ -475,4 +519,6 @@ func (body *MessageBody) WroteChunk(chunk *Buffer) {
 	_arg1 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(chunk)))
 
 	C.soup_message_body_wrote_chunk(_arg0, _arg1)
+	runtime.KeepAlive(body)
+	runtime.KeepAlive(chunk)
 }

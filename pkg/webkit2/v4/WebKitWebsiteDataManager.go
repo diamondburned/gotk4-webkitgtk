@@ -12,8 +12,8 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -65,8 +65,6 @@ type WebsiteDataManager struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*WebsiteDataManager)(nil)
-
 func wrapWebsiteDataManager(obj *externglib.Object) *WebsiteDataManager {
 	return &WebsiteDataManager{
 		Object: obj,
@@ -101,13 +99,17 @@ func (manager *WebsiteDataManager) ClearFinish(result gio.AsyncResulter) error {
 	var _cerr *C.GError                   // in
 
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	C.webkit_website_data_manager_clear_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(result)
 
 	var _goerr error // out
 
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _goerr
 }
@@ -131,43 +133,52 @@ func (manager *WebsiteDataManager) Fetch(ctx context.Context, types WebsiteDataT
 		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
 	_arg1 = C.WebKitWebsiteDataTypes(types)
-	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_website_data_manager_fetch(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(types)
+	runtime.KeepAlive(callback)
 }
 
 // FetchFinish: finish an asynchronous operation started with
 // webkit_website_data_manager_fetch().
-func (manager *WebsiteDataManager) FetchFinish(result gio.AsyncResulter) (*externglib.List, error) {
+func (manager *WebsiteDataManager) FetchFinish(result gio.AsyncResulter) ([]*WebsiteData, error) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 *C.GAsyncResult             // out
 	var _cret *C.GList                    // in
 	var _cerr *C.GError                   // in
 
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.webkit_website_data_manager_fetch_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(result)
 
-	var _list *externglib.List // out
-	var _goerr error           // out
+	var _list []*WebsiteData // out
+	var _goerr error         // out
 
-	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
-	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
-		src := (*C.WebKitWebsiteData)(_p)
+	_list = make([]*WebsiteData, 0, gextras.ListSize(unsafe.Pointer(_cret)))
+	gextras.MoveList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
+		src := (*C.WebKitWebsiteData)(v)
 		var dst *WebsiteData // out
 		dst = (*WebsiteData)(gextras.NewStructNative(unsafe.Pointer(src)))
-		C.webkit_website_data_ref(src)
-		runtime.SetFinalizer(dst, func(v *WebsiteData) {
-			C.webkit_website_data_unref((*C.WebKitWebsiteData)(gextras.StructNative(unsafe.Pointer(v))))
-		})
-		return dst
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(dst)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.webkit_website_data_unref((*C.WebKitWebsiteData)(intern.C))
+			},
+		)
+		_list = append(_list, dst)
 	})
-	_list.AttachFinalizer(func(v uintptr) {
-		C.webkit_website_data_unref((*C.WebKitWebsiteData)(unsafe.Pointer(v)))
-	})
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _list, _goerr
 }
@@ -181,10 +192,13 @@ func (manager *WebsiteDataManager) BaseCacheDirectory() string {
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_website_data_manager_get_base_cache_directory(_arg0)
+	runtime.KeepAlive(manager)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -198,10 +212,13 @@ func (manager *WebsiteDataManager) BaseDataDirectory() string {
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_website_data_manager_get_base_data_directory(_arg0)
+	runtime.KeepAlive(manager)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -214,6 +231,7 @@ func (manager *WebsiteDataManager) CookieManager() *CookieManager {
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_website_data_manager_get_cookie_manager(_arg0)
+	runtime.KeepAlive(manager)
 
 	var _cookieManager *CookieManager // out
 
@@ -231,10 +249,13 @@ func (manager *WebsiteDataManager) DiskCacheDirectory() string {
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_website_data_manager_get_disk_cache_directory(_arg0)
+	runtime.KeepAlive(manager)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -248,10 +269,13 @@ func (manager *WebsiteDataManager) DomCacheDirectory() string {
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_website_data_manager_get_dom_cache_directory(_arg0)
+	runtime.KeepAlive(manager)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -265,10 +289,13 @@ func (manager *WebsiteDataManager) HstsCacheDirectory() string {
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_website_data_manager_get_hsts_cache_directory(_arg0)
+	runtime.KeepAlive(manager)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -282,10 +309,13 @@ func (manager *WebsiteDataManager) IndexeddbDirectory() string {
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_website_data_manager_get_indexeddb_directory(_arg0)
+	runtime.KeepAlive(manager)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -298,10 +328,13 @@ func (manager *WebsiteDataManager) ITPDirectory() string {
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_website_data_manager_get_itp_directory(_arg0)
+	runtime.KeepAlive(manager)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -315,6 +348,7 @@ func (manager *WebsiteDataManager) ITPEnabled() bool {
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_website_data_manager_get_itp_enabled(_arg0)
+	runtime.KeepAlive(manager)
 
 	var _ok bool // out
 
@@ -344,43 +378,51 @@ func (manager *WebsiteDataManager) ITPSummary(ctx context.Context, callback gio.
 		defer runtime.KeepAlive(cancellable)
 		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
-	_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	if callback != nil {
+		_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_website_data_manager_get_itp_summary(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(callback)
 }
 
 // ITPSummaryFinish: finish an asynchronous operation started with
 // webkit_website_data_manager_get_itp_summary().
-func (manager *WebsiteDataManager) ITPSummaryFinish(result gio.AsyncResulter) (*externglib.List, error) {
+func (manager *WebsiteDataManager) ITPSummaryFinish(result gio.AsyncResulter) ([]*ITPThirdParty, error) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 *C.GAsyncResult             // out
 	var _cret *C.GList                    // in
 	var _cerr *C.GError                   // in
 
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.webkit_website_data_manager_get_itp_summary_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(result)
 
-	var _list *externglib.List // out
+	var _list []*ITPThirdParty // out
 	var _goerr error           // out
 
-	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
-	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
-		src := (*C.WebKitITPThirdParty)(_p)
+	_list = make([]*ITPThirdParty, 0, gextras.ListSize(unsafe.Pointer(_cret)))
+	gextras.MoveList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
+		src := (*C.WebKitITPThirdParty)(v)
 		var dst *ITPThirdParty // out
 		dst = (*ITPThirdParty)(gextras.NewStructNative(unsafe.Pointer(src)))
-		C.webkit_itp_third_party_ref(src)
-		runtime.SetFinalizer(dst, func(v *ITPThirdParty) {
-			C.webkit_itp_third_party_unref((*C.WebKitITPThirdParty)(gextras.StructNative(unsafe.Pointer(v))))
-		})
-		return dst
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(dst)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.webkit_itp_third_party_unref((*C.WebKitITPThirdParty)(intern.C))
+			},
+		)
+		_list = append(_list, dst)
 	})
-	_list.AttachFinalizer(func(v uintptr) {
-		C.webkit_itp_third_party_unref((*C.WebKitITPThirdParty)(unsafe.Pointer(v)))
-	})
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _list, _goerr
 }
@@ -394,10 +436,13 @@ func (manager *WebsiteDataManager) LocalStorageDirectory() string {
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_website_data_manager_get_local_storage_directory(_arg0)
+	runtime.KeepAlive(manager)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -411,10 +456,13 @@ func (manager *WebsiteDataManager) OfflineApplicationCacheDirectory() string {
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_website_data_manager_get_offline_application_cache_directory(_arg0)
+	runtime.KeepAlive(manager)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -429,6 +477,7 @@ func (manager *WebsiteDataManager) PersistentCredentialStorageEnabled() bool {
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_website_data_manager_get_persistent_credential_storage_enabled(_arg0)
+	runtime.KeepAlive(manager)
 
 	var _ok bool // out
 
@@ -448,10 +497,13 @@ func (manager *WebsiteDataManager) ServiceWorkerRegistrationsDirectory() string 
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_website_data_manager_get_service_worker_registrations_directory(_arg0)
+	runtime.KeepAlive(manager)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -464,6 +516,7 @@ func (manager *WebsiteDataManager) TLSErrorsPolicy() TLSErrorsPolicy {
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_website_data_manager_get_tls_errors_policy(_arg0)
+	runtime.KeepAlive(manager)
 
 	var _tlsErrorsPolicy TLSErrorsPolicy // out
 
@@ -482,10 +535,13 @@ func (manager *WebsiteDataManager) WebsqlDirectory() string {
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_website_data_manager_get_websql_directory(_arg0)
+	runtime.KeepAlive(manager)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -499,6 +555,7 @@ func (manager *WebsiteDataManager) IsEphemeral() bool {
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_website_data_manager_is_ephemeral(_arg0)
+	runtime.KeepAlive(manager)
 
 	var _ok bool // out
 
@@ -509,6 +566,49 @@ func (manager *WebsiteDataManager) IsEphemeral() bool {
 	return _ok
 }
 
+// Remove: asynchronously removes the website data of the for the given types
+// for websites in the given website_data list. Use
+// webkit_website_data_manager_clear() if you want to remove the website data
+// for all sites.
+//
+// When the operation is finished, callback will be called. You can then call
+// webkit_website_data_manager_remove_finish() to get the result of the
+// operation.
+func (manager *WebsiteDataManager) Remove(ctx context.Context, types WebsiteDataTypes, websiteData []*WebsiteData, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebsiteDataManager // out
+	var _arg3 *C.GCancellable             // out
+	var _arg1 C.WebKitWebsiteDataTypes    // out
+	var _arg2 *C.GList                    // out
+	var _arg4 C.GAsyncReadyCallback       // out
+	var _arg5 C.gpointer
+
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = C.WebKitWebsiteDataTypes(types)
+	for i := len(websiteData) - 1; i >= 0; i-- {
+		src := websiteData[i]
+		var dst *C.WebKitWebsiteData // out
+		dst = (*C.WebKitWebsiteData)(gextras.StructNative(unsafe.Pointer(src)))
+		_arg2 = C.g_list_prepend(_arg2, C.gpointer(unsafe.Pointer(dst)))
+	}
+	defer C.g_list_free(_arg2)
+	if callback != nil {
+		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg5 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_website_data_manager_remove(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(types)
+	runtime.KeepAlive(websiteData)
+	runtime.KeepAlive(callback)
+}
+
 // RemoveFinish: finish an asynchronous operation started with
 // webkit_website_data_manager_remove().
 func (manager *WebsiteDataManager) RemoveFinish(result gio.AsyncResulter) error {
@@ -517,13 +617,17 @@ func (manager *WebsiteDataManager) RemoveFinish(result gio.AsyncResulter) error 
 	var _cerr *C.GError                   // in
 
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	C.webkit_website_data_manager_remove_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(result)
 
 	var _goerr error // out
 
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _goerr
 }
@@ -545,6 +649,8 @@ func (manager *WebsiteDataManager) SetITPEnabled(enabled bool) {
 	}
 
 	C.webkit_website_data_manager_set_itp_enabled(_arg0, _arg1)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(enabled)
 }
 
 // SetNetworkProxySettings: set the network proxy settings to be used by
@@ -563,9 +669,14 @@ func (manager *WebsiteDataManager) SetNetworkProxySettings(proxyMode NetworkProx
 
 	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
 	_arg1 = C.WebKitNetworkProxyMode(proxyMode)
-	_arg2 = (*C.WebKitNetworkProxySettings)(gextras.StructNative(unsafe.Pointer(proxySettings)))
+	if proxySettings != nil {
+		_arg2 = (*C.WebKitNetworkProxySettings)(gextras.StructNative(unsafe.Pointer(proxySettings)))
+	}
 
 	C.webkit_website_data_manager_set_network_proxy_settings(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(proxyMode)
+	runtime.KeepAlive(proxySettings)
 }
 
 // SetPersistentCredentialStorageEnabled: enable or disable persistent
@@ -582,6 +693,8 @@ func (manager *WebsiteDataManager) SetPersistentCredentialStorageEnabled(enabled
 	}
 
 	C.webkit_website_data_manager_set_persistent_credential_storage_enabled(_arg0, _arg1)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(enabled)
 }
 
 // SetTLSErrorsPolicy: set the TLS errors policy of manager as policy
@@ -593,16 +706,23 @@ func (manager *WebsiteDataManager) SetTLSErrorsPolicy(policy TLSErrorsPolicy) {
 	_arg1 = C.WebKitTLSErrorsPolicy(policy)
 
 	C.webkit_website_data_manager_set_tls_errors_policy(_arg0, _arg1)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(policy)
 }
 
+// ITPFirstParty: instance of this type is always passed by reference.
 type ITPFirstParty struct {
-	nocopy gextras.NoCopy
+	*itpFirstParty
+}
+
+// itpFirstParty is the struct that's finalized.
+type itpFirstParty struct {
 	native *C.WebKitITPFirstParty
 }
 
 func marshalITPFirstParty(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &ITPFirstParty{native: (*C.WebKitITPFirstParty)(unsafe.Pointer(b))}, nil
+	return &ITPFirstParty{&itpFirstParty{(*C.WebKitITPFirstParty)(unsafe.Pointer(b))}}, nil
 }
 
 // Domain: get the domain name of itp_first_party
@@ -613,6 +733,7 @@ func (itpFirstParty *ITPFirstParty) Domain() string {
 	_arg0 = (*C.WebKitITPFirstParty)(gextras.StructNative(unsafe.Pointer(itpFirstParty)))
 
 	_cret = C.webkit_itp_first_party_get_domain(_arg0)
+	runtime.KeepAlive(itpFirstParty)
 
 	var _utf8 string // out
 
@@ -632,6 +753,7 @@ func (itpFirstParty *ITPFirstParty) WebsiteDataAccessAllowed() bool {
 	_arg0 = (*C.WebKitITPFirstParty)(gextras.StructNative(unsafe.Pointer(itpFirstParty)))
 
 	_cret = C.webkit_itp_first_party_get_website_data_access_allowed(_arg0)
+	runtime.KeepAlive(itpFirstParty)
 
 	var _ok bool // out
 
@@ -642,46 +764,19 @@ func (itpFirstParty *ITPFirstParty) WebsiteDataAccessAllowed() bool {
 	return _ok
 }
 
-// Ref: atomically increments the reference count of itp_first_party by one.
-// This function is MT-safe and may be called from any thread.
-func (itpFirstParty *ITPFirstParty) ref() *ITPFirstParty {
-	var _arg0 *C.WebKitITPFirstParty // out
-	var _cret *C.WebKitITPFirstParty // in
-
-	_arg0 = (*C.WebKitITPFirstParty)(gextras.StructNative(unsafe.Pointer(itpFirstParty)))
-
-	_cret = C.webkit_itp_first_party_ref(_arg0)
-
-	var _itpFirstParty *ITPFirstParty // out
-
-	_itpFirstParty = (*ITPFirstParty)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_itp_first_party_ref(_cret)
-	runtime.SetFinalizer(_itpFirstParty, func(v *ITPFirstParty) {
-		C.webkit_itp_first_party_unref((*C.WebKitITPFirstParty)(gextras.StructNative(unsafe.Pointer(v))))
-	})
-
-	return _itpFirstParty
-}
-
-// Unref: atomically decrements the reference count of itp_first_party by one.
-// If the reference count drops to 0, all memory allocated by KitITPFirstParty
-// is released. This function is MT-safe and may be called from any thread.
-func (itpFirstParty *ITPFirstParty) unref() {
-	var _arg0 *C.WebKitITPFirstParty // out
-
-	_arg0 = (*C.WebKitITPFirstParty)(gextras.StructNative(unsafe.Pointer(itpFirstParty)))
-
-	C.webkit_itp_first_party_unref(_arg0)
-}
-
+// ITPThirdParty: instance of this type is always passed by reference.
 type ITPThirdParty struct {
-	nocopy gextras.NoCopy
+	*itpThirdParty
+}
+
+// itpThirdParty is the struct that's finalized.
+type itpThirdParty struct {
 	native *C.WebKitITPThirdParty
 }
 
 func marshalITPThirdParty(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &ITPThirdParty{native: (*C.WebKitITPThirdParty)(unsafe.Pointer(b))}, nil
+	return &ITPThirdParty{&itpThirdParty{(*C.WebKitITPThirdParty)(unsafe.Pointer(b))}}, nil
 }
 
 // Domain: get the domain name of itp_third_party
@@ -692,6 +787,7 @@ func (itpThirdParty *ITPThirdParty) Domain() string {
 	_arg0 = (*C.WebKitITPThirdParty)(gextras.StructNative(unsafe.Pointer(itpThirdParty)))
 
 	_cret = C.webkit_itp_third_party_get_domain(_arg0)
+	runtime.KeepAlive(itpThirdParty)
 
 	var _utf8 string // out
 
@@ -702,58 +798,31 @@ func (itpThirdParty *ITPThirdParty) Domain() string {
 
 // FirstParties: get the list of KitITPFirstParty under which itp_third_party
 // has been seen.
-func (itpThirdParty *ITPThirdParty) FirstParties() *externglib.List {
+func (itpThirdParty *ITPThirdParty) FirstParties() []*ITPFirstParty {
 	var _arg0 *C.WebKitITPThirdParty // out
 	var _cret *C.GList               // in
 
 	_arg0 = (*C.WebKitITPThirdParty)(gextras.StructNative(unsafe.Pointer(itpThirdParty)))
 
 	_cret = C.webkit_itp_third_party_get_first_parties(_arg0)
+	runtime.KeepAlive(itpThirdParty)
 
-	var _list *externglib.List // out
+	var _list []*ITPFirstParty // out
 
-	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
-	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
-		src := (*C.WebKitITPFirstParty)(_p)
+	_list = make([]*ITPFirstParty, 0, gextras.ListSize(unsafe.Pointer(_cret)))
+	gextras.MoveList(unsafe.Pointer(_cret), false, func(v unsafe.Pointer) {
+		src := (*C.WebKitITPFirstParty)(v)
 		var dst *ITPFirstParty // out
 		dst = (*ITPFirstParty)(gextras.NewStructNative(unsafe.Pointer(src)))
-		runtime.SetFinalizer(dst, func(v *ITPFirstParty) {
-			C.webkit_itp_first_party_unref((*C.WebKitITPFirstParty)(gextras.StructNative(unsafe.Pointer(v))))
-		})
-		return dst
+		C.webkit_itp_first_party_ref(src)
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(dst)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.webkit_itp_first_party_unref((*C.WebKitITPFirstParty)(intern.C))
+			},
+		)
+		_list = append(_list, dst)
 	})
 
 	return _list
-}
-
-// Ref: atomically increments the reference count of itp_third_party by one.
-// This function is MT-safe and may be called from any thread.
-func (itpThirdParty *ITPThirdParty) ref() *ITPThirdParty {
-	var _arg0 *C.WebKitITPThirdParty // out
-	var _cret *C.WebKitITPThirdParty // in
-
-	_arg0 = (*C.WebKitITPThirdParty)(gextras.StructNative(unsafe.Pointer(itpThirdParty)))
-
-	_cret = C.webkit_itp_third_party_ref(_arg0)
-
-	var _itpThirdParty *ITPThirdParty // out
-
-	_itpThirdParty = (*ITPThirdParty)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_itp_third_party_ref(_cret)
-	runtime.SetFinalizer(_itpThirdParty, func(v *ITPThirdParty) {
-		C.webkit_itp_third_party_unref((*C.WebKitITPThirdParty)(gextras.StructNative(unsafe.Pointer(v))))
-	})
-
-	return _itpThirdParty
-}
-
-// Unref: atomically decrements the reference count of itp_third_party by one.
-// If the reference count drops to 0, all memory allocated by KitITPThirdParty
-// is released. This function is MT-safe and may be called from any thread.
-func (itpThirdParty *ITPThirdParty) unref() {
-	var _arg0 *C.WebKitITPThirdParty // out
-
-	_arg0 = (*C.WebKitITPThirdParty)(gextras.StructNative(unsafe.Pointer(itpThirdParty)))
-
-	C.webkit_itp_third_party_unref(_arg0)
 }

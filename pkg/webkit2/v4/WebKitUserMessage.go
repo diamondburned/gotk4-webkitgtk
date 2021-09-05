@@ -8,9 +8,9 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -53,8 +53,6 @@ type UserMessage struct {
 	externglib.InitiallyUnowned
 }
 
-var _ gextras.Nativer = (*UserMessage)(nil)
-
 func wrapUserMessage(obj *externglib.Object) *UserMessage {
 	return &UserMessage{
 		InitiallyUnowned: externglib.InitiallyUnowned{
@@ -76,9 +74,14 @@ func NewUserMessage(name string, parameters *glib.Variant) *UserMessage {
 	var _cret *C.WebKitUserMessage // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
-	_arg2 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(parameters)))
+	defer C.free(unsafe.Pointer(_arg1))
+	if parameters != nil {
+		_arg2 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(parameters)))
+	}
 
 	_cret = C.webkit_user_message_new(_arg1, _arg2)
+	runtime.KeepAlive(name)
+	runtime.KeepAlive(parameters)
 
 	var _userMessage *UserMessage // out
 
@@ -96,10 +99,18 @@ func NewUserMessageWithFdList(name string, parameters *glib.Variant, fdList *gio
 	var _cret *C.WebKitUserMessage // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
-	_arg2 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(parameters)))
-	_arg3 = (*C.GUnixFDList)(unsafe.Pointer(fdList.Native()))
+	defer C.free(unsafe.Pointer(_arg1))
+	if parameters != nil {
+		_arg2 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(parameters)))
+	}
+	if fdList != nil {
+		_arg3 = (*C.GUnixFDList)(unsafe.Pointer(fdList.Native()))
+	}
 
 	_cret = C.webkit_user_message_new_with_fd_list(_arg1, _arg2, _arg3)
+	runtime.KeepAlive(name)
+	runtime.KeepAlive(parameters)
+	runtime.KeepAlive(fdList)
 
 	var _userMessage *UserMessage // out
 
@@ -116,13 +127,16 @@ func (message *UserMessage) FdList() *gio.UnixFDList {
 	_arg0 = (*C.WebKitUserMessage)(unsafe.Pointer(message.Native()))
 
 	_cret = C.webkit_user_message_get_fd_list(_arg0)
+	runtime.KeepAlive(message)
 
 	var _unixFDList *gio.UnixFDList // out
 
-	{
-		obj := externglib.Take(unsafe.Pointer(_cret))
-		_unixFDList = &gio.UnixFDList{
-			Object: obj,
+	if _cret != nil {
+		{
+			obj := externglib.Take(unsafe.Pointer(_cret))
+			_unixFDList = &gio.UnixFDList{
+				Object: obj,
+			}
 		}
 	}
 
@@ -137,6 +151,7 @@ func (message *UserMessage) Name() string {
 	_arg0 = (*C.WebKitUserMessage)(unsafe.Pointer(message.Native()))
 
 	_cret = C.webkit_user_message_get_name(_arg0)
+	runtime.KeepAlive(message)
 
 	var _utf8 string // out
 
@@ -153,13 +168,20 @@ func (message *UserMessage) Parameters() *glib.Variant {
 	_arg0 = (*C.WebKitUserMessage)(unsafe.Pointer(message.Native()))
 
 	_cret = C.webkit_user_message_get_parameters(_arg0)
+	runtime.KeepAlive(message)
 
 	var _variant *glib.Variant // out
 
-	_variant = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_variant, func(v *glib.Variant) {
-		C.g_variant_unref((*C.GVariant)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	if _cret != nil {
+		_variant = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+		C.g_variant_ref(_cret)
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(_variant)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.g_variant_unref((*C.GVariant)(intern.C))
+			},
+		)
+	}
 
 	return _variant
 }
@@ -174,4 +196,6 @@ func (message *UserMessage) SendReply(reply *UserMessage) {
 	_arg1 = (*C.WebKitUserMessage)(unsafe.Pointer(reply.Native()))
 
 	C.webkit_user_message_send_reply(_arg0, _arg1)
+	runtime.KeepAlive(message)
+	runtime.KeepAlive(reply)
 }

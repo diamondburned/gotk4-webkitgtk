@@ -13,8 +13,8 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -97,8 +97,6 @@ type CookieManager struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*CookieManager)(nil)
-
 func wrapCookieManager(obj *externglib.Object) *CookieManager {
 	return &CookieManager{
 		Object: obj,
@@ -129,10 +127,16 @@ func (cookieManager *CookieManager) AddCookie(ctx context.Context, cookie *soup.
 		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
 	_arg1 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
-	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_cookie_manager_add_cookie(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(cookieManager)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(cookie)
+	runtime.KeepAlive(callback)
 }
 
 // AddCookieFinish: finish an asynchronous operation started with
@@ -143,13 +147,17 @@ func (cookieManager *CookieManager) AddCookieFinish(result gio.AsyncResulter) er
 	var _cerr *C.GError              // in
 
 	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	C.webkit_cookie_manager_add_cookie_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(cookieManager)
+	runtime.KeepAlive(result)
 
 	var _goerr error // out
 
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _goerr
 }
@@ -163,6 +171,7 @@ func (cookieManager *CookieManager) DeleteAllCookies() {
 	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
 
 	C.webkit_cookie_manager_delete_all_cookies(_arg0)
+	runtime.KeepAlive(cookieManager)
 }
 
 // DeleteCookie: asynchronously delete a Cookie from the current session.
@@ -184,10 +193,16 @@ func (cookieManager *CookieManager) DeleteCookie(ctx context.Context, cookie *so
 		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
 	_arg1 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
-	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_cookie_manager_delete_cookie(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(cookieManager)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(cookie)
+	runtime.KeepAlive(callback)
 }
 
 // DeleteCookieFinish: finish an asynchronous operation started with
@@ -198,13 +213,17 @@ func (cookieManager *CookieManager) DeleteCookieFinish(result gio.AsyncResulter)
 	var _cerr *C.GError              // in
 
 	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	C.webkit_cookie_manager_delete_cookie_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(cookieManager)
+	runtime.KeepAlive(result)
 
 	var _goerr error // out
 
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _goerr
 }
@@ -219,8 +238,11 @@ func (cookieManager *CookieManager) DeleteCookiesForDomain(domain string) {
 
 	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(domain)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_cookie_manager_delete_cookies_for_domain(_arg0, _arg1)
+	runtime.KeepAlive(cookieManager)
+	runtime.KeepAlive(domain)
 }
 
 // AcceptPolicy: asynchronously get the cookie acceptance policy of
@@ -244,10 +266,15 @@ func (cookieManager *CookieManager) AcceptPolicy(ctx context.Context, callback g
 		defer runtime.KeepAlive(cancellable)
 		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
-	_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	if callback != nil {
+		_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_cookie_manager_get_accept_policy(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(cookieManager)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(callback)
 }
 
 // AcceptPolicyFinish: finish an asynchronous operation started with
@@ -259,15 +286,19 @@ func (cookieManager *CookieManager) AcceptPolicyFinish(result gio.AsyncResulter)
 	var _cerr *C.GError                  // in
 
 	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.webkit_cookie_manager_get_accept_policy_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(cookieManager)
+	runtime.KeepAlive(result)
 
 	var _cookieAcceptPolicy CookieAcceptPolicy // out
 	var _goerr error                           // out
 
 	_cookieAcceptPolicy = CookieAcceptPolicy(_cret)
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _cookieAcceptPolicy, _goerr
 }
@@ -292,41 +323,55 @@ func (cookieManager *CookieManager) Cookies(ctx context.Context, uri string, cal
 		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(uri)))
-	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	defer C.free(unsafe.Pointer(_arg1))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_cookie_manager_get_cookies(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(cookieManager)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(callback)
 }
 
 // CookiesFinish: finish an asynchronous operation started with
 // webkit_cookie_manager_get_cookies(). The return value is a List of Cookie
 // instances which should be released with g_list_free_full() and
 // soup_cookie_free().
-func (cookieManager *CookieManager) CookiesFinish(result gio.AsyncResulter) (*externglib.List, error) {
+func (cookieManager *CookieManager) CookiesFinish(result gio.AsyncResulter) ([]soup.Cookie, error) {
 	var _arg0 *C.WebKitCookieManager // out
 	var _arg1 *C.GAsyncResult        // out
 	var _cret *C.GList               // in
 	var _cerr *C.GError              // in
 
 	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.webkit_cookie_manager_get_cookies_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(cookieManager)
+	runtime.KeepAlive(result)
 
-	var _list *externglib.List // out
-	var _goerr error           // out
+	var _list []soup.Cookie // out
+	var _goerr error        // out
 
-	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
-	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
-		src := (*C.SoupCookie)(_p)
+	_list = make([]soup.Cookie, 0, gextras.ListSize(unsafe.Pointer(_cret)))
+	gextras.MoveList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
+		src := (*C.SoupCookie)(v)
 		var dst soup.Cookie // out
 		dst = *(*soup.Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
-		return dst
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(&dst)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.soup_cookie_free((*C.SoupCookie)(intern.C))
+			},
+		)
+		_list = append(_list, dst)
 	})
-	_list.AttachFinalizer(func(v uintptr) {
-		C.soup_cookie_free((*C.SoupCookie)(unsafe.Pointer(v)))
-	})
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _list, _goerr
 }
@@ -351,10 +396,15 @@ func (cookieManager *CookieManager) DomainsWithCookies(ctx context.Context, call
 		defer runtime.KeepAlive(cancellable)
 		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
-	_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	if callback != nil {
+		_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_cookie_manager_get_domains_with_cookies(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(cookieManager)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(callback)
 }
 
 // DomainsWithCookiesFinish: finish an asynchronous operation started with
@@ -365,17 +415,20 @@ func (cookieManager *CookieManager) DomainsWithCookies(ctx context.Context, call
 func (cookieManager *CookieManager) DomainsWithCookiesFinish(result gio.AsyncResulter) ([]string, error) {
 	var _arg0 *C.WebKitCookieManager // out
 	var _arg1 *C.GAsyncResult        // out
-	var _cret **C.gchar
-	var _cerr *C.GError // in
+	var _cret **C.gchar              // in
+	var _cerr *C.GError              // in
 
 	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.webkit_cookie_manager_get_domains_with_cookies_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(cookieManager)
+	runtime.KeepAlive(result)
 
-	var _utf8s []string
-	var _goerr error // out
+	var _utf8s []string // out
+	var _goerr error    // out
 
+	defer C.free(unsafe.Pointer(_cret))
 	{
 		var i int
 		var z *C.gchar
@@ -387,9 +440,12 @@ func (cookieManager *CookieManager) DomainsWithCookiesFinish(result gio.AsyncRes
 		_utf8s = make([]string, i)
 		for i := range src {
 			_utf8s[i] = C.GoString((*C.gchar)(unsafe.Pointer(src[i])))
+			defer C.free(unsafe.Pointer(src[i]))
 		}
 	}
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _utf8s, _goerr
 }
@@ -409,6 +465,8 @@ func (cookieManager *CookieManager) SetAcceptPolicy(policy CookieAcceptPolicy) {
 	_arg1 = C.WebKitCookieAcceptPolicy(policy)
 
 	C.webkit_cookie_manager_set_accept_policy(_arg0, _arg1)
+	runtime.KeepAlive(cookieManager)
+	runtime.KeepAlive(policy)
 }
 
 // SetPersistentStorage: set the filename where non-session cookies are stored
@@ -428,7 +486,11 @@ func (cookieManager *CookieManager) SetPersistentStorage(filename string, storag
 
 	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(filename)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.WebKitCookiePersistentStorage(storage)
 
 	C.webkit_cookie_manager_set_persistent_storage(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(cookieManager)
+	runtime.KeepAlive(filename)
+	runtime.KeepAlive(storage)
 }

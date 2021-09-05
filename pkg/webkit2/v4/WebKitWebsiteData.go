@@ -9,7 +9,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -64,7 +64,7 @@ const (
 )
 
 func marshalWebsiteDataTypes(p uintptr) (interface{}, error) {
-	return WebsiteDataTypes(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return WebsiteDataTypes(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
 }
 
 // String returns the names in string for WebsiteDataTypes.
@@ -121,14 +121,24 @@ func (w WebsiteDataTypes) String() string {
 	return strings.TrimSuffix(builder.String(), "|")
 }
 
+// Has returns true if w contains other.
+func (w WebsiteDataTypes) Has(other WebsiteDataTypes) bool {
+	return (w & other) == other
+}
+
+// WebsiteData: instance of this type is always passed by reference.
 type WebsiteData struct {
-	nocopy gextras.NoCopy
+	*websiteData
+}
+
+// websiteData is the struct that's finalized.
+type websiteData struct {
 	native *C.WebKitWebsiteData
 }
 
 func marshalWebsiteData(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &WebsiteData{native: (*C.WebKitWebsiteData)(unsafe.Pointer(b))}, nil
+	return &WebsiteData{&websiteData{(*C.WebKitWebsiteData)(unsafe.Pointer(b))}}, nil
 }
 
 // Name gets the name of KitWebsiteData. This is the website name, normally
@@ -141,6 +151,7 @@ func (websiteData *WebsiteData) Name() string {
 	_arg0 = (*C.WebKitWebsiteData)(gextras.StructNative(unsafe.Pointer(websiteData)))
 
 	_cret = C.webkit_website_data_get_name(_arg0)
+	runtime.KeepAlive(websiteData)
 
 	var _utf8 string // out
 
@@ -161,6 +172,8 @@ func (websiteData *WebsiteData) Size(types WebsiteDataTypes) uint64 {
 	_arg1 = C.WebKitWebsiteDataTypes(types)
 
 	_cret = C.webkit_website_data_get_size(_arg0, _arg1)
+	runtime.KeepAlive(websiteData)
+	runtime.KeepAlive(types)
 
 	var _guint64 uint64 // out
 
@@ -179,42 +192,11 @@ func (websiteData *WebsiteData) Types() WebsiteDataTypes {
 	_arg0 = (*C.WebKitWebsiteData)(gextras.StructNative(unsafe.Pointer(websiteData)))
 
 	_cret = C.webkit_website_data_get_types(_arg0)
+	runtime.KeepAlive(websiteData)
 
 	var _websiteDataTypes WebsiteDataTypes // out
 
 	_websiteDataTypes = WebsiteDataTypes(_cret)
 
 	return _websiteDataTypes
-}
-
-// Ref: atomically increments the reference count of website_data by one. This
-// function is MT-safe and may be called from any thread.
-func (websiteData *WebsiteData) ref() *WebsiteData {
-	var _arg0 *C.WebKitWebsiteData // out
-	var _cret *C.WebKitWebsiteData // in
-
-	_arg0 = (*C.WebKitWebsiteData)(gextras.StructNative(unsafe.Pointer(websiteData)))
-
-	_cret = C.webkit_website_data_ref(_arg0)
-
-	var _websiteData *WebsiteData // out
-
-	_websiteData = (*WebsiteData)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_website_data_ref(_cret)
-	runtime.SetFinalizer(_websiteData, func(v *WebsiteData) {
-		C.webkit_website_data_unref((*C.WebKitWebsiteData)(gextras.StructNative(unsafe.Pointer(v))))
-	})
-
-	return _websiteData
-}
-
-// Unref: atomically decrements the reference count of website_data by one. If
-// the reference count drops to 0, all memory allocated by KitWebsiteData is
-// released. This function is MT-safe and may be called from any thread.
-func (websiteData *WebsiteData) unref() {
-	var _arg0 *C.WebKitWebsiteData // out
-
-	_arg0 = (*C.WebKitWebsiteData)(gextras.StructNative(unsafe.Pointer(websiteData)))
-
-	C.webkit_website_data_unref(_arg0)
 }

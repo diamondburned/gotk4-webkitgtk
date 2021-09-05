@@ -3,11 +3,12 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v3"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -25,8 +26,6 @@ func init() {
 type ColorChooserRequest struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*ColorChooserRequest)(nil)
 
 func wrapColorChooserRequest(obj *externglib.Object) *ColorChooserRequest {
 	return &ColorChooserRequest{
@@ -50,6 +49,7 @@ func (request *ColorChooserRequest) Cancel() {
 	_arg0 = (*C.WebKitColorChooserRequest)(unsafe.Pointer(request.Native()))
 
 	C.webkit_color_chooser_request_cancel(_arg0)
+	runtime.KeepAlive(request)
 }
 
 // Finish finishes request and the input element keeps the current value of
@@ -61,6 +61,7 @@ func (request *ColorChooserRequest) Finish() {
 	_arg0 = (*C.WebKitColorChooserRequest)(unsafe.Pointer(request.Native()))
 
 	C.webkit_color_chooser_request_finish(_arg0)
+	runtime.KeepAlive(request)
 }
 
 // ElementRectangle gets the bounding box of the color input element.
@@ -71,6 +72,7 @@ func (request *ColorChooserRequest) ElementRectangle() gdk.Rectangle {
 	_arg0 = (*C.WebKitColorChooserRequest)(unsafe.Pointer(request.Native()))
 
 	C.webkit_color_chooser_request_get_element_rectangle(_arg0, &_arg1)
+	runtime.KeepAlive(request)
 
 	var _rect gdk.Rectangle // out
 
@@ -87,6 +89,7 @@ func (request *ColorChooserRequest) RGBA() gdk.RGBA {
 	_arg0 = (*C.WebKitColorChooserRequest)(unsafe.Pointer(request.Native()))
 
 	C.webkit_color_chooser_request_get_rgba(_arg0, &_arg1)
+	runtime.KeepAlive(request)
 
 	var _rgba gdk.RGBA // out
 
@@ -104,4 +107,6 @@ func (request *ColorChooserRequest) SetRGBA(rgba *gdk.RGBA) {
 	_arg1 = (*C.GdkRGBA)(gextras.StructNative(unsafe.Pointer(rgba)))
 
 	C.webkit_color_chooser_request_set_rgba(_arg0, _arg1)
+	runtime.KeepAlive(request)
+	runtime.KeepAlive(rgba)
 }

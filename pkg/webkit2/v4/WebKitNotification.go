@@ -3,10 +3,10 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -24,8 +24,6 @@ func init() {
 type Notification struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*Notification)(nil)
 
 func wrapNotification(obj *externglib.Object) *Notification {
 	return &Notification{
@@ -47,6 +45,7 @@ func (notification *Notification) Clicked() {
 	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(notification.Native()))
 
 	C.webkit_notification_clicked(_arg0)
+	runtime.KeepAlive(notification)
 }
 
 // Close closes the notification.
@@ -56,6 +55,7 @@ func (notification *Notification) Close() {
 	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(notification.Native()))
 
 	C.webkit_notification_close(_arg0)
+	runtime.KeepAlive(notification)
 }
 
 // Body obtains the body for the notification.
@@ -66,6 +66,7 @@ func (notification *Notification) Body() string {
 	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(notification.Native()))
 
 	_cret = C.webkit_notification_get_body(_arg0)
+	runtime.KeepAlive(notification)
 
 	var _utf8 string // out
 
@@ -82,6 +83,7 @@ func (notification *Notification) ID() uint64 {
 	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(notification.Native()))
 
 	_cret = C.webkit_notification_get_id(_arg0)
+	runtime.KeepAlive(notification)
 
 	var _guint64 uint64 // out
 
@@ -98,10 +100,13 @@ func (notification *Notification) Tag() string {
 	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(notification.Native()))
 
 	_cret = C.webkit_notification_get_tag(_arg0)
+	runtime.KeepAlive(notification)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -114,6 +119,7 @@ func (notification *Notification) Title() string {
 	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(notification.Native()))
 
 	_cret = C.webkit_notification_get_title(_arg0)
+	runtime.KeepAlive(notification)
 
 	var _utf8 string // out
 

@@ -3,11 +3,11 @@
 package soup
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -23,6 +23,14 @@ func init() {
 		{T: externglib.Type(C.soup_auth_domain_digest_get_type()), F: marshalAuthDomainDigester},
 	})
 }
+
+// AUTH_DOMAIN_DIGEST_AUTH_CALLBACK alias for the AuthDomainDigest:auth-callback
+// property. (The AuthDomainDigestAuthCallback.)
+const AUTH_DOMAIN_DIGEST_AUTH_CALLBACK = "auth-callback"
+
+// AUTH_DOMAIN_DIGEST_AUTH_DATA alias for the AuthDomainDigest:auth-callback
+// property. (The AuthDomainDigestAuthCallback.)
+const AUTH_DOMAIN_DIGEST_AUTH_DATA = "auth-data"
 
 // AuthDomainDigestAuthCallback: callback used by AuthDomainDigest for
 // authentication purposes. The application should look up username in its
@@ -49,7 +57,10 @@ func _gotk4_soup2_AuthDomainDigestAuthCallback(arg0 *C.SoupAuthDomain, arg1 *C.S
 	fn := v.(AuthDomainDigestAuthCallback)
 	utf8 := fn(domain, msg, username)
 
-	cret = (*C.char)(unsafe.Pointer(C.CString(utf8)))
+	if utf8 != "" {
+		cret = (*C.char)(unsafe.Pointer(C.CString(utf8)))
+		defer C.free(unsafe.Pointer(cret))
+	}
 
 	return cret
 }
@@ -57,8 +68,6 @@ func _gotk4_soup2_AuthDomainDigestAuthCallback(arg0 *C.SoupAuthDomain, arg1 *C.S
 type AuthDomainDigest struct {
 	AuthDomain
 }
-
-var _ gextras.Nativer = (*AuthDomainDigest)(nil)
 
 func wrapAuthDomainDigest(obj *externglib.Object) *AuthDomainDigest {
 	return &AuthDomainDigest{
@@ -94,6 +103,8 @@ func (domain *AuthDomainDigest) SetAuthCallback(callback AuthDomainDigestAuthCal
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
 
 	C.soup_auth_domain_digest_set_auth_callback(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(callback)
 }
 
 // AuthDomainDigestEncodePassword encodes the username/realm/password triplet
@@ -114,10 +125,16 @@ func AuthDomainDigestEncodePassword(username string, realm string, password stri
 	var _cret *C.char // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(username)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(realm)))
+	defer C.free(unsafe.Pointer(_arg2))
 	_arg3 = (*C.char)(unsafe.Pointer(C.CString(password)))
+	defer C.free(unsafe.Pointer(_arg3))
 
 	_cret = C.soup_auth_domain_digest_encode_password(_arg1, _arg2, _arg3)
+	runtime.KeepAlive(username)
+	runtime.KeepAlive(realm)
+	runtime.KeepAlive(password)
 
 	var _utf8 string // out
 

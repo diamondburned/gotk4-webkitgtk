@@ -4,13 +4,15 @@ package soup
 
 import (
 	"fmt"
+	"runtime"
+	"runtime/cgo"
 	"strings"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -29,6 +31,75 @@ func init() {
 		{T: externglib.Type(C.soup_message_get_type()), F: marshalMessager},
 	})
 }
+
+// MESSAGE_FIRST_PARTY alias for the Message:first-party property. (The URI
+// loaded in the application when the message was queued.)
+const MESSAGE_FIRST_PARTY = "first-party"
+
+// MESSAGE_FLAGS alias for the Message:flags property. (The message's
+// MessageFlags.)
+const MESSAGE_FLAGS = "flags"
+
+// MESSAGE_HTTP_VERSION alias for the Message:http-version property. (The
+// message's HTTPVersion.)
+const MESSAGE_HTTP_VERSION = "http-version"
+const MESSAGE_IS_TOP_LEVEL_NAVIGATION = "is-top-level-navigation"
+
+// MESSAGE_METHOD alias for the Message:method property. (The message's HTTP
+// method.)
+const MESSAGE_METHOD = "method"
+
+// MESSAGE_PRIORITY sets the priority of the Message. See
+// soup_message_set_priority() for further details.
+const MESSAGE_PRIORITY = "priority"
+
+// MESSAGE_REASON_PHRASE alias for the Message:reason-phrase property. (The
+// message's HTTP response reason phrase.)
+const MESSAGE_REASON_PHRASE = "reason-phrase"
+
+// MESSAGE_REQUEST_BODY alias for the Message:request-body property. (The
+// message's HTTP request body.)
+const MESSAGE_REQUEST_BODY = "request-body"
+
+// MESSAGE_REQUEST_BODY_DATA alias for the Message:request-body-data property.
+// (The message's HTTP request body, as a #GBytes.)
+const MESSAGE_REQUEST_BODY_DATA = "request-body-data"
+
+// MESSAGE_REQUEST_HEADERS alias for the Message:request-headers property. (The
+// message's HTTP request headers.)
+const MESSAGE_REQUEST_HEADERS = "request-headers"
+
+// MESSAGE_RESPONSE_BODY alias for the Message:response-body property. (The
+// message's HTTP response body.)
+const MESSAGE_RESPONSE_BODY = "response-body"
+
+// MESSAGE_RESPONSE_BODY_DATA alias for the Message:response-body-data property.
+// (The message's HTTP response body, as a #GBytes.)
+const MESSAGE_RESPONSE_BODY_DATA = "response-body-data"
+
+// MESSAGE_RESPONSE_HEADERS alias for the Message:response-headers property.
+// (The message's HTTP response headers.)
+const MESSAGE_RESPONSE_HEADERS = "response-headers"
+
+// MESSAGE_SERVER_SIDE alias for the Message:server-side property. (TRUE if the
+// message was created by Server.)
+const MESSAGE_SERVER_SIDE = "server-side"
+const MESSAGE_SITE_FOR_COOKIES = "site-for-cookies"
+
+// MESSAGE_STATUS_CODE alias for the Message:status-code property. (The
+// message's HTTP response status code.)
+const MESSAGE_STATUS_CODE = "status-code"
+
+// MESSAGE_TLS_CERTIFICATE alias for the Message:tls-certificate property. (The
+// TLS certificate associated with the message, if any.)
+const MESSAGE_TLS_CERTIFICATE = "tls-certificate"
+
+// MESSAGE_TLS_ERRORS alias for the Message:tls-errors property. (The
+// verification errors on Message:tls-certificate.)
+const MESSAGE_TLS_ERRORS = "tls-errors"
+
+// MESSAGE_URI alias for the Message:uri property. (The message's URI.)
+const MESSAGE_URI = "uri"
 
 // HTTPVersion indicates the HTTP protocol version being used.
 type HTTPVersion int
@@ -150,7 +221,7 @@ const (
 )
 
 func marshalMessageFlags(p uintptr) (interface{}, error) {
-	return MessageFlags(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return MessageFlags(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
 }
 
 // String returns the names in string for MessageFlags.
@@ -195,6 +266,11 @@ func (m MessageFlags) String() string {
 	return strings.TrimSuffix(builder.String(), "|")
 }
 
+// Has returns true if m contains other.
+func (m MessageFlags) Has(other MessageFlags) bool {
+	return (m & other) == other
+}
+
 // ChunkAllocator: prototype for a chunk allocation callback. This should
 // allocate a new Buffer and return it for the I/O layer to read message body
 // data off the network into.
@@ -229,7 +305,9 @@ func _gotk4_soup2_ChunkAllocator(arg0 *C.SoupMessage, arg1 C.gsize, arg2 C.gpoin
 	fn := v.(ChunkAllocator)
 	buffer := fn(msg, maxLen)
 
-	cret = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(buffer)))
+	if buffer != nil {
+		cret = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(buffer)))
+	}
 
 	return cret
 }
@@ -290,8 +368,6 @@ type Message struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*Message)(nil)
-
 func wrapMessage(obj *externglib.Object) *Message {
 	return &Message{
 		Object: obj,
@@ -311,13 +387,19 @@ func NewMessage(method string, uriString string) *Message {
 	var _cret *C.SoupMessage // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(method)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(uriString)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	_cret = C.soup_message_new(_arg1, _arg2)
+	runtime.KeepAlive(method)
+	runtime.KeepAlive(uriString)
 
 	var _message *Message // out
 
-	_message = wrapMessage(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_message = wrapMessage(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	}
 
 	return _message
 }
@@ -329,15 +411,42 @@ func NewMessageFromURI(method string, uri *URI) *Message {
 	var _cret *C.SoupMessage // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(method)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	_cret = C.soup_message_new_from_uri(_arg1, _arg2)
+	runtime.KeepAlive(method)
+	runtime.KeepAlive(uri)
 
 	var _message *Message // out
 
 	_message = wrapMessage(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _message
+}
+
+func (msg *Message) ContentSniffed(contentType string, params map[cgo.Handle]cgo.Handle) {
+	var _arg0 *C.SoupMessage // out
+	var _arg1 *C.char        // out
+	var _arg2 *C.GHashTable  // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(contentType)))
+	defer C.free(unsafe.Pointer(_arg1))
+	_arg2 = C.g_hash_table_new_full(nil, nil, (*[0]byte)(C.free), (*[0]byte)(C.free))
+	for ksrc, vsrc := range params {
+		var kdst *C.gpointer // out
+		var vdst *C.gpointer // out
+		kdst = (*C.gpointer)(unsafe.Pointer(ksrc))
+		vdst = (*C.gpointer)(unsafe.Pointer(vsrc))
+		C.g_hash_table_insert(_arg2, C.gpointer(unsafe.Pointer(kdst)), C.gpointer(unsafe.Pointer(vdst)))
+	}
+	defer C.g_hash_table_unref(_arg2)
+
+	C.soup_message_content_sniffed(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(contentType)
+	runtime.KeepAlive(params)
 }
 
 // DisableFeature: this disables the actions of SessionFeature<!-- -->s with the
@@ -357,6 +466,8 @@ func (msg *Message) DisableFeature(featureType externglib.Type) {
 	_arg1 = C.GType(featureType)
 
 	C.soup_message_disable_feature(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(featureType)
 }
 
 func (msg *Message) Finished() {
@@ -365,6 +476,7 @@ func (msg *Message) Finished() {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	C.soup_message_finished(_arg0)
+	runtime.KeepAlive(msg)
 }
 
 // Address gets the address msg's URI points to. After first setting the URI on
@@ -377,6 +489,7 @@ func (msg *Message) Address() *Address {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_message_get_address(_arg0)
+	runtime.KeepAlive(msg)
 
 	var _address *Address // out
 
@@ -393,6 +506,7 @@ func (msg *Message) FirstParty() *URI {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_message_get_first_party(_arg0)
+	runtime.KeepAlive(msg)
 
 	var _urI *URI // out
 
@@ -409,6 +523,7 @@ func (msg *Message) Flags() MessageFlags {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_message_get_flags(_arg0)
+	runtime.KeepAlive(msg)
 
 	var _messageFlags MessageFlags // out
 
@@ -426,6 +541,7 @@ func (msg *Message) HttpVersion() HTTPVersion {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_message_get_http_version(_arg0)
+	runtime.KeepAlive(msg)
 
 	var _httpVersion HTTPVersion // out
 
@@ -450,12 +566,13 @@ func (msg *Message) HttpsStatus() (gio.TLSCertificater, gio.TLSCertificateFlags,
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_message_get_https_status(_arg0, &_arg1, &_arg2)
+	runtime.KeepAlive(msg)
 
 	var _certificate gio.TLSCertificater // out
 	var _errors gio.TLSCertificateFlags  // out
 	var _ok bool                         // out
 
-	_certificate = (gextras.CastObject(externglib.Take(unsafe.Pointer(_arg1)))).(gio.TLSCertificater)
+	_certificate = (externglib.CastObject(externglib.Take(unsafe.Pointer(_arg1)))).(gio.TLSCertificater)
 	_errors = gio.TLSCertificateFlags(_arg2)
 	if _cret != 0 {
 		_ok = true
@@ -471,6 +588,7 @@ func (msg *Message) IsTopLevelNavigation() bool {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_message_get_is_top_level_navigation(_arg0)
+	runtime.KeepAlive(msg)
 
 	var _ok bool // out
 
@@ -490,6 +608,7 @@ func (msg *Message) Priority() MessagePriority {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_message_get_priority(_arg0)
+	runtime.KeepAlive(msg)
 
 	var _messagePriority MessagePriority // out
 
@@ -506,6 +625,7 @@ func (msg *Message) SiteForCookies() *URI {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_message_get_site_for_cookies(_arg0)
+	runtime.KeepAlive(msg)
 
 	var _urI *URI // out
 
@@ -523,6 +643,7 @@ func (msg *Message) SoupRequest() *Request {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_message_get_soup_request(_arg0)
+	runtime.KeepAlive(msg)
 
 	var _request *Request // out
 
@@ -539,6 +660,7 @@ func (msg *Message) URI() *URI {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_message_get_uri(_arg0)
+	runtime.KeepAlive(msg)
 
 	var _urI *URI // out
 
@@ -553,6 +675,7 @@ func (msg *Message) GotBody() {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	C.soup_message_got_body(_arg0)
+	runtime.KeepAlive(msg)
 }
 
 func (msg *Message) GotChunk(chunk *Buffer) {
@@ -563,6 +686,8 @@ func (msg *Message) GotChunk(chunk *Buffer) {
 	_arg1 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(chunk)))
 
 	C.soup_message_got_chunk(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(chunk)
 }
 
 func (msg *Message) GotHeaders() {
@@ -571,6 +696,7 @@ func (msg *Message) GotHeaders() {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	C.soup_message_got_headers(_arg0)
+	runtime.KeepAlive(msg)
 }
 
 func (msg *Message) GotInformational() {
@@ -579,6 +705,7 @@ func (msg *Message) GotInformational() {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	C.soup_message_got_informational(_arg0)
+	runtime.KeepAlive(msg)
 }
 
 // IsFeatureDisabled: get whether SessionFeature<!-- -->s of the given
@@ -593,6 +720,8 @@ func (msg *Message) IsFeatureDisabled(featureType externglib.Type) bool {
 	_arg1 = C.GType(featureType)
 
 	_cret = C.soup_message_is_feature_disabled(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(featureType)
 
 	var _ok bool // out
 
@@ -613,6 +742,7 @@ func (msg *Message) IsKeepalive() bool {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_message_is_keepalive(_arg0)
+	runtime.KeepAlive(msg)
 
 	var _ok bool // out
 
@@ -629,6 +759,7 @@ func (msg *Message) Restarted() {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	C.soup_message_restarted(_arg0)
+	runtime.KeepAlive(msg)
 }
 
 // SetChunkAllocator sets an alternate chunk-allocation function to use when
@@ -669,6 +800,8 @@ func (msg *Message) SetChunkAllocator(allocator ChunkAllocator) {
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
 
 	C.soup_message_set_chunk_allocator(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(allocator)
 }
 
 // SetFirstParty sets first_party as the main document URI for msg. For details
@@ -682,6 +815,8 @@ func (msg *Message) SetFirstParty(firstParty *URI) {
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(firstParty)))
 
 	C.soup_message_set_first_party(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(firstParty)
 }
 
 // SetFlags sets the specified flags on msg.
@@ -693,6 +828,8 @@ func (msg *Message) SetFlags(flags MessageFlags) {
 	_arg1 = C.SoupMessageFlags(flags)
 
 	C.soup_message_set_flags(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(flags)
 }
 
 // SetHttpVersion sets the HTTP version on msg. The default version is
@@ -706,6 +843,8 @@ func (msg *Message) SetHttpVersion(version HTTPVersion) {
 	_arg1 = C.SoupHTTPVersion(version)
 
 	C.soup_message_set_http_version(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(version)
 }
 
 // SetIsTopLevelNavigation: see the same-site spec
@@ -721,6 +860,8 @@ func (msg *Message) SetIsTopLevelNavigation(isTopLevelNavigation bool) {
 	}
 
 	C.soup_message_set_is_top_level_navigation(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(isTopLevelNavigation)
 }
 
 // SetPriority sets the priority of a message. Note that this won't have any
@@ -742,6 +883,8 @@ func (msg *Message) SetPriority(priority MessagePriority) {
 	_arg1 = C.SoupMessagePriority(priority)
 
 	C.soup_message_set_priority(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(priority)
 }
 
 // SetRedirect sets msg's status_code to status_code and adds a Location header
@@ -751,7 +894,7 @@ func (msg *Message) SetPriority(priority MessagePriority) {
 // redirect_uri can be a relative URI, in which case it is interpreted relative
 // to msg's current URI. In particular, if redirect_uri is just a path, it will
 // replace the path <emphasis>and query</emphasis> of msg's URI.
-func (msg *Message) SetRedirect(statusCode uint, redirectUri string) {
+func (msg *Message) SetRedirect(statusCode uint32, redirectUri string) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.guint        // out
 	var _arg2 *C.char        // out
@@ -759,8 +902,12 @@ func (msg *Message) SetRedirect(statusCode uint, redirectUri string) {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 	_arg1 = C.guint(statusCode)
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(redirectUri)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	C.soup_message_set_redirect(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(statusCode)
+	runtime.KeepAlive(redirectUri)
 }
 
 // SetRequest: convenience function to set the request body of a Message. If
@@ -769,11 +916,14 @@ func (msg *Message) SetRequest(contentType string, reqUse MemoryUse, reqBody []b
 	var _arg0 *C.SoupMessage  // out
 	var _arg1 *C.char         // out
 	var _arg2 C.SoupMemoryUse // out
-	var _arg3 *C.char
+	var _arg3 *C.char         // out
 	var _arg4 C.gsize
 
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(contentType)))
+	if contentType != "" {
+		_arg1 = (*C.char)(unsafe.Pointer(C.CString(contentType)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
 	_arg2 = C.SoupMemoryUse(reqUse)
 	_arg4 = (C.gsize)(len(reqBody))
 	if len(reqBody) > 0 {
@@ -781,6 +931,10 @@ func (msg *Message) SetRequest(contentType string, reqUse MemoryUse, reqBody []b
 	}
 
 	C.soup_message_set_request(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(contentType)
+	runtime.KeepAlive(reqUse)
+	runtime.KeepAlive(reqBody)
 }
 
 // SetResponse: convenience function to set the response body of a Message. If
@@ -789,11 +943,14 @@ func (msg *Message) SetResponse(contentType string, respUse MemoryUse, respBody 
 	var _arg0 *C.SoupMessage  // out
 	var _arg1 *C.char         // out
 	var _arg2 C.SoupMemoryUse // out
-	var _arg3 *C.char
+	var _arg3 *C.char         // out
 	var _arg4 C.gsize
 
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(contentType)))
+	if contentType != "" {
+		_arg1 = (*C.char)(unsafe.Pointer(C.CString(contentType)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
 	_arg2 = C.SoupMemoryUse(respUse)
 	_arg4 = (C.gsize)(len(respBody))
 	if len(respBody) > 0 {
@@ -801,6 +958,10 @@ func (msg *Message) SetResponse(contentType string, respUse MemoryUse, respBody 
 	}
 
 	C.soup_message_set_response(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(contentType)
+	runtime.KeepAlive(respUse)
+	runtime.KeepAlive(respBody)
 }
 
 // SetSiteForCookies sets site_for_cookies as the policy URL for same-site
@@ -819,14 +980,18 @@ func (msg *Message) SetSiteForCookies(siteForCookies *URI) {
 	var _arg1 *C.SoupURI     // out
 
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(siteForCookies)))
+	if siteForCookies != nil {
+		_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(siteForCookies)))
+	}
 
 	C.soup_message_set_site_for_cookies(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(siteForCookies)
 }
 
 // SetStatus sets msg's status code to status_code. If status_code is a known
 // value, it will also set msg's reason_phrase.
-func (msg *Message) SetStatus(statusCode uint) {
+func (msg *Message) SetStatus(statusCode uint32) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.guint        // out
 
@@ -834,10 +999,12 @@ func (msg *Message) SetStatus(statusCode uint) {
 	_arg1 = C.guint(statusCode)
 
 	C.soup_message_set_status(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(statusCode)
 }
 
 // SetStatusFull sets msg's status code and reason phrase.
-func (msg *Message) SetStatusFull(statusCode uint, reasonPhrase string) {
+func (msg *Message) SetStatusFull(statusCode uint32, reasonPhrase string) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.guint        // out
 	var _arg2 *C.char        // out
@@ -845,8 +1012,12 @@ func (msg *Message) SetStatusFull(statusCode uint, reasonPhrase string) {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 	_arg1 = C.guint(statusCode)
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(reasonPhrase)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	C.soup_message_set_status_full(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(statusCode)
+	runtime.KeepAlive(reasonPhrase)
 }
 
 // SetURI sets msg's URI to uri. If msg has already been sent and you want to
@@ -859,6 +1030,8 @@ func (msg *Message) SetURI(uri *URI) {
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	C.soup_message_set_uri(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(uri)
 }
 
 func (msg *Message) Starting() {
@@ -867,6 +1040,7 @@ func (msg *Message) Starting() {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	C.soup_message_starting(_arg0)
+	runtime.KeepAlive(msg)
 }
 
 func (msg *Message) WroteBody() {
@@ -875,6 +1049,7 @@ func (msg *Message) WroteBody() {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	C.soup_message_wrote_body(_arg0)
+	runtime.KeepAlive(msg)
 }
 
 func (msg *Message) WroteBodyData(chunk *Buffer) {
@@ -885,6 +1060,8 @@ func (msg *Message) WroteBodyData(chunk *Buffer) {
 	_arg1 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(chunk)))
 
 	C.soup_message_wrote_body_data(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(chunk)
 }
 
 func (msg *Message) WroteChunk() {
@@ -893,6 +1070,7 @@ func (msg *Message) WroteChunk() {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	C.soup_message_wrote_chunk(_arg0)
+	runtime.KeepAlive(msg)
 }
 
 func (msg *Message) WroteHeaders() {
@@ -901,6 +1079,7 @@ func (msg *Message) WroteHeaders() {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	C.soup_message_wrote_headers(_arg0)
+	runtime.KeepAlive(msg)
 }
 
 func (msg *Message) WroteInformational() {
@@ -909,4 +1088,5 @@ func (msg *Message) WroteInformational() {
 	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	C.soup_message_wrote_informational(_arg0)
+	runtime.KeepAlive(msg)
 }

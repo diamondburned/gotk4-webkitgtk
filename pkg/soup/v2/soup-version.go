@@ -2,15 +2,47 @@
 
 package soup
 
+import (
+	"runtime"
+)
+
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <libsoup/soup.h>
 import "C"
 
+// MAJOR_VERSION: like soup_get_major_version(), but from the headers used at
+// application compile time, rather than from the library linked against at
+// application run time.
+const MAJOR_VERSION = 2
+
+// MICRO_VERSION: like soup_get_micro_version(), but from the headers used at
+// application compile time, rather than from the library linked against at
+// application run time.
+const MICRO_VERSION = 0
+
+// MINOR_VERSION: like soup_get_minor_version(), but from the headers used at
+// application compile time, rather than from the library linked against at
+// application run time.
+const MINOR_VERSION = 72
+
+// VERSION_MIN_REQUIRED: macro that should be defined by the user prior to
+// including libsoup.h. The definition should be one of the predefined libsoup
+// version macros: SOUP_VERSION_2_24, SOUP_VERSION_2_26, ...
+//
+// This macro defines the earliest version of libsoup that the package is
+// required to be able to compile against.
+//
+// If the compiler is configured to warn about the use of deprecated functions,
+// then using functions that were deprecated in version
+// SOUP_VERSION_MIN_REQUIRED or earlier will cause warnings (but using functions
+// deprecated in later releases will not).
+const VERSION_MIN_REQUIRED = 2
+
 // CheckVersion: like SOUP_CHECK_VERSION, but the check for soup_check_version
 // is at runtime instead of compile time. This is useful for compiling against
 // older versions of libsoup, but using features from newer versions.
-func CheckVersion(major uint, minor uint, micro uint) bool {
+func CheckVersion(major uint32, minor uint32, micro uint32) bool {
 	var _arg1 C.guint    // out
 	var _arg2 C.guint    // out
 	var _arg3 C.guint    // out
@@ -21,6 +53,9 @@ func CheckVersion(major uint, minor uint, micro uint) bool {
 	_arg3 = C.guint(micro)
 
 	_cret = C.soup_check_version(_arg1, _arg2, _arg3)
+	runtime.KeepAlive(major)
+	runtime.KeepAlive(minor)
+	runtime.KeepAlive(micro)
 
 	var _ok bool // out
 
@@ -38,14 +73,14 @@ func CheckVersion(major uint, minor uint, micro uint) bool {
 // code is running against. Contrast with the UP_MAJOR_VERSION macro, which
 // represents the major version of the libsoup headers you have included when
 // compiling your code.
-func GetMajorVersion() uint {
+func GetMajorVersion() uint32 {
 	var _cret C.guint // in
 
 	_cret = C.soup_get_major_version()
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -57,14 +92,14 @@ func GetMajorVersion() uint {
 // code is running against. Contrast with the UP_MICRO_VERSION macro, which
 // represents the micro version of the libsoup headers you have included when
 // compiling your code.
-func GetMicroVersion() uint {
+func GetMicroVersion() uint32 {
 	var _cret C.guint // in
 
 	_cret = C.soup_get_micro_version()
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -76,14 +111,14 @@ func GetMicroVersion() uint {
 // code is running against. Contrast with the UP_MINOR_VERSION macro, which
 // represents the minor version of the libsoup headers you have included when
 // compiling your code.
-func GetMinorVersion() uint {
+func GetMinorVersion() uint32 {
 	var _cret C.guint // in
 
 	_cret = C.soup_get_minor_version()
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }

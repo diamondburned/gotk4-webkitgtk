@@ -4,12 +4,14 @@ package javascriptcore
 
 import (
 	"fmt"
+	"runtime"
 	"runtime/cgo"
 	"strings"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
 // #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
@@ -72,11 +74,14 @@ func (v ValuePropertyFlags) String() string {
 	return strings.TrimSuffix(builder.String(), "|")
 }
 
+// Has returns true if v contains other.
+func (v ValuePropertyFlags) Has(other ValuePropertyFlags) bool {
+	return (v & other) == other
+}
+
 type Value struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*Value)(nil)
 
 func wrapValue(obj *externglib.Object) *Value {
 	return &Value{
@@ -95,23 +100,27 @@ func marshalValueer(p uintptr) (interface{}, error) {
 // created.
 func NewValueArrayFromStrv(context *Context, strv []string) *Value {
 	var _arg1 *C.JSCContext // out
-	var _arg2 **C.char
-	var _cret *C.JSCValue // in
+	var _arg2 **C.char      // out
+	var _cret *C.JSCValue   // in
 
 	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
 	{
 		_arg2 = (**C.char)(C.malloc(C.ulong(len(strv)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg2))
 		{
 			out := unsafe.Slice(_arg2, len(strv)+1)
 			var zero *C.char
 			out[len(strv)] = zero
 			for i := range strv {
 				out[i] = (*C.char)(unsafe.Pointer(C.CString(strv[i])))
+				defer C.free(unsafe.Pointer(out[i]))
 			}
 		}
 	}
 
 	_cret = C.jsc_value_new_array_from_strv(_arg1, _arg2)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(strv)
 
 	var _value *Value // out
 
@@ -132,6 +141,8 @@ func NewValueBoolean(context *Context, value bool) *Value {
 	}
 
 	_cret = C.jsc_value_new_boolean(_arg1, _arg2)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(value)
 
 	var _ret *Value // out
 
@@ -149,8 +160,11 @@ func NewValueFromJson(context *Context, json string) *Value {
 
 	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(json)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	_cret = C.jsc_value_new_from_json(_arg1, _arg2)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(json)
 
 	var _value *Value // out
 
@@ -168,6 +182,7 @@ func NewValueNull(context *Context) *Value {
 	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.jsc_value_new_null(_arg1)
+	runtime.KeepAlive(context)
 
 	var _value *Value // out
 
@@ -186,6 +201,8 @@ func NewValueNumber(context *Context, number float64) *Value {
 	_arg2 = C.double(number)
 
 	_cret = C.jsc_value_new_number(_arg1, _arg2)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(number)
 
 	var _value *Value // out
 
@@ -206,9 +223,14 @@ func NewValueObject(context *Context, instance cgo.Handle, jscClass *Class) *Val
 
 	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
 	_arg2 = (C.gpointer)(unsafe.Pointer(instance))
-	_arg3 = (*C.JSCClass)(unsafe.Pointer(jscClass.Native()))
+	if jscClass != nil {
+		_arg3 = (*C.JSCClass)(unsafe.Pointer(jscClass.Native()))
+	}
 
 	_cret = C.jsc_value_new_object(_arg1, _arg2, _arg3)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(instance)
+	runtime.KeepAlive(jscClass)
 
 	var _value *Value // out
 
@@ -226,9 +248,36 @@ func NewValueString(context *Context, _string string) *Value {
 	var _cret *C.JSCValue   // in
 
 	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
-	_arg2 = (*C.char)(unsafe.Pointer(C.CString(_string)))
+	if _string != "" {
+		_arg2 = (*C.char)(unsafe.Pointer(C.CString(_string)))
+		defer C.free(unsafe.Pointer(_arg2))
+	}
 
 	_cret = C.jsc_value_new_string(_arg1, _arg2)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(_string)
+
+	var _value *Value // out
+
+	_value = wrapValue(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+
+	return _value
+}
+
+// NewValueStringFromBytes: create a new CValue from bytes.
+func NewValueStringFromBytes(context *Context, bytes *glib.Bytes) *Value {
+	var _arg1 *C.JSCContext // out
+	var _arg2 *C.GBytes     // out
+	var _cret *C.JSCValue   // in
+
+	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	if bytes != nil {
+		_arg2 = (*C.GBytes)(gextras.StructNative(unsafe.Pointer(bytes)))
+	}
+
+	_cret = C.jsc_value_new_string_from_bytes(_arg1, _arg2)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(bytes)
 
 	var _value *Value // out
 
@@ -246,6 +295,7 @@ func NewValueUndefined(context *Context) *Value {
 	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
 
 	_cret = C.jsc_value_new_undefined(_arg1)
+	runtime.KeepAlive(context)
 
 	var _value *Value // out
 
@@ -254,26 +304,31 @@ func NewValueUndefined(context *Context) *Value {
 	return _value
 }
 
-// ConstructorCallv: invoke <function>new</function> with constructor referenced
+// ConstructorCall: invoke <function>new</function> with constructor referenced
 // by value. If n_parameters is 0 no parameters will be passed to the
 // constructor.
-func (value *Value) ConstructorCallv(parameters []*Value) *Value {
-	var _arg0 *C.JSCValue // out
-	var _arg2 **C.JSCValue
+func (value *Value) ConstructorCall(parameters []*Value) *Value {
+	var _arg0 *C.JSCValue  // out
+	var _arg2 **C.JSCValue // out
 	var _arg1 C.guint
 	var _cret *C.JSCValue // in
 
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
-	_arg1 = (C.guint)(len(parameters))
-	_arg2 = (**C.JSCValue)(C.malloc(C.ulong(len(parameters)) * C.ulong(unsafe.Sizeof(uint(0)))))
-	{
-		out := unsafe.Slice((**C.JSCValue)(_arg2), len(parameters))
-		for i := range parameters {
-			out[i] = (*C.JSCValue)(unsafe.Pointer(parameters[i].Native()))
+	if parameters != nil {
+		_arg1 = (C.guint)(len(parameters))
+		_arg2 = (**C.JSCValue)(C.malloc(C.ulong(len(parameters)) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg2))
+		{
+			out := unsafe.Slice((**C.JSCValue)(_arg2), len(parameters))
+			for i := range parameters {
+				out[i] = (*C.JSCValue)(unsafe.Pointer(parameters[i].Native()))
+			}
 		}
 	}
 
 	_cret = C.jsc_value_constructor_callv(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(value)
+	runtime.KeepAlive(parameters)
 
 	var _ret *Value // out
 
@@ -282,29 +337,34 @@ func (value *Value) ConstructorCallv(parameters []*Value) *Value {
 	return _ret
 }
 
-// FunctionCallv: call function referenced by value, passing the given
+// FunctionCall: call function referenced by value, passing the given
 // parameters. If n_parameters is 0 no parameters will be passed to the
 // function.
 //
 // This function always returns a CValue, in case of void functions a CValue
 // referencing <function>undefined</function> is returned
-func (value *Value) FunctionCallv(parameters []*Value) *Value {
-	var _arg0 *C.JSCValue // out
-	var _arg2 **C.JSCValue
+func (value *Value) FunctionCall(parameters []*Value) *Value {
+	var _arg0 *C.JSCValue  // out
+	var _arg2 **C.JSCValue // out
 	var _arg1 C.guint
 	var _cret *C.JSCValue // in
 
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
-	_arg1 = (C.guint)(len(parameters))
-	_arg2 = (**C.JSCValue)(C.malloc(C.ulong(len(parameters)) * C.ulong(unsafe.Sizeof(uint(0)))))
-	{
-		out := unsafe.Slice((**C.JSCValue)(_arg2), len(parameters))
-		for i := range parameters {
-			out[i] = (*C.JSCValue)(unsafe.Pointer(parameters[i].Native()))
+	if parameters != nil {
+		_arg1 = (C.guint)(len(parameters))
+		_arg2 = (**C.JSCValue)(C.malloc(C.ulong(len(parameters)) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg2))
+		{
+			out := unsafe.Slice((**C.JSCValue)(_arg2), len(parameters))
+			for i := range parameters {
+				out[i] = (*C.JSCValue)(unsafe.Pointer(parameters[i].Native()))
+			}
 		}
 	}
 
 	_cret = C.jsc_value_function_callv(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(value)
+	runtime.KeepAlive(parameters)
 
 	var _ret *Value // out
 
@@ -321,6 +381,7 @@ func (value *Value) Context() *Context {
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 
 	_cret = C.jsc_value_get_context(_arg0)
+	runtime.KeepAlive(value)
 
 	var _context *Context // out
 
@@ -337,6 +398,7 @@ func (value *Value) IsArray() bool {
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 
 	_cret = C.jsc_value_is_array(_arg0)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 
@@ -355,6 +417,7 @@ func (value *Value) IsBoolean() bool {
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 
 	_cret = C.jsc_value_is_boolean(_arg0)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 
@@ -373,6 +436,7 @@ func (value *Value) IsConstructor() bool {
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 
 	_cret = C.jsc_value_is_constructor(_arg0)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 
@@ -391,6 +455,7 @@ func (value *Value) IsFunction() bool {
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 
 	_cret = C.jsc_value_is_function(_arg0)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 
@@ -410,6 +475,7 @@ func (value *Value) IsNull() bool {
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 
 	_cret = C.jsc_value_is_null(_arg0)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 
@@ -428,6 +494,7 @@ func (value *Value) IsNumber() bool {
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 
 	_cret = C.jsc_value_is_number(_arg0)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 
@@ -446,6 +513,7 @@ func (value *Value) IsObject() bool {
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 
 	_cret = C.jsc_value_is_object(_arg0)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 
@@ -464,6 +532,7 @@ func (value *Value) IsString() bool {
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 
 	_cret = C.jsc_value_is_string(_arg0)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 
@@ -483,6 +552,7 @@ func (value *Value) IsUndefined() bool {
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 
 	_cret = C.jsc_value_is_undefined(_arg0)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 
@@ -505,10 +575,17 @@ func (value *Value) ObjectDefinePropertyData(propertyName string, flags ValuePro
 
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(propertyName)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.JSCValuePropertyFlags(flags)
-	_arg3 = (*C.JSCValue)(unsafe.Pointer(propertyValue.Native()))
+	if propertyValue != nil {
+		_arg3 = (*C.JSCValue)(unsafe.Pointer(propertyValue.Native()))
+	}
 
 	C.jsc_value_object_define_property_data(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(value)
+	runtime.KeepAlive(propertyName)
+	runtime.KeepAlive(flags)
+	runtime.KeepAlive(propertyValue)
 }
 
 // ObjectDeleteProperty: try to delete property with name from value. This
@@ -521,8 +598,11 @@ func (value *Value) ObjectDeleteProperty(name string) bool {
 
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.jsc_value_object_delete_property(_arg0, _arg1)
+	runtime.KeepAlive(value)
+	runtime.KeepAlive(name)
 
 	var _ok bool // out
 
@@ -537,25 +617,30 @@ func (value *Value) ObjectDeleteProperty(name string) bool {
 // properties defined with JSC_VALUE_PROPERTY_ENUMERABLE flag will be collected.
 func (value *Value) ObjectEnumerateProperties() []string {
 	var _arg0 *C.JSCValue // out
-	var _cret **C.gchar
+	var _cret **C.gchar   // in
 
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 
 	_cret = C.jsc_value_object_enumerate_properties(_arg0)
+	runtime.KeepAlive(value)
 
-	var _utf8s []string
+	var _utf8s []string // out
 
-	{
-		var i int
-		var z *C.gchar
-		for p := _cret; *p != z; p = &unsafe.Slice(p, i+1)[i] {
-			i++
-		}
+	if _cret != nil {
+		defer C.free(unsafe.Pointer(_cret))
+		{
+			var i int
+			var z *C.gchar
+			for p := _cret; *p != z; p = &unsafe.Slice(p, i+1)[i] {
+				i++
+			}
 
-		src := unsafe.Slice(_cret, i)
-		_utf8s = make([]string, i)
-		for i := range src {
-			_utf8s[i] = C.GoString((*C.gchar)(unsafe.Pointer(src[i])))
+			src := unsafe.Slice(_cret, i)
+			_utf8s = make([]string, i)
+			for i := range src {
+				_utf8s[i] = C.GoString((*C.gchar)(unsafe.Pointer(src[i])))
+				defer C.free(unsafe.Pointer(src[i]))
+			}
 		}
 	}
 
@@ -570,8 +655,11 @@ func (value *Value) ObjectGetProperty(name string) *Value {
 
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.jsc_value_object_get_property(_arg0, _arg1)
+	runtime.KeepAlive(value)
+	runtime.KeepAlive(name)
 
 	var _ret *Value // out
 
@@ -581,7 +669,7 @@ func (value *Value) ObjectGetProperty(name string) *Value {
 }
 
 // ObjectGetPropertyAtIndex: get property at index from value.
-func (value *Value) ObjectGetPropertyAtIndex(index uint) *Value {
+func (value *Value) ObjectGetPropertyAtIndex(index uint32) *Value {
 	var _arg0 *C.JSCValue // out
 	var _arg1 C.guint     // out
 	var _cret *C.JSCValue // in
@@ -590,6 +678,8 @@ func (value *Value) ObjectGetPropertyAtIndex(index uint) *Value {
 	_arg1 = C.guint(index)
 
 	_cret = C.jsc_value_object_get_property_at_index(_arg0, _arg1)
+	runtime.KeepAlive(value)
+	runtime.KeepAlive(index)
 
 	var _ret *Value // out
 
@@ -606,8 +696,11 @@ func (value *Value) ObjectHasProperty(name string) bool {
 
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.jsc_value_object_has_property(_arg0, _arg1)
+	runtime.KeepAlive(value)
+	runtime.KeepAlive(name)
 
 	var _ok bool // out
 
@@ -618,7 +711,7 @@ func (value *Value) ObjectHasProperty(name string) bool {
 	return _ok
 }
 
-// ObjectInvokeMethodv: invoke method with name on object referenced by value,
+// ObjectInvokeMethod: invoke method with name on object referenced by value,
 // passing the given parameters. If n_parameters is 0 no parameters will be
 // passed to the method. The object instance will be handled automatically even
 // when the method is a custom one registered with jsc_class_add_method(), so it
@@ -626,25 +719,32 @@ func (value *Value) ObjectHasProperty(name string) bool {
 //
 // This function always returns a CValue, in case of void methods a CValue
 // referencing <function>undefined</function> is returned.
-func (value *Value) ObjectInvokeMethodv(name string, parameters []*Value) *Value {
-	var _arg0 *C.JSCValue // out
-	var _arg1 *C.char     // out
-	var _arg3 **C.JSCValue
+func (value *Value) ObjectInvokeMethod(name string, parameters []*Value) *Value {
+	var _arg0 *C.JSCValue  // out
+	var _arg1 *C.char      // out
+	var _arg3 **C.JSCValue // out
 	var _arg2 C.guint
 	var _cret *C.JSCValue // in
 
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
-	_arg2 = (C.guint)(len(parameters))
-	_arg3 = (**C.JSCValue)(C.malloc(C.ulong(len(parameters)) * C.ulong(unsafe.Sizeof(uint(0)))))
-	{
-		out := unsafe.Slice((**C.JSCValue)(_arg3), len(parameters))
-		for i := range parameters {
-			out[i] = (*C.JSCValue)(unsafe.Pointer(parameters[i].Native()))
+	defer C.free(unsafe.Pointer(_arg1))
+	if parameters != nil {
+		_arg2 = (C.guint)(len(parameters))
+		_arg3 = (**C.JSCValue)(C.malloc(C.ulong(len(parameters)) * C.ulong(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg3))
+		{
+			out := unsafe.Slice((**C.JSCValue)(_arg3), len(parameters))
+			for i := range parameters {
+				out[i] = (*C.JSCValue)(unsafe.Pointer(parameters[i].Native()))
+			}
 		}
 	}
 
 	_cret = C.jsc_value_object_invoke_methodv(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(value)
+	runtime.KeepAlive(name)
+	runtime.KeepAlive(parameters)
 
 	var _ret *Value // out
 
@@ -662,8 +762,11 @@ func (value *Value) ObjectIsInstanceOf(name string) bool {
 
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.jsc_value_object_is_instance_of(_arg0, _arg1)
+	runtime.KeepAlive(value)
+	runtime.KeepAlive(name)
 
 	var _ok bool // out
 
@@ -682,13 +785,17 @@ func (value *Value) ObjectSetProperty(name string, property *Value) {
 
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.JSCValue)(unsafe.Pointer(property.Native()))
 
 	C.jsc_value_object_set_property(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(value)
+	runtime.KeepAlive(name)
+	runtime.KeepAlive(property)
 }
 
 // ObjectSetPropertyAtIndex: set property at index on value.
-func (value *Value) ObjectSetPropertyAtIndex(index uint, property *Value) {
+func (value *Value) ObjectSetPropertyAtIndex(index uint32, property *Value) {
 	var _arg0 *C.JSCValue // out
 	var _arg1 C.guint     // out
 	var _arg2 *C.JSCValue // out
@@ -698,6 +805,9 @@ func (value *Value) ObjectSetPropertyAtIndex(index uint, property *Value) {
 	_arg2 = (*C.JSCValue)(unsafe.Pointer(property.Native()))
 
 	C.jsc_value_object_set_property_at_index(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(value)
+	runtime.KeepAlive(index)
+	runtime.KeepAlive(property)
 }
 
 // ToBoolean: convert value to a boolean.
@@ -708,6 +818,7 @@ func (value *Value) ToBoolean() bool {
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 
 	_cret = C.jsc_value_to_boolean(_arg0)
+	runtime.KeepAlive(value)
 
 	var _ok bool // out
 
@@ -726,6 +837,7 @@ func (value *Value) ToDouble() float64 {
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 
 	_cret = C.jsc_value_to_double(_arg0)
+	runtime.KeepAlive(value)
 
 	var _gdouble float64 // out
 
@@ -742,6 +854,7 @@ func (value *Value) ToInt32() int32 {
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 
 	_cret = C.jsc_value_to_int32(_arg0)
+	runtime.KeepAlive(value)
 
 	var _gint32 int32 // out
 
@@ -753,7 +866,7 @@ func (value *Value) ToInt32() int32 {
 // ToJson: create a JSON string of value serialization. If indent is 0, the
 // resulting JSON will not contain newlines. The size of the indent is clamped
 // to 10 spaces.
-func (value *Value) ToJson(indent uint) string {
+func (value *Value) ToJson(indent uint32) string {
 	var _arg0 *C.JSCValue // out
 	var _arg1 C.guint     // out
 	var _cret *C.char     // in
@@ -762,6 +875,8 @@ func (value *Value) ToJson(indent uint) string {
 	_arg1 = C.guint(indent)
 
 	_cret = C.jsc_value_to_json(_arg0, _arg1)
+	runtime.KeepAlive(value)
+	runtime.KeepAlive(indent)
 
 	var _utf8 string // out
 
@@ -780,6 +895,7 @@ func (value *Value) String() string {
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 
 	_cret = C.jsc_value_to_string(_arg0)
+	runtime.KeepAlive(value)
 
 	var _utf8 string // out
 
@@ -787,4 +903,28 @@ func (value *Value) String() string {
 	defer C.free(unsafe.Pointer(_cret))
 
 	return _utf8
+}
+
+// ToStringAsBytes: convert value to a string and return the results as #GBytes.
+// This is needed to handle strings with null characters.
+func (value *Value) ToStringAsBytes() *glib.Bytes {
+	var _arg0 *C.JSCValue // out
+	var _cret *C.GBytes   // in
+
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+
+	_cret = C.jsc_value_to_string_as_bytes(_arg0)
+	runtime.KeepAlive(value)
+
+	var _bytes *glib.Bytes // out
+
+	_bytes = (*glib.Bytes)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_bytes)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.g_bytes_unref((*C.GBytes)(intern.C))
+		},
+	)
+
+	return _bytes
 }

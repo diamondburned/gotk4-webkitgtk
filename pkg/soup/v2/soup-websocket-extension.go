@@ -3,10 +3,13 @@
 package soup
 
 import (
+	"runtime"
+	"runtime/cgo"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gerror"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -26,6 +29,8 @@ func init() {
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type WebsocketExtensionOverrider interface {
+	// Configure configures extension with the given params
+	Configure(connectionType WebsocketConnectionType, params map[cgo.Handle]cgo.Handle) error
 	// RequestParams: get the parameters strings to be included in the request
 	// header. If the extension doesn't include any parameter in the request,
 	// this function returns NULL.
@@ -40,10 +45,12 @@ type WebsocketExtension struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*WebsocketExtension)(nil)
-
 // WebsocketExtensioner describes WebsocketExtension's abstract methods.
 type WebsocketExtensioner interface {
+	externglib.Objector
+
+	// Configure configures extension with the given params
+	Configure(connectionType WebsocketConnectionType, params map[cgo.Handle]cgo.Handle) error
 	// RequestParams: get the parameters strings to be included in the request
 	// header.
 	RequestParams() string
@@ -66,6 +73,41 @@ func marshalWebsocketExtensioner(p uintptr) (interface{}, error) {
 	return wrapWebsocketExtension(obj), nil
 }
 
+// Configure configures extension with the given params
+func (extension *WebsocketExtension) Configure(connectionType WebsocketConnectionType, params map[cgo.Handle]cgo.Handle) error {
+	var _arg0 *C.SoupWebsocketExtension     // out
+	var _arg1 C.SoupWebsocketConnectionType // out
+	var _arg2 *C.GHashTable                 // out
+	var _cerr *C.GError                     // in
+
+	_arg0 = (*C.SoupWebsocketExtension)(unsafe.Pointer(extension.Native()))
+	_arg1 = C.SoupWebsocketConnectionType(connectionType)
+	if params != nil {
+		_arg2 = C.g_hash_table_new_full(nil, nil, (*[0]byte)(C.free), (*[0]byte)(C.free))
+		for ksrc, vsrc := range params {
+			var kdst *C.gpointer // out
+			var vdst *C.gpointer // out
+			kdst = (*C.gpointer)(unsafe.Pointer(ksrc))
+			vdst = (*C.gpointer)(unsafe.Pointer(vsrc))
+			C.g_hash_table_insert(_arg2, C.gpointer(unsafe.Pointer(kdst)), C.gpointer(unsafe.Pointer(vdst)))
+		}
+		defer C.g_hash_table_unref(_arg2)
+	}
+
+	C.soup_websocket_extension_configure(_arg0, _arg1, _arg2, &_cerr)
+	runtime.KeepAlive(extension)
+	runtime.KeepAlive(connectionType)
+	runtime.KeepAlive(params)
+
+	var _goerr error // out
+
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
+
+	return _goerr
+}
+
 // RequestParams: get the parameters strings to be included in the request
 // header. If the extension doesn't include any parameter in the request, this
 // function returns NULL.
@@ -76,11 +118,14 @@ func (extension *WebsocketExtension) RequestParams() string {
 	_arg0 = (*C.SoupWebsocketExtension)(unsafe.Pointer(extension.Native()))
 
 	_cret = C.soup_websocket_extension_get_request_params(_arg0)
+	runtime.KeepAlive(extension)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	defer C.free(unsafe.Pointer(_cret))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+		defer C.free(unsafe.Pointer(_cret))
+	}
 
 	return _utf8
 }
@@ -95,11 +140,14 @@ func (extension *WebsocketExtension) ResponseParams() string {
 	_arg0 = (*C.SoupWebsocketExtension)(unsafe.Pointer(extension.Native()))
 
 	_cret = C.soup_websocket_extension_get_response_params(_arg0)
+	runtime.KeepAlive(extension)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	defer C.free(unsafe.Pointer(_cret))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+		defer C.free(unsafe.Pointer(_cret))
+	}
 
 	return _utf8
 }

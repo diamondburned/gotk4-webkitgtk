@@ -9,8 +9,8 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -90,6 +90,18 @@ func (x XMLRPCFault) String() string {
 	}
 }
 
+func XMLRPCFaultQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.soup_xmlrpc_fault_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+
+	return _quark
+}
+
 // XmlrpcBuildRequest: this creates an XML-RPC methodCall and returns it as a
 // string. This is the low-level method that soup_xmlrpc_message_new() is built
 // on.
@@ -116,16 +128,21 @@ func XmlrpcBuildRequest(methodName string, params *glib.Variant) (string, error)
 	var _cerr *C.GError   // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(methodName)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(params)))
 
 	_cret = C.soup_xmlrpc_build_request(_arg1, _arg2, &_cerr)
+	runtime.KeepAlive(methodName)
+	runtime.KeepAlive(params)
 
 	var _utf8 string // out
 	var _goerr error // out
 
 	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
 	defer C.free(unsafe.Pointer(_cret))
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _utf8, _goerr
 }
@@ -148,13 +165,16 @@ func XmlrpcBuildResponse(value *glib.Variant) (string, error) {
 	_arg1 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(value)))
 
 	_cret = C.soup_xmlrpc_build_response(_arg1, &_cerr)
+	runtime.KeepAlive(value)
 
 	var _utf8 string // out
 	var _goerr error // out
 
 	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
 	defer C.free(unsafe.Pointer(_cret))
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _utf8, _goerr
 }
@@ -173,16 +193,23 @@ func NewXmlrpcMessage(uri string, methodName string, params *glib.Variant) (*Mes
 	var _cerr *C.GError      // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(uri)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(methodName)))
+	defer C.free(unsafe.Pointer(_arg2))
 	_arg3 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(params)))
 
 	_cret = C.soup_xmlrpc_message_new(_arg1, _arg2, _arg3, &_cerr)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(methodName)
+	runtime.KeepAlive(params)
 
 	var _message *Message // out
 	var _goerr error      // out
 
 	_message = wrapMessage(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _message, _goerr
 }
@@ -203,10 +230,14 @@ func XmlrpcMessageSetResponse(msg *Message, value *glib.Variant) error {
 	_arg2 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(value)))
 
 	C.soup_xmlrpc_message_set_response(_arg1, _arg2, &_cerr)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(value)
 
 	var _goerr error // out
 
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _goerr
 }
@@ -219,7 +250,7 @@ func XmlrpcMessageSetResponse(msg *Message, value *glib.Variant) error {
 // an error in the SOUP_XMLRPC_ERROR domain.
 //
 // See soup_xmlrpc_params_parse() for deserialization details.
-func XmlrpcParseResponse(methodResponse string, length int, signature string) (*glib.Variant, error) {
+func XmlrpcParseResponse(methodResponse string, length int32, signature string) (*glib.Variant, error) {
 	var _arg1 *C.char     // out
 	var _arg2 C.int       // out
 	var _arg3 *C.char     // out
@@ -227,20 +258,31 @@ func XmlrpcParseResponse(methodResponse string, length int, signature string) (*
 	var _cerr *C.GError   // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(methodResponse)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.int(length)
-	_arg3 = (*C.char)(unsafe.Pointer(C.CString(signature)))
+	if signature != "" {
+		_arg3 = (*C.char)(unsafe.Pointer(C.CString(signature)))
+		defer C.free(unsafe.Pointer(_arg3))
+	}
 
 	_cret = C.soup_xmlrpc_parse_response(_arg1, _arg2, _arg3, &_cerr)
+	runtime.KeepAlive(methodResponse)
+	runtime.KeepAlive(length)
+	runtime.KeepAlive(signature)
 
 	var _variant *glib.Variant // out
 	var _goerr error           // out
 
 	_variant = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.g_variant_ref(_cret)
-	runtime.SetFinalizer(_variant, func(v *glib.Variant) {
-		C.g_variant_unref((*C.GVariant)(gextras.StructNative(unsafe.Pointer(v))))
-	})
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_variant)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.g_variant_unref((*C.GVariant)(intern.C))
+		},
+	)
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _variant, _goerr
 }
@@ -260,15 +302,21 @@ func XmlrpcVariantGetDatetime(variant *glib.Variant) (*Date, error) {
 	_arg1 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(variant)))
 
 	_cret = C.soup_xmlrpc_variant_get_datetime(_arg1, &_cerr)
+	runtime.KeepAlive(variant)
 
 	var _date *Date  // out
 	var _goerr error // out
 
 	_date = (*Date)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_date, func(v *Date) {
-		C.soup_date_free((*C.SoupDate)(gextras.StructNative(unsafe.Pointer(v))))
-	})
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_date)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_date_free((*C.SoupDate)(intern.C))
+		},
+	)
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _date, _goerr
 }
@@ -287,14 +335,17 @@ func XmlrpcVariantNewDatetime(date *Date) *glib.Variant {
 	_arg1 = (*C.SoupDate)(gextras.StructNative(unsafe.Pointer(date)))
 
 	_cret = C.soup_xmlrpc_variant_new_datetime(_arg1)
+	runtime.KeepAlive(date)
 
 	var _variant *glib.Variant // out
 
 	_variant = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.g_variant_ref(_cret)
-	runtime.SetFinalizer(_variant, func(v *glib.Variant) {
-		C.g_variant_unref((*C.GVariant)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_variant)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.g_variant_unref((*C.GVariant)(intern.C))
+		},
+	)
 
 	return _variant
 }

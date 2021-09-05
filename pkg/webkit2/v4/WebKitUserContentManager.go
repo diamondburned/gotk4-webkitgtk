@@ -3,10 +3,11 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -24,8 +25,6 @@ func init() {
 type UserContentManager struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*UserContentManager)(nil)
 
 func wrapUserContentManager(obj *externglib.Object) *UserContentManager {
 	return &UserContentManager{
@@ -65,6 +64,8 @@ func (manager *UserContentManager) AddFilter(filter *UserContentFilter) {
 	_arg1 = (*C.WebKitUserContentFilter)(gextras.StructNative(unsafe.Pointer(filter)))
 
 	C.webkit_user_content_manager_add_filter(_arg0, _arg1)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(filter)
 }
 
 // AddScript adds a KitUserScript to the given KitUserContentManager. The same
@@ -77,6 +78,8 @@ func (manager *UserContentManager) AddScript(script *UserScript) {
 	_arg1 = (*C.WebKitUserScript)(gextras.StructNative(unsafe.Pointer(script)))
 
 	C.webkit_user_content_manager_add_script(_arg0, _arg1)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(script)
 }
 
 // AddStyleSheet adds a KitUserStyleSheet to the given KitUserContentManager.
@@ -90,6 +93,8 @@ func (manager *UserContentManager) AddStyleSheet(stylesheet *UserStyleSheet) {
 	_arg1 = (*C.WebKitUserStyleSheet)(gextras.StructNative(unsafe.Pointer(stylesheet)))
 
 	C.webkit_user_content_manager_add_style_sheet(_arg0, _arg1)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(stylesheet)
 }
 
 // RegisterScriptMessageHandler registers a new user script message handler.
@@ -117,8 +122,11 @@ func (manager *UserContentManager) RegisterScriptMessageHandler(name string) boo
 
 	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.webkit_user_content_manager_register_script_message_handler(_arg0, _arg1)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(name)
 
 	var _ok bool // out
 
@@ -144,9 +152,14 @@ func (manager *UserContentManager) RegisterScriptMessageHandlerInWorld(name stri
 
 	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(worldName)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	_cret = C.webkit_user_content_manager_register_script_message_handler_in_world(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(name)
+	runtime.KeepAlive(worldName)
 
 	var _ok bool // out
 
@@ -165,6 +178,7 @@ func (manager *UserContentManager) RemoveAllFilters() {
 	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
 
 	C.webkit_user_content_manager_remove_all_filters(_arg0)
+	runtime.KeepAlive(manager)
 }
 
 // RemoveAllScripts removes all user scripts from the given
@@ -177,6 +191,7 @@ func (manager *UserContentManager) RemoveAllScripts() {
 	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
 
 	C.webkit_user_content_manager_remove_all_scripts(_arg0)
+	runtime.KeepAlive(manager)
 }
 
 // RemoveAllStyleSheets removes all user style sheets from the given
@@ -187,6 +202,7 @@ func (manager *UserContentManager) RemoveAllStyleSheets() {
 	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
 
 	C.webkit_user_content_manager_remove_all_style_sheets(_arg0)
+	runtime.KeepAlive(manager)
 }
 
 // RemoveFilter removes a filter from the given KitUserContentManager.
@@ -200,6 +216,8 @@ func (manager *UserContentManager) RemoveFilter(filter *UserContentFilter) {
 	_arg1 = (*C.WebKitUserContentFilter)(gextras.StructNative(unsafe.Pointer(filter)))
 
 	C.webkit_user_content_manager_remove_filter(_arg0, _arg1)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(filter)
 }
 
 // RemoveFilterByID removes a filter from the given KitUserContentManager given
@@ -211,8 +229,11 @@ func (manager *UserContentManager) RemoveFilterByID(filterId string) {
 
 	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(filterId)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_user_content_manager_remove_filter_by_id(_arg0, _arg1)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(filterId)
 }
 
 // RemoveScript removes a KitUserScript from the given KitUserContentManager.
@@ -226,6 +247,8 @@ func (manager *UserContentManager) RemoveScript(script *UserScript) {
 	_arg1 = (*C.WebKitUserScript)(gextras.StructNative(unsafe.Pointer(script)))
 
 	C.webkit_user_content_manager_remove_script(_arg0, _arg1)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(script)
 }
 
 // RemoveStyleSheet removes a KitUserStyleSheet from the given
@@ -240,6 +263,8 @@ func (manager *UserContentManager) RemoveStyleSheet(stylesheet *UserStyleSheet) 
 	_arg1 = (*C.WebKitUserStyleSheet)(gextras.StructNative(unsafe.Pointer(stylesheet)))
 
 	C.webkit_user_content_manager_remove_style_sheet(_arg0, _arg1)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(stylesheet)
 }
 
 // UnregisterScriptMessageHandler unregisters a previously registered message
@@ -257,8 +282,11 @@ func (manager *UserContentManager) UnregisterScriptMessageHandler(name string) {
 
 	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_user_content_manager_unregister_script_message_handler(_arg0, _arg1)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(name)
 }
 
 // UnregisterScriptMessageHandlerInWorld unregisters a previously registered
@@ -278,7 +306,12 @@ func (manager *UserContentManager) UnregisterScriptMessageHandlerInWorld(name st
 
 	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(worldName)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	C.webkit_user_content_manager_unregister_script_message_handler_in_world(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(name)
+	runtime.KeepAlive(worldName)
 }

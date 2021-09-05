@@ -3,12 +3,12 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -26,8 +26,6 @@ func init() {
 type URISchemeRequest struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*URISchemeRequest)(nil)
 
 func wrapURISchemeRequest(obj *externglib.Object) *URISchemeRequest {
 	return &URISchemeRequest{
@@ -50,11 +48,18 @@ func (request *URISchemeRequest) Finish(stream gio.InputStreamer, streamLength i
 	var _arg3 *C.gchar                  // out
 
 	_arg0 = (*C.WebKitURISchemeRequest)(unsafe.Pointer(request.Native()))
-	_arg1 = (*C.GInputStream)(unsafe.Pointer((stream).(gextras.Nativer).Native()))
+	_arg1 = (*C.GInputStream)(unsafe.Pointer(stream.Native()))
 	_arg2 = C.gint64(streamLength)
-	_arg3 = (*C.gchar)(unsafe.Pointer(C.CString(contentType)))
+	if contentType != "" {
+		_arg3 = (*C.gchar)(unsafe.Pointer(C.CString(contentType)))
+		defer C.free(unsafe.Pointer(_arg3))
+	}
 
 	C.webkit_uri_scheme_request_finish(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(request)
+	runtime.KeepAlive(stream)
+	runtime.KeepAlive(streamLength)
+	runtime.KeepAlive(contentType)
 }
 
 // FinishError: finish a KitURISchemeRequest with a #GError.
@@ -66,6 +71,8 @@ func (request *URISchemeRequest) FinishError(err error) {
 	_arg1 = (*C.GError)(gerror.New(err))
 
 	C.webkit_uri_scheme_request_finish_error(_arg0, _arg1)
+	runtime.KeepAlive(request)
+	runtime.KeepAlive(err)
 }
 
 // Path: get the URI path of request
@@ -76,6 +83,7 @@ func (request *URISchemeRequest) Path() string {
 	_arg0 = (*C.WebKitURISchemeRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_uri_scheme_request_get_path(_arg0)
+	runtime.KeepAlive(request)
 
 	var _utf8 string // out
 
@@ -92,6 +100,7 @@ func (request *URISchemeRequest) Scheme() string {
 	_arg0 = (*C.WebKitURISchemeRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_uri_scheme_request_get_scheme(_arg0)
+	runtime.KeepAlive(request)
 
 	var _utf8 string // out
 
@@ -108,6 +117,7 @@ func (request *URISchemeRequest) URI() string {
 	_arg0 = (*C.WebKitURISchemeRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_uri_scheme_request_get_uri(_arg0)
+	runtime.KeepAlive(request)
 
 	var _utf8 string // out
 
@@ -124,6 +134,7 @@ func (request *URISchemeRequest) WebView() *WebView {
 	_arg0 = (*C.WebKitURISchemeRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_uri_scheme_request_get_web_view(_arg0)
+	runtime.KeepAlive(request)
 
 	var _webView *WebView // out
 

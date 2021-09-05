@@ -8,8 +8,8 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -87,18 +87,24 @@ func (d DateFormat) String() string {
 // offset to the time would give the correct UTC time). If utc is FALSE and
 // offset is 0, then the SoupDate represents a "floating" time with no
 // associated timezone information.
+//
+// An instance of this type is always passed by reference.
 type Date struct {
-	nocopy gextras.NoCopy
+	*date
+}
+
+// date is the struct that's finalized.
+type date struct {
 	native *C.SoupDate
 }
 
 func marshalDate(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &Date{native: (*C.SoupDate)(unsafe.Pointer(b))}, nil
+	return &Date{&date{(*C.SoupDate)(unsafe.Pointer(b))}}, nil
 }
 
 // NewDate constructs a struct Date.
-func NewDate(year int, month int, day int, hour int, minute int, second int) *Date {
+func NewDate(year int32, month int32, day int32, hour int32, minute int32, second int32) *Date {
 	var _arg1 C.int       // out
 	var _arg2 C.int       // out
 	var _arg3 C.int       // out
@@ -115,32 +121,45 @@ func NewDate(year int, month int, day int, hour int, minute int, second int) *Da
 	_arg6 = C.int(second)
 
 	_cret = C.soup_date_new(_arg1, _arg2, _arg3, _arg4, _arg5, _arg6)
+	runtime.KeepAlive(year)
+	runtime.KeepAlive(month)
+	runtime.KeepAlive(day)
+	runtime.KeepAlive(hour)
+	runtime.KeepAlive(minute)
+	runtime.KeepAlive(second)
 
 	var _date *Date // out
 
 	_date = (*Date)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_date, func(v *Date) {
-		C.soup_date_free((*C.SoupDate)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_date)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_date_free((*C.SoupDate)(intern.C))
+		},
+	)
 
 	return _date
 }
 
 // NewDateFromNow constructs a struct Date.
-func NewDateFromNow(offsetSeconds int) *Date {
+func NewDateFromNow(offsetSeconds int32) *Date {
 	var _arg1 C.int       // out
 	var _cret *C.SoupDate // in
 
 	_arg1 = C.int(offsetSeconds)
 
 	_cret = C.soup_date_new_from_now(_arg1)
+	runtime.KeepAlive(offsetSeconds)
 
 	var _date *Date // out
 
 	_date = (*Date)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_date, func(v *Date) {
-		C.soup_date_free((*C.SoupDate)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_date)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_date_free((*C.SoupDate)(intern.C))
+		},
+	)
 
 	return _date
 }
@@ -151,15 +170,22 @@ func NewDateFromString(dateString string) *Date {
 	var _cret *C.SoupDate // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(dateString)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.soup_date_new_from_string(_arg1)
+	runtime.KeepAlive(dateString)
 
 	var _date *Date // out
 
-	_date = (*Date)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_date, func(v *Date) {
-		C.soup_date_free((*C.SoupDate)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	if _cret != nil {
+		_date = (*Date)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(_date)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.soup_date_free((*C.SoupDate)(intern.C))
+			},
+		)
+	}
 
 	return _date
 }
@@ -172,13 +198,17 @@ func NewDateFromTimeT(when int32) *Date {
 	_arg1 = C.time_t(when)
 
 	_cret = C.soup_date_new_from_time_t(_arg1)
+	runtime.KeepAlive(when)
 
 	var _date *Date // out
 
 	_date = (*Date)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_date, func(v *Date) {
-		C.soup_date_free((*C.SoupDate)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_date)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_date_free((*C.SoupDate)(intern.C))
+		},
+	)
 
 	return _date
 }
@@ -191,150 +221,153 @@ func (date *Date) Copy() *Date {
 	_arg0 = (*C.SoupDate)(gextras.StructNative(unsafe.Pointer(date)))
 
 	_cret = C.soup_date_copy(_arg0)
+	runtime.KeepAlive(date)
 
 	var _ret *Date // out
 
 	_ret = (*Date)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_ret, func(v *Date) {
-		C.soup_date_free((*C.SoupDate)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_ret)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_date_free((*C.SoupDate)(intern.C))
+		},
+	)
 
 	return _ret
 }
 
-// Free frees date.
-func (date *Date) free() {
-	var _arg0 *C.SoupDate // out
-
-	_arg0 = (*C.SoupDate)(gextras.StructNative(unsafe.Pointer(date)))
-
-	C.soup_date_free(_arg0)
-}
-
 // Day gets date's day.
-func (date *Date) Day() int {
+func (date *Date) Day() int32 {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
 
 	_arg0 = (*C.SoupDate)(gextras.StructNative(unsafe.Pointer(date)))
 
 	_cret = C.soup_date_get_day(_arg0)
+	runtime.KeepAlive(date)
 
-	var _gint int // out
+	var _gint int32 // out
 
-	_gint = int(_cret)
+	_gint = int32(_cret)
 
 	return _gint
 }
 
 // Hour gets date's hour.
-func (date *Date) Hour() int {
+func (date *Date) Hour() int32 {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
 
 	_arg0 = (*C.SoupDate)(gextras.StructNative(unsafe.Pointer(date)))
 
 	_cret = C.soup_date_get_hour(_arg0)
+	runtime.KeepAlive(date)
 
-	var _gint int // out
+	var _gint int32 // out
 
-	_gint = int(_cret)
+	_gint = int32(_cret)
 
 	return _gint
 }
 
 // Minute gets date's minute.
-func (date *Date) Minute() int {
+func (date *Date) Minute() int32 {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
 
 	_arg0 = (*C.SoupDate)(gextras.StructNative(unsafe.Pointer(date)))
 
 	_cret = C.soup_date_get_minute(_arg0)
+	runtime.KeepAlive(date)
 
-	var _gint int // out
+	var _gint int32 // out
 
-	_gint = int(_cret)
+	_gint = int32(_cret)
 
 	return _gint
 }
 
 // Month gets date's month.
-func (date *Date) Month() int {
+func (date *Date) Month() int32 {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
 
 	_arg0 = (*C.SoupDate)(gextras.StructNative(unsafe.Pointer(date)))
 
 	_cret = C.soup_date_get_month(_arg0)
+	runtime.KeepAlive(date)
 
-	var _gint int // out
+	var _gint int32 // out
 
-	_gint = int(_cret)
+	_gint = int32(_cret)
 
 	return _gint
 }
 
 // Offset gets date's offset from UTC.
-func (date *Date) Offset() int {
+func (date *Date) Offset() int32 {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
 
 	_arg0 = (*C.SoupDate)(gextras.StructNative(unsafe.Pointer(date)))
 
 	_cret = C.soup_date_get_offset(_arg0)
+	runtime.KeepAlive(date)
 
-	var _gint int // out
+	var _gint int32 // out
 
-	_gint = int(_cret)
+	_gint = int32(_cret)
 
 	return _gint
 }
 
 // Second gets date's second.
-func (date *Date) Second() int {
+func (date *Date) Second() int32 {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
 
 	_arg0 = (*C.SoupDate)(gextras.StructNative(unsafe.Pointer(date)))
 
 	_cret = C.soup_date_get_second(_arg0)
+	runtime.KeepAlive(date)
 
-	var _gint int // out
+	var _gint int32 // out
 
-	_gint = int(_cret)
+	_gint = int32(_cret)
 
 	return _gint
 }
 
 // Utc gets date's UTC flag
-func (date *Date) Utc() int {
+func (date *Date) Utc() int32 {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
 
 	_arg0 = (*C.SoupDate)(gextras.StructNative(unsafe.Pointer(date)))
 
 	_cret = C.soup_date_get_utc(_arg0)
+	runtime.KeepAlive(date)
 
-	var _gint int // out
+	var _gint int32 // out
 
-	_gint = int(_cret)
+	_gint = int32(_cret)
 
 	return _gint
 }
 
 // Year gets date's year.
-func (date *Date) Year() int {
+func (date *Date) Year() int32 {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
 
 	_arg0 = (*C.SoupDate)(gextras.StructNative(unsafe.Pointer(date)))
 
 	_cret = C.soup_date_get_year(_arg0)
+	runtime.KeepAlive(date)
 
-	var _gint int // out
+	var _gint int32 // out
 
-	_gint = int(_cret)
+	_gint = int32(_cret)
 
 	return _gint
 }
@@ -347,6 +380,7 @@ func (date *Date) IsPast() bool {
 	_arg0 = (*C.SoupDate)(gextras.StructNative(unsafe.Pointer(date)))
 
 	_cret = C.soup_date_is_past(_arg0)
+	runtime.KeepAlive(date)
 
 	var _ok bool // out
 
@@ -367,6 +401,8 @@ func (date *Date) String(format DateFormat) string {
 	_arg1 = C.SoupDateFormat(format)
 
 	_cret = C.soup_date_to_string(_arg0, _arg1)
+	runtime.KeepAlive(date)
+	runtime.KeepAlive(format)
 
 	var _utf8 string // out
 
@@ -388,6 +424,7 @@ func (date *Date) ToTimeT() int32 {
 	_arg0 = (*C.SoupDate)(gextras.StructNative(unsafe.Pointer(date)))
 
 	_cret = C.soup_date_to_time_t(_arg0)
+	runtime.KeepAlive(date)
 
 	var _glong int32 // out
 
@@ -406,6 +443,7 @@ func (date *Date) ToTimeval() glib.TimeVal {
 	_arg0 = (*C.SoupDate)(gextras.StructNative(unsafe.Pointer(date)))
 
 	C.soup_date_to_timeval(_arg0, &_arg1)
+	runtime.KeepAlive(date)
 
 	var _time glib.TimeVal // out
 

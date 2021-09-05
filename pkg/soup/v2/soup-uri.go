@@ -7,7 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -58,14 +58,20 @@ func init() {
 // that has exactly the same meaning as the original. (In theory, URI should
 // leave user, password, and host partially-encoded as well, but this would be
 // more annoying than useful.)
+//
+// An instance of this type is always passed by reference.
 type URI struct {
-	nocopy gextras.NoCopy
+	*urI
+}
+
+// urI is the struct that's finalized.
+type urI struct {
 	native *C.SoupURI
 }
 
 func marshalURI(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &URI{native: (*C.SoupURI)(unsafe.Pointer(b))}, nil
+	return &URI{&urI{(*C.SoupURI)(unsafe.Pointer(b))}}, nil
 }
 
 // NewURI constructs a struct URI.
@@ -73,16 +79,25 @@ func NewURI(uriString string) *URI {
 	var _arg1 *C.char    // out
 	var _cret *C.SoupURI // in
 
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(uriString)))
+	if uriString != "" {
+		_arg1 = (*C.char)(unsafe.Pointer(C.CString(uriString)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
 
 	_cret = C.soup_uri_new(_arg1)
+	runtime.KeepAlive(uriString)
 
 	var _urI *URI // out
 
-	_urI = (*URI)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_urI, func(v *URI) {
-		C.soup_uri_free((*C.SoupURI)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	if _cret != nil {
+		_urI = (*URI)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(_urI)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.soup_uri_free((*C.SoupURI)(intern.C))
+			},
+		)
+	}
 
 	return _urI
 }
@@ -95,15 +110,21 @@ func NewURIWithBase(base *URI, uriString string) *URI {
 
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(base)))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(uriString)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	_cret = C.soup_uri_new_with_base(_arg1, _arg2)
+	runtime.KeepAlive(base)
+	runtime.KeepAlive(uriString)
 
 	var _urI *URI // out
 
 	_urI = (*URI)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_urI, func(v *URI) {
-		C.soup_uri_free((*C.SoupURI)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_urI)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_uri_free((*C.SoupURI)(intern.C))
+		},
+	)
 
 	return _urI
 }
@@ -116,13 +137,17 @@ func (uri *URI) Copy() *URI {
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	_cret = C.soup_uri_copy(_arg0)
+	runtime.KeepAlive(uri)
 
 	var _urI *URI // out
 
 	_urI = (*URI)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_urI, func(v *URI) {
-		C.soup_uri_free((*C.SoupURI)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_urI)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_uri_free((*C.SoupURI)(intern.C))
+		},
+	)
 
 	return _urI
 }
@@ -135,13 +160,17 @@ func (uri *URI) CopyHost() *URI {
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	_cret = C.soup_uri_copy_host(_arg0)
+	runtime.KeepAlive(uri)
 
 	var _urI *URI // out
 
 	_urI = (*URI)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_urI, func(v *URI) {
-		C.soup_uri_free((*C.SoupURI)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_urI)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_uri_free((*C.SoupURI)(intern.C))
+		},
+	)
 
 	return _urI
 }
@@ -156,6 +185,8 @@ func (uri1 *URI) Equal(uri2 *URI) bool {
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri2)))
 
 	_cret = C.soup_uri_equal(_arg0, _arg1)
+	runtime.KeepAlive(uri1)
+	runtime.KeepAlive(uri2)
 
 	var _ok bool // out
 
@@ -166,15 +197,6 @@ func (uri1 *URI) Equal(uri2 *URI) bool {
 	return _ok
 }
 
-// Free frees uri.
-func (uri *URI) free() {
-	var _arg0 *C.SoupURI // out
-
-	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
-
-	C.soup_uri_free(_arg0)
-}
-
 // Fragment gets uri's fragment.
 func (uri *URI) Fragment() string {
 	var _arg0 *C.SoupURI // out
@@ -183,6 +205,7 @@ func (uri *URI) Fragment() string {
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	_cret = C.soup_uri_get_fragment(_arg0)
+	runtime.KeepAlive(uri)
 
 	var _utf8 string // out
 
@@ -199,6 +222,7 @@ func (uri *URI) Host() string {
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	_cret = C.soup_uri_get_host(_arg0)
+	runtime.KeepAlive(uri)
 
 	var _utf8 string // out
 
@@ -215,6 +239,7 @@ func (uri *URI) Password() string {
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	_cret = C.soup_uri_get_password(_arg0)
+	runtime.KeepAlive(uri)
 
 	var _utf8 string // out
 
@@ -231,6 +256,7 @@ func (uri *URI) Path() string {
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	_cret = C.soup_uri_get_path(_arg0)
+	runtime.KeepAlive(uri)
 
 	var _utf8 string // out
 
@@ -240,17 +266,18 @@ func (uri *URI) Path() string {
 }
 
 // Port gets uri's port.
-func (uri *URI) Port() uint {
+func (uri *URI) Port() uint32 {
 	var _arg0 *C.SoupURI // out
 	var _cret C.guint    // in
 
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	_cret = C.soup_uri_get_port(_arg0)
+	runtime.KeepAlive(uri)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -263,6 +290,7 @@ func (uri *URI) Query() string {
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	_cret = C.soup_uri_get_query(_arg0)
+	runtime.KeepAlive(uri)
 
 	var _utf8 string // out
 
@@ -279,6 +307,7 @@ func (uri *URI) Scheme() string {
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	_cret = C.soup_uri_get_scheme(_arg0)
+	runtime.KeepAlive(uri)
 
 	var _utf8 string // out
 
@@ -295,6 +324,7 @@ func (uri *URI) User() string {
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	_cret = C.soup_uri_get_user(_arg0)
+	runtime.KeepAlive(uri)
 
 	var _utf8 string // out
 
@@ -313,6 +343,8 @@ func (v1 *URI) HostEqual(v2 *URI) bool {
 	_arg1 = C.gconstpointer(gextras.StructNative(unsafe.Pointer(v2)))
 
 	_cret = C.soup_uri_host_equal(_arg0, _arg1)
+	runtime.KeepAlive(v1)
+	runtime.KeepAlive(v2)
 
 	var _ok bool // out
 
@@ -324,17 +356,18 @@ func (v1 *URI) HostEqual(v2 *URI) bool {
 }
 
 // HostHash hashes key, considering only the scheme, host, and port.
-func (key *URI) HostHash() uint {
+func (key *URI) HostHash() uint32 {
 	var _arg0 C.gconstpointer // out
 	var _cret C.guint         // in
 
 	_arg0 = C.gconstpointer(gextras.StructNative(unsafe.Pointer(key)))
 
 	_cret = C.soup_uri_host_hash(_arg0)
+	runtime.KeepAlive(key)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -345,9 +378,14 @@ func (uri *URI) SetFragment(fragment string) {
 	var _arg1 *C.char    // out
 
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(fragment)))
+	if fragment != "" {
+		_arg1 = (*C.char)(unsafe.Pointer(C.CString(fragment)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
 
 	C.soup_uri_set_fragment(_arg0, _arg1)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(fragment)
 }
 
 // SetHost sets uri's host to host.
@@ -362,9 +400,14 @@ func (uri *URI) SetHost(host string) {
 	var _arg1 *C.char    // out
 
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(host)))
+	if host != "" {
+		_arg1 = (*C.char)(unsafe.Pointer(C.CString(host)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
 
 	C.soup_uri_set_host(_arg0, _arg1)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(host)
 }
 
 // SetPassword sets uri's password to password.
@@ -373,9 +416,14 @@ func (uri *URI) SetPassword(password string) {
 	var _arg1 *C.char    // out
 
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(password)))
+	if password != "" {
+		_arg1 = (*C.char)(unsafe.Pointer(C.CString(password)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
 
 	C.soup_uri_set_password(_arg0, _arg1)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(password)
 }
 
 // SetPath sets uri's path to path.
@@ -385,13 +433,16 @@ func (uri *URI) SetPath(path string) {
 
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.soup_uri_set_path(_arg0, _arg1)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(path)
 }
 
 // SetPort sets uri's port to port. If port is 0, uri will not have an
 // explicitly-specified port.
-func (uri *URI) SetPort(port uint) {
+func (uri *URI) SetPort(port uint32) {
 	var _arg0 *C.SoupURI // out
 	var _arg1 C.guint    // out
 
@@ -399,6 +450,8 @@ func (uri *URI) SetPort(port uint) {
 	_arg1 = C.guint(port)
 
 	C.soup_uri_set_port(_arg0, _arg1)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(port)
 }
 
 // SetQuery sets uri's query to query.
@@ -407,9 +460,38 @@ func (uri *URI) SetQuery(query string) {
 	var _arg1 *C.char    // out
 
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(query)))
+	if query != "" {
+		_arg1 = (*C.char)(unsafe.Pointer(C.CString(query)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
 
 	C.soup_uri_set_query(_arg0, _arg1)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(query)
+}
+
+// SetQueryFromForm sets uri's query to the result of encoding form according to
+// the HTML form rules. See soup_form_encode_hash() for more information.
+func (uri *URI) SetQueryFromForm(form map[string]string) {
+	var _arg0 *C.SoupURI    // out
+	var _arg1 *C.GHashTable // out
+
+	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
+	_arg1 = C.g_hash_table_new_full(nil, nil, (*[0]byte)(C.free), (*[0]byte)(C.free))
+	for ksrc, vsrc := range form {
+		var kdst *C.gchar // out
+		var vdst *C.gchar // out
+		kdst = (*C.gchar)(unsafe.Pointer(C.CString(ksrc)))
+		defer C.free(unsafe.Pointer(kdst))
+		vdst = (*C.gchar)(unsafe.Pointer(C.CString(vsrc)))
+		defer C.free(unsafe.Pointer(vdst))
+		C.g_hash_table_insert(_arg1, C.gpointer(unsafe.Pointer(kdst)), C.gpointer(unsafe.Pointer(vdst)))
+	}
+	defer C.g_hash_table_unref(_arg1)
+
+	C.soup_uri_set_query_from_form(_arg0, _arg1)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(form)
 }
 
 // SetScheme sets uri's scheme to scheme. This will also set uri's port to the
@@ -420,8 +502,11 @@ func (uri *URI) SetScheme(scheme string) {
 
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(scheme)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.soup_uri_set_scheme(_arg0, _arg1)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(scheme)
 }
 
 // SetUser sets uri's user to user.
@@ -430,9 +515,14 @@ func (uri *URI) SetUser(user string) {
 	var _arg1 *C.char    // out
 
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(user)))
+	if user != "" {
+		_arg1 = (*C.char)(unsafe.Pointer(C.CString(user)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
 
 	C.soup_uri_set_user(_arg0, _arg1)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(user)
 }
 
 // String returns a string representing uri.
@@ -453,6 +543,8 @@ func (uri *URI) String(justPathAndQuery bool) string {
 	}
 
 	_cret = C.soup_uri_to_string(_arg0, _arg1)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(justPathAndQuery)
 
 	var _utf8 string // out
 
@@ -472,6 +564,7 @@ func (uri *URI) UsesDefaultPort() bool {
 	_arg0 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	_cret = C.soup_uri_uses_default_port(_arg0)
+	runtime.KeepAlive(uri)
 
 	var _ok bool // out
 
@@ -492,8 +585,10 @@ func URIDecode(part string) string {
 	var _cret *C.char // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(part)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.soup_uri_decode(_arg1)
+	runtime.KeepAlive(part)
 
 	var _utf8 string // out
 
@@ -511,9 +606,15 @@ func URIEncode(part string, escapeExtra string) string {
 	var _cret *C.char // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(part)))
-	_arg2 = (*C.char)(unsafe.Pointer(C.CString(escapeExtra)))
+	defer C.free(unsafe.Pointer(_arg1))
+	if escapeExtra != "" {
+		_arg2 = (*C.char)(unsafe.Pointer(C.CString(escapeExtra)))
+		defer C.free(unsafe.Pointer(_arg2))
+	}
 
 	_cret = C.soup_uri_encode(_arg1, _arg2)
+	runtime.KeepAlive(part)
+	runtime.KeepAlive(escapeExtra)
 
 	var _utf8 string // out
 
@@ -544,9 +645,15 @@ func URINormalize(part string, unescapeExtra string) string {
 	var _cret *C.char // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(part)))
-	_arg2 = (*C.char)(unsafe.Pointer(C.CString(unescapeExtra)))
+	defer C.free(unsafe.Pointer(_arg1))
+	if unescapeExtra != "" {
+		_arg2 = (*C.char)(unsafe.Pointer(C.CString(unescapeExtra)))
+		defer C.free(unsafe.Pointer(_arg2))
+	}
 
 	_cret = C.soup_uri_normalize(_arg1, _arg2)
+	runtime.KeepAlive(part)
+	runtime.KeepAlive(unescapeExtra)
 
 	var _utf8 string // out
 

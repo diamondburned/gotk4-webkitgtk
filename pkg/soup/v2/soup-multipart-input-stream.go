@@ -11,8 +11,8 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -32,9 +32,8 @@ type MultipartInputStream struct {
 	gio.FilterInputStream
 
 	gio.PollableInputStream
+	*externglib.Object
 }
-
-var _ gextras.Nativer = (*MultipartInputStream)(nil)
 
 func wrapMultipartInputStream(obj *externglib.Object) *MultipartInputStream {
 	return &MultipartInputStream{
@@ -48,6 +47,7 @@ func wrapMultipartInputStream(obj *externglib.Object) *MultipartInputStream {
 				Object: obj,
 			},
 		},
+		Object: obj,
 	}
 }
 
@@ -67,21 +67,17 @@ func NewMultipartInputStream(msg *Message, baseStream gio.InputStreamer) *Multip
 	var _cret *C.SoupMultipartInputStream // in
 
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg2 = (*C.GInputStream)(unsafe.Pointer((baseStream).(gextras.Nativer).Native()))
+	_arg2 = (*C.GInputStream)(unsafe.Pointer(baseStream.Native()))
 
 	_cret = C.soup_multipart_input_stream_new(_arg1, _arg2)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(baseStream)
 
 	var _multipartInputStream *MultipartInputStream // out
 
 	_multipartInputStream = wrapMultipartInputStream(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _multipartInputStream
-}
-
-// Native implements gextras.Nativer. It returns the underlying GObject
-// field.
-func (v *MultipartInputStream) Native() uintptr {
-	return v.FilterInputStream.InputStream.Object.Native()
 }
 
 // Headers obtains the headers for the part currently being processed. Note that
@@ -99,10 +95,13 @@ func (multipart *MultipartInputStream) Headers() *MessageHeaders {
 	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(multipart.Native()))
 
 	_cret = C.soup_multipart_input_stream_get_headers(_arg0)
+	runtime.KeepAlive(multipart)
 
 	var _messageHeaders *MessageHeaders // out
 
-	_messageHeaders = (*MessageHeaders)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_messageHeaders = (*MessageHeaders)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+	}
 
 	return _messageHeaders
 }
@@ -130,19 +129,25 @@ func (multipart *MultipartInputStream) NextPart(ctx context.Context) (gio.InputS
 	}
 
 	_cret = C.soup_multipart_input_stream_next_part(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(multipart)
+	runtime.KeepAlive(ctx)
 
 	var _inputStream gio.InputStreamer // out
 	var _goerr error                   // out
 
-	_inputStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cret != nil {
+		_inputStream = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
+	}
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _inputStream, _goerr
 }
 
 // NextPartAsync obtains a Stream for the next request. See
 // soup_multipart_input_stream_next_part() for details on the workflow.
-func (multipart *MultipartInputStream) NextPartAsync(ctx context.Context, ioPriority int, callback gio.AsyncReadyCallback) {
+func (multipart *MultipartInputStream) NextPartAsync(ctx context.Context, ioPriority int32, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.SoupMultipartInputStream // out
 	var _arg2 *C.GCancellable             // out
 	var _arg1 C.int                       // out
@@ -156,10 +161,16 @@ func (multipart *MultipartInputStream) NextPartAsync(ctx context.Context, ioPrio
 		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
 	_arg1 = C.int(ioPriority)
-	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.soup_multipart_input_stream_next_part_async(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(multipart)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(ioPriority)
+	runtime.KeepAlive(callback)
 }
 
 // NextPartFinish finishes an asynchronous request for the next part.
@@ -170,15 +181,21 @@ func (multipart *MultipartInputStream) NextPartFinish(result gio.AsyncResulter) 
 	var _cerr *C.GError                   // in
 
 	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(multipart.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.soup_multipart_input_stream_next_part_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(multipart)
+	runtime.KeepAlive(result)
 
 	var _inputStream gio.InputStreamer // out
 	var _goerr error                   // out
 
-	_inputStream = (gextras.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cret != nil {
+		_inputStream = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
+	}
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _inputStream, _goerr
 }

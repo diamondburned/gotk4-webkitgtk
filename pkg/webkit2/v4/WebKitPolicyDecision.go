@@ -3,10 +3,10 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -25,10 +25,10 @@ type PolicyDecision struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*PolicyDecision)(nil)
-
 // PolicyDecisioner describes PolicyDecision's abstract methods.
 type PolicyDecisioner interface {
+	externglib.Objector
+
 	// Download: spawn a download from this decision.
 	Download()
 	// Ignore the action which triggered this decision.
@@ -62,6 +62,7 @@ func (decision *PolicyDecision) Download() {
 	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(decision.Native()))
 
 	C.webkit_policy_decision_download(_arg0)
+	runtime.KeepAlive(decision)
 }
 
 // Ignore the action which triggered this decision. For instance, for a
@@ -72,6 +73,7 @@ func (decision *PolicyDecision) Ignore() {
 	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(decision.Native()))
 
 	C.webkit_policy_decision_ignore(_arg0)
+	runtime.KeepAlive(decision)
 }
 
 // Use: accept the action which triggered this decision.
@@ -81,6 +83,7 @@ func (decision *PolicyDecision) Use() {
 	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(decision.Native()))
 
 	C.webkit_policy_decision_use(_arg0)
+	runtime.KeepAlive(decision)
 }
 
 // UseWithPolicies: accept the navigation action which triggered this decision,
@@ -98,4 +101,6 @@ func (decision *PolicyDecision) UseWithPolicies(policies *WebsitePolicies) {
 	_arg1 = (*C.WebKitWebsitePolicies)(unsafe.Pointer(policies.Native()))
 
 	C.webkit_policy_decision_use_with_policies(_arg0, _arg1)
+	runtime.KeepAlive(decision)
+	runtime.KeepAlive(policies)
 }

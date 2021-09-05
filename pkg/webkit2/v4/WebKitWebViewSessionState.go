@@ -7,7 +7,8 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -22,45 +23,63 @@ func init() {
 	})
 }
 
+// WebViewSessionState: instance of this type is always passed by reference.
 type WebViewSessionState struct {
-	nocopy gextras.NoCopy
+	*webViewSessionState
+}
+
+// webViewSessionState is the struct that's finalized.
+type webViewSessionState struct {
 	native *C.WebKitWebViewSessionState
 }
 
 func marshalWebViewSessionState(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &WebViewSessionState{native: (*C.WebKitWebViewSessionState)(unsafe.Pointer(b))}, nil
+	return &WebViewSessionState{&webViewSessionState{(*C.WebKitWebViewSessionState)(unsafe.Pointer(b))}}, nil
 }
 
-// Ref: atomically increments the reference count of state by one. This function
-// is MT-safe and may be called from any thread.
-func (state *WebViewSessionState) ref() *WebViewSessionState {
-	var _arg0 *C.WebKitWebViewSessionState // out
+// NewWebViewSessionState constructs a struct WebViewSessionState.
+func NewWebViewSessionState(data *glib.Bytes) *WebViewSessionState {
+	var _arg1 *C.GBytes                    // out
 	var _cret *C.WebKitWebViewSessionState // in
 
-	_arg0 = (*C.WebKitWebViewSessionState)(gextras.StructNative(unsafe.Pointer(state)))
+	_arg1 = (*C.GBytes)(gextras.StructNative(unsafe.Pointer(data)))
 
-	_cret = C.webkit_web_view_session_state_ref(_arg0)
+	_cret = C.webkit_web_view_session_state_new(_arg1)
+	runtime.KeepAlive(data)
 
 	var _webViewSessionState *WebViewSessionState // out
 
 	_webViewSessionState = (*WebViewSessionState)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_web_view_session_state_ref(_cret)
-	runtime.SetFinalizer(_webViewSessionState, func(v *WebViewSessionState) {
-		C.webkit_web_view_session_state_unref((*C.WebKitWebViewSessionState)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_webViewSessionState)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_web_view_session_state_unref((*C.WebKitWebViewSessionState)(intern.C))
+		},
+	)
 
 	return _webViewSessionState
 }
 
-// Unref: atomically decrements the reference count of state by one. If the
-// reference count drops to 0, all memory allocated by the
-// KitWebViewSessionState is released. This function is MT-safe and may be
-// called from any thread.
-func (state *WebViewSessionState) unref() {
+// Serialize serializes a KitWebViewSessionState.
+func (state *WebViewSessionState) Serialize() *glib.Bytes {
 	var _arg0 *C.WebKitWebViewSessionState // out
+	var _cret *C.GBytes                    // in
 
 	_arg0 = (*C.WebKitWebViewSessionState)(gextras.StructNative(unsafe.Pointer(state)))
 
-	C.webkit_web_view_session_state_unref(_arg0)
+	_cret = C.webkit_web_view_session_state_serialize(_arg0)
+	runtime.KeepAlive(state)
+
+	var _bytes *glib.Bytes // out
+
+	_bytes = (*glib.Bytes)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_bytes)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.g_bytes_unref((*C.GBytes)(intern.C))
+		},
+	)
+
+	return _bytes
 }

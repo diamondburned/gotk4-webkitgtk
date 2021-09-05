@@ -7,7 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -21,6 +21,8 @@ func init() {
 		{T: externglib.Type(C.soup_hsts_policy_get_type()), F: marshalHSTSPolicy},
 	})
 }
+
+const HSTS_POLICY_MAX_AGE_PAST = 0
 
 // HSTSPolicy: HTTP Strict Transport Security policy.
 //
@@ -37,14 +39,20 @@ func init() {
 //
 // If include_subdomains is TRUE, the Strict Transport Security policy must also
 // be enforced on subdomains of domain.
+//
+// An instance of this type is always passed by reference.
 type HSTSPolicy struct {
-	nocopy gextras.NoCopy
+	*hstsPolicy
+}
+
+// hstsPolicy is the struct that's finalized.
+type hstsPolicy struct {
 	native *C.SoupHSTSPolicy
 }
 
 func marshalHSTSPolicy(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &HSTSPolicy{native: (*C.SoupHSTSPolicy)(unsafe.Pointer(b))}, nil
+	return &HSTSPolicy{&hstsPolicy{(*C.SoupHSTSPolicy)(unsafe.Pointer(b))}}, nil
 }
 
 // NewHSTSPolicy constructs a struct HSTSPolicy.
@@ -55,19 +63,26 @@ func NewHSTSPolicy(domain string, maxAge uint32, includeSubdomains bool) *HSTSPo
 	var _cret *C.SoupHSTSPolicy // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(domain)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.ulong(maxAge)
 	if includeSubdomains {
 		_arg3 = C.TRUE
 	}
 
 	_cret = C.soup_hsts_policy_new(_arg1, _arg2, _arg3)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(maxAge)
+	runtime.KeepAlive(includeSubdomains)
 
 	var _hstsPolicy *HSTSPolicy // out
 
 	_hstsPolicy = (*HSTSPolicy)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_hstsPolicy, func(v *HSTSPolicy) {
-		C.soup_hsts_policy_free((*C.SoupHSTSPolicy)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_hstsPolicy)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_hsts_policy_free((*C.SoupHSTSPolicy)(intern.C))
+		},
+	)
 
 	return _hstsPolicy
 }
@@ -80,13 +95,19 @@ func NewHSTSPolicyFromResponse(msg *Message) *HSTSPolicy {
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
 
 	_cret = C.soup_hsts_policy_new_from_response(_arg1)
+	runtime.KeepAlive(msg)
 
 	var _hstsPolicy *HSTSPolicy // out
 
-	_hstsPolicy = (*HSTSPolicy)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_hstsPolicy, func(v *HSTSPolicy) {
-		C.soup_hsts_policy_free((*C.SoupHSTSPolicy)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	if _cret != nil {
+		_hstsPolicy = (*HSTSPolicy)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(_hstsPolicy)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.soup_hsts_policy_free((*C.SoupHSTSPolicy)(intern.C))
+			},
+		)
+	}
 
 	return _hstsPolicy
 }
@@ -100,6 +121,7 @@ func NewHSTSPolicyFull(domain string, maxAge uint32, expires *Date, includeSubdo
 	var _cret *C.SoupHSTSPolicy // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(domain)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.ulong(maxAge)
 	_arg3 = (*C.SoupDate)(gextras.StructNative(unsafe.Pointer(expires)))
 	if includeSubdomains {
@@ -107,13 +129,20 @@ func NewHSTSPolicyFull(domain string, maxAge uint32, expires *Date, includeSubdo
 	}
 
 	_cret = C.soup_hsts_policy_new_full(_arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(maxAge)
+	runtime.KeepAlive(expires)
+	runtime.KeepAlive(includeSubdomains)
 
 	var _hstsPolicy *HSTSPolicy // out
 
 	_hstsPolicy = (*HSTSPolicy)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_hstsPolicy, func(v *HSTSPolicy) {
-		C.soup_hsts_policy_free((*C.SoupHSTSPolicy)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_hstsPolicy)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_hsts_policy_free((*C.SoupHSTSPolicy)(intern.C))
+		},
+	)
 
 	return _hstsPolicy
 }
@@ -125,18 +154,24 @@ func NewHSTSPolicySessionPolicy(domain string, includeSubdomains bool) *HSTSPoli
 	var _cret *C.SoupHSTSPolicy // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(domain)))
+	defer C.free(unsafe.Pointer(_arg1))
 	if includeSubdomains {
 		_arg2 = C.TRUE
 	}
 
 	_cret = C.soup_hsts_policy_new_session_policy(_arg1, _arg2)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(includeSubdomains)
 
 	var _hstsPolicy *HSTSPolicy // out
 
 	_hstsPolicy = (*HSTSPolicy)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_hstsPolicy, func(v *HSTSPolicy) {
-		C.soup_hsts_policy_free((*C.SoupHSTSPolicy)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_hstsPolicy)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_hsts_policy_free((*C.SoupHSTSPolicy)(intern.C))
+		},
+	)
 
 	return _hstsPolicy
 }
@@ -172,13 +207,17 @@ func (policy *HSTSPolicy) Copy() *HSTSPolicy {
 	_arg0 = (*C.SoupHSTSPolicy)(gextras.StructNative(unsafe.Pointer(policy)))
 
 	_cret = C.soup_hsts_policy_copy(_arg0)
+	runtime.KeepAlive(policy)
 
 	var _hstsPolicy *HSTSPolicy // out
 
 	_hstsPolicy = (*HSTSPolicy)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_hstsPolicy, func(v *HSTSPolicy) {
-		C.soup_hsts_policy_free((*C.SoupHSTSPolicy)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_hstsPolicy)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_hsts_policy_free((*C.SoupHSTSPolicy)(intern.C))
+		},
+	)
 
 	return _hstsPolicy
 }
@@ -193,6 +232,8 @@ func (policy1 *HSTSPolicy) Equal(policy2 *HSTSPolicy) bool {
 	_arg1 = (*C.SoupHSTSPolicy)(gextras.StructNative(unsafe.Pointer(policy2)))
 
 	_cret = C.soup_hsts_policy_equal(_arg0, _arg1)
+	runtime.KeepAlive(policy1)
+	runtime.KeepAlive(policy2)
 
 	var _ok bool // out
 
@@ -203,15 +244,6 @@ func (policy1 *HSTSPolicy) Equal(policy2 *HSTSPolicy) bool {
 	return _ok
 }
 
-// Free frees policy.
-func (policy *HSTSPolicy) free() {
-	var _arg0 *C.SoupHSTSPolicy // out
-
-	_arg0 = (*C.SoupHSTSPolicy)(gextras.StructNative(unsafe.Pointer(policy)))
-
-	C.soup_hsts_policy_free(_arg0)
-}
-
 // Domain gets policy's domain.
 func (policy *HSTSPolicy) Domain() string {
 	var _arg0 *C.SoupHSTSPolicy // out
@@ -220,6 +252,7 @@ func (policy *HSTSPolicy) Domain() string {
 	_arg0 = (*C.SoupHSTSPolicy)(gextras.StructNative(unsafe.Pointer(policy)))
 
 	_cret = C.soup_hsts_policy_get_domain(_arg0)
+	runtime.KeepAlive(policy)
 
 	var _utf8 string // out
 
@@ -236,6 +269,7 @@ func (policy *HSTSPolicy) IncludesSubdomains() bool {
 	_arg0 = (*C.SoupHSTSPolicy)(gextras.StructNative(unsafe.Pointer(policy)))
 
 	_cret = C.soup_hsts_policy_includes_subdomains(_arg0)
+	runtime.KeepAlive(policy)
 
 	var _ok bool // out
 
@@ -254,6 +288,7 @@ func (policy *HSTSPolicy) IsExpired() bool {
 	_arg0 = (*C.SoupHSTSPolicy)(gextras.StructNative(unsafe.Pointer(policy)))
 
 	_cret = C.soup_hsts_policy_is_expired(_arg0)
+	runtime.KeepAlive(policy)
 
 	var _ok bool // out
 
@@ -273,6 +308,7 @@ func (policy *HSTSPolicy) IsSessionPolicy() bool {
 	_arg0 = (*C.SoupHSTSPolicy)(gextras.StructNative(unsafe.Pointer(policy)))
 
 	_cret = C.soup_hsts_policy_is_session_policy(_arg0)
+	runtime.KeepAlive(policy)
 
 	var _ok bool // out
 

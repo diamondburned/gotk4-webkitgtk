@@ -7,6 +7,21 @@ package javascriptcore
 // #include <jsc/jsc.h>
 import "C"
 
+// MAJOR_VERSION: like jsc_get_major_version(), but from the headers used at
+// application compile time, rather than from the library linked against at
+// application run time.
+const MAJOR_VERSION = 2
+
+// MICRO_VERSION: like jsc_get_micro_version(), but from the headers used at
+// application compile time, rather than from the library linked against at
+// application run time.
+const MICRO_VERSION = 1
+
+// MINOR_VERSION: like jsc_get_minor_version(), but from the headers used at
+// application compile time, rather than from the library linked against at
+// application run time.
+const MINOR_VERSION = 32
+
 // GetMajorVersion returns the major version number of the JavaScriptCore
 // library. (e.g. in JavaScriptCore version 1.8.3 this is 1.)
 //
@@ -14,14 +29,14 @@ import "C"
 // your code is running against. Contrast with the C_MAJOR_VERSION macro, which
 // represents the major version of the JavaScriptCore headers you have included
 // when compiling your code.
-func GetMajorVersion() uint {
+func GetMajorVersion() uint32 {
 	var _cret C.guint // in
 
 	_cret = C.jsc_get_major_version()
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -33,14 +48,14 @@ func GetMajorVersion() uint {
 // your code is running against. Contrast with the C_MICRO_VERSION macro, which
 // represents the micro version of the JavaScriptCore headers you have included
 // when compiling your code.
-func GetMicroVersion() uint {
+func GetMicroVersion() uint32 {
 	var _cret C.guint // in
 
 	_cret = C.jsc_get_micro_version()
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -52,14 +67,14 @@ func GetMicroVersion() uint {
 // your code is running against. Contrast with the C_MINOR_VERSION macro, which
 // represents the minor version of the JavaScriptCore headers you have included
 // when compiling your code.
-func GetMinorVersion() uint {
+func GetMinorVersion() uint32 {
 	var _cret C.guint // in
 
 	_cret = C.jsc_get_minor_version()
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }

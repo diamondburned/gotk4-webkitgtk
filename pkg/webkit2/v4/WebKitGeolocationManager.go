@@ -7,7 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -26,8 +26,6 @@ func init() {
 type GeolocationManager struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*GeolocationManager)(nil)
 
 func wrapGeolocationManager(obj *externglib.Object) *GeolocationManager {
 	return &GeolocationManager{
@@ -48,8 +46,11 @@ func (manager *GeolocationManager) Failed(errorMessage string) {
 
 	_arg0 = (*C.WebKitGeolocationManager)(unsafe.Pointer(manager.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(errorMessage)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_geolocation_manager_failed(_arg0, _arg1)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(errorMessage)
 }
 
 // EnableHighAccuracy: get whether high accuracy is enabled.
@@ -60,6 +61,7 @@ func (manager *GeolocationManager) EnableHighAccuracy() bool {
 	_arg0 = (*C.WebKitGeolocationManager)(unsafe.Pointer(manager.Native()))
 
 	_cret = C.webkit_geolocation_manager_get_enable_high_accuracy(_arg0)
+	runtime.KeepAlive(manager)
 
 	var _ok bool // out
 
@@ -79,18 +81,26 @@ func (manager *GeolocationManager) UpdatePosition(position *GeolocationPosition)
 	_arg1 = (*C.WebKitGeolocationPosition)(gextras.StructNative(unsafe.Pointer(position)))
 
 	C.webkit_geolocation_manager_update_position(_arg0, _arg1)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(position)
 }
 
 // GeolocationPosition is an opaque struct used to provide position updates to a
 // KitGeolocationManager using webkit_geolocation_manager_update_position().
+//
+// An instance of this type is always passed by reference.
 type GeolocationPosition struct {
-	nocopy gextras.NoCopy
+	*geolocationPosition
+}
+
+// geolocationPosition is the struct that's finalized.
+type geolocationPosition struct {
 	native *C.WebKitGeolocationPosition
 }
 
 func marshalGeolocationPosition(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &GeolocationPosition{native: (*C.WebKitGeolocationPosition)(unsafe.Pointer(b))}, nil
+	return &GeolocationPosition{&geolocationPosition{(*C.WebKitGeolocationPosition)(unsafe.Pointer(b))}}, nil
 }
 
 // NewGeolocationPosition constructs a struct GeolocationPosition.
@@ -105,13 +115,19 @@ func NewGeolocationPosition(latitude float64, longitude float64, accuracy float6
 	_arg3 = C.double(accuracy)
 
 	_cret = C.webkit_geolocation_position_new(_arg1, _arg2, _arg3)
+	runtime.KeepAlive(latitude)
+	runtime.KeepAlive(longitude)
+	runtime.KeepAlive(accuracy)
 
 	var _geolocationPosition *GeolocationPosition // out
 
 	_geolocationPosition = (*GeolocationPosition)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_geolocationPosition, func(v *GeolocationPosition) {
-		C.webkit_geolocation_position_free((*C.WebKitGeolocationPosition)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_geolocationPosition)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_geolocation_position_free((*C.WebKitGeolocationPosition)(intern.C))
+		},
+	)
 
 	return _geolocationPosition
 }
@@ -124,24 +140,19 @@ func (position *GeolocationPosition) Copy() *GeolocationPosition {
 	_arg0 = (*C.WebKitGeolocationPosition)(gextras.StructNative(unsafe.Pointer(position)))
 
 	_cret = C.webkit_geolocation_position_copy(_arg0)
+	runtime.KeepAlive(position)
 
 	var _geolocationPosition *GeolocationPosition // out
 
 	_geolocationPosition = (*GeolocationPosition)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_geolocationPosition, func(v *GeolocationPosition) {
-		C.webkit_geolocation_position_free((*C.WebKitGeolocationPosition)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_geolocationPosition)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_geolocation_position_free((*C.WebKitGeolocationPosition)(intern.C))
+		},
+	)
 
 	return _geolocationPosition
-}
-
-// Free: free the KitGeolocationPosition
-func (position *GeolocationPosition) free() {
-	var _arg0 *C.WebKitGeolocationPosition // out
-
-	_arg0 = (*C.WebKitGeolocationPosition)(gextras.StructNative(unsafe.Pointer(position)))
-
-	C.webkit_geolocation_position_free(_arg0)
 }
 
 // SetAltitude: set the position altitude
@@ -153,6 +164,8 @@ func (position *GeolocationPosition) SetAltitude(altitude float64) {
 	_arg1 = C.double(altitude)
 
 	C.webkit_geolocation_position_set_altitude(_arg0, _arg1)
+	runtime.KeepAlive(position)
+	runtime.KeepAlive(altitude)
 }
 
 // SetAltitudeAccuracy: set the accuracy of position altitude
@@ -164,6 +177,8 @@ func (position *GeolocationPosition) SetAltitudeAccuracy(altitudeAccuracy float6
 	_arg1 = C.double(altitudeAccuracy)
 
 	C.webkit_geolocation_position_set_altitude_accuracy(_arg0, _arg1)
+	runtime.KeepAlive(position)
+	runtime.KeepAlive(altitudeAccuracy)
 }
 
 // SetHeading: set the position heading, as a positive angle between the
@@ -176,6 +191,8 @@ func (position *GeolocationPosition) SetHeading(heading float64) {
 	_arg1 = C.double(heading)
 
 	C.webkit_geolocation_position_set_heading(_arg0, _arg1)
+	runtime.KeepAlive(position)
+	runtime.KeepAlive(heading)
 }
 
 // SetSpeed: set the position speed
@@ -187,6 +204,8 @@ func (position *GeolocationPosition) SetSpeed(speed float64) {
 	_arg1 = C.double(speed)
 
 	C.webkit_geolocation_position_set_speed(_arg0, _arg1)
+	runtime.KeepAlive(position)
+	runtime.KeepAlive(speed)
 }
 
 // SetTimestamp: set the position timestamp. By default it's the time when the
@@ -199,4 +218,6 @@ func (position *GeolocationPosition) SetTimestamp(timestamp uint64) {
 	_arg1 = C.guint64(timestamp)
 
 	C.webkit_geolocation_position_set_timestamp(_arg0, _arg1)
+	runtime.KeepAlive(position)
+	runtime.KeepAlive(timestamp)
 }

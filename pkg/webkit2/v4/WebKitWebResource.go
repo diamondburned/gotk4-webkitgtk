@@ -9,9 +9,9 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gcancel"
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/gerror"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -30,8 +30,6 @@ func init() {
 type WebResource struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*WebResource)(nil)
 
 func wrapWebResource(obj *externglib.Object) *WebResource {
 	return &WebResource{
@@ -61,10 +59,44 @@ func (resource *WebResource) Data(ctx context.Context, callback gio.AsyncReadyCa
 		defer runtime.KeepAlive(cancellable)
 		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
-	_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	if callback != nil {
+		_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_web_resource_get_data(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(resource)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(callback)
+}
+
+// DataFinish: finish an asynchronous operation started with
+// webkit_web_resource_get_data().
+func (resource *WebResource) DataFinish(result gio.AsyncResulter) ([]byte, error) {
+	var _arg0 *C.WebKitWebResource // out
+	var _arg1 *C.GAsyncResult      // out
+	var _cret *C.guchar            // in
+	var _arg2 C.gsize              // in
+	var _cerr *C.GError            // in
+
+	_arg0 = (*C.WebKitWebResource)(unsafe.Pointer(resource.Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+
+	_cret = C.webkit_web_resource_get_data_finish(_arg0, _arg1, &_arg2, &_cerr)
+	runtime.KeepAlive(resource)
+	runtime.KeepAlive(result)
+
+	var _guint8s []byte // out
+	var _goerr error    // out
+
+	defer C.free(unsafe.Pointer(_cret))
+	_guint8s = make([]byte, _arg2)
+	copy(_guint8s, unsafe.Slice((*byte)(unsafe.Pointer(_cret)), _arg2))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
+
+	return _guint8s, _goerr
 }
 
 // Response retrieves the KitURIResponse of the resource load operation. This
@@ -78,6 +110,7 @@ func (resource *WebResource) Response() *URIResponse {
 	_arg0 = (*C.WebKitWebResource)(unsafe.Pointer(resource.Native()))
 
 	_cret = C.webkit_web_resource_get_response(_arg0)
+	runtime.KeepAlive(resource)
 
 	var _uriResponse *URIResponse // out
 
@@ -109,6 +142,7 @@ func (resource *WebResource) URI() string {
 	_arg0 = (*C.WebKitWebResource)(unsafe.Pointer(resource.Native()))
 
 	_cret = C.webkit_web_resource_get_uri(_arg0)
+	runtime.KeepAlive(resource)
 
 	var _utf8 string // out
 

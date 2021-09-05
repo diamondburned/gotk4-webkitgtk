@@ -8,7 +8,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -63,14 +63,19 @@ func (s ScriptDialogType) String() string {
 	}
 }
 
+// ScriptDialog: instance of this type is always passed by reference.
 type ScriptDialog struct {
-	nocopy gextras.NoCopy
+	*scriptDialog
+}
+
+// scriptDialog is the struct that's finalized.
+type scriptDialog struct {
 	native *C.WebKitScriptDialog
 }
 
 func marshalScriptDialog(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &ScriptDialog{native: (*C.WebKitScriptDialog)(unsafe.Pointer(b))}, nil
+	return &ScriptDialog{&scriptDialog{(*C.WebKitScriptDialog)(unsafe.Pointer(b))}}, nil
 }
 
 // Close dialog. When handling a KitScriptDialog asynchronously
@@ -84,6 +89,7 @@ func (dialog *ScriptDialog) Close() {
 	_arg0 = (*C.WebKitScriptDialog)(gextras.StructNative(unsafe.Pointer(dialog)))
 
 	C.webkit_script_dialog_close(_arg0)
+	runtime.KeepAlive(dialog)
 }
 
 // ConfirmSetConfirmed: this method is used for WEBKIT_SCRIPT_DIALOG_CONFIRM and
@@ -103,6 +109,8 @@ func (dialog *ScriptDialog) ConfirmSetConfirmed(confirmed bool) {
 	}
 
 	C.webkit_script_dialog_confirm_set_confirmed(_arg0, _arg1)
+	runtime.KeepAlive(dialog)
+	runtime.KeepAlive(confirmed)
 }
 
 // DialogType: get the dialog type of a KitScriptDialog.
@@ -113,6 +121,7 @@ func (dialog *ScriptDialog) DialogType() ScriptDialogType {
 	_arg0 = (*C.WebKitScriptDialog)(gextras.StructNative(unsafe.Pointer(dialog)))
 
 	_cret = C.webkit_script_dialog_get_dialog_type(_arg0)
+	runtime.KeepAlive(dialog)
 
 	var _scriptDialogType ScriptDialogType // out
 
@@ -129,6 +138,7 @@ func (dialog *ScriptDialog) Message() string {
 	_arg0 = (*C.WebKitScriptDialog)(gextras.StructNative(unsafe.Pointer(dialog)))
 
 	_cret = C.webkit_script_dialog_get_message(_arg0)
+	runtime.KeepAlive(dialog)
 
 	var _utf8 string // out
 
@@ -147,6 +157,7 @@ func (dialog *ScriptDialog) PromptGetDefaultText() string {
 	_arg0 = (*C.WebKitScriptDialog)(gextras.StructNative(unsafe.Pointer(dialog)))
 
 	_cret = C.webkit_script_dialog_prompt_get_default_text(_arg0)
+	runtime.KeepAlive(dialog)
 
 	var _utf8 string // out
 
@@ -167,38 +178,9 @@ func (dialog *ScriptDialog) PromptSetText(text string) {
 
 	_arg0 = (*C.WebKitScriptDialog)(gextras.StructNative(unsafe.Pointer(dialog)))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(text)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_script_dialog_prompt_set_text(_arg0, _arg1)
-}
-
-// Ref: atomically increments the reference count of dialog by one. This
-// function is MT-safe and may be called from any thread.
-func (dialog *ScriptDialog) ref() *ScriptDialog {
-	var _arg0 *C.WebKitScriptDialog // out
-	var _cret *C.WebKitScriptDialog // in
-
-	_arg0 = (*C.WebKitScriptDialog)(gextras.StructNative(unsafe.Pointer(dialog)))
-
-	_cret = C.webkit_script_dialog_ref(_arg0)
-
-	var _scriptDialog *ScriptDialog // out
-
-	_scriptDialog = (*ScriptDialog)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.webkit_script_dialog_ref(_cret)
-	runtime.SetFinalizer(_scriptDialog, func(v *ScriptDialog) {
-		C.webkit_script_dialog_unref((*C.WebKitScriptDialog)(gextras.StructNative(unsafe.Pointer(v))))
-	})
-
-	return _scriptDialog
-}
-
-// Unref: atomically decrements the reference count of dialog by one. If the
-// reference count drops to 0, all memory allocated by the KitScriptdialog is
-// released. This function is MT-safe and may be called from any thread.
-func (dialog *ScriptDialog) unref() {
-	var _arg0 *C.WebKitScriptDialog // out
-
-	_arg0 = (*C.WebKitScriptDialog)(gextras.StructNative(unsafe.Pointer(dialog)))
-
-	C.webkit_script_dialog_unref(_arg0)
+	runtime.KeepAlive(dialog)
+	runtime.KeepAlive(text)
 }

@@ -3,10 +3,10 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -24,8 +24,6 @@ func init() {
 type SecurityManager struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*SecurityManager)(nil)
 
 func wrapSecurityManager(obj *externglib.Object) *SecurityManager {
 	return &SecurityManager{
@@ -48,8 +46,11 @@ func (securityManager *SecurityManager) RegisterURISchemeAsCorsEnabled(scheme st
 
 	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_security_manager_register_uri_scheme_as_cors_enabled(_arg0, _arg1)
+	runtime.KeepAlive(securityManager)
+	runtime.KeepAlive(scheme)
 }
 
 // RegisterURISchemeAsDisplayIsolated: register scheme as a display isolated
@@ -61,8 +62,11 @@ func (securityManager *SecurityManager) RegisterURISchemeAsDisplayIsolated(schem
 
 	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_security_manager_register_uri_scheme_as_display_isolated(_arg0, _arg1)
+	runtime.KeepAlive(securityManager)
+	runtime.KeepAlive(scheme)
 }
 
 // RegisterURISchemeAsEmptyDocument: register scheme as an empty document
@@ -73,8 +77,11 @@ func (securityManager *SecurityManager) RegisterURISchemeAsEmptyDocument(scheme 
 
 	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_security_manager_register_uri_scheme_as_empty_document(_arg0, _arg1)
+	runtime.KeepAlive(securityManager)
+	runtime.KeepAlive(scheme)
 }
 
 // RegisterURISchemeAsLocal: register scheme as a local scheme. This means that
@@ -85,8 +92,11 @@ func (securityManager *SecurityManager) RegisterURISchemeAsLocal(scheme string) 
 
 	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_security_manager_register_uri_scheme_as_local(_arg0, _arg1)
+	runtime.KeepAlive(securityManager)
+	runtime.KeepAlive(scheme)
 }
 
 // RegisterURISchemeAsNoAccess: register scheme as a no-access scheme. This
@@ -98,8 +108,11 @@ func (securityManager *SecurityManager) RegisterURISchemeAsNoAccess(scheme strin
 
 	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_security_manager_register_uri_scheme_as_no_access(_arg0, _arg1)
+	runtime.KeepAlive(securityManager)
+	runtime.KeepAlive(scheme)
 }
 
 // RegisterURISchemeAsSecure: register scheme as a secure scheme. This means
@@ -111,8 +124,11 @@ func (securityManager *SecurityManager) RegisterURISchemeAsSecure(scheme string)
 
 	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_security_manager_register_uri_scheme_as_secure(_arg0, _arg1)
+	runtime.KeepAlive(securityManager)
+	runtime.KeepAlive(scheme)
 }
 
 // URISchemeIsCorsEnabled: whether scheme is considered as a CORS enabled
@@ -125,8 +141,11 @@ func (securityManager *SecurityManager) URISchemeIsCorsEnabled(scheme string) bo
 
 	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.webkit_security_manager_uri_scheme_is_cors_enabled(_arg0, _arg1)
+	runtime.KeepAlive(securityManager)
+	runtime.KeepAlive(scheme)
 
 	var _ok bool // out
 
@@ -147,8 +166,11 @@ func (securityManager *SecurityManager) URISchemeIsDisplayIsolated(scheme string
 
 	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.webkit_security_manager_uri_scheme_is_display_isolated(_arg0, _arg1)
+	runtime.KeepAlive(securityManager)
+	runtime.KeepAlive(scheme)
 
 	var _ok bool // out
 
@@ -169,8 +191,11 @@ func (securityManager *SecurityManager) URISchemeIsEmptyDocument(scheme string) 
 
 	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.webkit_security_manager_uri_scheme_is_empty_document(_arg0, _arg1)
+	runtime.KeepAlive(securityManager)
+	runtime.KeepAlive(scheme)
 
 	var _ok bool // out
 
@@ -190,8 +215,11 @@ func (securityManager *SecurityManager) URISchemeIsLocal(scheme string) bool {
 
 	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.webkit_security_manager_uri_scheme_is_local(_arg0, _arg1)
+	runtime.KeepAlive(securityManager)
+	runtime.KeepAlive(scheme)
 
 	var _ok bool // out
 
@@ -211,8 +239,11 @@ func (securityManager *SecurityManager) URISchemeIsNoAccess(scheme string) bool 
 
 	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.webkit_security_manager_uri_scheme_is_no_access(_arg0, _arg1)
+	runtime.KeepAlive(securityManager)
+	runtime.KeepAlive(scheme)
 
 	var _ok bool // out
 
@@ -232,8 +263,11 @@ func (securityManager *SecurityManager) URISchemeIsSecure(scheme string) bool {
 
 	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.webkit_security_manager_uri_scheme_is_secure(_arg0, _arg1)
+	runtime.KeepAlive(securityManager)
+	runtime.KeepAlive(scheme)
 
 	var _ok bool // out
 

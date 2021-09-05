@@ -3,13 +3,14 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v3"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -27,8 +28,6 @@ func init() {
 type ContextMenuItem struct {
 	externglib.InitiallyUnowned
 }
-
-var _ gextras.Nativer = (*ContextMenuItem)(nil)
 
 func wrapContextMenuItem(obj *externglib.Object) *ContextMenuItem {
 	return &ContextMenuItem{
@@ -54,6 +53,7 @@ func NewContextMenuItem(action *gtk.Action) *ContextMenuItem {
 	_arg1 = (*C.GtkAction)(unsafe.Pointer(action.Native()))
 
 	_cret = C.webkit_context_menu_item_new(_arg1)
+	runtime.KeepAlive(action)
 
 	var _contextMenuItem *ContextMenuItem // out
 
@@ -71,11 +71,17 @@ func NewContextMenuItemFromGaction(action gio.Actioner, label string, target *gl
 	var _arg3 *C.GVariant              // out
 	var _cret *C.WebKitContextMenuItem // in
 
-	_arg1 = (*C.GAction)(unsafe.Pointer((action).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAction)(unsafe.Pointer(action.Native()))
 	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(label)))
-	_arg3 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(target)))
+	defer C.free(unsafe.Pointer(_arg2))
+	if target != nil {
+		_arg3 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(target)))
+	}
 
 	_cret = C.webkit_context_menu_item_new_from_gaction(_arg1, _arg2, _arg3)
+	runtime.KeepAlive(action)
+	runtime.KeepAlive(label)
+	runtime.KeepAlive(target)
 
 	var _contextMenuItem *ContextMenuItem // out
 
@@ -100,6 +106,7 @@ func NewContextMenuItemFromStockAction(action ContextMenuAction) *ContextMenuIte
 	_arg1 = C.WebKitContextMenuAction(action)
 
 	_cret = C.webkit_context_menu_item_new_from_stock_action(_arg1)
+	runtime.KeepAlive(action)
 
 	var _contextMenuItem *ContextMenuItem // out
 
@@ -119,8 +126,11 @@ func NewContextMenuItemFromStockActionWithLabel(action ContextMenuAction, label 
 
 	_arg1 = C.WebKitContextMenuAction(action)
 	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(label)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	_cret = C.webkit_context_menu_item_new_from_stock_action_with_label(_arg1, _arg2)
+	runtime.KeepAlive(action)
+	runtime.KeepAlive(label)
 
 	var _contextMenuItem *ContextMenuItem // out
 
@@ -151,9 +161,12 @@ func NewContextMenuItemWithSubmenu(label string, submenu *ContextMenu) *ContextM
 	var _cret *C.WebKitContextMenuItem // in
 
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(label)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.WebKitContextMenu)(unsafe.Pointer(submenu.Native()))
 
 	_cret = C.webkit_context_menu_item_new_with_submenu(_arg1, _arg2)
+	runtime.KeepAlive(label)
+	runtime.KeepAlive(submenu)
 
 	var _contextMenuItem *ContextMenuItem // out
 
@@ -172,6 +185,7 @@ func (item *ContextMenuItem) Action() *gtk.Action {
 	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
 
 	_cret = C.webkit_context_menu_item_get_action(_arg0)
+	runtime.KeepAlive(item)
 
 	var _action *gtk.Action // out
 
@@ -196,10 +210,11 @@ func (item *ContextMenuItem) Gaction() gio.Actioner {
 	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
 
 	_cret = C.webkit_context_menu_item_get_gaction(_arg0)
+	runtime.KeepAlive(item)
 
 	var _action gio.Actioner // out
 
-	_action = (gextras.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(gio.Actioner)
+	_action = (externglib.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(gio.Actioner)
 
 	return _action
 }
@@ -215,6 +230,7 @@ func (item *ContextMenuItem) StockAction() ContextMenuAction {
 	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
 
 	_cret = C.webkit_context_menu_item_get_stock_action(_arg0)
+	runtime.KeepAlive(item)
 
 	var _contextMenuAction ContextMenuAction // out
 
@@ -231,6 +247,7 @@ func (item *ContextMenuItem) Submenu() *ContextMenu {
 	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
 
 	_cret = C.webkit_context_menu_item_get_submenu(_arg0)
+	runtime.KeepAlive(item)
 
 	var _contextMenu *ContextMenu // out
 
@@ -247,6 +264,7 @@ func (item *ContextMenuItem) IsSeparator() bool {
 	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
 
 	_cret = C.webkit_context_menu_item_is_separator(_arg0)
+	runtime.KeepAlive(item)
 
 	var _ok bool // out
 
@@ -264,7 +282,11 @@ func (item *ContextMenuItem) SetSubmenu(submenu *ContextMenu) {
 	var _arg1 *C.WebKitContextMenu     // out
 
 	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
-	_arg1 = (*C.WebKitContextMenu)(unsafe.Pointer(submenu.Native()))
+	if submenu != nil {
+		_arg1 = (*C.WebKitContextMenu)(unsafe.Pointer(submenu.Native()))
+	}
 
 	C.webkit_context_menu_item_set_submenu(_arg0, _arg1)
+	runtime.KeepAlive(item)
+	runtime.KeepAlive(submenu)
 }

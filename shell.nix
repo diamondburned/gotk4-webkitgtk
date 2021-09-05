@@ -1,50 +1,20 @@
-{ systemPkgs ? import <nixpkgs> {} }:
+{}:
 
-# The declarations, where a pinned Nixpkgs Unstable is fetched. When updating,
-# only rev and sha256 should be changed.
-let unstable = import (systemPkgs.fetchFromGitHub {
-	owner  = "NixOS";
-	repo   = "nixpkgs";
-	rev    = "fbfb79400a08bf754e32b4d4fc3f7d8f8055cf94";
-	sha256 = "0pgyx1l1gj33g5i9kwjar7dc3sal2g14mhfljcajj8bqzzrbc3za";
-}) {
-	overlays = [
-		(self: super: {
-			go = super.go.overrideAttrs (old: {
-				version = "1.17beta1";
-				src = builtins.fetchurl {
-					url    = "https://golang.org/dl/go1.17rc1.linux-arm64.tar.gz";
-					sha256 = "sha256:0kps5kw9yymxawf57ps9xivqrkx2p60bpmkisahr8jl1rqkf963l";
-				};
-				doCheck = false;
-			});
-		})
-	];
-};
+let systemPkgs = import <nixpkgs> {};
 
-in unstable.mkShell {
-	buildInputs = with unstable; [
-		# gotk4
-		gobjectIntrospection
-		glib
-		graphene
-		gdk-pixbuf
-		gnome3.gtk
-		gtk4
-		vulkan-headers
+	gotk4 = systemPkgs.fetchFromGitHub {
+		owner = "diamondburned";
+		repo  = "gotk4";
+		rev   = "318362ceedaf5281a5afbb8c65888e958c328ef9";
+		hash  = "sha256:1f4sds78mnim36ymqsbqw07r6fi035ssj346krdnfqj75an4d5hz";
+	};
 
-		# webkitgtk
+	pkgs  = import "${gotk4}/.nix/pkgs.nix" {};
+	shell = import "${gotk4}/.nix/shell.nix" {};
+
+in shell.overrideAttrs (old: {
+	buildInputs = old.buildInputs ++ (with pkgs; [
 		gnome3.libsoup
 		gnome3.webkitgtk
-	];
-
-	nativeBuildInputs =	with unstable; [
-		pkgconfig
-		go
-	];
-
-	CGO_ENABLED = "1";
-
-	TMP    = "/tmp";
-	TMPDIR = "/tmp";
-}
+	]);
+})

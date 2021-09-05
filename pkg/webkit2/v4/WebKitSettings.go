@@ -4,10 +4,10 @@ package webkit2
 
 import (
 	"fmt"
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -61,8 +61,6 @@ type Settings struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*Settings)(nil)
-
 func wrapSettings(obj *externglib.Object) *Settings {
 	return &Settings{
 		Object: obj,
@@ -99,6 +97,7 @@ func (settings *Settings) AllowFileAccessFromFileUrls() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_allow_file_access_from_file_urls(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -117,6 +116,7 @@ func (settings *Settings) AllowModalDialogs() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_allow_modal_dialogs(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -136,6 +136,7 @@ func (settings *Settings) AllowTopNavigationToDataUrls() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_allow_top_navigation_to_data_urls(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -155,6 +156,7 @@ func (settings *Settings) AllowUniversalAccessFromFileUrls() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_allow_universal_access_from_file_urls(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -173,6 +175,7 @@ func (settings *Settings) AutoLoadImages() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_auto_load_images(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -191,6 +194,7 @@ func (settings *Settings) CursiveFontFamily() string {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_cursive_font_family(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _utf8 string // out
 
@@ -207,6 +211,7 @@ func (settings *Settings) DefaultCharset() string {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_default_charset(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _utf8 string // out
 
@@ -222,6 +227,7 @@ func (settings *Settings) DefaultFontFamily() string {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_default_font_family(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _utf8 string // out
 
@@ -238,6 +244,7 @@ func (settings *Settings) DefaultFontSize() uint32 {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_default_font_size(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _guint32 uint32 // out
 
@@ -255,6 +262,7 @@ func (settings *Settings) DefaultMonospaceFontSize() uint32 {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_default_monospace_font_size(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _guint32 uint32 // out
 
@@ -272,6 +280,7 @@ func (settings *Settings) DrawCompositingIndicators() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_draw_compositing_indicators(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -293,6 +302,7 @@ func (settings *Settings) EnableAccelerated2DCanvas() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_accelerated_2d_canvas(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -312,6 +322,7 @@ func (settings *Settings) EnableBackForwardNavigationGestures() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_back_forward_navigation_gestures(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -330,6 +341,7 @@ func (settings *Settings) EnableCaretBrowsing() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_caret_browsing(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -348,6 +360,7 @@ func (settings *Settings) EnableDeveloperExtras() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_developer_extras(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -366,6 +379,7 @@ func (settings *Settings) EnableDnsPrefetching() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_dns_prefetching(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -384,6 +398,7 @@ func (settings *Settings) EnableEncryptedMedia() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_encrypted_media(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -402,6 +417,7 @@ func (settings *Settings) EnableFrameFlattening() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_frame_flattening(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -420,6 +436,7 @@ func (settings *Settings) EnableFullscreen() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_fullscreen(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -438,6 +455,7 @@ func (settings *Settings) EnableHtml5Database() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_html5_database(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -457,6 +475,7 @@ func (settings *Settings) EnableHtml5LocalStorage() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_html5_local_storage(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -476,6 +495,7 @@ func (settings *Settings) EnableHyperlinkAuditing() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_hyperlink_auditing(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -494,6 +514,7 @@ func (settings *Settings) EnableJava() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_java(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -512,6 +533,7 @@ func (settings *Settings) EnableJavascript() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_javascript(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -531,6 +553,7 @@ func (settings *Settings) EnableJavascriptMarkup() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_javascript_markup(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -549,6 +572,7 @@ func (settings *Settings) EnableMedia() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_media(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -568,6 +592,7 @@ func (settings *Settings) EnableMediaCapabilities() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_media_capabilities(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -586,6 +611,7 @@ func (settings *Settings) EnableMediaStream() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_media_stream(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -604,6 +630,7 @@ func (settings *Settings) EnableMediasource() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_mediasource(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -623,6 +650,7 @@ func (settings *Settings) EnableMockCaptureDevices() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_mock_capture_devices(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -642,6 +670,7 @@ func (settings *Settings) EnableOfflineWebApplicationCache() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_offline_web_application_cache(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -660,6 +689,7 @@ func (settings *Settings) EnablePageCache() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_page_cache(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -680,6 +710,7 @@ func (settings *Settings) EnablePlugins() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_plugins(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -701,6 +732,7 @@ func (settings *Settings) EnablePrivateBrowsing() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_private_browsing(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -720,6 +752,7 @@ func (settings *Settings) EnableResizableTextAreas() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_resizable_text_areas(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -739,6 +772,7 @@ func (settings *Settings) EnableSiteSpecificQuirks() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_site_specific_quirks(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -757,6 +791,7 @@ func (settings *Settings) EnableSmoothScrolling() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_smooth_scrolling(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -776,6 +811,7 @@ func (settings *Settings) EnableSpatialNavigation() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_spatial_navigation(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -794,6 +830,7 @@ func (settings *Settings) EnableTabsToLinks() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_tabs_to_links(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -812,6 +849,7 @@ func (settings *Settings) EnableWebaudio() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_webaudio(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -830,6 +868,7 @@ func (settings *Settings) EnableWebgl() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_webgl(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -849,6 +888,7 @@ func (settings *Settings) EnableWriteConsoleMessagesToStdout() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_write_console_messages_to_stdout(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -867,6 +907,7 @@ func (settings *Settings) EnableXssAuditor() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_enable_xss_auditor(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -885,6 +926,7 @@ func (settings *Settings) FantasyFontFamily() string {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_fantasy_font_family(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _utf8 string // out
 
@@ -902,6 +944,7 @@ func (settings *Settings) HardwareAccelerationPolicy() HardwareAccelerationPolic
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_hardware_acceleration_policy(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _hardwareAccelerationPolicy HardwareAccelerationPolicy // out
 
@@ -919,6 +962,7 @@ func (settings *Settings) JavascriptCanAccessClipboard() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_javascript_can_access_clipboard(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -938,6 +982,7 @@ func (settings *Settings) JavascriptCanOpenWindowsAutomatically() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_javascript_can_open_windows_automatically(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -957,6 +1002,7 @@ func (settings *Settings) LoadIconsIgnoringImageLoadSetting() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_load_icons_ignoring_image_load_setting(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -976,6 +1022,7 @@ func (settings *Settings) MediaContentTypesRequiringHardwareSupport() string {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_media_content_types_requiring_hardware_support(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _utf8 string // out
 
@@ -993,6 +1040,7 @@ func (settings *Settings) MediaPlaybackAllowsInline() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_media_playback_allows_inline(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -1012,6 +1060,7 @@ func (settings *Settings) MediaPlaybackRequiresUserGesture() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_media_playback_requires_user_gesture(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -1030,6 +1079,7 @@ func (settings *Settings) MinimumFontSize() uint32 {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_minimum_font_size(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _guint32 uint32 // out
 
@@ -1046,6 +1096,7 @@ func (settings *Settings) MonospaceFontFamily() string {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_monospace_font_family(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _utf8 string // out
 
@@ -1062,6 +1113,7 @@ func (settings *Settings) PictographFontFamily() string {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_pictograph_font_family(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _utf8 string // out
 
@@ -1078,6 +1130,7 @@ func (settings *Settings) PrintBackgrounds() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_print_backgrounds(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -1096,6 +1149,7 @@ func (settings *Settings) SansSerifFontFamily() string {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_sans_serif_font_family(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _utf8 string // out
 
@@ -1112,6 +1166,7 @@ func (settings *Settings) SerifFontFamily() string {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_serif_font_family(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _utf8 string // out
 
@@ -1128,6 +1183,7 @@ func (settings *Settings) UserAgent() string {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_user_agent(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _utf8 string // out
 
@@ -1144,6 +1200,7 @@ func (settings *Settings) ZoomTextOnly() bool {
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 
 	_cret = C.webkit_settings_get_zoom_text_only(_arg0)
+	runtime.KeepAlive(settings)
 
 	var _ok bool // out
 
@@ -1166,6 +1223,8 @@ func (settings *Settings) SetAllowFileAccessFromFileUrls(allowed bool) {
 	}
 
 	C.webkit_settings_set_allow_file_access_from_file_urls(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(allowed)
 }
 
 // SetAllowModalDialogs: set the KitSettings:allow-modal-dialogs property.
@@ -1179,6 +1238,8 @@ func (settings *Settings) SetAllowModalDialogs(allowed bool) {
 	}
 
 	C.webkit_settings_set_allow_modal_dialogs(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(allowed)
 }
 
 // SetAllowTopNavigationToDataUrls: set the
@@ -1193,6 +1254,8 @@ func (settings *Settings) SetAllowTopNavigationToDataUrls(allowed bool) {
 	}
 
 	C.webkit_settings_set_allow_top_navigation_to_data_urls(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(allowed)
 }
 
 // SetAllowUniversalAccessFromFileUrls: set the
@@ -1207,6 +1270,8 @@ func (settings *Settings) SetAllowUniversalAccessFromFileUrls(allowed bool) {
 	}
 
 	C.webkit_settings_set_allow_universal_access_from_file_urls(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(allowed)
 }
 
 // SetAutoLoadImages: set the KitSettings:auto-load-images property.
@@ -1220,6 +1285,8 @@ func (settings *Settings) SetAutoLoadImages(enabled bool) {
 	}
 
 	C.webkit_settings_set_auto_load_images(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetCursiveFontFamily: set the KitSettings:cursive-font-family property.
@@ -1229,8 +1296,11 @@ func (settings *Settings) SetCursiveFontFamily(cursiveFontFamily string) {
 
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(cursiveFontFamily)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_settings_set_cursive_font_family(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(cursiveFontFamily)
 }
 
 // SetDefaultCharset: set the KitSettings:default-charset property.
@@ -1240,8 +1310,11 @@ func (settings *Settings) SetDefaultCharset(defaultCharset string) {
 
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(defaultCharset)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_settings_set_default_charset(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(defaultCharset)
 }
 
 // SetDefaultFontFamily: set the KitSettings:default-font-family property.
@@ -1251,8 +1324,11 @@ func (settings *Settings) SetDefaultFontFamily(defaultFontFamily string) {
 
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(defaultFontFamily)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_settings_set_default_font_family(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(defaultFontFamily)
 }
 
 // SetDefaultFontSize: set the KitSettings:default-font-size property.
@@ -1264,6 +1340,8 @@ func (settings *Settings) SetDefaultFontSize(fontSize uint32) {
 	_arg1 = C.guint32(fontSize)
 
 	C.webkit_settings_set_default_font_size(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(fontSize)
 }
 
 // SetDefaultMonospaceFontSize: set the KitSettings:default-monospace-font-size
@@ -1276,6 +1354,8 @@ func (settings *Settings) SetDefaultMonospaceFontSize(fontSize uint32) {
 	_arg1 = C.guint32(fontSize)
 
 	C.webkit_settings_set_default_monospace_font_size(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(fontSize)
 }
 
 // SetDrawCompositingIndicators: set the KitSettings:draw-compositing-indicators
@@ -1290,6 +1370,8 @@ func (settings *Settings) SetDrawCompositingIndicators(enabled bool) {
 	}
 
 	C.webkit_settings_set_draw_compositing_indicators(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableAccelerated2DCanvas: set the
@@ -1306,6 +1388,8 @@ func (settings *Settings) SetEnableAccelerated2DCanvas(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_accelerated_2d_canvas(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableBackForwardNavigationGestures: set the
@@ -1320,6 +1404,8 @@ func (settings *Settings) SetEnableBackForwardNavigationGestures(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_back_forward_navigation_gestures(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableCaretBrowsing: set the KitSettings:enable-caret-browsing property.
@@ -1333,6 +1419,8 @@ func (settings *Settings) SetEnableCaretBrowsing(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_caret_browsing(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableDeveloperExtras: set the KitSettings:enable-developer-extras
@@ -1347,6 +1435,8 @@ func (settings *Settings) SetEnableDeveloperExtras(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_developer_extras(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableDnsPrefetching: set the KitSettings:enable-dns-prefetching property.
@@ -1360,6 +1450,8 @@ func (settings *Settings) SetEnableDnsPrefetching(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_dns_prefetching(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableEncryptedMedia: set the KitSettings:enable-encrypted-media property.
@@ -1373,6 +1465,8 @@ func (settings *Settings) SetEnableEncryptedMedia(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_encrypted_media(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableFrameFlattening: set the KitSettings:enable-frame-flattening
@@ -1387,6 +1481,8 @@ func (settings *Settings) SetEnableFrameFlattening(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_frame_flattening(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableFullscreen: set the KitSettings:enable-fullscreen property.
@@ -1400,6 +1496,8 @@ func (settings *Settings) SetEnableFullscreen(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_fullscreen(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableHtml5Database: set the KitSettings:enable-html5-database property.
@@ -1413,6 +1511,8 @@ func (settings *Settings) SetEnableHtml5Database(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_html5_database(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableHtml5LocalStorage: set the KitSettings:enable-html5-local-storage
@@ -1427,6 +1527,8 @@ func (settings *Settings) SetEnableHtml5LocalStorage(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_html5_local_storage(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableHyperlinkAuditing: set the KitSettings:enable-hyperlink-auditing
@@ -1441,6 +1543,8 @@ func (settings *Settings) SetEnableHyperlinkAuditing(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_hyperlink_auditing(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableJava: set the KitSettings:enable-java property.
@@ -1454,6 +1558,8 @@ func (settings *Settings) SetEnableJava(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_java(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableJavascript: set the KitSettings:enable-javascript property.
@@ -1467,6 +1573,8 @@ func (settings *Settings) SetEnableJavascript(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_javascript(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableJavascriptMarkup: set the KitSettings:enable-javascript-markup
@@ -1481,6 +1589,8 @@ func (settings *Settings) SetEnableJavascriptMarkup(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_javascript_markup(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableMedia: set the KitSettings:enable-media property.
@@ -1494,6 +1604,8 @@ func (settings *Settings) SetEnableMedia(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_media(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableMediaCapabilities: set the KitSettings:enable-media-capabilities
@@ -1508,6 +1620,8 @@ func (settings *Settings) SetEnableMediaCapabilities(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_media_capabilities(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableMediaStream: set the KitSettings:enable-media-stream property.
@@ -1521,6 +1635,8 @@ func (settings *Settings) SetEnableMediaStream(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_media_stream(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableMediasource: set the KitSettings:enable-mediasource property.
@@ -1534,6 +1650,8 @@ func (settings *Settings) SetEnableMediasource(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_mediasource(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableMockCaptureDevices: set the KitSettings:enable-mock-capture-devices
@@ -1548,6 +1666,8 @@ func (settings *Settings) SetEnableMockCaptureDevices(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_mock_capture_devices(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableOfflineWebApplicationCache: set the
@@ -1562,6 +1682,8 @@ func (settings *Settings) SetEnableOfflineWebApplicationCache(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_offline_web_application_cache(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnablePageCache: set the KitSettings:enable-page-cache property.
@@ -1575,6 +1697,8 @@ func (settings *Settings) SetEnablePageCache(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_page_cache(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnablePlugins: set the KitSettings:enable-plugins property.
@@ -1590,6 +1714,8 @@ func (settings *Settings) SetEnablePlugins(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_plugins(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnablePrivateBrowsing: set the KitSettings:enable-private-browsing
@@ -1607,6 +1733,8 @@ func (settings *Settings) SetEnablePrivateBrowsing(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_private_browsing(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableResizableTextAreas: set the KitSettings:enable-resizable-text-areas
@@ -1621,6 +1749,8 @@ func (settings *Settings) SetEnableResizableTextAreas(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_resizable_text_areas(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableSiteSpecificQuirks: set the KitSettings:enable-site-specific-quirks
@@ -1635,6 +1765,8 @@ func (settings *Settings) SetEnableSiteSpecificQuirks(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_site_specific_quirks(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableSmoothScrolling: set the KitSettings:enable-smooth-scrolling
@@ -1649,6 +1781,8 @@ func (settings *Settings) SetEnableSmoothScrolling(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_smooth_scrolling(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableSpatialNavigation: set the KitSettings:enable-spatial-navigation
@@ -1663,6 +1797,8 @@ func (settings *Settings) SetEnableSpatialNavigation(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_spatial_navigation(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableTabsToLinks: set the KitSettings:enable-tabs-to-links property.
@@ -1676,6 +1812,8 @@ func (settings *Settings) SetEnableTabsToLinks(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_tabs_to_links(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableWebaudio: set the KitSettings:enable-webaudio property.
@@ -1689,6 +1827,8 @@ func (settings *Settings) SetEnableWebaudio(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_webaudio(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableWebgl: set the KitSettings:enable-webgl property.
@@ -1702,6 +1842,8 @@ func (settings *Settings) SetEnableWebgl(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_webgl(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableWriteConsoleMessagesToStdout: set the
@@ -1716,6 +1858,8 @@ func (settings *Settings) SetEnableWriteConsoleMessagesToStdout(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_write_console_messages_to_stdout(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetEnableXssAuditor: set the KitSettings:enable-xss-auditor property.
@@ -1729,6 +1873,8 @@ func (settings *Settings) SetEnableXssAuditor(enabled bool) {
 	}
 
 	C.webkit_settings_set_enable_xss_auditor(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetFantasyFontFamily: set the KitSettings:fantasy-font-family property.
@@ -1738,8 +1884,11 @@ func (settings *Settings) SetFantasyFontFamily(fantasyFontFamily string) {
 
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(fantasyFontFamily)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_settings_set_fantasy_font_family(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(fantasyFontFamily)
 }
 
 // SetHardwareAccelerationPolicy: set the
@@ -1752,6 +1901,8 @@ func (settings *Settings) SetHardwareAccelerationPolicy(policy HardwareAccelerat
 	_arg1 = C.WebKitHardwareAccelerationPolicy(policy)
 
 	C.webkit_settings_set_hardware_acceleration_policy(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(policy)
 }
 
 // SetJavascriptCanAccessClipboard: set the
@@ -1766,6 +1917,8 @@ func (settings *Settings) SetJavascriptCanAccessClipboard(enabled bool) {
 	}
 
 	C.webkit_settings_set_javascript_can_access_clipboard(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetJavascriptCanOpenWindowsAutomatically: set the
@@ -1780,6 +1933,8 @@ func (settings *Settings) SetJavascriptCanOpenWindowsAutomatically(enabled bool)
 	}
 
 	C.webkit_settings_set_javascript_can_open_windows_automatically(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetLoadIconsIgnoringImageLoadSetting: set the
@@ -1794,6 +1949,8 @@ func (settings *Settings) SetLoadIconsIgnoringImageLoadSetting(enabled bool) {
 	}
 
 	C.webkit_settings_set_load_icons_ignoring_image_load_setting(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetMediaContentTypesRequiringHardwareSupport: set the
@@ -1803,9 +1960,14 @@ func (settings *Settings) SetMediaContentTypesRequiringHardwareSupport(contentTy
 	var _arg1 *C.gchar          // out
 
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(contentTypes)))
+	if contentTypes != "" {
+		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(contentTypes)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
 
 	C.webkit_settings_set_media_content_types_requiring_hardware_support(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(contentTypes)
 }
 
 // SetMediaPlaybackAllowsInline: set the
@@ -1820,6 +1982,8 @@ func (settings *Settings) SetMediaPlaybackAllowsInline(enabled bool) {
 	}
 
 	C.webkit_settings_set_media_playback_allows_inline(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetMediaPlaybackRequiresUserGesture: set the
@@ -1834,6 +1998,8 @@ func (settings *Settings) SetMediaPlaybackRequiresUserGesture(enabled bool) {
 	}
 
 	C.webkit_settings_set_media_playback_requires_user_gesture(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
 }
 
 // SetMinimumFontSize: set the KitSettings:minimum-font-size property.
@@ -1845,6 +2011,8 @@ func (settings *Settings) SetMinimumFontSize(fontSize uint32) {
 	_arg1 = C.guint32(fontSize)
 
 	C.webkit_settings_set_minimum_font_size(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(fontSize)
 }
 
 // SetMonospaceFontFamily: set the KitSettings:monospace-font-family property.
@@ -1854,8 +2022,11 @@ func (settings *Settings) SetMonospaceFontFamily(monospaceFontFamily string) {
 
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(monospaceFontFamily)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_settings_set_monospace_font_family(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(monospaceFontFamily)
 }
 
 // SetPictographFontFamily: set the KitSettings:pictograph-font-family property.
@@ -1865,8 +2036,11 @@ func (settings *Settings) SetPictographFontFamily(pictographFontFamily string) {
 
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(pictographFontFamily)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_settings_set_pictograph_font_family(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(pictographFontFamily)
 }
 
 // SetPrintBackgrounds: set the KitSettings:print-backgrounds property.
@@ -1880,6 +2054,8 @@ func (settings *Settings) SetPrintBackgrounds(printBackgrounds bool) {
 	}
 
 	C.webkit_settings_set_print_backgrounds(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(printBackgrounds)
 }
 
 // SetSansSerifFontFamily: set the KitSettings:sans-serif-font-family property.
@@ -1889,8 +2065,11 @@ func (settings *Settings) SetSansSerifFontFamily(sansSerifFontFamily string) {
 
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(sansSerifFontFamily)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_settings_set_sans_serif_font_family(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(sansSerifFontFamily)
 }
 
 // SetSerifFontFamily: set the KitSettings:serif-font-family property.
@@ -1900,8 +2079,11 @@ func (settings *Settings) SetSerifFontFamily(serifFontFamily string) {
 
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(serifFontFamily)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_settings_set_serif_font_family(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(serifFontFamily)
 }
 
 // SetUserAgent: set the KitSettings:user-agent property.
@@ -1910,9 +2092,14 @@ func (settings *Settings) SetUserAgent(userAgent string) {
 	var _arg1 *C.gchar          // out
 
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(userAgent)))
+	if userAgent != "" {
+		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(userAgent)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
 
 	C.webkit_settings_set_user_agent(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(userAgent)
 }
 
 // SetUserAgentWithApplicationDetails: set the KitSettings:user-agent property
@@ -1926,10 +2113,19 @@ func (settings *Settings) SetUserAgentWithApplicationDetails(applicationName str
 	var _arg2 *C.gchar          // out
 
 	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(applicationName)))
-	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(applicationVersion)))
+	if applicationName != "" {
+		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(applicationName)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
+	if applicationVersion != "" {
+		_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(applicationVersion)))
+		defer C.free(unsafe.Pointer(_arg2))
+	}
 
 	C.webkit_settings_set_user_agent_with_application_details(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(applicationName)
+	runtime.KeepAlive(applicationVersion)
 }
 
 // SetZoomTextOnly: set the KitSettings:zoom-text-only property.
@@ -1943,6 +2139,8 @@ func (settings *Settings) SetZoomTextOnly(zoomTextOnly bool) {
 	}
 
 	C.webkit_settings_set_zoom_text_only(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(zoomTextOnly)
 }
 
 // SettingsFontSizeToPixels: convert points to the equivalent value in pixels,
@@ -1956,6 +2154,7 @@ func SettingsFontSizeToPixels(points uint32) uint32 {
 	_arg1 = C.guint32(points)
 
 	_cret = C.webkit_settings_font_size_to_pixels(_arg1)
+	runtime.KeepAlive(points)
 
 	var _guint32 uint32 // out
 
@@ -1975,6 +2174,7 @@ func SettingsFontSizeToPoints(pixels uint32) uint32 {
 	_arg1 = C.guint32(pixels)
 
 	_cret = C.webkit_settings_font_size_to_points(_arg1)
+	runtime.KeepAlive(pixels)
 
 	var _guint32 uint32 // out
 

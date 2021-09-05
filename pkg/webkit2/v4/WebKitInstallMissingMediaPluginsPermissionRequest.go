@@ -3,10 +3,10 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -26,8 +26,6 @@ type InstallMissingMediaPluginsPermissionRequest struct {
 
 	PermissionRequest
 }
-
-var _ gextras.Nativer = (*InstallMissingMediaPluginsPermissionRequest)(nil)
 
 func wrapInstallMissingMediaPluginsPermissionRequest(obj *externglib.Object) *InstallMissingMediaPluginsPermissionRequest {
 	return &InstallMissingMediaPluginsPermissionRequest{
@@ -53,6 +51,7 @@ func (request *InstallMissingMediaPluginsPermissionRequest) Description() string
 	_arg0 = (*C.WebKitInstallMissingMediaPluginsPermissionRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_install_missing_media_plugins_permission_request_get_description(_arg0)
+	runtime.KeepAlive(request)
 
 	var _utf8 string // out
 

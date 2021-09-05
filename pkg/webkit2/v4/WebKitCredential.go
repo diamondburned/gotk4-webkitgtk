@@ -8,7 +8,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -55,14 +55,19 @@ func (c CredentialPersistence) String() string {
 	}
 }
 
+// Credential: instance of this type is always passed by reference.
 type Credential struct {
-	nocopy gextras.NoCopy
+	*credential
+}
+
+// credential is the struct that's finalized.
+type credential struct {
 	native *C.WebKitCredential
 }
 
 func marshalCredential(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &Credential{native: (*C.WebKitCredential)(unsafe.Pointer(b))}, nil
+	return &Credential{&credential{(*C.WebKitCredential)(unsafe.Pointer(b))}}, nil
 }
 
 // NewCredential constructs a struct Credential.
@@ -73,17 +78,25 @@ func NewCredential(username string, password string, persistence CredentialPersi
 	var _cret *C.WebKitCredential           // in
 
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(username)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(password)))
+	defer C.free(unsafe.Pointer(_arg2))
 	_arg3 = C.WebKitCredentialPersistence(persistence)
 
 	_cret = C.webkit_credential_new(_arg1, _arg2, _arg3)
+	runtime.KeepAlive(username)
+	runtime.KeepAlive(password)
+	runtime.KeepAlive(persistence)
 
 	var _credential *Credential // out
 
 	_credential = (*Credential)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_credential, func(v *Credential) {
-		C.webkit_credential_free((*C.WebKitCredential)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_credential)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_credential_free((*C.WebKitCredential)(intern.C))
+		},
+	)
 
 	return _credential
 }
@@ -96,24 +109,19 @@ func (credential *Credential) Copy() *Credential {
 	_arg0 = (*C.WebKitCredential)(gextras.StructNative(unsafe.Pointer(credential)))
 
 	_cret = C.webkit_credential_copy(_arg0)
+	runtime.KeepAlive(credential)
 
 	var _ret *Credential // out
 
 	_ret = (*Credential)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_ret, func(v *Credential) {
-		C.webkit_credential_free((*C.WebKitCredential)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_ret)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_credential_free((*C.WebKitCredential)(intern.C))
+		},
+	)
 
 	return _ret
-}
-
-// Free: free the KitCredential.
-func (credential *Credential) free() {
-	var _arg0 *C.WebKitCredential // out
-
-	_arg0 = (*C.WebKitCredential)(gextras.StructNative(unsafe.Pointer(credential)))
-
-	C.webkit_credential_free(_arg0)
 }
 
 // Password: get the password currently held by this KitCredential.
@@ -124,6 +132,7 @@ func (credential *Credential) Password() string {
 	_arg0 = (*C.WebKitCredential)(gextras.StructNative(unsafe.Pointer(credential)))
 
 	_cret = C.webkit_credential_get_password(_arg0)
+	runtime.KeepAlive(credential)
 
 	var _utf8 string // out
 
@@ -140,6 +149,7 @@ func (credential *Credential) Persistence() CredentialPersistence {
 	_arg0 = (*C.WebKitCredential)(gextras.StructNative(unsafe.Pointer(credential)))
 
 	_cret = C.webkit_credential_get_persistence(_arg0)
+	runtime.KeepAlive(credential)
 
 	var _credentialPersistence CredentialPersistence // out
 
@@ -156,6 +166,7 @@ func (credential *Credential) Username() string {
 	_arg0 = (*C.WebKitCredential)(gextras.StructNative(unsafe.Pointer(credential)))
 
 	_cret = C.webkit_credential_get_username(_arg0)
+	runtime.KeepAlive(credential)
 
 	var _utf8 string // out
 
@@ -172,6 +183,7 @@ func (credential *Credential) HasPassword() bool {
 	_arg0 = (*C.WebKitCredential)(gextras.StructNative(unsafe.Pointer(credential)))
 
 	_cret = C.webkit_credential_has_password(_arg0)
+	runtime.KeepAlive(credential)
 
 	var _ok bool // out
 

@@ -3,11 +3,12 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4-webkitgtk/pkg/soup/v2"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -25,8 +26,6 @@ func init() {
 type URIRequest struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*URIRequest)(nil)
 
 func wrapURIRequest(obj *externglib.Object) *URIRequest {
 	return &URIRequest{
@@ -46,8 +45,10 @@ func NewURIRequest(uri string) *URIRequest {
 	var _cret *C.WebKitURIRequest // in
 
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(uri)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.webkit_uri_request_new(_arg1)
+	runtime.KeepAlive(uri)
 
 	var _uriRequest *URIRequest // out
 
@@ -64,6 +65,7 @@ func (request *URIRequest) HttpHeaders() *soup.MessageHeaders {
 	_arg0 = (*C.WebKitURIRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_uri_request_get_http_headers(_arg0)
+	runtime.KeepAlive(request)
 
 	var _messageHeaders *soup.MessageHeaders // out
 
@@ -80,6 +82,7 @@ func (request *URIRequest) HttpMethod() string {
 	_arg0 = (*C.WebKitURIRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_uri_request_get_http_method(_arg0)
+	runtime.KeepAlive(request)
 
 	var _utf8 string // out
 
@@ -95,6 +98,7 @@ func (request *URIRequest) URI() string {
 	_arg0 = (*C.WebKitURIRequest)(unsafe.Pointer(request.Native()))
 
 	_cret = C.webkit_uri_request_get_uri(_arg0)
+	runtime.KeepAlive(request)
 
 	var _utf8 string // out
 
@@ -110,6 +114,9 @@ func (request *URIRequest) SetURI(uri string) {
 
 	_arg0 = (*C.WebKitURIRequest)(unsafe.Pointer(request.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(uri)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.webkit_uri_request_set_uri(_arg0, _arg1)
+	runtime.KeepAlive(request)
+	runtime.KeepAlive(uri)
 }

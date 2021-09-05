@@ -3,10 +3,11 @@
 package soup
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -41,8 +42,6 @@ type HSTSEnforcer struct {
 	SessionFeature
 }
 
-var _ gextras.Nativer = (*HSTSEnforcer)(nil)
-
 func wrapHSTSEnforcer(obj *externglib.Object) *HSTSEnforcer {
 	return &HSTSEnforcer{
 		Object: obj,
@@ -73,7 +72,7 @@ func NewHSTSEnforcer() *HSTSEnforcer {
 }
 
 // Domains gets a list of domains for which there are policies in enforcer.
-func (hstsEnforcer *HSTSEnforcer) Domains(sessionPolicies bool) *externglib.List {
+func (hstsEnforcer *HSTSEnforcer) Domains(sessionPolicies bool) []string {
 	var _arg0 *C.SoupHSTSEnforcer // out
 	var _arg1 C.gboolean          // out
 	var _cret *C.GList            // in
@@ -84,19 +83,25 @@ func (hstsEnforcer *HSTSEnforcer) Domains(sessionPolicies bool) *externglib.List
 	}
 
 	_cret = C.soup_hsts_enforcer_get_domains(_arg0, _arg1)
+	runtime.KeepAlive(hstsEnforcer)
+	runtime.KeepAlive(sessionPolicies)
 
-	var _list *externglib.List // out
+	var _list []string // out
 
-	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
-	_list.AttachFinalizer(func(v uintptr) {
-		C.free(unsafe.Pointer(v))
+	_list = make([]string, 0, gextras.ListSize(unsafe.Pointer(_cret)))
+	gextras.MoveList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
+		src := (*C.gchar)(v)
+		var dst string // out
+		dst = C.GoString((*C.gchar)(unsafe.Pointer(src)))
+		defer C.free(unsafe.Pointer(src))
+		_list = append(_list, dst)
 	})
 
 	return _list
 }
 
 // Policies gets a list with the policies in enforcer.
-func (hstsEnforcer *HSTSEnforcer) Policies(sessionPolicies bool) *externglib.List {
+func (hstsEnforcer *HSTSEnforcer) Policies(sessionPolicies bool) []HSTSPolicy {
 	var _arg0 *C.SoupHSTSEnforcer // out
 	var _arg1 C.gboolean          // out
 	var _cret *C.GList            // in
@@ -107,18 +112,23 @@ func (hstsEnforcer *HSTSEnforcer) Policies(sessionPolicies bool) *externglib.Lis
 	}
 
 	_cret = C.soup_hsts_enforcer_get_policies(_arg0, _arg1)
+	runtime.KeepAlive(hstsEnforcer)
+	runtime.KeepAlive(sessionPolicies)
 
-	var _list *externglib.List // out
+	var _list []HSTSPolicy // out
 
-	_list = externglib.WrapList(uintptr(unsafe.Pointer(_cret)))
-	_list.DataWrapper(func(_p unsafe.Pointer) interface{} {
-		src := (*C.SoupHSTSPolicy)(_p)
+	_list = make([]HSTSPolicy, 0, gextras.ListSize(unsafe.Pointer(_cret)))
+	gextras.MoveList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
+		src := (*C.SoupHSTSPolicy)(v)
 		var dst HSTSPolicy // out
 		dst = *(*HSTSPolicy)(gextras.NewStructNative(unsafe.Pointer(src)))
-		return dst
-	})
-	_list.AttachFinalizer(func(v uintptr) {
-		C.soup_hsts_policy_free((*C.SoupHSTSPolicy)(unsafe.Pointer(v)))
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(&dst)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.soup_hsts_policy_free((*C.SoupHSTSPolicy)(intern.C))
+			},
+		)
+		_list = append(_list, dst)
 	})
 
 	return _list
@@ -133,8 +143,11 @@ func (hstsEnforcer *HSTSEnforcer) HasValidPolicy(domain string) bool {
 
 	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(hstsEnforcer.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(domain)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.soup_hsts_enforcer_has_valid_policy(_arg0, _arg1)
+	runtime.KeepAlive(hstsEnforcer)
+	runtime.KeepAlive(domain)
 
 	var _ok bool // out
 
@@ -153,6 +166,7 @@ func (hstsEnforcer *HSTSEnforcer) IsPersistent() bool {
 	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(hstsEnforcer.Native()))
 
 	_cret = C.soup_hsts_enforcer_is_persistent(_arg0)
+	runtime.KeepAlive(hstsEnforcer)
 
 	var _ok bool // out
 
@@ -177,6 +191,8 @@ func (hstsEnforcer *HSTSEnforcer) SetPolicy(policy *HSTSPolicy) {
 	_arg1 = (*C.SoupHSTSPolicy)(gextras.StructNative(unsafe.Pointer(policy)))
 
 	C.soup_hsts_enforcer_set_policy(_arg0, _arg1)
+	runtime.KeepAlive(hstsEnforcer)
+	runtime.KeepAlive(policy)
 }
 
 // SetSessionPolicy sets a session policy for domain. A session policy is a
@@ -189,9 +205,13 @@ func (hstsEnforcer *HSTSEnforcer) SetSessionPolicy(domain string, includeSubdoma
 
 	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(hstsEnforcer.Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(domain)))
+	defer C.free(unsafe.Pointer(_arg1))
 	if includeSubdomains {
 		_arg2 = C.TRUE
 	}
 
 	C.soup_hsts_enforcer_set_session_policy(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(hstsEnforcer)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(includeSubdomains)
 }

@@ -4,9 +4,10 @@ package soup
 
 import (
 	"fmt"
+	"runtime"
 	"unsafe"
 
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -64,9 +65,9 @@ const (
 	StatusSwitchingProtocols Status = 101
 	// StatusProcessing: 102 Processing (WebDAV)
 	StatusProcessing Status = 102
-	// StatusOk: 200 Success (HTTP). Also used by many lower-level soup routines
+	// StatusOK: 200 Success (HTTP). Also used by many lower-level soup routines
 	// to indicate success.
-	StatusOk Status = 200
+	StatusOK Status = 200
 	// StatusCreated: 201 Created (HTTP)
 	StatusCreated Status = 201
 	// StatusAccepted: 202 Accepted (HTTP)
@@ -205,8 +206,8 @@ func (s Status) String() string {
 		return "SwitchingProtocols"
 	case StatusProcessing:
 		return "Processing"
-	case StatusOk:
-		return "Ok"
+	case StatusOK:
+		return "OK"
 	case StatusCreated:
 		return "Created"
 	case StatusAccepted:
@@ -314,13 +315,14 @@ func (s Status) String() string {
 // so they should never be presented to the user directly. Instead, you should
 // create you own error messages based on the status code, and on what you were
 // trying to do.
-func StatusGetPhrase(statusCode uint) string {
+func StatusGetPhrase(statusCode uint32) string {
 	var _arg1 C.guint // out
 	var _cret *C.char // in
 
 	_arg1 = C.guint(statusCode)
 
 	_cret = C.soup_status_get_phrase(_arg1)
+	runtime.KeepAlive(statusCode)
 
 	var _utf8 string // out
 
@@ -333,17 +335,18 @@ func StatusGetPhrase(statusCode uint) string {
 // SOUP_STATUS_CANT_RESOLVE_PROXY and SOUP_STATUS_CANT_CONNECT into
 // SOUP_STATUS_CANT_CONNECT_PROXY. Other status codes are passed through
 // unchanged.
-func StatusProxify(statusCode uint) uint {
+func StatusProxify(statusCode uint32) uint32 {
 	var _arg1 C.guint // out
 	var _cret C.guint // in
 
 	_arg1 = C.guint(statusCode)
 
 	_cret = C.soup_status_proxify(_arg1)
+	runtime.KeepAlive(statusCode)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }

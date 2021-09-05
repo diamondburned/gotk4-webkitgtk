@@ -3,10 +3,10 @@
 package javascriptcore
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
@@ -24,8 +24,6 @@ func init() {
 type Exception struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*Exception)(nil)
 
 func wrapException(obj *externglib.Object) *Exception {
 	return &Exception{
@@ -47,8 +45,11 @@ func NewException(context *Context, message string) *Exception {
 
 	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(message)))
+	defer C.free(unsafe.Pointer(_arg2))
 
 	_cret = C.jsc_exception_new(_arg1, _arg2)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(message)
 
 	var _exception *Exception // out
 
@@ -67,9 +68,14 @@ func NewExceptionWithName(context *Context, name string, message string) *Except
 
 	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg2))
 	_arg3 = (*C.char)(unsafe.Pointer(C.CString(message)))
+	defer C.free(unsafe.Pointer(_arg3))
 
 	_cret = C.jsc_exception_new_with_name(_arg1, _arg2, _arg3)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(name)
+	runtime.KeepAlive(message)
 
 	var _exception *Exception // out
 
@@ -86,42 +92,47 @@ func (exception *Exception) BacktraceString() string {
 	_arg0 = (*C.JSCException)(unsafe.Pointer(exception.Native()))
 
 	_cret = C.jsc_exception_get_backtrace_string(_arg0)
+	runtime.KeepAlive(exception)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
 
 // ColumnNumber: get the column number at which exception happened.
-func (exception *Exception) ColumnNumber() uint {
+func (exception *Exception) ColumnNumber() uint32 {
 	var _arg0 *C.JSCException // out
 	var _cret C.guint         // in
 
 	_arg0 = (*C.JSCException)(unsafe.Pointer(exception.Native()))
 
 	_cret = C.jsc_exception_get_column_number(_arg0)
+	runtime.KeepAlive(exception)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
 
 // LineNumber: get the line number at which exception happened.
-func (exception *Exception) LineNumber() uint {
+func (exception *Exception) LineNumber() uint32 {
 	var _arg0 *C.JSCException // out
 	var _cret C.guint         // in
 
 	_arg0 = (*C.JSCException)(unsafe.Pointer(exception.Native()))
 
 	_cret = C.jsc_exception_get_line_number(_arg0)
+	runtime.KeepAlive(exception)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -134,6 +145,7 @@ func (exception *Exception) Message() string {
 	_arg0 = (*C.JSCException)(unsafe.Pointer(exception.Native()))
 
 	_cret = C.jsc_exception_get_message(_arg0)
+	runtime.KeepAlive(exception)
 
 	var _utf8 string // out
 
@@ -150,6 +162,7 @@ func (exception *Exception) Name() string {
 	_arg0 = (*C.JSCException)(unsafe.Pointer(exception.Native()))
 
 	_cret = C.jsc_exception_get_name(_arg0)
+	runtime.KeepAlive(exception)
 
 	var _utf8 string // out
 
@@ -166,10 +179,13 @@ func (exception *Exception) SourceURI() string {
 	_arg0 = (*C.JSCException)(unsafe.Pointer(exception.Native()))
 
 	_cret = C.jsc_exception_get_source_uri(_arg0)
+	runtime.KeepAlive(exception)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -184,6 +200,7 @@ func (exception *Exception) Report() string {
 	_arg0 = (*C.JSCException)(unsafe.Pointer(exception.Native()))
 
 	_cret = C.jsc_exception_report(_arg0)
+	runtime.KeepAlive(exception)
 
 	var _utf8 string // out
 
@@ -201,6 +218,7 @@ func (exception *Exception) String() string {
 	_arg0 = (*C.JSCException)(unsafe.Pointer(exception.Native()))
 
 	_cret = C.jsc_exception_to_string(_arg0)
+	runtime.KeepAlive(exception)
 
 	var _utf8 string // out
 

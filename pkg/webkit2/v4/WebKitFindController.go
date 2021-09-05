@@ -4,11 +4,11 @@ package webkit2
 
 import (
 	"fmt"
+	"runtime"
 	"strings"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -46,7 +46,7 @@ const (
 )
 
 func marshalFindOptions(p uintptr) (interface{}, error) {
-	return FindOptions(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return FindOptions(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
 }
 
 // String returns the names in string for FindOptions.
@@ -85,11 +85,14 @@ func (f FindOptions) String() string {
 	return strings.TrimSuffix(builder.String(), "|")
 }
 
+// Has returns true if f contains other.
+func (f FindOptions) Has(other FindOptions) bool {
+	return (f & other) == other
+}
+
 type FindController struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*FindController)(nil)
 
 func wrapFindController(obj *externglib.Object) *FindController {
 	return &FindController{
@@ -106,7 +109,7 @@ func marshalFindControllerer(p uintptr) (interface{}, error) {
 // CountMatches counts the number of matches for search_text found in the
 // KitWebView with the provided find_options. The number of matches will be
 // provided by the KitFindController::counted-matches signal.
-func (findController *FindController) CountMatches(searchText string, findOptions uint32, maxMatchCount uint) {
+func (findController *FindController) CountMatches(searchText string, findOptions uint32, maxMatchCount uint32) {
 	var _arg0 *C.WebKitFindController // out
 	var _arg1 *C.gchar                // out
 	var _arg2 C.guint32               // out
@@ -114,26 +117,32 @@ func (findController *FindController) CountMatches(searchText string, findOption
 
 	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(findController.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(searchText)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.guint32(findOptions)
 	_arg3 = C.guint(maxMatchCount)
 
 	C.webkit_find_controller_count_matches(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(findController)
+	runtime.KeepAlive(searchText)
+	runtime.KeepAlive(findOptions)
+	runtime.KeepAlive(maxMatchCount)
 }
 
 // MaxMatchCount gets the maximum number of matches to report during a text
 // lookup. This number is passed as the last argument of
 // webkit_find_controller_search() or webkit_find_controller_count_matches().
-func (findController *FindController) MaxMatchCount() uint {
+func (findController *FindController) MaxMatchCount() uint32 {
 	var _arg0 *C.WebKitFindController // out
 	var _cret C.guint                 // in
 
 	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(findController.Native()))
 
 	_cret = C.webkit_find_controller_get_max_match_count(_arg0)
+	runtime.KeepAlive(findController)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -147,6 +156,7 @@ func (findController *FindController) Options() uint32 {
 	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(findController.Native()))
 
 	_cret = C.webkit_find_controller_get_options(_arg0)
+	runtime.KeepAlive(findController)
 
 	var _guint32 uint32 // out
 
@@ -165,6 +175,7 @@ func (findController *FindController) SearchText() string {
 	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(findController.Native()))
 
 	_cret = C.webkit_find_controller_get_search_text(_arg0)
+	runtime.KeepAlive(findController)
 
 	var _utf8 string // out
 
@@ -182,6 +193,7 @@ func (findController *FindController) WebView() *WebView {
 	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(findController.Native()))
 
 	_cret = C.webkit_find_controller_get_web_view(_arg0)
+	runtime.KeepAlive(findController)
 
 	var _webView *WebView // out
 
@@ -208,7 +220,7 @@ func (findController *FindController) WebView() *WebView {
 //
 // Callers should call webkit_find_controller_search_finish() to finish the
 // current search operation.
-func (findController *FindController) Search(searchText string, findOptions uint32, maxMatchCount uint) {
+func (findController *FindController) Search(searchText string, findOptions uint32, maxMatchCount uint32) {
 	var _arg0 *C.WebKitFindController // out
 	var _arg1 *C.gchar                // out
 	var _arg2 C.guint32               // out
@@ -216,10 +228,15 @@ func (findController *FindController) Search(searchText string, findOptions uint
 
 	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(findController.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(searchText)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.guint32(findOptions)
 	_arg3 = C.guint(maxMatchCount)
 
 	C.webkit_find_controller_search(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(findController)
+	runtime.KeepAlive(searchText)
+	runtime.KeepAlive(findOptions)
+	runtime.KeepAlive(maxMatchCount)
 }
 
 // SearchFinish finishes a find operation started by
@@ -234,6 +251,7 @@ func (findController *FindController) SearchFinish() {
 	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(findController.Native()))
 
 	C.webkit_find_controller_search_finish(_arg0)
+	runtime.KeepAlive(findController)
 }
 
 // SearchNext looks for the next occurrence of the search text.
@@ -246,6 +264,7 @@ func (findController *FindController) SearchNext() {
 	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(findController.Native()))
 
 	C.webkit_find_controller_search_next(_arg0)
+	runtime.KeepAlive(findController)
 }
 
 // SearchPrevious looks for the previous occurrence of the search text.
@@ -258,4 +277,5 @@ func (findController *FindController) SearchPrevious() {
 	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(findController.Native()))
 
 	C.webkit_find_controller_search_previous(_arg0)
+	runtime.KeepAlive(findController)
 }

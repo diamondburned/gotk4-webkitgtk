@@ -7,7 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -20,6 +20,154 @@ func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
 		{T: externglib.Type(C.soup_cookie_get_type()), F: marshalCookie},
 	})
+}
+
+// COOKIE_MAX_AGE_ONE_DAY: constant corresponding to 1 day, for use with
+// soup_cookie_new() and soup_cookie_set_max_age().
+const COOKIE_MAX_AGE_ONE_DAY = 0
+
+// COOKIE_MAX_AGE_ONE_HOUR: constant corresponding to 1 hour, for use with
+// soup_cookie_new() and soup_cookie_set_max_age().
+const COOKIE_MAX_AGE_ONE_HOUR = 3600
+
+// COOKIE_MAX_AGE_ONE_WEEK: constant corresponding to 1 week, for use with
+// soup_cookie_new() and soup_cookie_set_max_age().
+const COOKIE_MAX_AGE_ONE_WEEK = 0
+
+// COOKIE_MAX_AGE_ONE_YEAR: constant corresponding to 1 year, for use with
+// soup_cookie_new() and soup_cookie_set_max_age().
+const COOKIE_MAX_AGE_ONE_YEAR = 0
+
+// CookiesFromRequest parses msg's Cookie request header and returns a List of
+// Cookie<!-- -->s. As the "Cookie" header, unlike "Set-Cookie", only contains
+// cookie names and values, none of the other Cookie fields will be filled in.
+// (Thus, you can't generally pass a cookie returned from this method directly
+// to soup_cookies_to_response().)
+func CookiesFromRequest(msg *Message) []Cookie {
+	var _arg1 *C.SoupMessage // out
+	var _cret *C.GSList      // in
+
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	_cret = C.soup_cookies_from_request(_arg1)
+	runtime.KeepAlive(msg)
+
+	var _sList []Cookie // out
+
+	_sList = make([]Cookie, 0, gextras.SListSize(unsafe.Pointer(_cret)))
+	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
+		src := (*C.SoupCookie)(v)
+		var dst Cookie // out
+		dst = *(*Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(&dst)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.soup_cookie_free((*C.SoupCookie)(intern.C))
+			},
+		)
+		_sList = append(_sList, dst)
+	})
+
+	return _sList
+}
+
+// CookiesFromResponse parses msg's Set-Cookie response headers and returns a
+// List of Cookie<!-- -->s. Cookies that do not specify "path" or "domain"
+// attributes will have their values defaulted from msg.
+func CookiesFromResponse(msg *Message) []Cookie {
+	var _arg1 *C.SoupMessage // out
+	var _cret *C.GSList      // in
+
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	_cret = C.soup_cookies_from_response(_arg1)
+	runtime.KeepAlive(msg)
+
+	var _sList []Cookie // out
+
+	_sList = make([]Cookie, 0, gextras.SListSize(unsafe.Pointer(_cret)))
+	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
+		src := (*C.SoupCookie)(v)
+		var dst Cookie // out
+		dst = *(*Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(&dst)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.soup_cookie_free((*C.SoupCookie)(intern.C))
+			},
+		)
+		_sList = append(_sList, dst)
+	})
+
+	return _sList
+}
+
+// CookiesToCookieHeader serializes a List of Cookie into a string suitable for
+// setting as the value of the "Cookie" header.
+func CookiesToCookieHeader(cookies []Cookie) string {
+	var _arg1 *C.GSList // out
+	var _cret *C.char   // in
+
+	for i := len(cookies) - 1; i >= 0; i-- {
+		src := cookies[i]
+		var dst *C.SoupCookie // out
+		dst = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer((&src))))
+		_arg1 = C.g_slist_prepend(_arg1, C.gpointer(unsafe.Pointer(dst)))
+	}
+	defer C.g_slist_free(_arg1)
+
+	_cret = C.soup_cookies_to_cookie_header(_arg1)
+	runtime.KeepAlive(cookies)
+
+	var _utf8 string // out
+
+	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	defer C.free(unsafe.Pointer(_cret))
+
+	return _utf8
+}
+
+// CookiesToRequest adds the name and value of each cookie in cookies to msg's
+// "Cookie" request. (If msg already has a "Cookie" request header, these
+// cookies will be appended to the cookies already present. Be careful that you
+// do not append the same cookies twice, eg, when requeuing a message.)
+func CookiesToRequest(cookies []Cookie, msg *Message) {
+	var _arg1 *C.GSList      // out
+	var _arg2 *C.SoupMessage // out
+
+	for i := len(cookies) - 1; i >= 0; i-- {
+		src := cookies[i]
+		var dst *C.SoupCookie // out
+		dst = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer((&src))))
+		_arg1 = C.g_slist_prepend(_arg1, C.gpointer(unsafe.Pointer(dst)))
+	}
+	defer C.g_slist_free(_arg1)
+	_arg2 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	C.soup_cookies_to_request(_arg1, _arg2)
+	runtime.KeepAlive(cookies)
+	runtime.KeepAlive(msg)
+}
+
+// CookiesToResponse appends a "Set-Cookie" response header to msg for each
+// cookie in cookies. (This is in addition to any other "Set-Cookie" headers msg
+// may already have.)
+func CookiesToResponse(cookies []Cookie, msg *Message) {
+	var _arg1 *C.GSList      // out
+	var _arg2 *C.SoupMessage // out
+
+	for i := len(cookies) - 1; i >= 0; i-- {
+		src := cookies[i]
+		var dst *C.SoupCookie // out
+		dst = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer((&src))))
+		_arg1 = C.g_slist_prepend(_arg1, C.gpointer(unsafe.Pointer(dst)))
+	}
+	defer C.g_slist_free(_arg1)
+	_arg2 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	C.soup_cookies_to_response(_arg1, _arg2)
+	runtime.KeepAlive(cookies)
+	runtime.KeepAlive(msg)
 }
 
 // Cookie: HTTP cookie.
@@ -40,18 +188,24 @@ func init() {
 // If http_only is set, the cookie should not be exposed to untrusted code (eg,
 // javascript), so as to minimize the danger posed by cross-site scripting
 // attacks.
+//
+// An instance of this type is always passed by reference.
 type Cookie struct {
-	nocopy gextras.NoCopy
+	*cookie
+}
+
+// cookie is the struct that's finalized.
+type cookie struct {
 	native *C.SoupCookie
 }
 
 func marshalCookie(p uintptr) (interface{}, error) {
 	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &Cookie{native: (*C.SoupCookie)(unsafe.Pointer(b))}, nil
+	return &Cookie{&cookie{(*C.SoupCookie)(unsafe.Pointer(b))}}, nil
 }
 
 // NewCookie constructs a struct Cookie.
-func NewCookie(name string, value string, domain string, path string, maxAge int) *Cookie {
+func NewCookie(name string, value string, domain string, path string, maxAge int32) *Cookie {
 	var _arg1 *C.char       // out
 	var _arg2 *C.char       // out
 	var _arg3 *C.char       // out
@@ -60,19 +214,31 @@ func NewCookie(name string, value string, domain string, path string, maxAge int
 	var _cret *C.SoupCookie // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(value)))
+	defer C.free(unsafe.Pointer(_arg2))
 	_arg3 = (*C.char)(unsafe.Pointer(C.CString(domain)))
+	defer C.free(unsafe.Pointer(_arg3))
 	_arg4 = (*C.char)(unsafe.Pointer(C.CString(path)))
+	defer C.free(unsafe.Pointer(_arg4))
 	_arg5 = C.int(maxAge)
 
 	_cret = C.soup_cookie_new(_arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(name)
+	runtime.KeepAlive(value)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(path)
+	runtime.KeepAlive(maxAge)
 
 	var _cookie *Cookie // out
 
 	_cookie = (*Cookie)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_cookie, func(v *Cookie) {
-		C.soup_cookie_free((*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_cookie)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_cookie_free((*C.SoupCookie)(intern.C))
+		},
+	)
 
 	return _cookie
 }
@@ -91,6 +257,8 @@ func (cookie *Cookie) AppliesToURI(uri *URI) bool {
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	_cret = C.soup_cookie_applies_to_uri(_arg0, _arg1)
+	runtime.KeepAlive(cookie)
+	runtime.KeepAlive(uri)
 
 	var _ok bool // out
 
@@ -109,13 +277,17 @@ func (cookie *Cookie) Copy() *Cookie {
 	_arg0 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 
 	_cret = C.soup_cookie_copy(_arg0)
+	runtime.KeepAlive(cookie)
 
 	var _ret *Cookie // out
 
 	_ret = (*Cookie)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_ret, func(v *Cookie) {
-		C.soup_cookie_free((*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_ret)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_cookie_free((*C.SoupCookie)(intern.C))
+		},
+	)
 
 	return _ret
 }
@@ -130,8 +302,11 @@ func (cookie *Cookie) DomainMatches(host string) bool {
 
 	_arg0 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(host)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.soup_cookie_domain_matches(_arg0, _arg1)
+	runtime.KeepAlive(cookie)
+	runtime.KeepAlive(host)
 
 	var _ok bool // out
 
@@ -155,6 +330,8 @@ func (cookie1 *Cookie) Equal(cookie2 *Cookie) bool {
 	_arg1 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie2)))
 
 	_cret = C.soup_cookie_equal(_arg0, _arg1)
+	runtime.KeepAlive(cookie1)
+	runtime.KeepAlive(cookie2)
 
 	var _ok bool // out
 
@@ -165,15 +342,6 @@ func (cookie1 *Cookie) Equal(cookie2 *Cookie) bool {
 	return _ok
 }
 
-// Free frees cookie
-func (cookie *Cookie) free() {
-	var _arg0 *C.SoupCookie // out
-
-	_arg0 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
-
-	C.soup_cookie_free(_arg0)
-}
-
 // Domain gets cookie's domain
 func (cookie *Cookie) Domain() string {
 	var _arg0 *C.SoupCookie // out
@@ -182,6 +350,7 @@ func (cookie *Cookie) Domain() string {
 	_arg0 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 
 	_cret = C.soup_cookie_get_domain(_arg0)
+	runtime.KeepAlive(cookie)
 
 	var _utf8 string // out
 
@@ -198,10 +367,13 @@ func (cookie *Cookie) Expires() *Date {
 	_arg0 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 
 	_cret = C.soup_cookie_get_expires(_arg0)
+	runtime.KeepAlive(cookie)
 
 	var _date *Date // out
 
-	_date = (*Date)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_date = (*Date)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+	}
 
 	return _date
 }
@@ -214,6 +386,7 @@ func (cookie *Cookie) HttpOnly() bool {
 	_arg0 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 
 	_cret = C.soup_cookie_get_http_only(_arg0)
+	runtime.KeepAlive(cookie)
 
 	var _ok bool // out
 
@@ -232,6 +405,7 @@ func (cookie *Cookie) Name() string {
 	_arg0 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 
 	_cret = C.soup_cookie_get_name(_arg0)
+	runtime.KeepAlive(cookie)
 
 	var _utf8 string // out
 
@@ -248,6 +422,7 @@ func (cookie *Cookie) Path() string {
 	_arg0 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 
 	_cret = C.soup_cookie_get_path(_arg0)
+	runtime.KeepAlive(cookie)
 
 	var _utf8 string // out
 
@@ -263,6 +438,7 @@ func (cookie *Cookie) SameSitePolicy() SameSitePolicy {
 	_arg0 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 
 	_cret = C.soup_cookie_get_same_site_policy(_arg0)
+	runtime.KeepAlive(cookie)
 
 	var _sameSitePolicy SameSitePolicy // out
 
@@ -279,6 +455,7 @@ func (cookie *Cookie) Secure() bool {
 	_arg0 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 
 	_cret = C.soup_cookie_get_secure(_arg0)
+	runtime.KeepAlive(cookie)
 
 	var _ok bool // out
 
@@ -297,6 +474,7 @@ func (cookie *Cookie) Value() string {
 	_arg0 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 
 	_cret = C.soup_cookie_get_value(_arg0)
+	runtime.KeepAlive(cookie)
 
 	var _utf8 string // out
 
@@ -312,8 +490,11 @@ func (cookie *Cookie) SetDomain(domain string) {
 
 	_arg0 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(domain)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.soup_cookie_set_domain(_arg0, _arg1)
+	runtime.KeepAlive(cookie)
+	runtime.KeepAlive(domain)
 }
 
 // SetExpires sets cookie's expiration time to expires. If expires is NULL,
@@ -329,6 +510,8 @@ func (cookie *Cookie) SetExpires(expires *Date) {
 	_arg1 = (*C.SoupDate)(gextras.StructNative(unsafe.Pointer(expires)))
 
 	C.soup_cookie_set_expires(_arg0, _arg1)
+	runtime.KeepAlive(cookie)
+	runtime.KeepAlive(expires)
 }
 
 // SetHttpOnly sets cookie's HttpOnly attribute to http_only. If TRUE, cookie
@@ -344,6 +527,8 @@ func (cookie *Cookie) SetHttpOnly(httpOnly bool) {
 	}
 
 	C.soup_cookie_set_http_only(_arg0, _arg1)
+	runtime.KeepAlive(cookie)
+	runtime.KeepAlive(httpOnly)
 }
 
 // SetMaxAge sets cookie's max age to max_age. If max_age is -1, the cookie is a
@@ -355,7 +540,7 @@ func (cookie *Cookie) SetHttpOnly(httpOnly bool) {
 // should be considered already-expired.)
 //
 // (This sets the same property as soup_cookie_set_expires().)
-func (cookie *Cookie) SetMaxAge(maxAge int) {
+func (cookie *Cookie) SetMaxAge(maxAge int32) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 C.int         // out
 
@@ -363,6 +548,8 @@ func (cookie *Cookie) SetMaxAge(maxAge int) {
 	_arg1 = C.int(maxAge)
 
 	C.soup_cookie_set_max_age(_arg0, _arg1)
+	runtime.KeepAlive(cookie)
+	runtime.KeepAlive(maxAge)
 }
 
 // SetName sets cookie's name to name
@@ -372,8 +559,11 @@ func (cookie *Cookie) SetName(name string) {
 
 	_arg0 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.soup_cookie_set_name(_arg0, _arg1)
+	runtime.KeepAlive(cookie)
+	runtime.KeepAlive(name)
 }
 
 // SetPath sets cookie's path to path
@@ -383,8 +573,11 @@ func (cookie *Cookie) SetPath(path string) {
 
 	_arg0 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.soup_cookie_set_path(_arg0, _arg1)
+	runtime.KeepAlive(cookie)
+	runtime.KeepAlive(path)
 }
 
 // SetSameSitePolicy: when used in conjunction with
@@ -398,6 +591,8 @@ func (cookie *Cookie) SetSameSitePolicy(policy SameSitePolicy) {
 	_arg1 = C.SoupSameSitePolicy(policy)
 
 	C.soup_cookie_set_same_site_policy(_arg0, _arg1)
+	runtime.KeepAlive(cookie)
+	runtime.KeepAlive(policy)
 }
 
 // SetSecure sets cookie's secure attribute to secure. If TRUE, cookie will only
@@ -412,6 +607,8 @@ func (cookie *Cookie) SetSecure(secure bool) {
 	}
 
 	C.soup_cookie_set_secure(_arg0, _arg1)
+	runtime.KeepAlive(cookie)
+	runtime.KeepAlive(secure)
 }
 
 // SetValue sets cookie's value to value
@@ -421,8 +618,11 @@ func (cookie *Cookie) SetValue(value string) {
 
 	_arg0 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(value)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	C.soup_cookie_set_value(_arg0, _arg1)
+	runtime.KeepAlive(cookie)
+	runtime.KeepAlive(value)
 }
 
 // ToCookieHeader serializes cookie in the format used by the Cookie header (ie,
@@ -434,6 +634,7 @@ func (cookie *Cookie) ToCookieHeader() string {
 	_arg0 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 
 	_cret = C.soup_cookie_to_cookie_header(_arg0)
+	runtime.KeepAlive(cookie)
 
 	var _utf8 string // out
 
@@ -452,6 +653,7 @@ func (cookie *Cookie) ToSetCookieHeader() string {
 	_arg0 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 
 	_cret = C.soup_cookie_to_set_cookie_header(_arg0)
+	runtime.KeepAlive(cookie)
 
 	var _utf8 string // out
 
@@ -475,16 +677,24 @@ func CookieParse(header string, origin *URI) *Cookie {
 	var _cret *C.SoupCookie // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(header)))
+	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(origin)))
 
 	_cret = C.soup_cookie_parse(_arg1, _arg2)
+	runtime.KeepAlive(header)
+	runtime.KeepAlive(origin)
 
 	var _cookie *Cookie // out
 
-	_cookie = (*Cookie)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_cookie, func(v *Cookie) {
-		C.soup_cookie_free((*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(v))))
-	})
+	if _cret != nil {
+		_cookie = (*Cookie)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(_cookie)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.soup_cookie_free((*C.SoupCookie)(intern.C))
+			},
+		)
+	}
 
 	return _cookie
 }

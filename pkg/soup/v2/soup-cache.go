@@ -4,10 +4,10 @@ package soup
 
 import (
 	"fmt"
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -63,8 +63,6 @@ type Cache struct {
 	SessionFeature
 }
 
-var _ gextras.Nativer = (*Cache)(nil)
-
 func wrapCache(obj *externglib.Object) *Cache {
 	return &Cache{
 		Object: obj,
@@ -86,10 +84,15 @@ func NewCache(cacheDir string, cacheType CacheType) *Cache {
 	var _arg2 C.SoupCacheType // out
 	var _cret *C.SoupCache    // in
 
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(cacheDir)))
+	if cacheDir != "" {
+		_arg1 = (*C.char)(unsafe.Pointer(C.CString(cacheDir)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
 	_arg2 = C.SoupCacheType(cacheType)
 
 	_cret = C.soup_cache_new(_arg1, _arg2)
+	runtime.KeepAlive(cacheDir)
+	runtime.KeepAlive(cacheType)
 
 	var _cache *Cache // out
 
@@ -105,6 +108,7 @@ func (cache *Cache) Clear() {
 	_arg0 = (*C.SoupCache)(unsafe.Pointer(cache.Native()))
 
 	C.soup_cache_clear(_arg0)
+	runtime.KeepAlive(cache)
 }
 
 // Dump: synchronously writes the cache index out to disk. Contrast with
@@ -119,6 +123,7 @@ func (cache *Cache) Dump() {
 	_arg0 = (*C.SoupCache)(unsafe.Pointer(cache.Native()))
 
 	C.soup_cache_dump(_arg0)
+	runtime.KeepAlive(cache)
 }
 
 // Flush: this function will force all pending writes in the cache to be
@@ -132,20 +137,22 @@ func (cache *Cache) Flush() {
 	_arg0 = (*C.SoupCache)(unsafe.Pointer(cache.Native()))
 
 	C.soup_cache_flush(_arg0)
+	runtime.KeepAlive(cache)
 }
 
 // MaxSize gets the maximum size of the cache.
-func (cache *Cache) MaxSize() uint {
+func (cache *Cache) MaxSize() uint32 {
 	var _arg0 *C.SoupCache // out
 	var _cret C.guint      // in
 
 	_arg0 = (*C.SoupCache)(unsafe.Pointer(cache.Native()))
 
 	_cret = C.soup_cache_get_max_size(_arg0)
+	runtime.KeepAlive(cache)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -157,10 +164,11 @@ func (cache *Cache) Load() {
 	_arg0 = (*C.SoupCache)(unsafe.Pointer(cache.Native()))
 
 	C.soup_cache_load(_arg0)
+	runtime.KeepAlive(cache)
 }
 
 // SetMaxSize sets the maximum size of the cache.
-func (cache *Cache) SetMaxSize(maxSize uint) {
+func (cache *Cache) SetMaxSize(maxSize uint32) {
 	var _arg0 *C.SoupCache // out
 	var _arg1 C.guint      // out
 
@@ -168,4 +176,6 @@ func (cache *Cache) SetMaxSize(maxSize uint) {
 	_arg1 = C.guint(maxSize)
 
 	C.soup_cache_set_max_size(_arg0, _arg1)
+	runtime.KeepAlive(cache)
+	runtime.KeepAlive(maxSize)
 }

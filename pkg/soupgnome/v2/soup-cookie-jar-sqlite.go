@@ -3,11 +3,11 @@
 package soupgnome
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4-webkitgtk/pkg/soup/v2"
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: libsoup-gnome-2.4
@@ -22,11 +22,11 @@ func init() {
 	})
 }
 
+const COOKIE_JAR_SQLITE_FILENAME = "filename"
+
 type CookieJarSqlite struct {
 	soup.CookieJarDB
 }
-
-var _ gextras.Nativer = (*CookieJarSqlite)(nil)
 
 func wrapCookieJarSqlite(obj *externglib.Object) *CookieJarSqlite {
 	return &CookieJarSqlite{
@@ -53,11 +53,14 @@ func NewCookieJarSqlite(filename string, readOnly bool) *CookieJarSqlite {
 	var _cret *C.SoupCookieJar // in
 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(filename)))
+	defer C.free(unsafe.Pointer(_arg1))
 	if readOnly {
 		_arg2 = C.TRUE
 	}
 
 	_cret = C.soup_cookie_jar_sqlite_new(_arg1, _arg2)
+	runtime.KeepAlive(filename)
+	runtime.KeepAlive(readOnly)
 
 	var _cookieJarSqlite *CookieJarSqlite // out
 

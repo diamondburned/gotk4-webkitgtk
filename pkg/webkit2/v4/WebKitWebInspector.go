@@ -3,10 +3,10 @@
 package webkit2
 
 import (
+	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -24,8 +24,6 @@ func init() {
 type WebInspector struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*WebInspector)(nil)
 
 func wrapWebInspector(obj *externglib.Object) *WebInspector {
 	return &WebInspector{
@@ -47,6 +45,7 @@ func (inspector *WebInspector) Attach() {
 	_arg0 = (*C.WebKitWebInspector)(unsafe.Pointer(inspector.Native()))
 
 	C.webkit_web_inspector_attach(_arg0)
+	runtime.KeepAlive(inspector)
 }
 
 // Close: request inspector to be closed.
@@ -56,6 +55,7 @@ func (inspector *WebInspector) Close() {
 	_arg0 = (*C.WebKitWebInspector)(unsafe.Pointer(inspector.Native()))
 
 	C.webkit_web_inspector_close(_arg0)
+	runtime.KeepAlive(inspector)
 }
 
 // Detach: request inspector to be detached. The signal KitWebInspector::detach
@@ -66,21 +66,23 @@ func (inspector *WebInspector) Detach() {
 	_arg0 = (*C.WebKitWebInspector)(unsafe.Pointer(inspector.Native()))
 
 	C.webkit_web_inspector_detach(_arg0)
+	runtime.KeepAlive(inspector)
 }
 
 // AttachedHeight: get the height that the inspector view should have when it's
 // attached. If the inspector view is not attached this returns 0.
-func (inspector *WebInspector) AttachedHeight() uint {
+func (inspector *WebInspector) AttachedHeight() uint32 {
 	var _arg0 *C.WebKitWebInspector // out
 	var _cret C.guint               // in
 
 	_arg0 = (*C.WebKitWebInspector)(unsafe.Pointer(inspector.Native()))
 
 	_cret = C.webkit_web_inspector_get_attached_height(_arg0)
+	runtime.KeepAlive(inspector)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -94,6 +96,7 @@ func (inspector *WebInspector) CanAttach() bool {
 	_arg0 = (*C.WebKitWebInspector)(unsafe.Pointer(inspector.Native()))
 
 	_cret = C.webkit_web_inspector_get_can_attach(_arg0)
+	runtime.KeepAlive(inspector)
 
 	var _ok bool // out
 
@@ -115,6 +118,7 @@ func (inspector *WebInspector) InspectedURI() string {
 	_arg0 = (*C.WebKitWebInspector)(unsafe.Pointer(inspector.Native()))
 
 	_cret = C.webkit_web_inspector_get_inspected_uri(_arg0)
+	runtime.KeepAlive(inspector)
 
 	var _utf8 string // out
 
@@ -132,6 +136,7 @@ func (inspector *WebInspector) WebView() *WebViewBase {
 	_arg0 = (*C.WebKitWebInspector)(unsafe.Pointer(inspector.Native()))
 
 	_cret = C.webkit_web_inspector_get_web_view(_arg0)
+	runtime.KeepAlive(inspector)
 
 	var _webViewBase *WebViewBase // out
 
@@ -149,6 +154,7 @@ func (inspector *WebInspector) IsAttached() bool {
 	_arg0 = (*C.WebKitWebInspector)(unsafe.Pointer(inspector.Native()))
 
 	_cret = C.webkit_web_inspector_is_attached(_arg0)
+	runtime.KeepAlive(inspector)
 
 	var _ok bool // out
 
@@ -166,4 +172,5 @@ func (inspector *WebInspector) Show() {
 	_arg0 = (*C.WebKitWebInspector)(unsafe.Pointer(inspector.Native()))
 
 	C.webkit_web_inspector_show(_arg0)
+	runtime.KeepAlive(inspector)
 }

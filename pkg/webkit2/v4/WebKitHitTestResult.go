@@ -4,11 +4,11 @@ package webkit2
 
 import (
 	"fmt"
+	"runtime"
 	"strings"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/gotk3/gotk3/glib"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -46,7 +46,7 @@ const (
 )
 
 func marshalHitTestResultContext(p uintptr) (interface{}, error) {
-	return HitTestResultContext(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return HitTestResultContext(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
 }
 
 // String returns the names in string for HitTestResultContext.
@@ -87,11 +87,14 @@ func (h HitTestResultContext) String() string {
 	return strings.TrimSuffix(builder.String(), "|")
 }
 
+// Has returns true if h contains other.
+func (h HitTestResultContext) Has(other HitTestResultContext) bool {
+	return (h & other) == other
+}
+
 type HitTestResult struct {
 	*externglib.Object
 }
-
-var _ gextras.Nativer = (*HitTestResult)(nil)
 
 func wrapHitTestResult(obj *externglib.Object) *HitTestResult {
 	return &HitTestResult{
@@ -114,6 +117,7 @@ func (hitTestResult *HitTestResult) ContextIsEditable() bool {
 	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
 
 	_cret = C.webkit_hit_test_result_context_is_editable(_arg0)
+	runtime.KeepAlive(hitTestResult)
 
 	var _ok bool // out
 
@@ -133,6 +137,7 @@ func (hitTestResult *HitTestResult) ContextIsImage() bool {
 	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
 
 	_cret = C.webkit_hit_test_result_context_is_image(_arg0)
+	runtime.KeepAlive(hitTestResult)
 
 	var _ok bool // out
 
@@ -152,6 +157,7 @@ func (hitTestResult *HitTestResult) ContextIsLink() bool {
 	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
 
 	_cret = C.webkit_hit_test_result_context_is_link(_arg0)
+	runtime.KeepAlive(hitTestResult)
 
 	var _ok bool // out
 
@@ -171,6 +177,7 @@ func (hitTestResult *HitTestResult) ContextIsMedia() bool {
 	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
 
 	_cret = C.webkit_hit_test_result_context_is_media(_arg0)
+	runtime.KeepAlive(hitTestResult)
 
 	var _ok bool // out
 
@@ -190,6 +197,7 @@ func (hitTestResult *HitTestResult) ContextIsScrollbar() bool {
 	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
 
 	_cret = C.webkit_hit_test_result_context_is_scrollbar(_arg0)
+	runtime.KeepAlive(hitTestResult)
 
 	var _ok bool // out
 
@@ -209,6 +217,7 @@ func (hitTestResult *HitTestResult) ContextIsSelection() bool {
 	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
 
 	_cret = C.webkit_hit_test_result_context_is_selection(_arg0)
+	runtime.KeepAlive(hitTestResult)
 
 	var _ok bool // out
 
@@ -220,17 +229,18 @@ func (hitTestResult *HitTestResult) ContextIsSelection() bool {
 }
 
 // Context gets the value of the KitHitTestResult:context property.
-func (hitTestResult *HitTestResult) Context() uint {
+func (hitTestResult *HitTestResult) Context() uint32 {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.guint                // in
 
 	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
 
 	_cret = C.webkit_hit_test_result_get_context(_arg0)
+	runtime.KeepAlive(hitTestResult)
 
-	var _guint uint // out
+	var _guint uint32 // out
 
-	_guint = uint(_cret)
+	_guint = uint32(_cret)
 
 	return _guint
 }
@@ -243,6 +253,7 @@ func (hitTestResult *HitTestResult) ImageURI() string {
 	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
 
 	_cret = C.webkit_hit_test_result_get_image_uri(_arg0)
+	runtime.KeepAlive(hitTestResult)
 
 	var _utf8 string // out
 
@@ -259,6 +270,7 @@ func (hitTestResult *HitTestResult) LinkLabel() string {
 	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
 
 	_cret = C.webkit_hit_test_result_get_link_label(_arg0)
+	runtime.KeepAlive(hitTestResult)
 
 	var _utf8 string // out
 
@@ -275,6 +287,7 @@ func (hitTestResult *HitTestResult) LinkTitle() string {
 	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
 
 	_cret = C.webkit_hit_test_result_get_link_title(_arg0)
+	runtime.KeepAlive(hitTestResult)
 
 	var _utf8 string // out
 
@@ -291,6 +304,7 @@ func (hitTestResult *HitTestResult) LinkURI() string {
 	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
 
 	_cret = C.webkit_hit_test_result_get_link_uri(_arg0)
+	runtime.KeepAlive(hitTestResult)
 
 	var _utf8 string // out
 
@@ -307,6 +321,7 @@ func (hitTestResult *HitTestResult) MediaURI() string {
 	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
 
 	_cret = C.webkit_hit_test_result_get_media_uri(_arg0)
+	runtime.KeepAlive(hitTestResult)
 
 	var _utf8 string // out
 

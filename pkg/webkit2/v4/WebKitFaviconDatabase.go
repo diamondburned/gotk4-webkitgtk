@@ -8,13 +8,12 @@ import (
 	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/cairo"
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
-	"github.com/gotk3/gotk3/cairo"
-	externglib "github.com/gotk3/gotk3/glib"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -68,8 +67,6 @@ type FaviconDatabase struct {
 	*externglib.Object
 }
 
-var _ gextras.Nativer = (*FaviconDatabase)(nil)
-
 func wrapFaviconDatabase(obj *externglib.Object) *FaviconDatabase {
 	return &FaviconDatabase{
 		Object: obj,
@@ -89,6 +86,7 @@ func (database *FaviconDatabase) Clear() {
 	_arg0 = (*C.WebKitFaviconDatabase)(unsafe.Pointer(database.Native()))
 
 	C.webkit_favicon_database_clear(_arg0)
+	runtime.KeepAlive(database)
 }
 
 // Favicon: asynchronously obtains a #cairo_surface_t of the favicon for the
@@ -117,10 +115,17 @@ func (database *FaviconDatabase) Favicon(ctx context.Context, pageUri string, ca
 		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(pageUri)))
-	_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-	_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	defer C.free(unsafe.Pointer(_arg1))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
 
 	C.webkit_favicon_database_get_favicon(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(database)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(pageUri)
+	runtime.KeepAlive(callback)
 }
 
 // FaviconFinish finishes an operation started with
@@ -132,19 +137,22 @@ func (database *FaviconDatabase) FaviconFinish(result gio.AsyncResulter) (*cairo
 	var _cerr *C.GError                // in
 
 	_arg0 = (*C.WebKitFaviconDatabase)(unsafe.Pointer(database.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer((result).(gextras.Nativer).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
 
 	_cret = C.webkit_favicon_database_get_favicon_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(database)
+	runtime.KeepAlive(result)
 
 	var _surface *cairo.Surface // out
 	var _goerr error            // out
 
 	_surface = cairo.WrapSurface(uintptr(unsafe.Pointer(_cret)))
-	C.cairo_surface_reference(_cret)
 	runtime.SetFinalizer(_surface, func(v *cairo.Surface) {
 		C.cairo_surface_destroy((*C.cairo_surface_t)(unsafe.Pointer(v.Native())))
 	})
-	_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
 
 	return _surface, _goerr
 }
@@ -157,8 +165,11 @@ func (database *FaviconDatabase) FaviconURI(pageUri string) string {
 
 	_arg0 = (*C.WebKitFaviconDatabase)(unsafe.Pointer(database.Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(pageUri)))
+	defer C.free(unsafe.Pointer(_arg1))
 
 	_cret = C.webkit_favicon_database_get_favicon_uri(_arg0, _arg1)
+	runtime.KeepAlive(database)
+	runtime.KeepAlive(pageUri)
 
 	var _utf8 string // out
 
