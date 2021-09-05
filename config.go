@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/diamondburned/gotk4/gir"
 	"github.com/diamondburned/gotk4/gir/cmd/gir_generate/gendata"
 	"github.com/diamondburned/gotk4/gir/girgen/types"
 )
@@ -29,6 +30,14 @@ var pkgExceptions = []string{
 	"LICENSE",
 }
 
+var preprocessors = []types.Preprocessor{
+	types.PreprocessorFunc(func(repos gir.Repositories) {
+		res := repos.FindFullType("Soup-2.Auth")
+		// Remove all virtual methods, since .Update() is invalid.
+		res.Type.(*gir.Class).VirtualMethods = nil
+	}),
+}
+
 var filters = []types.FilterMatcher{
 	// This requires some weird C import.
 	types.AbsoluteFilter("C.sockaddr"),
@@ -36,4 +45,5 @@ var filters = []types.FilterMatcher{
 	types.AbsoluteFilter("Soup.PasswordManager"),
 	types.AbsoluteFilter("Soup.Requester"),
 	types.AbsoluteFilter("Soup.get_resource"),
+	types.AbsoluteFilter("C.soup_requester_error_quark"),
 }

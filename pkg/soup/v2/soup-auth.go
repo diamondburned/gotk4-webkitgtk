@@ -8,7 +8,6 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
 // #cgo pkg-config: libsoup-2.4
@@ -41,38 +40,6 @@ const AUTH_REALM = "realm"
 // AUTH_SCHEME_NAME alias for the Auth:scheme-name property. (The authentication
 // scheme name.)
 const AUTH_SCHEME_NAME = "scheme-name"
-
-// AuthOverrider contains methods that are overridable.
-//
-// As of right now, interface overriding and subclassing is not supported
-// yet, so the interface currently has no use.
-type AuthOverrider interface {
-	// Authenticate: call this on an auth to authenticate it; normally this will
-	// cause the auth's message to be requeued with the new authentication info.
-	Authenticate(username string, password string)
-	// CanAuthenticate tests if auth is able to authenticate by providing
-	// credentials to the soup_auth_authenticate().
-	CanAuthenticate() bool
-	// Authorization generates an appropriate "Authorization" header for msg.
-	// (The session will only call this if soup_auth_is_authenticated() returned
-	// TRUE.)
-	Authorization(msg *Message) string
-	// ProtectionSpace returns a list of paths on the server which auth extends
-	// over. (All subdirectories of these paths are also assumed to be part of
-	// auth's protection space, unless otherwise discovered not to be.)
-	ProtectionSpace(sourceUri *URI) []string
-	// IsAuthenticated tests if auth has been given a username and password
-	IsAuthenticated() bool
-	// IsReady tests if auth is ready to make a request for msg with. For most
-	// auths, this is equivalent to soup_auth_is_authenticated(), but for some
-	// auth types (eg, NTLM), the auth may be sendable (eg, as an authentication
-	// request) even before it is authenticated.
-	IsReady(msg *Message) bool
-	// Update updates auth with the information from msg and auth_header,
-	// possibly un-authenticating it. As with soup_auth_new(), this is normally
-	// only used by Session.
-	Update(msg *Message, authHeader map[cgo.Handle]cgo.Handle) bool
-}
 
 // Auth: abstract base class for handling authentication. Specific HTTP
 // Authentication mechanisms are implemented by its subclasses, but applications

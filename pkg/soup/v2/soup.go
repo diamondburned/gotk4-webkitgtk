@@ -329,18 +329,6 @@ func (r RequesterError) String() string {
 	}
 }
 
-func RequesterErrorQuark() glib.Quark {
-	var _cret C.GQuark // in
-
-	_cret = C.soup_requester_error_quark()
-
-	var _quark glib.Quark // out
-
-	_quark = uint32(_cret)
-
-	return _quark
-}
-
 type SameSitePolicy int
 
 const (

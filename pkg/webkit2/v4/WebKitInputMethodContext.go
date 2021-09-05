@@ -317,11 +317,11 @@ func (context *InputMethodContext) Preedit() (string, []InputMethodUnderline, ui
 		defer C.free(unsafe.Pointer(_arg1))
 	}
 	if _arg2 != nil {
-		_underlines = make([]*InputMethodUnderline, 0, gextras.ListSize(unsafe.Pointer(_arg2)))
+		_underlines = make([]InputMethodUnderline, 0, gextras.ListSize(unsafe.Pointer(_arg2)))
 		gextras.MoveList(unsafe.Pointer(_arg2), true, func(v unsafe.Pointer) {
 			src := (*C.WebKitInputMethodUnderline)(v)
-			var dst *InputMethodUnderline // out
-			dst = (*InputMethodUnderline)(gextras.NewStructNative(unsafe.Pointer(src)))
+			var dst InputMethodUnderline // out
+			dst = *(*InputMethodUnderline)(gextras.NewStructNative(unsafe.Pointer(src)))
 			_underlines = append(_underlines, dst)
 		})
 	}

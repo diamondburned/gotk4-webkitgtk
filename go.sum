@@ -1,15 +1,9 @@
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/diamondburned/gotk4 v0.0.0-20210718230843-25dfbfc8c5e5 h1:V8sMWmjnza4XMr0RL7cRmeloR05DxdT3szNQfUlrI38=
-github.com/diamondburned/gotk4 v0.0.0-20210718230843-25dfbfc8c5e5/go.mod h1:WbOkeM91aOubLbxqcbYwd7q/HCKxAmqObvT5Dhpzm1Y=
-github.com/diamondburned/gotk4 v0.0.0-20210719000705-8769fdd215fb h1:CNMoVt9eCQOAxxfAI1bGHatmew3BnCDyMBB+3bu6ZOE=
-github.com/diamondburned/gotk4 v0.0.0-20210719000705-8769fdd215fb/go.mod h1:WbOkeM91aOubLbxqcbYwd7q/HCKxAmqObvT5Dhpzm1Y=
-github.com/diamondburned/gotk4 v0.0.0-20210831033410-318362ceedaf h1:DsM6l7ehkXDdC5Fht5by8GsKoNgPtXvtsREeN2Qvx1M=
-github.com/diamondburned/gotk4 v0.0.0-20210831033410-318362ceedaf/go.mod h1:WbOkeM91aOubLbxqcbYwd7q/HCKxAmqObvT5Dhpzm1Y=
-github.com/diamondburned/gotk4/pkg v0.0.0-20210716064220-07ac6b2e1c40/go.mod h1:g3UzDkxWTTcv0McQlKXeBScFhLywsH+GgwJSL7iQqk0=
+github.com/diamondburned/gotk4 v0.0.0-20210905100529-e1f4d4670e4a h1:zv3f6e6TuONi6OmByv+3FFMWfVDmb9kZLioMEtRfvg4=
+github.com/diamondburned/gotk4 v0.0.0-20210905100529-e1f4d4670e4a/go.mod h1:WbOkeM91aOubLbxqcbYwd7q/HCKxAmqObvT5Dhpzm1Y=
 github.com/fatih/color v1.10.0 h1:s36xzo75JdqLaaWoiEHk767eHiwo0598uUxyfiPkDsg=
 github.com/fatih/color v1.10.0/go.mod h1:ELkj/draVOlAH/xkhN6mQ50Qd0MPOk5AAr3maGEBuJM=
-github.com/gotk3/gotk3 v0.6.2-0.20210715143523-dfa2afe348c5/go.mod h1:/hqFpkNa9T3JgNAE2fLvCdov7c5bw//FHNZrZ3Uv9/Q=
 github.com/mattn/go-colorable v0.1.8 h1:c1ghPdyEDarC70ftn0y+A/Ee++9zz8ljHG1b13eJ0s8=
 github.com/mattn/go-colorable v0.1.8/go.mod h1:u6P/XSegPjTcexA+o6vUJrdnUu04hMope9wVRipJSqc=
 github.com/mattn/go-isatty v0.0.12 h1:wuysRhFDzyxgEmMf5xjvJ2M9dZoWAXNNr5LSBS7uHXY=

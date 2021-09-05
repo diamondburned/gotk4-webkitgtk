@@ -66,6 +66,7 @@ func main() {
 	gen.Logger = log.New(os.Stderr, "girgen: ", log.Lmsgprefix)
 	gen.AddFilters(gendata.Filters)
 	gen.AddFilters(filters)
+	gen.ApplyPreprocessors(preprocessors)
 	gen.ApplyPreprocessors(gendata.Preprocessors)
 
 	if verbose {
