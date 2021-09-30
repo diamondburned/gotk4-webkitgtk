@@ -205,7 +205,7 @@ func marshalCookie(p uintptr) (interface{}, error) {
 }
 
 // NewCookie constructs a struct Cookie.
-func NewCookie(name string, value string, domain string, path string, maxAge int32) *Cookie {
+func NewCookie(name string, value string, domain string, path string, maxAge int) *Cookie {
 	var _arg1 *C.char       // out
 	var _arg2 *C.char       // out
 	var _arg3 *C.char       // out
@@ -540,7 +540,7 @@ func (cookie *Cookie) SetHttpOnly(httpOnly bool) {
 // should be considered already-expired.)
 //
 // (This sets the same property as soup_cookie_set_expires().)
-func (cookie *Cookie) SetMaxAge(maxAge int32) {
+func (cookie *Cookie) SetMaxAge(maxAge int) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 C.int         // out
 

@@ -72,7 +72,19 @@ func _gotk4_soup2_AuthDomainFilter(arg0 *C.SoupAuthDomain, arg1 *C.SoupMessage, 
 	var domain AuthDomainer // out
 	var msg *Message        // out
 
-	domain = (externglib.CastObject(externglib.Take(unsafe.Pointer(arg0)))).(AuthDomainer)
+	{
+		objptr := unsafe.Pointer(arg0)
+		if objptr == nil {
+			panic("object of type soup.AuthDomainer is nil")
+		}
+
+		object := externglib.Take(objptr)
+		rv, ok := (externglib.CastObject(object)).(AuthDomainer)
+		if !ok {
+			panic("object of type " + object.TypeFromInstance().String() + " is not soup.AuthDomainer")
+		}
+		domain = rv
+	}
 	msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
 
 	fn := v.(AuthDomainFilter)
@@ -113,10 +125,21 @@ func _gotk4_soup2_AuthDomainGenericAuthCallback(arg0 *C.SoupAuthDomain, arg1 *C.
 	var msg *Message        // out
 	var username string     // out
 
-	domain = (externglib.CastObject(externglib.Take(unsafe.Pointer(arg0)))).(AuthDomainer)
+	{
+		objptr := unsafe.Pointer(arg0)
+		if objptr == nil {
+			panic("object of type soup.AuthDomainer is nil")
+		}
+
+		object := externglib.Take(objptr)
+		rv, ok := (externglib.CastObject(object)).(AuthDomainer)
+		if !ok {
+			panic("object of type " + object.TypeFromInstance().String() + " is not soup.AuthDomainer")
+		}
+		domain = rv
+	}
 	msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
 	username = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-	defer C.free(unsafe.Pointer(arg2))
 
 	fn := v.(AuthDomainGenericAuthCallback)
 	ok := fn(domain, msg, username)

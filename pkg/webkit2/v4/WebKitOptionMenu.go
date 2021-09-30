@@ -42,7 +42,7 @@ func marshalOptionMenuer(p uintptr) (interface{}, error) {
 // item changes the value of the element making the item the active one. You are
 // expected to close the menu with webkit_option_menu_close() after activating
 // an item, calling this function again will have no effect.
-func (menu *OptionMenu) ActivateItem(index uint32) {
+func (menu *OptionMenu) ActivateItem(index uint) {
 	var _arg0 *C.WebKitOptionMenu // out
 	var _arg1 C.guint             // out
 
@@ -69,7 +69,7 @@ func (menu *OptionMenu) Close() {
 }
 
 // Item returns the KitOptionMenuItem at index in menu.
-func (menu *OptionMenu) Item(index uint32) *OptionMenuItem {
+func (menu *OptionMenu) Item(index uint) *OptionMenuItem {
 	var _arg0 *C.WebKitOptionMenu     // out
 	var _arg1 C.guint                 // out
 	var _cret *C.WebKitOptionMenuItem // in
@@ -89,7 +89,7 @@ func (menu *OptionMenu) Item(index uint32) *OptionMenuItem {
 }
 
 // NItems gets the length of the menu.
-func (menu *OptionMenu) NItems() uint32 {
+func (menu *OptionMenu) NItems() uint {
 	var _arg0 *C.WebKitOptionMenu // out
 	var _cret C.guint             // in
 
@@ -98,9 +98,9 @@ func (menu *OptionMenu) NItems() uint32 {
 	_cret = C.webkit_option_menu_get_n_items(_arg0)
 	runtime.KeepAlive(menu)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
@@ -111,7 +111,7 @@ func (menu *OptionMenu) NItems() uint32 {
 // webkit_option_menu_select_item() or close the menu with
 // webkit_option_menu_close() in which case the currently selected item will be
 // activated.
-func (menu *OptionMenu) SelectItem(index uint32) {
+func (menu *OptionMenu) SelectItem(index uint) {
 	var _arg0 *C.WebKitOptionMenu // out
 	var _arg1 C.guint             // out
 

@@ -166,7 +166,7 @@ func (multipart *Multipart) AppendPart(headers *MessageHeaders, body *Buffer) {
 }
 
 // Length gets the number of body parts in multipart
-func (multipart *Multipart) Length() int32 {
+func (multipart *Multipart) Length() int {
 	var _arg0 *C.SoupMultipart // out
 	var _cret C.int            // in
 
@@ -175,15 +175,15 @@ func (multipart *Multipart) Length() int32 {
 	_cret = C.soup_multipart_get_length(_arg0)
 	runtime.KeepAlive(multipart)
 
-	var _gint int32 // out
+	var _gint int // out
 
-	_gint = int32(_cret)
+	_gint = int(_cret)
 
 	return _gint
 }
 
 // Part gets the indicated body part from multipart.
-func (multipart *Multipart) Part(part int32) (*MessageHeaders, *Buffer, bool) {
+func (multipart *Multipart) Part(part int) (*MessageHeaders, *Buffer, bool) {
 	var _arg0 *C.SoupMultipart      // out
 	var _arg1 C.int                 // out
 	var _arg2 *C.SoupMessageHeaders // in

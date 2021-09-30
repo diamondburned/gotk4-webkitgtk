@@ -164,9 +164,7 @@ func _gotk4_soup2_MessageHeadersForeachFunc(arg0 *C.char, arg1 *C.char, arg2 C.g
 	var value string // out
 
 	name = C.GoString((*C.gchar)(unsafe.Pointer(arg0)))
-	defer C.free(unsafe.Pointer(arg0))
 	value = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
-	defer C.free(unsafe.Pointer(arg1))
 
 	fn := v.(MessageHeadersForeachFunc)
 	fn(name, value)
@@ -898,7 +896,7 @@ func (hdrs *MessageHeaders) SetRange(start int64, end int64) {
 // SetRanges sets hdrs's Range header to request the indicated ranges. (If you
 // only want to request a single range, you can use
 // soup_message_headers_set_range().)
-func (hdrs *MessageHeaders) SetRanges(ranges *Range, length int32) {
+func (hdrs *MessageHeaders) SetRanges(ranges *Range, length int) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.SoupRange          // out
 	var _arg2 C.int                 // out

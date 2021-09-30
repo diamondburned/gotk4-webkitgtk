@@ -93,7 +93,7 @@ func (response *URIResponse) MIMEType() string {
 // StatusCode: get the status code of the KitURIResponse as returned by the
 // server. It will normally be a KnownStatusCode, for example SOUP_STATUS_OK,
 // though the server can respond with any unsigned integer.
-func (response *URIResponse) StatusCode() uint32 {
+func (response *URIResponse) StatusCode() uint {
 	var _arg0 *C.WebKitURIResponse // out
 	var _cret C.guint              // in
 
@@ -102,9 +102,9 @@ func (response *URIResponse) StatusCode() uint32 {
 	_cret = C.webkit_uri_response_get_status_code(_arg0)
 	runtime.KeepAlive(response)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }

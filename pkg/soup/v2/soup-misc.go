@@ -42,7 +42,7 @@ func StrCaseEqual(v1 cgo.Handle, v2 cgo.Handle) bool {
 }
 
 // StrCaseHash hashes key in a case-insensitive manner.
-func StrCaseHash(key cgo.Handle) uint32 {
+func StrCaseHash(key cgo.Handle) uint {
 	var _arg1 C.gconstpointer // out
 	var _cret C.guint         // in
 
@@ -51,9 +51,9 @@ func StrCaseHash(key cgo.Handle) uint32 {
 	_cret = C.soup_str_case_hash(_arg1)
 	runtime.KeepAlive(key)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }

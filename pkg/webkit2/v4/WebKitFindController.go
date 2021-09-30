@@ -109,7 +109,7 @@ func marshalFindControllerer(p uintptr) (interface{}, error) {
 // CountMatches counts the number of matches for search_text found in the
 // KitWebView with the provided find_options. The number of matches will be
 // provided by the KitFindController::counted-matches signal.
-func (findController *FindController) CountMatches(searchText string, findOptions uint32, maxMatchCount uint32) {
+func (findController *FindController) CountMatches(searchText string, findOptions uint32, maxMatchCount uint) {
 	var _arg0 *C.WebKitFindController // out
 	var _arg1 *C.gchar                // out
 	var _arg2 C.guint32               // out
@@ -131,7 +131,7 @@ func (findController *FindController) CountMatches(searchText string, findOption
 // MaxMatchCount gets the maximum number of matches to report during a text
 // lookup. This number is passed as the last argument of
 // webkit_find_controller_search() or webkit_find_controller_count_matches().
-func (findController *FindController) MaxMatchCount() uint32 {
+func (findController *FindController) MaxMatchCount() uint {
 	var _arg0 *C.WebKitFindController // out
 	var _cret C.guint                 // in
 
@@ -140,9 +140,9 @@ func (findController *FindController) MaxMatchCount() uint32 {
 	_cret = C.webkit_find_controller_get_max_match_count(_arg0)
 	runtime.KeepAlive(findController)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
@@ -220,7 +220,7 @@ func (findController *FindController) WebView() *WebView {
 //
 // Callers should call webkit_find_controller_search_finish() to finish the
 // current search operation.
-func (findController *FindController) Search(searchText string, findOptions uint32, maxMatchCount uint32) {
+func (findController *FindController) Search(searchText string, findOptions uint32, maxMatchCount uint) {
 	var _arg0 *C.WebKitFindController // out
 	var _arg1 *C.gchar                // out
 	var _arg2 C.guint32               // out

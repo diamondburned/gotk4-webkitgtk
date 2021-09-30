@@ -104,7 +104,7 @@ func (exception *Exception) BacktraceString() string {
 }
 
 // ColumnNumber: get the column number at which exception happened.
-func (exception *Exception) ColumnNumber() uint32 {
+func (exception *Exception) ColumnNumber() uint {
 	var _arg0 *C.JSCException // out
 	var _cret C.guint         // in
 
@@ -113,15 +113,15 @@ func (exception *Exception) ColumnNumber() uint32 {
 	_cret = C.jsc_exception_get_column_number(_arg0)
 	runtime.KeepAlive(exception)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
 
 // LineNumber: get the line number at which exception happened.
-func (exception *Exception) LineNumber() uint32 {
+func (exception *Exception) LineNumber() uint {
 	var _arg0 *C.JSCException // out
 	var _cret C.guint         // in
 
@@ -130,9 +130,9 @@ func (exception *Exception) LineNumber() uint32 {
 	_cret = C.jsc_exception_get_line_number(_arg0)
 	runtime.KeepAlive(exception)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }

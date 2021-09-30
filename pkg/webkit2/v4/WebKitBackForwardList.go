@@ -79,7 +79,7 @@ func (backForwardList *BackForwardList) BackList() []BackForwardListItem {
 	return _list
 }
 
-func (backForwardList *BackForwardList) BackListWithLimit(limit uint32) []BackForwardListItem {
+func (backForwardList *BackForwardList) BackListWithLimit(limit uint) []BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList // out
 	var _arg1 C.guint                  // out
 	var _cret *C.GList                 // in
@@ -164,7 +164,7 @@ func (backForwardList *BackForwardList) ForwardList() []BackForwardListItem {
 	return _list
 }
 
-func (backForwardList *BackForwardList) ForwardListWithLimit(limit uint32) []BackForwardListItem {
+func (backForwardList *BackForwardList) ForwardListWithLimit(limit uint) []BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList // out
 	var _arg1 C.guint                  // out
 	var _cret *C.GList                 // in
@@ -189,7 +189,7 @@ func (backForwardList *BackForwardList) ForwardListWithLimit(limit uint32) []Bac
 	return _list
 }
 
-func (backForwardList *BackForwardList) Length() uint32 {
+func (backForwardList *BackForwardList) Length() uint {
 	var _arg0 *C.WebKitBackForwardList // out
 	var _cret C.guint                  // in
 
@@ -198,15 +198,15 @@ func (backForwardList *BackForwardList) Length() uint32 {
 	_cret = C.webkit_back_forward_list_get_length(_arg0)
 	runtime.KeepAlive(backForwardList)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
 
 // NthItem returns the item at a given index relative to the current item.
-func (backForwardList *BackForwardList) NthItem(index int32) *BackForwardListItem {
+func (backForwardList *BackForwardList) NthItem(index int) *BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList     // out
 	var _arg1 C.gint                       // out
 	var _cret *C.WebKitBackForwardListItem // in

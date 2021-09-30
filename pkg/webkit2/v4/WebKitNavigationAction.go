@@ -109,7 +109,7 @@ func (navigation *NavigationAction) Copy() *NavigationAction {
 
 // Modifiers: return a bitmask of ModifierType values describing the modifier
 // keys that were in effect when the navigation was requested
-func (navigation *NavigationAction) Modifiers() uint32 {
+func (navigation *NavigationAction) Modifiers() uint {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret C.guint                   // in
 
@@ -118,16 +118,16 @@ func (navigation *NavigationAction) Modifiers() uint32 {
 	_cret = C.webkit_navigation_action_get_modifiers(_arg0)
 	runtime.KeepAlive(navigation)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
 
 // MouseButton: return the number of the mouse button that triggered the
 // navigation, or 0 if the navigation was not started by a mouse event.
-func (navigation *NavigationAction) MouseButton() uint32 {
+func (navigation *NavigationAction) MouseButton() uint {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret C.guint                   // in
 
@@ -136,9 +136,9 @@ func (navigation *NavigationAction) MouseButton() uint32 {
 	_cret = C.webkit_navigation_action_get_mouse_button(_arg0)
 	runtime.KeepAlive(navigation)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }

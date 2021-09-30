@@ -171,7 +171,7 @@ func (request *AuthenticationRequest) Host() string {
 }
 
 // Port: get the port that this authentication challenge is applicable to.
-func (request *AuthenticationRequest) Port() uint32 {
+func (request *AuthenticationRequest) Port() uint {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.guint                        // in
 
@@ -180,9 +180,9 @@ func (request *AuthenticationRequest) Port() uint32 {
 	_cret = C.webkit_authentication_request_get_port(_arg0)
 	runtime.KeepAlive(request)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }

@@ -104,7 +104,7 @@ func marshalDate(p uintptr) (interface{}, error) {
 }
 
 // NewDate constructs a struct Date.
-func NewDate(year int32, month int32, day int32, hour int32, minute int32, second int32) *Date {
+func NewDate(year int, month int, day int, hour int, minute int, second int) *Date {
 	var _arg1 C.int       // out
 	var _arg2 C.int       // out
 	var _arg3 C.int       // out
@@ -142,7 +142,7 @@ func NewDate(year int32, month int32, day int32, hour int32, minute int32, secon
 }
 
 // NewDateFromNow constructs a struct Date.
-func NewDateFromNow(offsetSeconds int32) *Date {
+func NewDateFromNow(offsetSeconds int) *Date {
 	var _arg1 C.int       // out
 	var _cret *C.SoupDate // in
 
@@ -237,7 +237,7 @@ func (date *Date) Copy() *Date {
 }
 
 // Day gets date's day.
-func (date *Date) Day() int32 {
+func (date *Date) Day() int {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
 
@@ -246,15 +246,15 @@ func (date *Date) Day() int32 {
 	_cret = C.soup_date_get_day(_arg0)
 	runtime.KeepAlive(date)
 
-	var _gint int32 // out
+	var _gint int // out
 
-	_gint = int32(_cret)
+	_gint = int(_cret)
 
 	return _gint
 }
 
 // Hour gets date's hour.
-func (date *Date) Hour() int32 {
+func (date *Date) Hour() int {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
 
@@ -263,15 +263,15 @@ func (date *Date) Hour() int32 {
 	_cret = C.soup_date_get_hour(_arg0)
 	runtime.KeepAlive(date)
 
-	var _gint int32 // out
+	var _gint int // out
 
-	_gint = int32(_cret)
+	_gint = int(_cret)
 
 	return _gint
 }
 
 // Minute gets date's minute.
-func (date *Date) Minute() int32 {
+func (date *Date) Minute() int {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
 
@@ -280,15 +280,15 @@ func (date *Date) Minute() int32 {
 	_cret = C.soup_date_get_minute(_arg0)
 	runtime.KeepAlive(date)
 
-	var _gint int32 // out
+	var _gint int // out
 
-	_gint = int32(_cret)
+	_gint = int(_cret)
 
 	return _gint
 }
 
 // Month gets date's month.
-func (date *Date) Month() int32 {
+func (date *Date) Month() int {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
 
@@ -297,15 +297,15 @@ func (date *Date) Month() int32 {
 	_cret = C.soup_date_get_month(_arg0)
 	runtime.KeepAlive(date)
 
-	var _gint int32 // out
+	var _gint int // out
 
-	_gint = int32(_cret)
+	_gint = int(_cret)
 
 	return _gint
 }
 
 // Offset gets date's offset from UTC.
-func (date *Date) Offset() int32 {
+func (date *Date) Offset() int {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
 
@@ -314,15 +314,15 @@ func (date *Date) Offset() int32 {
 	_cret = C.soup_date_get_offset(_arg0)
 	runtime.KeepAlive(date)
 
-	var _gint int32 // out
+	var _gint int // out
 
-	_gint = int32(_cret)
+	_gint = int(_cret)
 
 	return _gint
 }
 
 // Second gets date's second.
-func (date *Date) Second() int32 {
+func (date *Date) Second() int {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
 
@@ -331,15 +331,15 @@ func (date *Date) Second() int32 {
 	_cret = C.soup_date_get_second(_arg0)
 	runtime.KeepAlive(date)
 
-	var _gint int32 // out
+	var _gint int // out
 
-	_gint = int32(_cret)
+	_gint = int(_cret)
 
 	return _gint
 }
 
 // Utc gets date's UTC flag
-func (date *Date) Utc() int32 {
+func (date *Date) Utc() int {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
 
@@ -348,15 +348,15 @@ func (date *Date) Utc() int32 {
 	_cret = C.soup_date_get_utc(_arg0)
 	runtime.KeepAlive(date)
 
-	var _gint int32 // out
+	var _gint int // out
 
-	_gint = int32(_cret)
+	_gint = int(_cret)
 
 	return _gint
 }
 
 // Year gets date's year.
-func (date *Date) Year() int32 {
+func (date *Date) Year() int {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
 
@@ -365,9 +365,9 @@ func (date *Date) Year() int32 {
 	_cret = C.soup_date_get_year(_arg0)
 	runtime.KeepAlive(date)
 
-	var _gint int32 // out
+	var _gint int // out
 
-	_gint = int32(_cret)
+	_gint = int(_cret)
 
 	return _gint
 }

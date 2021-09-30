@@ -52,14 +52,12 @@ func _gotk4_soup2_AuthDomainDigestAuthCallback(arg0 *C.SoupAuthDomain, arg1 *C.S
 	domain = wrapAuthDomainDigest(externglib.Take(unsafe.Pointer(arg0)))
 	msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
 	username = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-	defer C.free(unsafe.Pointer(arg2))
 
 	fn := v.(AuthDomainDigestAuthCallback)
 	utf8 := fn(domain, msg, username)
 
 	if utf8 != "" {
 		cret = (*C.char)(unsafe.Pointer(C.CString(utf8)))
-		defer C.free(unsafe.Pointer(cret))
 	}
 
 	return cret

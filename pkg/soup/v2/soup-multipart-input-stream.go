@@ -136,7 +136,16 @@ func (multipart *MultipartInputStream) NextPart(ctx context.Context) (gio.InputS
 	var _goerr error                   // out
 
 	if _cret != nil {
-		_inputStream = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
+		{
+			objptr := unsafe.Pointer(_cret)
+
+			object := externglib.AssumeOwnership(objptr)
+			rv, ok := (externglib.CastObject(object)).(gio.InputStreamer)
+			if !ok {
+				panic("object of type " + object.TypeFromInstance().String() + " is not gio.InputStreamer")
+			}
+			_inputStream = rv
+		}
 	}
 	if _cerr != nil {
 		_goerr = gerror.Take(unsafe.Pointer(_cerr))
@@ -147,7 +156,7 @@ func (multipart *MultipartInputStream) NextPart(ctx context.Context) (gio.InputS
 
 // NextPartAsync obtains a Stream for the next request. See
 // soup_multipart_input_stream_next_part() for details on the workflow.
-func (multipart *MultipartInputStream) NextPartAsync(ctx context.Context, ioPriority int32, callback gio.AsyncReadyCallback) {
+func (multipart *MultipartInputStream) NextPartAsync(ctx context.Context, ioPriority int, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.SoupMultipartInputStream // out
 	var _arg2 *C.GCancellable             // out
 	var _arg1 C.int                       // out
@@ -191,7 +200,16 @@ func (multipart *MultipartInputStream) NextPartFinish(result gio.AsyncResulter) 
 	var _goerr error                   // out
 
 	if _cret != nil {
-		_inputStream = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
+		{
+			objptr := unsafe.Pointer(_cret)
+
+			object := externglib.AssumeOwnership(objptr)
+			rv, ok := (externglib.CastObject(object)).(gio.InputStreamer)
+			if !ok {
+				panic("object of type " + object.TypeFromInstance().String() + " is not gio.InputStreamer")
+			}
+			_inputStream = rv
+		}
 	}
 	if _cerr != nil {
 		_goerr = gerror.Take(unsafe.Pointer(_cerr))

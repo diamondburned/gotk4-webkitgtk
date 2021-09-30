@@ -141,7 +141,7 @@ func (cache *Cache) Flush() {
 }
 
 // MaxSize gets the maximum size of the cache.
-func (cache *Cache) MaxSize() uint32 {
+func (cache *Cache) MaxSize() uint {
 	var _arg0 *C.SoupCache // out
 	var _cret C.guint      // in
 
@@ -150,9 +150,9 @@ func (cache *Cache) MaxSize() uint32 {
 	_cret = C.soup_cache_get_max_size(_arg0)
 	runtime.KeepAlive(cache)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
@@ -168,7 +168,7 @@ func (cache *Cache) Load() {
 }
 
 // SetMaxSize sets the maximum size of the cache.
-func (cache *Cache) SetMaxSize(maxSize uint32) {
+func (cache *Cache) SetMaxSize(maxSize uint) {
 	var _arg0 *C.SoupCache // out
 	var _arg1 C.guint      // out
 

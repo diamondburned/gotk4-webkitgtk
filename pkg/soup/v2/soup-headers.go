@@ -277,7 +277,7 @@ func HeaderParseSemiParamListStrict(header string) map[string]string {
 //
 // This is a low-level method; normally you would use
 // soup_headers_parse_request() or soup_headers_parse_response().
-func HeadersParse(str string, len int32, dest *MessageHeaders) bool {
+func HeadersParse(str string, len int, dest *MessageHeaders) bool {
 	var _arg1 *C.char               // out
 	var _arg2 C.int                 // out
 	var _arg3 *C.SoupMessageHeaders // out
@@ -306,7 +306,7 @@ func HeadersParse(str string, len int32, dest *MessageHeaders) bool {
 // the results in req_method, req_path, ver, and req_headers.
 //
 // Beware that req_headers may be modified even on failure.
-func HeadersParseRequest(str string, len int32, reqHeaders *MessageHeaders) (reqMethod string, reqPath string, ver HTTPVersion, guint uint32) {
+func HeadersParseRequest(str string, len int, reqHeaders *MessageHeaders) (reqMethod string, reqPath string, ver HTTPVersion, guint uint) {
 	var _arg1 *C.char               // out
 	var _arg2 C.int                 // out
 	var _arg3 *C.SoupMessageHeaders // out
@@ -328,7 +328,7 @@ func HeadersParseRequest(str string, len int32, reqHeaders *MessageHeaders) (req
 	var _reqMethod string // out
 	var _reqPath string   // out
 	var _ver HTTPVersion  // out
-	var _guint uint32     // out
+	var _guint uint       // out
 
 	if _arg4 != nil {
 		_reqMethod = C.GoString((*C.gchar)(unsafe.Pointer(_arg4)))
@@ -339,7 +339,7 @@ func HeadersParseRequest(str string, len int32, reqHeaders *MessageHeaders) (req
 		defer C.free(unsafe.Pointer(_arg5))
 	}
 	_ver = HTTPVersion(_arg6)
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _reqMethod, _reqPath, _ver, _guint
 }
@@ -348,7 +348,7 @@ func HeadersParseRequest(str string, len int32, reqHeaders *MessageHeaders) (req
 // the results in ver, status_code, reason_phrase, and headers.
 //
 // Beware that headers may be modified even on failure.
-func HeadersParseResponse(str string, len int32, headers *MessageHeaders) (HTTPVersion, uint32, string, bool) {
+func HeadersParseResponse(str string, len int, headers *MessageHeaders) (HTTPVersion, uint, string, bool) {
 	var _arg1 *C.char               // out
 	var _arg2 C.int                 // out
 	var _arg3 *C.SoupMessageHeaders // out
@@ -368,12 +368,12 @@ func HeadersParseResponse(str string, len int32, headers *MessageHeaders) (HTTPV
 	runtime.KeepAlive(headers)
 
 	var _ver HTTPVersion     // out
-	var _statusCode uint32   // out
+	var _statusCode uint     // out
 	var _reasonPhrase string // out
 	var _ok bool             // out
 
 	_ver = HTTPVersion(_arg4)
-	_statusCode = uint32(_arg5)
+	_statusCode = uint(_arg5)
 	if _arg6 != nil {
 		_reasonPhrase = C.GoString((*C.gchar)(unsafe.Pointer(_arg6)))
 		defer C.free(unsafe.Pointer(_arg6))
@@ -388,7 +388,7 @@ func HeadersParseResponse(str string, len int32, headers *MessageHeaders) (HTTPV
 // HeadersParseStatusLine parses the HTTP Status-Line string in status_line into
 // ver, status_code, and reason_phrase. status_line must be terminated by either
 // "\0" or "\r\n".
-func HeadersParseStatusLine(statusLine string) (HTTPVersion, uint32, string, bool) {
+func HeadersParseStatusLine(statusLine string) (HTTPVersion, uint, string, bool) {
 	var _arg1 *C.char           // out
 	var _arg2 C.SoupHTTPVersion // in
 	var _arg3 C.guint           // in
@@ -402,12 +402,12 @@ func HeadersParseStatusLine(statusLine string) (HTTPVersion, uint32, string, boo
 	runtime.KeepAlive(statusLine)
 
 	var _ver HTTPVersion     // out
-	var _statusCode uint32   // out
+	var _statusCode uint     // out
 	var _reasonPhrase string // out
 	var _ok bool             // out
 
 	_ver = HTTPVersion(_arg2)
-	_statusCode = uint32(_arg3)
+	_statusCode = uint(_arg3)
 	if _arg4 != nil {
 		_reasonPhrase = C.GoString((*C.gchar)(unsafe.Pointer(_arg4)))
 		defer C.free(unsafe.Pointer(_arg4))

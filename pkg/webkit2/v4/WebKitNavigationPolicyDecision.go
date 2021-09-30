@@ -63,7 +63,7 @@ func (decision *NavigationPolicyDecision) FrameName() string {
 //
 // Deprecated: Use webkit_navigation_policy_decision_get_navigation_action()
 // instead.
-func (decision *NavigationPolicyDecision) Modifiers() uint32 {
+func (decision *NavigationPolicyDecision) Modifiers() uint {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret C.guint                           // in
 
@@ -72,9 +72,9 @@ func (decision *NavigationPolicyDecision) Modifiers() uint32 {
 	_cret = C.webkit_navigation_policy_decision_get_modifiers(_arg0)
 	runtime.KeepAlive(decision)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
@@ -84,7 +84,7 @@ func (decision *NavigationPolicyDecision) Modifiers() uint32 {
 //
 // Deprecated: Use webkit_navigation_policy_decision_get_navigation_action()
 // instead.
-func (decision *NavigationPolicyDecision) MouseButton() uint32 {
+func (decision *NavigationPolicyDecision) MouseButton() uint {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret C.guint                           // in
 
@@ -93,9 +93,9 @@ func (decision *NavigationPolicyDecision) MouseButton() uint32 {
 	_cret = C.webkit_navigation_policy_decision_get_mouse_button(_arg0)
 	runtime.KeepAlive(decision)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }

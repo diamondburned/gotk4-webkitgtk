@@ -114,7 +114,7 @@ func (menu *ContextMenu) First() *ContextMenuItem {
 }
 
 // ItemAtPosition gets the item at the given position in the menu.
-func (menu *ContextMenu) ItemAtPosition(position uint32) *ContextMenuItem {
+func (menu *ContextMenu) ItemAtPosition(position uint) *ContextMenuItem {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _arg1 C.guint                  // out
 	var _cret *C.WebKitContextMenuItem // in
@@ -157,7 +157,7 @@ func (menu *ContextMenu) Items() []ContextMenuItem {
 }
 
 // NItems gets the length of the menu.
-func (menu *ContextMenu) NItems() uint32 {
+func (menu *ContextMenu) NItems() uint {
 	var _arg0 *C.WebKitContextMenu // out
 	var _cret C.guint              // in
 
@@ -166,9 +166,9 @@ func (menu *ContextMenu) NItems() uint32 {
 	_cret = C.webkit_context_menu_get_n_items(_arg0)
 	runtime.KeepAlive(menu)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
@@ -202,7 +202,7 @@ func (menu *ContextMenu) UserData() *glib.Variant {
 // Insert inserts item into the menu at the given position. If position is
 // negative, or is larger than the number of items in the KitContextMenu, the
 // item is added on to the end of the menu. The first position is 0.
-func (menu *ContextMenu) Insert(item *ContextMenuItem, position int32) {
+func (menu *ContextMenu) Insert(item *ContextMenuItem, position int) {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _arg1 *C.WebKitContextMenuItem // out
 	var _arg2 C.gint                   // out
@@ -237,7 +237,7 @@ func (menu *ContextMenu) Last() *ContextMenuItem {
 // MoveItem moves item to the given position in the menu. If position is
 // negative, or is larger than the number of items in the KitContextMenu, the
 // item is added on to the end of the menu. The first position is 0.
-func (menu *ContextMenu) MoveItem(item *ContextMenuItem, position int32) {
+func (menu *ContextMenu) MoveItem(item *ContextMenuItem, position int) {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _arg1 *C.WebKitContextMenuItem // out
 	var _arg2 C.gint                   // out

@@ -631,7 +631,7 @@ func (value *Value) ObjectEnumerateProperties() []string {
 		{
 			var i int
 			var z *C.gchar
-			for p := _cret; *p != z; p = &unsafe.Slice(p, i+1)[i] {
+			for p := _cret; *p != z; p = &unsafe.Slice(p, 2)[1] {
 				i++
 			}
 
@@ -669,7 +669,7 @@ func (value *Value) ObjectGetProperty(name string) *Value {
 }
 
 // ObjectGetPropertyAtIndex: get property at index from value.
-func (value *Value) ObjectGetPropertyAtIndex(index uint32) *Value {
+func (value *Value) ObjectGetPropertyAtIndex(index uint) *Value {
 	var _arg0 *C.JSCValue // out
 	var _arg1 C.guint     // out
 	var _cret *C.JSCValue // in
@@ -795,7 +795,7 @@ func (value *Value) ObjectSetProperty(name string, property *Value) {
 }
 
 // ObjectSetPropertyAtIndex: set property at index on value.
-func (value *Value) ObjectSetPropertyAtIndex(index uint32, property *Value) {
+func (value *Value) ObjectSetPropertyAtIndex(index uint, property *Value) {
 	var _arg0 *C.JSCValue // out
 	var _arg1 C.guint     // out
 	var _arg2 *C.JSCValue // out
@@ -866,7 +866,7 @@ func (value *Value) ToInt32() int32 {
 // ToJson: create a JSON string of value serialization. If indent is 0, the
 // resulting JSON will not contain newlines. The size of the indent is clamped
 // to 10 spaces.
-func (value *Value) ToJson(indent uint32) string {
+func (value *Value) ToJson(indent uint) string {
 	var _arg0 *C.JSCValue // out
 	var _arg1 C.guint     // out
 	var _cret *C.char     // in

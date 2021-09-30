@@ -93,11 +93,9 @@ func _gotk4_javascriptcore4_OptionsFunc(arg0 *C.char, arg1 C.JSCOptionType, arg2
 	var description string // out
 
 	option = C.GoString((*C.gchar)(unsafe.Pointer(arg0)))
-	defer C.free(unsafe.Pointer(arg0))
 	typ = OptionType(arg1)
 	if arg2 != nil {
 		description = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-		defer C.free(unsafe.Pointer(arg2))
 	}
 
 	fn := v.(OptionsFunc)
@@ -173,7 +171,7 @@ func OptionsGetDouble(option string) (float64, bool) {
 }
 
 // OptionsGetInt: get option as a #gint value.
-func OptionsGetInt(option string) (int32, bool) {
+func OptionsGetInt(option string) (int, bool) {
 	var _arg1 *C.char    // out
 	var _arg2 C.gint     // in
 	var _cret C.gboolean // in
@@ -184,10 +182,10 @@ func OptionsGetInt(option string) (int32, bool) {
 	_cret = C.jsc_options_get_int(_arg1, &_arg2)
 	runtime.KeepAlive(option)
 
-	var _value int32 // out
-	var _ok bool     // out
+	var _value int // out
+	var _ok bool   // out
 
-	_value = int32(_arg2)
+	_value = int(_arg2)
 	if _cret != 0 {
 		_ok = true
 	}
@@ -296,7 +294,7 @@ func OptionsGetString(option string) (string, bool) {
 }
 
 // OptionsGetUint: get option as a #guint value.
-func OptionsGetUint(option string) (uint32, bool) {
+func OptionsGetUint(option string) (uint, bool) {
 	var _arg1 *C.char    // out
 	var _arg2 C.guint    // in
 	var _cret C.gboolean // in
@@ -307,10 +305,10 @@ func OptionsGetUint(option string) (uint32, bool) {
 	_cret = C.jsc_options_get_uint(_arg1, &_arg2)
 	runtime.KeepAlive(option)
 
-	var _value uint32 // out
-	var _ok bool      // out
+	var _value uint // out
+	var _ok bool    // out
 
-	_value = uint32(_arg2)
+	_value = uint(_arg2)
 	if _cret != 0 {
 		_ok = true
 	}
@@ -367,7 +365,7 @@ func OptionsSetDouble(option string, value float64) bool {
 }
 
 // OptionsSetInt: set option as a #gint value.
-func OptionsSetInt(option string, value int32) bool {
+func OptionsSetInt(option string, value int) bool {
 	var _arg1 *C.char    // out
 	var _arg2 C.gint     // out
 	var _cret C.gboolean // in
@@ -465,7 +463,7 @@ func OptionsSetString(option string, value string) bool {
 }
 
 // OptionsSetUint: set option as a #guint value.
-func OptionsSetUint(option string, value uint32) bool {
+func OptionsSetUint(option string, value uint) bool {
 	var _arg1 *C.char    // out
 	var _arg2 C.guint    // out
 	var _cret C.gboolean // in

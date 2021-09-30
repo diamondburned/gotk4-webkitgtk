@@ -183,28 +183,19 @@ func _gotk4_soup2_ServerCallback(arg0 *C.SoupServer, arg1 *C.SoupMessage, arg2 *
 	server = wrapServer(externglib.Take(unsafe.Pointer(arg0)))
 	msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
 	path = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-	defer C.free(unsafe.Pointer(arg2))
 	if arg3 != nil {
 		query = make(map[string]string, gextras.HashTableSize(unsafe.Pointer(arg3)))
-		gextras.MoveHashTable(unsafe.Pointer(arg3), true, func(k, v unsafe.Pointer) {
+		gextras.MoveHashTable(unsafe.Pointer(arg3), false, func(k, v unsafe.Pointer) {
 			ksrc := *(**C.gchar)(k)
 			vsrc := *(**C.gchar)(v)
 			var kdst string // out
 			var vdst string // out
 			kdst = C.GoString((*C.gchar)(unsafe.Pointer(ksrc)))
-			defer C.free(unsafe.Pointer(ksrc))
 			vdst = C.GoString((*C.gchar)(unsafe.Pointer(vsrc)))
-			defer C.free(unsafe.Pointer(vsrc))
 			query[kdst] = vdst
 		})
 	}
 	client = (*ClientContext)(gextras.NewStructNative(unsafe.Pointer(arg4)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(client)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.free(intern.C)
-		},
-	)
 
 	fn := v.(ServerCallback)
 	fn(server, msg, path, query, client)
@@ -233,14 +224,7 @@ func _gotk4_soup2_ServerWebsocketCallback(arg0 *C.SoupServer, arg1 *C.SoupWebsoc
 	server = wrapServer(externglib.Take(unsafe.Pointer(arg0)))
 	connection = wrapWebsocketConnection(externglib.Take(unsafe.Pointer(arg1)))
 	path = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-	defer C.free(unsafe.Pointer(arg2))
 	client = (*ClientContext)(gextras.NewStructNative(unsafe.Pointer(arg3)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(client)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.free(intern.C)
-		},
-	)
 
 	fn := v.(ServerWebsocketCallback)
 	fn(server, connection, path, client)
@@ -623,7 +607,7 @@ func (server *Server) Listeners() []gio.Socket {
 //
 // Deprecated: If you are using soup_server_listen(), etc, then use
 // soup_server_get_uris() to get a list of all listening addresses.
-func (server *Server) Port() uint32 {
+func (server *Server) Port() uint {
 	var _arg0 *C.SoupServer // out
 	var _cret C.guint       // in
 
@@ -632,9 +616,9 @@ func (server *Server) Port() uint32 {
 	_cret = C.soup_server_get_port(_arg0)
 	runtime.KeepAlive(server)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
@@ -753,7 +737,7 @@ func (server *Server) Listen(address gio.SocketAddresser, options ServerListenOp
 // soup_server_get_uris() to find out what port it ended up choosing.)
 //
 // See soup_server_listen() for more details.
-func (server *Server) ListenAll(port uint32, options ServerListenOptions) error {
+func (server *Server) ListenAll(port uint, options ServerListenOptions) error {
 	var _arg0 *C.SoupServer             // out
 	var _arg1 C.guint                   // out
 	var _arg2 C.SoupServerListenOptions // out
@@ -783,7 +767,7 @@ func (server *Server) ListenAll(port uint32, options ServerListenOptions) error 
 //
 // Note that server will close fd when you free it or call
 // soup_server_disconnect().
-func (server *Server) ListenFd(fd int32, options ServerListenOptions) error {
+func (server *Server) ListenFd(fd int, options ServerListenOptions) error {
 	var _arg0 *C.SoupServer             // out
 	var _arg1 C.int                     // out
 	var _arg2 C.SoupServerListenOptions // out
@@ -816,7 +800,7 @@ func (server *Server) ListenFd(fd int32, options ServerListenOptions) error {
 // soup_server_get_uris() to find out what port it ended up choosing.)
 //
 // See soup_server_listen() for more details.
-func (server *Server) ListenLocal(port uint32, options ServerListenOptions) error {
+func (server *Server) ListenLocal(port uint, options ServerListenOptions) error {
 	var _arg0 *C.SoupServer             // out
 	var _arg1 C.guint                   // out
 	var _arg2 C.SoupServerListenOptions // out
@@ -1104,7 +1088,16 @@ func (client *ClientContext) AuthDomain() AuthDomainer {
 	var _authDomain AuthDomainer // out
 
 	if _cret != nil {
-		_authDomain = (externglib.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(AuthDomainer)
+		{
+			objptr := unsafe.Pointer(_cret)
+
+			object := externglib.Take(objptr)
+			rv, ok := (externglib.CastObject(object)).(AuthDomainer)
+			if !ok {
+				panic("object of type " + object.TypeFromInstance().String() + " is not soup.AuthDomainer")
+			}
+			_authDomain = rv
+		}
 	}
 
 	return _authDomain
@@ -1200,7 +1193,16 @@ func (client *ClientContext) LocalAddress() gio.SocketAddresser {
 	var _socketAddress gio.SocketAddresser // out
 
 	if _cret != nil {
-		_socketAddress = (externglib.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(gio.SocketAddresser)
+		{
+			objptr := unsafe.Pointer(_cret)
+
+			object := externglib.Take(objptr)
+			rv, ok := (externglib.CastObject(object)).(gio.SocketAddresser)
+			if !ok {
+				panic("object of type " + object.TypeFromInstance().String() + " is not gio.SocketAddresser")
+			}
+			_socketAddress = rv
+		}
 	}
 
 	return _socketAddress
@@ -1220,7 +1222,16 @@ func (client *ClientContext) RemoteAddress() gio.SocketAddresser {
 	var _socketAddress gio.SocketAddresser // out
 
 	if _cret != nil {
-		_socketAddress = (externglib.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(gio.SocketAddresser)
+		{
+			objptr := unsafe.Pointer(_cret)
+
+			object := externglib.Take(objptr)
+			rv, ok := (externglib.CastObject(object)).(gio.SocketAddresser)
+			if !ok {
+				panic("object of type " + object.TypeFromInstance().String() + " is not gio.SocketAddresser")
+			}
+			_socketAddress = rv
+		}
 	}
 
 	return _socketAddress
@@ -1272,7 +1283,19 @@ func (client *ClientContext) StealConnection() gio.IOStreamer {
 
 	var _ioStream gio.IOStreamer // out
 
-	_ioStream = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.IOStreamer)
+	{
+		objptr := unsafe.Pointer(_cret)
+		if objptr == nil {
+			panic("object of type gio.IOStreamer is nil")
+		}
+
+		object := externglib.AssumeOwnership(objptr)
+		rv, ok := (externglib.CastObject(object)).(gio.IOStreamer)
+		if !ok {
+			panic("object of type " + object.TypeFromInstance().String() + " is not gio.IOStreamer")
+		}
+		_ioStream = rv
+	}
 
 	return _ioStream
 }

@@ -315,7 +315,7 @@ func (s Status) String() string {
 // so they should never be presented to the user directly. Instead, you should
 // create you own error messages based on the status code, and on what you were
 // trying to do.
-func StatusGetPhrase(statusCode uint32) string {
+func StatusGetPhrase(statusCode uint) string {
 	var _arg1 C.guint // out
 	var _cret *C.char // in
 
@@ -335,7 +335,7 @@ func StatusGetPhrase(statusCode uint32) string {
 // SOUP_STATUS_CANT_RESOLVE_PROXY and SOUP_STATUS_CANT_CONNECT into
 // SOUP_STATUS_CANT_CONNECT_PROXY. Other status codes are passed through
 // unchanged.
-func StatusProxify(statusCode uint32) uint32 {
+func StatusProxify(statusCode uint) uint {
 	var _arg1 C.guint // out
 	var _cret C.guint // in
 
@@ -344,9 +344,9 @@ func StatusProxify(statusCode uint32) uint32 {
 	_cret = C.soup_status_proxify(_arg1)
 	runtime.KeepAlive(statusCode)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }

@@ -126,7 +126,6 @@ func _gotk4_soup2_LoggerPrinter(arg0 *C.SoupLogger, arg1 C.SoupLoggerLogLevel, a
 	level = LoggerLogLevel(arg1)
 	direction = byte(arg2)
 	data = C.GoString((*C.gchar)(unsafe.Pointer(arg3)))
-	defer C.free(unsafe.Pointer(arg3))
 
 	fn := v.(LoggerPrinter)
 	fn(logger, level, direction, data)
@@ -159,7 +158,7 @@ func marshalLoggerer(p uintptr) (interface{}, error) {
 //
 // If you need finer control over what message parts are and aren't logged, use
 // soup_logger_set_request_filter() and soup_logger_set_response_filter().
-func NewLogger(level LoggerLogLevel, maxBodySize int32) *Logger {
+func NewLogger(level LoggerLogLevel, maxBodySize int) *Logger {
 	var _arg1 C.SoupLoggerLogLevel // out
 	var _arg2 C.int                // out
 	var _cret *C.SoupLogger        // in

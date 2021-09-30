@@ -162,7 +162,7 @@ func NewContextWithVirtualMachine(vm *VirtualMachine) *Context {
 // first line is 1. uri and line_number are only used to fill the exception. In
 // case of errors exception will be set to a new CException with the details.
 // You can pass NULL to exception to ignore the error details.
-func (context *Context) CheckSyntax(code string, length int, mode CheckSyntaxMode, uri string, lineNumber uint32) (*Exception, CheckSyntaxResult) {
+func (context *Context) CheckSyntax(code string, length int, mode CheckSyntaxMode, uri string, lineNumber uint) (*Exception, CheckSyntaxResult) {
 	var _arg0 *C.JSCContext          // out
 	var _arg1 *C.char                // out
 	var _arg2 C.gssize               // out
@@ -242,7 +242,7 @@ func (context *Context) Evaluate(code string, length int) *Value {
 // number in uri; the value is one-based so the first line is 1. uri and
 // line_number will be shown in exceptions and they don't affect the behavior of
 // the script.
-func (context *Context) EvaluateInObject(code string, length int, objectInstance cgo.Handle, objectClass *Class, uri string, lineNumber uint32) (object *Value, value *Value) {
+func (context *Context) EvaluateInObject(code string, length int, objectInstance cgo.Handle, objectClass *Class, uri string, lineNumber uint) (object *Value, value *Value) {
 	var _arg0 *C.JSCContext // out
 	var _arg1 *C.char       // out
 	var _arg2 C.gssize      // out
@@ -287,7 +287,7 @@ func (context *Context) EvaluateInObject(code string, length int, objectInstance
 // The line_number is the starting line number in uri; the value is one-based so
 // the first line is 1. uri and line_number will be shown in exceptions and they
 // don't affect the behavior of the script.
-func (context *Context) EvaluateWithSourceURI(code string, length int, uri string, lineNumber uint32) *Value {
+func (context *Context) EvaluateWithSourceURI(code string, length int, uri string, lineNumber uint) *Value {
 	var _arg0 *C.JSCContext // out
 	var _arg1 *C.char       // out
 	var _arg2 C.gssize      // out

@@ -71,7 +71,7 @@ func (inspector *WebInspector) Detach() {
 
 // AttachedHeight: get the height that the inspector view should have when it's
 // attached. If the inspector view is not attached this returns 0.
-func (inspector *WebInspector) AttachedHeight() uint32 {
+func (inspector *WebInspector) AttachedHeight() uint {
 	var _arg0 *C.WebKitWebInspector // out
 	var _cret C.guint               // in
 
@@ -80,9 +80,9 @@ func (inspector *WebInspector) AttachedHeight() uint32 {
 	_cret = C.webkit_web_inspector_get_attached_height(_arg0)
 	runtime.KeepAlive(inspector)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }

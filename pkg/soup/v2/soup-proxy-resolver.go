@@ -28,7 +28,7 @@ func init() {
 }
 
 // ProxyResolverCallback: deprecated: Use SoupProxyURIResolver instead.
-type ProxyResolverCallback func(proxyResolver ProxyResolverer, msg *Message, arg uint32, addr *Address)
+type ProxyResolverCallback func(proxyResolver ProxyResolverer, msg *Message, arg uint, addr *Address)
 
 //export _gotk4_soup2_ProxyResolverCallback
 func _gotk4_soup2_ProxyResolverCallback(arg0 *C.SoupProxyResolver, arg1 *C.SoupMessage, arg2 C.guint, arg3 *C.SoupAddress, arg4 C.gpointer) {
@@ -39,12 +39,24 @@ func _gotk4_soup2_ProxyResolverCallback(arg0 *C.SoupProxyResolver, arg1 *C.SoupM
 
 	var proxyResolver ProxyResolverer // out
 	var msg *Message                  // out
-	var arg uint32                    // out
+	var arg uint                      // out
 	var addr *Address                 // out
 
-	proxyResolver = (externglib.CastObject(externglib.Take(unsafe.Pointer(arg0)))).(ProxyResolverer)
+	{
+		objptr := unsafe.Pointer(arg0)
+		if objptr == nil {
+			panic("object of type soup.ProxyResolverer is nil")
+		}
+
+		object := externglib.Take(objptr)
+		rv, ok := (externglib.CastObject(object)).(ProxyResolverer)
+		if !ok {
+			panic("object of type " + object.TypeFromInstance().String() + " is not soup.ProxyResolverer")
+		}
+		proxyResolver = rv
+	}
 	msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-	arg = uint32(arg2)
+	arg = uint(arg2)
 	addr = wrapAddress(externglib.Take(unsafe.Pointer(arg3)))
 
 	fn := v.(ProxyResolverCallback)
@@ -61,7 +73,7 @@ type ProxyResolverOverrider interface {
 	ProxyAsync(ctx context.Context, msg *Message, asyncContext *glib.MainContext, callback ProxyResolverCallback)
 	// ProxySync: deprecated: Use SoupProxyURIResolver.get_proxy_uri_sync()
 	// instead.
-	ProxySync(ctx context.Context, msg *Message) (*Address, uint32)
+	ProxySync(ctx context.Context, msg *Message) (*Address, uint)
 }
 
 type ProxyResolver struct {
@@ -77,7 +89,7 @@ type ProxyResolverer interface {
 	ProxyAsync(ctx context.Context, msg *Message, asyncContext *glib.MainContext, callback ProxyResolverCallback)
 	// ProxySync: deprecated: Use SoupProxyURIResolver.get_proxy_uri_sync()
 	// instead.
-	ProxySync(ctx context.Context, msg *Message) (*Address, uint32)
+	ProxySync(ctx context.Context, msg *Message) (*Address, uint)
 }
 
 var _ ProxyResolverer = (*ProxyResolver)(nil)
@@ -125,7 +137,7 @@ func (proxyResolver *ProxyResolver) ProxyAsync(ctx context.Context, msg *Message
 }
 
 // ProxySync: deprecated: Use SoupProxyURIResolver.get_proxy_uri_sync() instead.
-func (proxyResolver *ProxyResolver) ProxySync(ctx context.Context, msg *Message) (*Address, uint32) {
+func (proxyResolver *ProxyResolver) ProxySync(ctx context.Context, msg *Message) (*Address, uint) {
 	var _arg0 *C.SoupProxyResolver // out
 	var _arg2 *C.GCancellable      // out
 	var _arg1 *C.SoupMessage       // out
@@ -146,10 +158,10 @@ func (proxyResolver *ProxyResolver) ProxySync(ctx context.Context, msg *Message)
 	runtime.KeepAlive(msg)
 
 	var _addr *Address // out
-	var _guint uint32  // out
+	var _guint uint    // out
 
 	_addr = wrapAddress(externglib.Take(unsafe.Pointer(_arg3)))
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _addr, _guint
 }

@@ -250,7 +250,7 @@ func XmlrpcMessageSetResponse(msg *Message, value *glib.Variant) error {
 // an error in the SOUP_XMLRPC_ERROR domain.
 //
 // See soup_xmlrpc_params_parse() for deserialization details.
-func XmlrpcParseResponse(methodResponse string, length int32, signature string) (*glib.Variant, error) {
+func XmlrpcParseResponse(methodResponse string, length int, signature string) (*glib.Variant, error) {
 	var _arg1 *C.char     // out
 	var _arg2 C.int       // out
 	var _arg3 *C.char     // out

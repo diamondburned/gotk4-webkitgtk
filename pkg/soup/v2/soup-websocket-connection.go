@@ -239,7 +239,19 @@ func (self *WebsocketConnection) Extensions() []WebsocketExtensioner {
 	gextras.MoveList(unsafe.Pointer(_cret), false, func(v unsafe.Pointer) {
 		src := (*C.SoupWebsocketExtension)(v)
 		var dst WebsocketExtensioner // out
-		dst = (externglib.CastObject(externglib.Take(unsafe.Pointer(src)))).(WebsocketExtensioner)
+		{
+			objptr := unsafe.Pointer(src)
+			if objptr == nil {
+				panic("object of type soup.WebsocketExtensioner is nil")
+			}
+
+			object := externglib.Take(objptr)
+			rv, ok := (externglib.CastObject(object)).(WebsocketExtensioner)
+			if !ok {
+				panic("object of type " + object.TypeFromInstance().String() + " is not soup.WebsocketExtensioner")
+			}
+			dst = rv
+		}
 		_list = append(_list, dst)
 	})
 
@@ -258,13 +270,25 @@ func (self *WebsocketConnection) IOStream() gio.IOStreamer {
 
 	var _ioStream gio.IOStreamer // out
 
-	_ioStream = (externglib.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(gio.IOStreamer)
+	{
+		objptr := unsafe.Pointer(_cret)
+		if objptr == nil {
+			panic("object of type gio.IOStreamer is nil")
+		}
+
+		object := externglib.Take(objptr)
+		rv, ok := (externglib.CastObject(object)).(gio.IOStreamer)
+		if !ok {
+			panic("object of type " + object.TypeFromInstance().String() + " is not gio.IOStreamer")
+		}
+		_ioStream = rv
+	}
 
 	return _ioStream
 }
 
 // KeepaliveInterval gets the keepalive interval in seconds or 0 if disabled.
-func (self *WebsocketConnection) KeepaliveInterval() uint32 {
+func (self *WebsocketConnection) KeepaliveInterval() uint {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _cret C.guint                    // in
 
@@ -273,9 +297,9 @@ func (self *WebsocketConnection) KeepaliveInterval() uint32 {
 	_cret = C.soup_websocket_connection_get_keepalive_interval(_arg0)
 	runtime.KeepAlive(self)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
@@ -433,7 +457,7 @@ func (self *WebsocketConnection) SendText(text string) {
 // SetKeepaliveInterval sets the interval in seconds on when to send a ping
 // message which will serve as a keepalive message. If set to 0 the keepalive
 // message is disabled.
-func (self *WebsocketConnection) SetKeepaliveInterval(interval uint32) {
+func (self *WebsocketConnection) SetKeepaliveInterval(interval uint) {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _arg1 C.guint                    // out
 

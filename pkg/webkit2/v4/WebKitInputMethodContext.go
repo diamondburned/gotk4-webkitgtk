@@ -151,7 +151,7 @@ func (i InputHints) Has(other InputHints) bool {
 // yet, so the interface currently has no use.
 type InputMethodContextOverrider interface {
 	Committed(text string)
-	DeleteSurrounding(offset int32, nChars uint32)
+	DeleteSurrounding(offset int, nChars uint)
 	// FilterKeyEvent: allow key_event to be handled by the input method. If
 	// TRUE is returned, then no further processing should be done for the key
 	// event.
@@ -159,10 +159,10 @@ type InputMethodContextOverrider interface {
 	// Preedit: get the current preedit string for the context, and a list of
 	// WebKitInputMethodUnderline to apply to the string. The string will be
 	// displayed inserted at cursor_offset.
-	Preedit() (string, []InputMethodUnderline, uint32)
+	Preedit() (string, []InputMethodUnderline, uint)
 	// NotifyCursorArea: notify context that cursor area changed in input
 	// associated.
-	NotifyCursorArea(x int32, y int32, width int32, height int32)
+	NotifyCursorArea(x int, y int, width int, height int)
 	// NotifyFocusIn: notify context that input associated has gained focus.
 	NotifyFocusIn()
 	// NotifyFocusOut: notify context that input associated has lost focus.
@@ -170,7 +170,7 @@ type InputMethodContextOverrider interface {
 	// NotifySurrounding: notify context that the context surrounding the cursor
 	// has changed. If there's no selection selection_index is the same as
 	// cursor_index.
-	NotifySurrounding(text string, length uint32, cursorIndex uint32, selectionIndex uint32)
+	NotifySurrounding(text string, length uint, cursorIndex uint, selectionIndex uint)
 	PreeditChanged()
 	PreeditFinished()
 	PreeditStarted()
@@ -200,17 +200,17 @@ type InputMethodContexter interface {
 	InputPurpose() InputPurpose
 	// Preedit: get the current preedit string for the context, and a list of
 	// WebKitInputMethodUnderline to apply to the string.
-	Preedit() (string, []InputMethodUnderline, uint32)
+	Preedit() (string, []InputMethodUnderline, uint)
 	// NotifyCursorArea: notify context that cursor area changed in input
 	// associated.
-	NotifyCursorArea(x int32, y int32, width int32, height int32)
+	NotifyCursorArea(x int, y int, width int, height int)
 	// NotifyFocusIn: notify context that input associated has gained focus.
 	NotifyFocusIn()
 	// NotifyFocusOut: notify context that input associated has lost focus.
 	NotifyFocusOut()
 	// NotifySurrounding: notify context that the context surrounding the cursor
 	// has changed.
-	NotifySurrounding(text string, length int32, cursorIndex uint32, selectionIndex uint32)
+	NotifySurrounding(text string, length int, cursorIndex uint, selectionIndex uint)
 	// Reset the context.
 	Reset()
 	// SetEnablePreedit: set whether context should enable preedit to display
@@ -297,7 +297,7 @@ func (context *InputMethodContext) InputPurpose() InputPurpose {
 // Preedit: get the current preedit string for the context, and a list of
 // WebKitInputMethodUnderline to apply to the string. The string will be
 // displayed inserted at cursor_offset.
-func (context *InputMethodContext) Preedit() (string, []InputMethodUnderline, uint32) {
+func (context *InputMethodContext) Preedit() (string, []InputMethodUnderline, uint) {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _arg1 *C.char                     // in
 	var _arg2 *C.GList                    // in
@@ -310,7 +310,7 @@ func (context *InputMethodContext) Preedit() (string, []InputMethodUnderline, ui
 
 	var _text string                       // out
 	var _underlines []InputMethodUnderline // out
-	var _cursorOffset uint32               // out
+	var _cursorOffset uint                 // out
 
 	if _arg1 != nil {
 		_text = C.GoString((*C.gchar)(unsafe.Pointer(_arg1)))
@@ -325,14 +325,14 @@ func (context *InputMethodContext) Preedit() (string, []InputMethodUnderline, ui
 			_underlines = append(_underlines, dst)
 		})
 	}
-	_cursorOffset = uint32(_arg3)
+	_cursorOffset = uint(_arg3)
 
 	return _text, _underlines, _cursorOffset
 }
 
 // NotifyCursorArea: notify context that cursor area changed in input
 // associated.
-func (context *InputMethodContext) NotifyCursorArea(x int32, y int32, width int32, height int32) {
+func (context *InputMethodContext) NotifyCursorArea(x int, y int, width int, height int) {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _arg1 C.int                       // out
 	var _arg2 C.int                       // out
@@ -375,7 +375,7 @@ func (context *InputMethodContext) NotifyFocusOut() {
 
 // NotifySurrounding: notify context that the context surrounding the cursor has
 // changed. If there's no selection selection_index is the same as cursor_index.
-func (context *InputMethodContext) NotifySurrounding(text string, length int32, cursorIndex uint32, selectionIndex uint32) {
+func (context *InputMethodContext) NotifySurrounding(text string, length int, cursorIndex uint, selectionIndex uint) {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _arg1 *C.gchar                    // out
 	var _arg2 C.int                       // out
@@ -466,7 +466,7 @@ func marshalInputMethodUnderline(p uintptr) (interface{}, error) {
 }
 
 // NewInputMethodUnderline constructs a struct InputMethodUnderline.
-func NewInputMethodUnderline(startOffset uint32, endOffset uint32) *InputMethodUnderline {
+func NewInputMethodUnderline(startOffset uint, endOffset uint) *InputMethodUnderline {
 	var _arg1 C.guint                       // out
 	var _arg2 C.guint                       // out
 	var _cret *C.WebKitInputMethodUnderline // in

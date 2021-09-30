@@ -309,7 +309,7 @@ type WebViewOverrider interface {
 	LoadChanged(loadEvent LoadEvent)
 	LoadFailed(loadEvent LoadEvent, failingUri string, err error) bool
 	LoadFailedWithTLSErrors(failingUri string, certificate gio.TLSCertificater, errors gio.TLSCertificateFlags) bool
-	MouseTargetChanged(hitTestResult *HitTestResult, modifiers uint32)
+	MouseTargetChanged(hitTestResult *HitTestResult, modifiers uint)
 	PermissionRequest(permissionRequest PermissionRequester) bool
 	Print(printOperation *PrintOperation) bool
 	ReadyToShow()
@@ -817,7 +817,16 @@ func (webView *WebView) InputMethodContext() InputMethodContexter {
 	var _inputMethodContext InputMethodContexter // out
 
 	if _cret != nil {
-		_inputMethodContext = (externglib.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(InputMethodContexter)
+		{
+			objptr := unsafe.Pointer(_cret)
+
+			object := externglib.Take(objptr)
+			rv, ok := (externglib.CastObject(object)).(InputMethodContexter)
+			if !ok {
+				panic("object of type " + object.TypeFromInstance().String() + " is not webkit2.InputMethodContexter")
+			}
+			_inputMethodContext = rv
+		}
 	}
 
 	return _inputMethodContext
@@ -1052,7 +1061,19 @@ func (webView *WebView) TLSInfo() (gio.TLSCertificater, gio.TLSCertificateFlags,
 	var _errors gio.TLSCertificateFlags  // out
 	var _ok bool                         // out
 
-	_certificate = (externglib.CastObject(externglib.Take(unsafe.Pointer(_arg1)))).(gio.TLSCertificater)
+	{
+		objptr := unsafe.Pointer(_arg1)
+		if objptr == nil {
+			panic("object of type gio.TLSCertificater is nil")
+		}
+
+		object := externglib.Take(objptr)
+		rv, ok := (externglib.CastObject(object)).(gio.TLSCertificater)
+		if !ok {
+			panic("object of type " + object.TypeFromInstance().String() + " is not gio.TLSCertificater")
+		}
+		_certificate = rv
+	}
 	_errors = gio.TLSCertificateFlags(_arg2)
 	if _cret != 0 {
 		_ok = true
@@ -1809,7 +1830,19 @@ func (webView *WebView) SaveFinish(result gio.AsyncResulter) (gio.InputStreamer,
 	var _inputStream gio.InputStreamer // out
 	var _goerr error                   // out
 
-	_inputStream = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
+	{
+		objptr := unsafe.Pointer(_cret)
+		if objptr == nil {
+			panic("object of type gio.InputStreamer is nil")
+		}
+
+		object := externglib.AssumeOwnership(objptr)
+		rv, ok := (externglib.CastObject(object)).(gio.InputStreamer)
+		if !ok {
+			panic("object of type " + object.TypeFromInstance().String() + " is not gio.InputStreamer")
+		}
+		_inputStream = rv
+	}
 	if _cerr != nil {
 		_goerr = gerror.Take(unsafe.Pointer(_cerr))
 	}

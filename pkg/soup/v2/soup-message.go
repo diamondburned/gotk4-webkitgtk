@@ -307,6 +307,7 @@ func _gotk4_soup2_ChunkAllocator(arg0 *C.SoupMessage, arg1 C.gsize, arg2 C.gpoin
 
 	if buffer != nil {
 		cret = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(buffer)))
+		runtime.SetFinalizer(gextras.StructIntern(unsafe.Pointer(buffer)), nil)
 	}
 
 	return cret
@@ -572,7 +573,19 @@ func (msg *Message) HttpsStatus() (gio.TLSCertificater, gio.TLSCertificateFlags,
 	var _errors gio.TLSCertificateFlags  // out
 	var _ok bool                         // out
 
-	_certificate = (externglib.CastObject(externglib.Take(unsafe.Pointer(_arg1)))).(gio.TLSCertificater)
+	{
+		objptr := unsafe.Pointer(_arg1)
+		if objptr == nil {
+			panic("object of type gio.TLSCertificater is nil")
+		}
+
+		object := externglib.Take(objptr)
+		rv, ok := (externglib.CastObject(object)).(gio.TLSCertificater)
+		if !ok {
+			panic("object of type " + object.TypeFromInstance().String() + " is not gio.TLSCertificater")
+		}
+		_certificate = rv
+	}
 	_errors = gio.TLSCertificateFlags(_arg2)
 	if _cret != 0 {
 		_ok = true
@@ -894,7 +907,7 @@ func (msg *Message) SetPriority(priority MessagePriority) {
 // redirect_uri can be a relative URI, in which case it is interpreted relative
 // to msg's current URI. In particular, if redirect_uri is just a path, it will
 // replace the path <emphasis>and query</emphasis> of msg's URI.
-func (msg *Message) SetRedirect(statusCode uint32, redirectUri string) {
+func (msg *Message) SetRedirect(statusCode uint, redirectUri string) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.guint        // out
 	var _arg2 *C.char        // out
@@ -991,7 +1004,7 @@ func (msg *Message) SetSiteForCookies(siteForCookies *URI) {
 
 // SetStatus sets msg's status code to status_code. If status_code is a known
 // value, it will also set msg's reason_phrase.
-func (msg *Message) SetStatus(statusCode uint32) {
+func (msg *Message) SetStatus(statusCode uint) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.guint        // out
 
@@ -1004,7 +1017,7 @@ func (msg *Message) SetStatus(statusCode uint32) {
 }
 
 // SetStatusFull sets msg's status code and reason phrase.
-func (msg *Message) SetStatusFull(statusCode uint32, reasonPhrase string) {
+func (msg *Message) SetStatusFull(statusCode uint, reasonPhrase string) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.guint        // out
 	var _arg2 *C.char        // out

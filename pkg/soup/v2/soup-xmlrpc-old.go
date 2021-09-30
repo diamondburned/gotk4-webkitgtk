@@ -107,7 +107,7 @@ func XmlrpcBuildMethodResponse(value *externglib.Value) string {
 // unset.)
 //
 // Deprecated: Use soup_xmlrpc_parse_response() instead.
-func XmlrpcParseMethodResponse(methodResponse string, length int32) (externglib.Value, error) {
+func XmlrpcParseMethodResponse(methodResponse string, length int) (externglib.Value, error) {
 	var _arg1 *C.char   // out
 	var _arg2 C.int     // out
 	var _arg3 C.GValue  // in

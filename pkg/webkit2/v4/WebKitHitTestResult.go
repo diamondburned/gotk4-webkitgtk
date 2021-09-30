@@ -229,7 +229,7 @@ func (hitTestResult *HitTestResult) ContextIsSelection() bool {
 }
 
 // Context gets the value of the KitHitTestResult:context property.
-func (hitTestResult *HitTestResult) Context() uint32 {
+func (hitTestResult *HitTestResult) Context() uint {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.guint                // in
 
@@ -238,9 +238,9 @@ func (hitTestResult *HitTestResult) Context() uint32 {
 	_cret = C.webkit_hit_test_result_get_context(_arg0)
 	runtime.KeepAlive(hitTestResult)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }

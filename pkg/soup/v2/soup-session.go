@@ -182,7 +182,19 @@ func _gotk4_soup2_SessionConnectProgressCallback(arg0 *C.SoupSession, arg1 C.GSo
 
 	session = wrapSession(externglib.Take(unsafe.Pointer(arg0)))
 	event = gio.SocketClientEvent(arg1)
-	connection = (externglib.CastObject(externglib.Take(unsafe.Pointer(arg2)))).(gio.IOStreamer)
+	{
+		objptr := unsafe.Pointer(arg2)
+		if objptr == nil {
+			panic("object of type gio.IOStreamer is nil")
+		}
+
+		object := externglib.Take(objptr)
+		rv, ok := (externglib.CastObject(object)).(gio.IOStreamer)
+		if !ok {
+			panic("object of type " + object.TypeFromInstance().String() + " is not gio.IOStreamer")
+		}
+		connection = rv
+	}
 
 	fn := v.(SessionConnectProgressCallback)
 	fn(session, event, connection)
@@ -215,7 +227,7 @@ type SessionOverrider interface {
 	// soup_session_cancel_message() returns. The plain Session does not have
 	// this behavior; cancelling an asynchronous message will merely queue its
 	// callback to be run after returning to the main loop.
-	CancelMessage(msg *Message, statusCode uint32)
+	CancelMessage(msg *Message, statusCode uint)
 	FlushQueue()
 	Kick()
 	// QueueMessage queues the message msg for asynchronously sending the
@@ -253,7 +265,7 @@ type SessionOverrider interface {
 	// Contrast this method with soup_session_send(), which also synchronously
 	// sends a message, but returns before reading the response body, and allows
 	// you to read the response via a Stream.
-	SendMessage(msg *Message) uint32
+	SendMessage(msg *Message) uint
 }
 
 type Session struct {
@@ -364,7 +376,7 @@ func (session *Session) AddFeatureByType(featureType externglib.Type) {
 // soup_session_cancel_message() returns. The plain Session does not have this
 // behavior; cancelling an asynchronous message will merely queue its callback
 // to be run after returning to the main loop.
-func (session *Session) CancelMessage(msg *Message, statusCode uint32) {
+func (session *Session) CancelMessage(msg *Message, statusCode uint) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
 	var _arg2 C.guint        // out
@@ -433,7 +445,19 @@ func (session *Session) ConnectFinish(result gio.AsyncResulter) (gio.IOStreamer,
 	var _ioStream gio.IOStreamer // out
 	var _goerr error             // out
 
-	_ioStream = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.IOStreamer)
+	{
+		objptr := unsafe.Pointer(_cret)
+		if objptr == nil {
+			panic("object of type gio.IOStreamer is nil")
+		}
+
+		object := externglib.AssumeOwnership(objptr)
+		rv, ok := (externglib.CastObject(object)).(gio.IOStreamer)
+		if !ok {
+			panic("object of type " + object.TypeFromInstance().String() + " is not gio.IOStreamer")
+		}
+		_ioStream = rv
+	}
 	if _cerr != nil {
 		_goerr = gerror.Take(unsafe.Pointer(_cerr))
 	}
@@ -490,7 +514,16 @@ func (session *Session) Feature(featureType externglib.Type) SessionFeaturer {
 	var _sessionFeature SessionFeaturer // out
 
 	if _cret != nil {
-		_sessionFeature = (externglib.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(SessionFeaturer)
+		{
+			objptr := unsafe.Pointer(_cret)
+
+			object := externglib.Take(objptr)
+			rv, ok := (externglib.CastObject(object)).(SessionFeaturer)
+			if !ok {
+				panic("object of type " + object.TypeFromInstance().String() + " is not soup.SessionFeaturer")
+			}
+			_sessionFeature = rv
+		}
 	}
 
 	return _sessionFeature
@@ -520,7 +553,16 @@ func (session *Session) FeatureForMessage(featureType externglib.Type, msg *Mess
 	var _sessionFeature SessionFeaturer // out
 
 	if _cret != nil {
-		_sessionFeature = (externglib.CastObject(externglib.Take(unsafe.Pointer(_cret)))).(SessionFeaturer)
+		{
+			objptr := unsafe.Pointer(_cret)
+
+			object := externglib.Take(objptr)
+			rv, ok := (externglib.CastObject(object)).(SessionFeaturer)
+			if !ok {
+				panic("object of type " + object.TypeFromInstance().String() + " is not soup.SessionFeaturer")
+			}
+			_sessionFeature = rv
+		}
 	}
 
 	return _sessionFeature
@@ -547,7 +589,19 @@ func (session *Session) Features(featureType externglib.Type) []SessionFeaturer 
 	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
 		src := (*C.SoupSessionFeature)(v)
 		var dst SessionFeaturer // out
-		dst = (externglib.CastObject(externglib.Take(unsafe.Pointer(src)))).(SessionFeaturer)
+		{
+			objptr := unsafe.Pointer(src)
+			if objptr == nil {
+				panic("object of type soup.SessionFeaturer is nil")
+			}
+
+			object := externglib.Take(objptr)
+			rv, ok := (externglib.CastObject(object)).(SessionFeaturer)
+			if !ok {
+				panic("object of type " + object.TypeFromInstance().String() + " is not soup.SessionFeaturer")
+			}
+			dst = rv
+		}
 		_sList = append(_sList, dst)
 	})
 
@@ -920,7 +974,19 @@ func (session *Session) Send(ctx context.Context, msg *Message) (gio.InputStream
 	var _inputStream gio.InputStreamer // out
 	var _goerr error                   // out
 
-	_inputStream = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
+	{
+		objptr := unsafe.Pointer(_cret)
+		if objptr == nil {
+			panic("object of type gio.InputStreamer is nil")
+		}
+
+		object := externglib.AssumeOwnership(objptr)
+		rv, ok := (externglib.CastObject(object)).(gio.InputStreamer)
+		if !ok {
+			panic("object of type " + object.TypeFromInstance().String() + " is not gio.InputStreamer")
+		}
+		_inputStream = rv
+	}
 	if _cerr != nil {
 		_goerr = gerror.Take(unsafe.Pointer(_cerr))
 	}
@@ -986,7 +1052,19 @@ func (session *Session) SendFinish(result gio.AsyncResulter) (gio.InputStreamer,
 	var _inputStream gio.InputStreamer // out
 	var _goerr error                   // out
 
-	_inputStream = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.InputStreamer)
+	{
+		objptr := unsafe.Pointer(_cret)
+		if objptr == nil {
+			panic("object of type gio.InputStreamer is nil")
+		}
+
+		object := externglib.AssumeOwnership(objptr)
+		rv, ok := (externglib.CastObject(object)).(gio.InputStreamer)
+		if !ok {
+			panic("object of type " + object.TypeFromInstance().String() + " is not gio.InputStreamer")
+		}
+		_inputStream = rv
+	}
 	if _cerr != nil {
 		_goerr = gerror.Take(unsafe.Pointer(_cerr))
 	}
@@ -1006,7 +1084,7 @@ func (session *Session) SendFinish(result gio.AsyncResulter) (gio.InputStreamer,
 // Contrast this method with soup_session_send(), which also synchronously sends
 // a message, but returns before reading the response body, and allows you to
 // read the response via a Stream.
-func (session *Session) SendMessage(msg *Message) uint32 {
+func (session *Session) SendMessage(msg *Message) uint {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
 	var _cret C.guint        // in
@@ -1018,9 +1096,9 @@ func (session *Session) SendMessage(msg *Message) uint32 {
 	runtime.KeepAlive(session)
 	runtime.KeepAlive(msg)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
@@ -1047,7 +1125,19 @@ func (session *Session) StealConnection(msg *Message) gio.IOStreamer {
 
 	var _ioStream gio.IOStreamer // out
 
-	_ioStream = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.IOStreamer)
+	{
+		objptr := unsafe.Pointer(_cret)
+		if objptr == nil {
+			panic("object of type gio.IOStreamer is nil")
+		}
+
+		object := externglib.AssumeOwnership(objptr)
+		rv, ok := (externglib.CastObject(object)).(gio.IOStreamer)
+		if !ok {
+			panic("object of type " + object.TypeFromInstance().String() + " is not gio.IOStreamer")
+		}
+		_ioStream = rv
+	}
 
 	return _ioStream
 }

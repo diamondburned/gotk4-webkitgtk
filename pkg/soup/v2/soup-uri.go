@@ -266,7 +266,7 @@ func (uri *URI) Path() string {
 }
 
 // Port gets uri's port.
-func (uri *URI) Port() uint32 {
+func (uri *URI) Port() uint {
 	var _arg0 *C.SoupURI // out
 	var _cret C.guint    // in
 
@@ -275,9 +275,9 @@ func (uri *URI) Port() uint32 {
 	_cret = C.soup_uri_get_port(_arg0)
 	runtime.KeepAlive(uri)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
@@ -356,7 +356,7 @@ func (v1 *URI) HostEqual(v2 *URI) bool {
 }
 
 // HostHash hashes key, considering only the scheme, host, and port.
-func (key *URI) HostHash() uint32 {
+func (key *URI) HostHash() uint {
 	var _arg0 C.gconstpointer // out
 	var _cret C.guint         // in
 
@@ -365,9 +365,9 @@ func (key *URI) HostHash() uint32 {
 	_cret = C.soup_uri_host_hash(_arg0)
 	runtime.KeepAlive(key)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
@@ -442,7 +442,7 @@ func (uri *URI) SetPath(path string) {
 
 // SetPort sets uri's port to port. If port is 0, uri will not have an
 // explicitly-specified port.
-func (uri *URI) SetPort(port uint32) {
+func (uri *URI) SetPort(port uint) {
 	var _arg0 *C.SoupURI // out
 	var _arg1 C.guint    // out
 

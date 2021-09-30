@@ -531,7 +531,7 @@ func (context *WebContext) SpellCheckingLanguages() []string {
 	{
 		var i int
 		var z *C.gchar
-		for p := _cret; *p != z; p = &unsafe.Slice(p, i+1)[i] {
+		for p := _cret; *p != z; p = &unsafe.Slice(p, 2)[1] {
 			i++
 		}
 
@@ -591,7 +591,7 @@ func (context *WebContext) UseSystemAppearanceForScrollbars() bool {
 // webkit_web_context_set_web_process_count_limit().
 //
 // Deprecated: since version 2.26.
-func (context *WebContext) WebProcessCountLimit() uint32 {
+func (context *WebContext) WebProcessCountLimit() uint {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret C.guint             // in
 
@@ -600,9 +600,9 @@ func (context *WebContext) WebProcessCountLimit() uint32 {
 	_cret = C.webkit_web_context_get_web_process_count_limit(_arg0)
 	runtime.KeepAlive(context)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
@@ -1132,7 +1132,7 @@ func (context *WebContext) SetWebExtensionsInitializationUserData(userData *glib
 // This function is now deprecated and does nothing for security reasons.
 //
 // Deprecated: since version 2.26.
-func (context *WebContext) SetWebProcessCountLimit(limit uint32) {
+func (context *WebContext) SetWebProcessCountLimit(limit uint) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 C.guint             // out
 

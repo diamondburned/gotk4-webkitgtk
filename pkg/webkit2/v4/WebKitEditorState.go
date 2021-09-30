@@ -104,7 +104,7 @@ func marshalEditorStater(p uintptr) (interface{}, error) {
 // If there is a selection, this returns the typing attributes of the selected
 // text. Note that in case of a selection, typing attributes are considered
 // active only when they are present throughout the selection.
-func (editorState *EditorState) TypingAttributes() uint32 {
+func (editorState *EditorState) TypingAttributes() uint {
 	var _arg0 *C.WebKitEditorState // out
 	var _cret C.guint              // in
 
@@ -113,9 +113,9 @@ func (editorState *EditorState) TypingAttributes() uint32 {
 	_cret = C.webkit_editor_state_get_typing_attributes(_arg0)
 	runtime.KeepAlive(editorState)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }

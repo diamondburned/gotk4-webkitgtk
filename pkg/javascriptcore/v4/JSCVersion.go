@@ -29,14 +29,14 @@ const MINOR_VERSION = 32
 // your code is running against. Contrast with the C_MAJOR_VERSION macro, which
 // represents the major version of the JavaScriptCore headers you have included
 // when compiling your code.
-func GetMajorVersion() uint32 {
+func GetMajorVersion() uint {
 	var _cret C.guint // in
 
 	_cret = C.jsc_get_major_version()
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
@@ -48,14 +48,14 @@ func GetMajorVersion() uint32 {
 // your code is running against. Contrast with the C_MICRO_VERSION macro, which
 // represents the micro version of the JavaScriptCore headers you have included
 // when compiling your code.
-func GetMicroVersion() uint32 {
+func GetMicroVersion() uint {
 	var _cret C.guint // in
 
 	_cret = C.jsc_get_micro_version()
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
@@ -67,14 +67,14 @@ func GetMicroVersion() uint32 {
 // your code is running against. Contrast with the C_MINOR_VERSION macro, which
 // represents the minor version of the JavaScriptCore headers you have included
 // when compiling your code.
-func GetMinorVersion() uint32 {
+func GetMinorVersion() uint {
 	var _cret C.guint // in
 
 	_cret = C.jsc_get_minor_version()
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }

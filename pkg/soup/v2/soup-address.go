@@ -89,7 +89,7 @@ func (a AddressFamily) String() string {
 }
 
 // AddressCallback: callback function passed to soup_address_resolve_async().
-type AddressCallback func(addr *Address, status uint32)
+type AddressCallback func(addr *Address, status uint)
 
 //export _gotk4_soup2_AddressCallback
 func _gotk4_soup2_AddressCallback(arg0 *C.SoupAddress, arg1 C.guint, arg2 C.gpointer) {
@@ -99,10 +99,10 @@ func _gotk4_soup2_AddressCallback(arg0 *C.SoupAddress, arg1 C.guint, arg2 C.gpoi
 	}
 
 	var addr *Address // out
-	var status uint32 // out
+	var status uint   // out
 
 	addr = wrapAddress(externglib.Take(unsafe.Pointer(arg0)))
-	status = uint32(arg1)
+	status = uint(arg1)
 
 	fn := v.(AddressCallback)
 	fn(addr, status)
@@ -132,7 +132,7 @@ func marshalAddresser(p uintptr) (interface{}, error) {
 // NewAddress creates a Address from name and port. The Address's IP address may
 // not be available right away; the caller can call soup_address_resolve_async()
 // or soup_address_resolve_sync() to force a DNS resolution.
-func NewAddress(name string, port uint32) *Address {
+func NewAddress(name string, port uint) *Address {
 	var _arg1 *C.char        // out
 	var _arg2 C.guint        // out
 	var _cret *C.SoupAddress // in
@@ -155,7 +155,7 @@ func NewAddress(name string, port uint32) *Address {
 // NewAddressAny returns a Address corresponding to the "any" address for family
 // (or NULL if family isn't supported), suitable for using as a listening
 // Socket.
-func NewAddressAny(family AddressFamily, port uint32) *Address {
+func NewAddressAny(family AddressFamily, port uint) *Address {
 	var _arg1 C.SoupAddressFamily // out
 	var _arg2 C.guint             // out
 	var _cret *C.SoupAddress      // in
@@ -262,7 +262,19 @@ func (addr *Address) Gsockaddr() gio.SocketAddresser {
 
 	var _socketAddress gio.SocketAddresser // out
 
-	_socketAddress = (externglib.CastObject(externglib.AssumeOwnership(unsafe.Pointer(_cret)))).(gio.SocketAddresser)
+	{
+		objptr := unsafe.Pointer(_cret)
+		if objptr == nil {
+			panic("object of type gio.SocketAddresser is nil")
+		}
+
+		object := externglib.AssumeOwnership(objptr)
+		rv, ok := (externglib.CastObject(object)).(gio.SocketAddresser)
+		if !ok {
+			panic("object of type " + object.TypeFromInstance().String() + " is not gio.SocketAddresser")
+		}
+		_socketAddress = rv
+	}
 
 	return _socketAddress
 }
@@ -317,7 +329,7 @@ func (addr *Address) Physical() string {
 }
 
 // Port returns the port associated with addr.
-func (addr *Address) Port() uint32 {
+func (addr *Address) Port() uint {
 	var _arg0 *C.SoupAddress // out
 	var _cret C.guint        // in
 
@@ -326,16 +338,16 @@ func (addr *Address) Port() uint32 {
 	_cret = C.soup_address_get_port(_arg0)
 	runtime.KeepAlive(addr)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
 
 // HashByIP: hash function (for Table) that corresponds to
 // soup_address_equal_by_ip(), qv
-func (addr *Address) HashByIP() uint32 {
+func (addr *Address) HashByIP() uint {
 	var _arg0 C.gconstpointer // out
 	var _cret C.guint         // in
 
@@ -344,16 +356,16 @@ func (addr *Address) HashByIP() uint32 {
 	_cret = C.soup_address_hash_by_ip(_arg0)
 	runtime.KeepAlive(addr)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
 
 // HashByName: hash function (for Table) that corresponds to
 // soup_address_equal_by_name(), qv
-func (addr *Address) HashByName() uint32 {
+func (addr *Address) HashByName() uint {
 	var _arg0 C.gconstpointer // out
 	var _cret C.guint         // in
 
@@ -362,9 +374,9 @@ func (addr *Address) HashByName() uint32 {
 	_cret = C.soup_address_hash_by_name(_arg0)
 	runtime.KeepAlive(addr)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
@@ -438,7 +450,7 @@ func (addr *Address) ResolveAsync(ctx context.Context, asyncContext *glib.MainCo
 // It is safe to call this more than once, even from different threads, but it
 // is not safe to mix calls to soup_address_resolve_sync() with calls to
 // soup_address_resolve_async() on the same address.
-func (addr *Address) ResolveSync(ctx context.Context) uint32 {
+func (addr *Address) ResolveSync(ctx context.Context) uint {
 	var _arg0 *C.SoupAddress  // out
 	var _arg1 *C.GCancellable // out
 	var _cret C.guint         // in
@@ -454,9 +466,9 @@ func (addr *Address) ResolveSync(ctx context.Context) uint32 {
 	runtime.KeepAlive(addr)
 	runtime.KeepAlive(ctx)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }

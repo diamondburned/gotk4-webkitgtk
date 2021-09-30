@@ -62,9 +62,7 @@ func _gotk4_soup2_AuthDomainBasicAuthCallback(arg0 *C.SoupAuthDomain, arg1 *C.So
 	domain = wrapAuthDomainBasic(externglib.Take(unsafe.Pointer(arg0)))
 	msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
 	username = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-	defer C.free(unsafe.Pointer(arg2))
 	password = C.GoString((*C.gchar)(unsafe.Pointer(arg3)))
-	defer C.free(unsafe.Pointer(arg3))
 
 	fn := v.(AuthDomainBasicAuthCallback)
 	ok := fn(domain, msg, username, password)

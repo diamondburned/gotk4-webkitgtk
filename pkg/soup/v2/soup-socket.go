@@ -115,7 +115,7 @@ func (s SocketIOStatus) String() string {
 }
 
 // SocketCallback: callback function passed to soup_socket_connect_async().
-type SocketCallback func(sock *Socket, status uint32)
+type SocketCallback func(sock *Socket, status uint)
 
 //export _gotk4_soup2_SocketCallback
 func _gotk4_soup2_SocketCallback(arg0 *C.SoupSocket, arg1 C.guint, arg2 C.gpointer) {
@@ -124,11 +124,11 @@ func _gotk4_soup2_SocketCallback(arg0 *C.SoupSocket, arg1 C.guint, arg2 C.gpoint
 		panic(`callback not found`)
 	}
 
-	var sock *Socket  // out
-	var status uint32 // out
+	var sock *Socket // out
+	var status uint  // out
 
 	sock = wrapSocket(externglib.Take(unsafe.Pointer(arg0)))
-	status = uint32(arg1)
+	status = uint(arg1)
 
 	fn := v.(SocketCallback)
 	fn(sock, status)
@@ -197,7 +197,7 @@ func (sock *Socket) ConnectAsync(ctx context.Context, callback SocketCallback) {
 //
 // If cancellable is non-NULL, it can be used to cancel the connection, in which
 // case soup_socket_connect_sync() will return SOUP_STATUS_CANCELLED.
-func (sock *Socket) ConnectSync(ctx context.Context) uint32 {
+func (sock *Socket) ConnectSync(ctx context.Context) uint {
 	var _arg0 *C.SoupSocket   // out
 	var _arg1 *C.GCancellable // out
 	var _cret C.guint         // in
@@ -213,9 +213,9 @@ func (sock *Socket) ConnectSync(ctx context.Context) uint32 {
 	runtime.KeepAlive(sock)
 	runtime.KeepAlive(ctx)
 
-	var _guint uint32 // out
+	var _guint uint // out
 
-	_guint = uint32(_cret)
+	_guint = uint(_cret)
 
 	return _guint
 }
@@ -234,7 +234,7 @@ func (sock *Socket) Disconnect() {
 // Fd gets sock's underlying file descriptor.
 //
 // Note that fiddling with the file descriptor may break the Socket.
-func (sock *Socket) Fd() int32 {
+func (sock *Socket) Fd() int {
 	var _arg0 *C.SoupSocket // out
 	var _cret C.int         // in
 
@@ -243,9 +243,9 @@ func (sock *Socket) Fd() int32 {
 	_cret = C.soup_socket_get_fd(_arg0)
 	runtime.KeepAlive(sock)
 
-	var _gint int32 // out
+	var _gint int // out
 
-	_gint = int32(_cret)
+	_gint = int(_cret)
 
 	return _gint
 }
