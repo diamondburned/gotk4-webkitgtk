@@ -32,34 +32,34 @@ func init() {
 type XMLRPCFault int
 
 const (
-	// XmlrpcFaultParseErrorNotWellFormed: request was not well-formed
+	// XmlrpcFaultParseErrorNotWellFormed: request was not well-formed.
 	XmlrpcFaultParseErrorNotWellFormed XMLRPCFault = -32700
 	// XmlrpcFaultParseErrorUnsupportedEncoding: request was in an unsupported
-	// encoding
+	// encoding.
 	XmlrpcFaultParseErrorUnsupportedEncoding XMLRPCFault = -32701
 	// XmlrpcFaultParseErrorInvalidCharacterForEncoding: request contained an
-	// invalid character
+	// invalid character.
 	XmlrpcFaultParseErrorInvalidCharacterForEncoding XMLRPCFault = -32702
-	// XmlrpcFaultServerErrorInvalidXMLRpc: request was not valid XML-RPC
+	// XmlrpcFaultServerErrorInvalidXMLRpc: request was not valid XML-RPC.
 	XmlrpcFaultServerErrorInvalidXMLRpc XMLRPCFault = -32600
-	// XmlrpcFaultServerErrorRequestedMethodNotFound: method not found
+	// XmlrpcFaultServerErrorRequestedMethodNotFound: method not found.
 	XmlrpcFaultServerErrorRequestedMethodNotFound XMLRPCFault = -32601
-	// XmlrpcFaultServerErrorInvalidMethodParameters: invalid parameters
+	// XmlrpcFaultServerErrorInvalidMethodParameters: invalid parameters.
 	XmlrpcFaultServerErrorInvalidMethodParameters XMLRPCFault = -32602
-	// XmlrpcFaultServerErrorInternalXMLRpcError: internal error
+	// XmlrpcFaultServerErrorInternalXMLRpcError: internal error.
 	XmlrpcFaultServerErrorInternalXMLRpcError XMLRPCFault = -32603
 	// XmlrpcFaultApplicationError: start of reserved range for application
-	// error codes
+	// error codes.
 	XmlrpcFaultApplicationError XMLRPCFault = -32500
-	// XmlrpcFaultSystemError: start of reserved range for system error codes
+	// XmlrpcFaultSystemError: start of reserved range for system error codes.
 	XmlrpcFaultSystemError XMLRPCFault = -32400
 	// XmlrpcFaultTransportError: start of reserved range for transport error
-	// codes
+	// codes.
 	XmlrpcFaultTransportError XMLRPCFault = -32300
 )
 
 func marshalXMLRPCFault(p uintptr) (interface{}, error) {
-	return XMLRPCFault(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return XMLRPCFault(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for XMLRPCFault.
@@ -121,6 +121,12 @@ func XMLRPCFaultQuark() glib.Quark {
 // handles, maybes and dictionaries with non-string keys.
 //
 // If params is floating, it is consumed.
+//
+// The function takes the following parameters:
+//
+//    - methodName: name of the XML-RPC method.
+//    - params: #GVariant tuple.
+//
 func XmlrpcBuildRequest(methodName string, params *glib.Variant) (string, error) {
 	var _arg1 *C.char     // out
 	var _arg2 *C.GVariant // out
@@ -157,6 +163,11 @@ func XmlrpcBuildRequest(methodName string, params *glib.Variant) (string, error)
 // tuple here (unless the return value is an array).
 //
 // If value is floating, it is consumed.
+//
+// The function takes the following parameters:
+//
+//    - value: return value.
+//
 func XmlrpcBuildResponse(value *glib.Variant) (string, error) {
 	var _arg1 *C.GVariant // out
 	var _cret *C.char     // in
@@ -185,7 +196,14 @@ func XmlrpcBuildResponse(value *glib.Variant) (string, error) {
 // See soup_xmlrpc_build_request() for serialization details.
 //
 // If params is floating, it is consumed.
-func NewXmlrpcMessage(uri string, methodName string, params *glib.Variant) (*Message, error) {
+//
+// The function takes the following parameters:
+//
+//    - uri: URI of the XML-RPC service.
+//    - methodName: name of the XML-RPC method to invoke at uri.
+//    - params: #GVariant tuple.
+//
+func NewXmlrpcMessage(uri, methodName string, params *glib.Variant) (*Message, error) {
 	var _arg1 *C.char        // out
 	var _arg2 *C.char        // out
 	var _arg3 *C.GVariant    // out
@@ -221,6 +239,12 @@ func NewXmlrpcMessage(uri string, methodName string, params *glib.Variant) (*Mes
 // See soup_xmlrpc_build_request() for serialization details.
 //
 // If value is floating, it is consumed.
+//
+// The function takes the following parameters:
+//
+//    - msg: XML-RPC request.
+//    - value: #GVariant.
+//
 func XmlrpcMessageSetResponse(msg *Message, value *glib.Variant) error {
 	var _arg1 *C.SoupMessage // out
 	var _arg2 *C.GVariant    // out
@@ -250,6 +274,13 @@ func XmlrpcMessageSetResponse(msg *Message, value *glib.Variant) error {
 // an error in the SOUP_XMLRPC_ERROR domain.
 //
 // See soup_xmlrpc_params_parse() for deserialization details.
+//
+// The function takes the following parameters:
+//
+//    - methodResponse: XML-RPC methodResponse string.
+//    - length of method_response, or -1 if it is NUL-terminated.
+//    - signature: valid #GVariant type string, or NULL.
+//
 func XmlrpcParseResponse(methodResponse string, length int, signature string) (*glib.Variant, error) {
 	var _arg1 *C.char     // out
 	var _arg2 C.int       // out
@@ -294,6 +325,11 @@ func XmlrpcParseResponse(methodResponse string, length int, signature string) (*
 // If variant does not contain a datetime it will return an error but it is not
 // considered a programmer error because it generally means parameters received
 // are not in the expected type.
+//
+// The function takes the following parameters:
+//
+//    - variant: #GVariant.
+//
 func XmlrpcVariantGetDatetime(variant *glib.Variant) (*Date, error) {
 	var _arg1 *C.GVariant // out
 	var _cret *C.SoupDate // in
@@ -327,7 +363,13 @@ func XmlrpcVariantGetDatetime(variant *glib.Variant) (*Date, error) {
 // The actual type of the returned #GVariant is unspecified and "v" or "*"
 // should be used in variant format strings. For example:
 // <informalexample><programlisting> args = g_variant_new ("(v)",
-// soup_xmlrpc_variant_new_datetime (date)); </programlisting></informalexample>
+// soup_xmlrpc_variant_new_datetime (date));
+// </programlisting></informalexample>.
+//
+// The function takes the following parameters:
+//
+//    - date: Date.
+//
 func XmlrpcVariantNewDatetime(date *Date) *glib.Variant {
 	var _arg1 *C.SoupDate // out
 	var _cret *C.GVariant // in

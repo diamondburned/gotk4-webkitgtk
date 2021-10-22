@@ -29,27 +29,29 @@ func init() {
 	})
 }
 
-// Encoding: how a message body is encoded for transport
+// Encoding: how a message body is encoded for transport.
 type Encoding int
 
 const (
-	// EncodingUnrecognized: unknown / error
+	// EncodingUnrecognized: unknown / error.
 	EncodingUnrecognized Encoding = iota
 	// EncodingNone: no body is present (which is not the same as a 0-length
-	// body, and only occurs in certain places)
+	// body, and only occurs in certain places).
 	EncodingNone
-	// EncodingContentLength: content-Length encoding
+	// EncodingContentLength: content-Length encoding.
 	EncodingContentLength
-	// EncodingEOF: response body ends when the connection is closed
+	// EncodingEOF: response body ends when the connection is closed.
 	EncodingEOF
-	// EncodingChunked encoding (currently only supported for response)
+	// EncodingChunked: chunked encoding (currently only supported for
+	// response).
 	EncodingChunked
-	// EncodingByteranges (Reserved for future use: NOT CURRENTLY IMPLEMENTED)
+	// EncodingByteranges multipart/byteranges (Reserved for future use: NOT
+	// CURRENTLY IMPLEMENTED).
 	EncodingByteranges
 )
 
 func marshalEncoding(p uintptr) (interface{}, error) {
-	return Encoding(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return Encoding(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for Encoding.
@@ -77,16 +79,16 @@ func (e Encoding) String() string {
 type MessageHeadersType int
 
 const (
-	// MessageHeadersRequest headers
+	// MessageHeadersRequest: request headers.
 	MessageHeadersRequest MessageHeadersType = iota
-	// MessageHeadersResponse headers
+	// MessageHeadersResponse: response headers.
 	MessageHeadersResponse
-	// MessageHeadersMultipart body part headers
+	// MessageHeadersMultipart: multipart body part headers.
 	MessageHeadersMultipart
 )
 
 func marshalMessageHeadersType(p uintptr) (interface{}, error) {
-	return MessageHeadersType(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return MessageHeadersType(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for MessageHeadersType.
@@ -107,14 +109,14 @@ func (m MessageHeadersType) String() string {
 type Expectation int
 
 const (
-	// ExpectationUnrecognized: any unrecognized expectation
+	// ExpectationUnrecognized: any unrecognized expectation.
 	ExpectationUnrecognized Expectation = 0b1
-	// ExpectationContinue: "100-continue"
+	// ExpectationContinue: "100-continue".
 	ExpectationContinue Expectation = 0b10
 )
 
 func marshalExpectation(p uintptr) (interface{}, error) {
-	return Expectation(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
+	return Expectation(externglib.ValueFromNative(unsafe.Pointer(p)).Flags()), nil
 }
 
 // String returns the names in string for Expectation.
@@ -151,7 +153,7 @@ func (e Expectation) Has(other Expectation) bool {
 }
 
 // MessageHeadersForeachFunc: callback passed to soup_message_headers_foreach().
-type MessageHeadersForeachFunc func(name string, value string)
+type MessageHeadersForeachFunc func(name, value string)
 
 //export _gotk4_soup2_MessageHeadersForeachFunc
 func _gotk4_soup2_MessageHeadersForeachFunc(arg0 *C.char, arg1 *C.char, arg2 C.gpointer) {
@@ -183,8 +185,8 @@ type messageHeaders struct {
 }
 
 func marshalMessageHeaders(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &MessageHeaders{&messageHeaders{(*C.SoupMessageHeaders)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &MessageHeaders{&messageHeaders{(*C.SoupMessageHeaders)(b)}}, nil
 }
 
 // NewMessageHeaders constructs a struct MessageHeaders.
@@ -557,7 +559,7 @@ func (hdrs *MessageHeaders) List(name string) string {
 //
 // If hdrs does erroneously contain multiple copies of the header, it is not
 // defined which one will be returned. (Ideally, it will return whichever one
-// makes libsoup most compatible with other HTTP implementations.)
+// makes libsoup most compatible with other HTTP implementations.).
 func (hdrs *MessageHeaders) One(name string) string {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.char               // out
@@ -603,7 +605,8 @@ func (hdrs *MessageHeaders) One(name string) string {
 // The only time you need to process the Range header yourself is if either you
 // need to stream the response body rather than returning it all at once, or you
 // do not already have the complete response body available, and only want to
-// generate the parts that were actually requested by the client. </para></note>
+// generate the parts that were actually requested by the client.
+// </para></note>.
 func (hdrs *MessageHeaders) Ranges(totalLength int64) ([]Range, bool) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 C.goffset             // out
@@ -635,7 +638,7 @@ func (hdrs *MessageHeaders) Ranges(totalLength int64) ([]Range, bool) {
 // and contains a case-insensitive match for token.
 //
 // (If name is present in hdrs, then this is equivalent to calling
-// soup_header_contains() on its value.)
+// soup_header_contains() on its value.).
 func (hdrs *MessageHeaders) HeaderContains(name string, token string) bool {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.char               // out
@@ -788,7 +791,7 @@ func (hdrs *MessageHeaders) SetContentLength(contentLength int64) {
 //
 // <note><para> Server has built-in handling for range requests, and you do not
 // normally need to call this function youself. See
-// soup_message_headers_get_ranges() for more details. </para></note>
+// soup_message_headers_get_ranges() for more details. </para></note>.
 func (hdrs *MessageHeaders) SetContentRange(start int64, end int64, totalLength int64) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 C.goffset             // out
@@ -895,7 +898,7 @@ func (hdrs *MessageHeaders) SetRange(start int64, end int64) {
 
 // SetRanges sets hdrs's Range header to request the indicated ranges. (If you
 // only want to request a single range, you can use
-// soup_message_headers_set_range().)
+// soup_message_headers_set_range().).
 func (hdrs *MessageHeaders) SetRanges(ranges *Range, length int) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.SoupRange          // out
@@ -958,6 +961,11 @@ func (iter *MessageHeadersIter) Next() (name string, value string, ok bool) {
 }
 
 // MessageHeadersIterInit initializes iter for iterating hdrs.
+//
+// The function takes the following parameters:
+//
+//    - hdrs: SoupMessageHeaders.
+//
 func MessageHeadersIterInit(hdrs *MessageHeaders) MessageHeadersIter {
 	var _arg1 C.SoupMessageHeadersIter // in
 	var _arg2 *C.SoupMessageHeaders    // out
@@ -1014,14 +1022,14 @@ func NewRange(start, end int64) Range {
 	return *(*Range)(gextras.NewStructNative(unsafe.Pointer(&v)))
 }
 
-// Start: start of the range
+// Start: start of the range.
 func (r *Range) Start() int64 {
 	var v int64 // out
 	v = int64(r.native.start)
 	return v
 }
 
-// End: end of the range
+// End: end of the range.
 func (r *Range) End() int64 {
 	var v int64 // out
 	v = int64(r.native.end)

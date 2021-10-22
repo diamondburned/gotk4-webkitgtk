@@ -65,7 +65,7 @@ const SERVER_INTERFACE = "interface"
 const SERVER_PORT = "port"
 
 // SERVER_RAW_PATHS alias for the Server:raw-paths property. (If TRUE,
-// percent-encoding in the Request-URI path will not be automatically decoded.)
+// percent-encoding in the Request-URI path will not be automatically decoded.).
 const SERVER_RAW_PATHS = "raw-paths"
 
 // SERVER_REMOVE_WEBSOCKET_EXTENSION alias for the
@@ -97,8 +97,8 @@ const SERVER_TLS_CERTIFICATE = "tls-certificate"
 type ServerListenOptions int
 
 const (
-	// ServerListenHttps: listen for https connections rather than plain http.
-	ServerListenHttps ServerListenOptions = 0b1
+	// ServerListenHTTPS: listen for https connections rather than plain http.
+	ServerListenHTTPS ServerListenOptions = 0b1
 	// ServerListenIPv4Only: only listen on IPv4 interfaces.
 	ServerListenIPv4Only ServerListenOptions = 0b10
 	// ServerListenIPv6Only: only listen on IPv6 interfaces.
@@ -106,7 +106,7 @@ const (
 )
 
 func marshalServerListenOptions(p uintptr) (interface{}, error) {
-	return ServerListenOptions(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
+	return ServerListenOptions(externglib.ValueFromNative(unsafe.Pointer(p)).Flags()), nil
 }
 
 // String returns the names in string for ServerListenOptions.
@@ -123,8 +123,8 @@ func (s ServerListenOptions) String() string {
 		bit := s - next
 
 		switch bit {
-		case ServerListenHttps:
-			builder.WriteString("Https|")
+		case ServerListenHTTPS:
+			builder.WriteString("HTTPS|")
 		case ServerListenIPv4Only:
 			builder.WriteString("IPv4Only|")
 		case ServerListenIPv6Only:
@@ -252,13 +252,18 @@ func wrapServer(obj *externglib.Object) *Server {
 }
 
 func marshalServerer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapServer(obj), nil
+	return wrapServer(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // AcceptIostream: add a new client stream to the server.
-func (server *Server) AcceptIostream(stream gio.IOStreamer, localAddr gio.SocketAddresser, remoteAddr gio.SocketAddresser) error {
+//
+// The function takes the following parameters:
+//
+//    - stream: OStream.
+//    - localAddr: local Address associated with the stream.
+//    - remoteAddr: remote Address associated with the stream.
+//
+func (server *Server) AcceptIostream(stream gio.IOStreamer, localAddr, remoteAddr gio.SocketAddresser) error {
 	var _arg0 *C.SoupServer     // out
 	var _arg1 *C.GIOStream      // out
 	var _arg2 *C.GSocketAddress // out
@@ -298,6 +303,11 @@ func (server *Server) AcceptIostream(stream gio.IOStreamer, localAddr gio.Socket
 // automatically reject the request with an appropriate status (401 Unauthorized
 // or 407 Proxy Authentication Required). If the request used the "100-continue"
 // Expectation, server will reject it before the request body is sent.
+//
+// The function takes the following parameters:
+//
+//    - authDomain: AuthDomain.
+//
 func (server *Server) AddAuthDomain(authDomain AuthDomainer) {
 	var _arg0 *C.SoupServer     // out
 	var _arg1 *C.SoupAuthDomain // out
@@ -333,6 +343,12 @@ func (server *Server) AddAuthDomain(authDomain AuthDomainer) {
 // non-early handler for path as well. As long as you have not set the
 // Message:status-code by the time Message::got-body is emitted, the non-early
 // handler will be run as well.
+//
+// The function takes the following parameters:
+//
+//    - path: toplevel path for the handler.
+//    - callback to invoke for requests under path.
+//
 func (server *Server) AddEarlyHandler(path string, callback ServerCallback) {
 	var _arg0 *C.SoupServer        // out
 	var _arg1 *C.char              // out
@@ -385,6 +401,12 @@ func (server *Server) AddEarlyHandler(path string, callback ServerCallback) {
 // automatically pause the message if it is using chunked encoding but no more
 // chunks are available.) When you are done, call soup_message_body_complete()
 // to indicate that no more chunks are coming.
+//
+// The function takes the following parameters:
+//
+//    - path: toplevel path for the handler.
+//    - callback to invoke for requests under path.
+//
 func (server *Server) AddHandler(path string, callback ServerCallback) {
 	var _arg0 *C.SoupServer        // out
 	var _arg1 *C.char              // out
@@ -416,6 +438,11 @@ func (server *Server) AddHandler(path string, callback ServerCallback) {
 // time by using the SOUP_SERVER_ADD_WEBSOCKET_EXTENSION property. Note that
 // WebsocketExtensionDeflate is supported by default, use
 // soup_server_remove_websocket_extension() if you want to disable it.
+//
+// The function takes the following parameters:
+//
+//    - extensionType: #GType.
+//
 func (server *Server) AddWebsocketExtension(extensionType externglib.Type) {
 	var _arg0 *C.SoupServer // out
 	var _arg1 C.GType       // out
@@ -444,7 +471,15 @@ func (server *Server) AddWebsocketExtension(extensionType externglib.Type) {
 // path, and having it perform whatever checks are needed (possibly calling
 // soup_server_check_websocket_handshake() one or more times), and setting a
 // failure status code if the handshake should be rejected.
-func (server *Server) AddWebsocketHandler(path string, origin string, protocols []string, callback ServerWebsocketCallback) {
+//
+// The function takes the following parameters:
+//
+//    - path: toplevel path for the handler.
+//    - origin of the connection.
+//    - protocols: protocols supported by this handler.
+//    - callback to invoke for successful WebSocket requests under path.
+//
+func (server *Server) AddWebsocketHandler(path, origin string, protocols []string, callback ServerWebsocketCallback) {
 	var _arg0 *C.SoupServer                 // out
 	var _arg1 *C.char                       // out
 	var _arg2 *C.char                       // out
@@ -568,7 +603,7 @@ func (server *Server) Listener() *Socket {
 // these sockets may cause server to malfunction.
 //
 // (Beware that in contrast to the old soup_server_get_listener(), this function
-// returns #GSockets, not Sockets.)
+// returns #GSockets, not Sockets.).
 func (server *Server) Listeners() []gio.Socket {
 	var _arg0 *C.SoupServer // out
 	var _cret *C.GSList     // in
@@ -658,7 +693,7 @@ func (server *Server) URIs() []URI {
 	return _sList
 }
 
-// IsHttps checks whether server is capable of https.
+// IsHTTPS checks whether server is capable of https.
 //
 // In order for a server to run https, you must call
 // soup_server_set_ssl_cert_file(), or set the Server:tls-certificate property,
@@ -670,7 +705,7 @@ func (server *Server) URIs() []URI {
 // server is <emphasis>able</emphasis> to do https, regardless of whether it
 // actually currently is or not. Use soup_server_get_uris() to see if it
 // currently has any https listeners.
-func (server *Server) IsHttps() bool {
+func (server *Server) IsHTTPS() bool {
 	var _arg0 *C.SoupServer // out
 	var _cret C.gboolean    // in
 
@@ -704,6 +739,12 @@ func (server *Server) IsHttps() bool {
 // Note that Server never makes use of dual IPv4/IPv6 sockets; if address is an
 // IPv6 address, it will only accept IPv6 connections. You must configure IPv4
 // listening separately.
+//
+// The function takes the following parameters:
+//
+//    - address of the interface to listen on.
+//    - options: listening options for this server.
+//
 func (server *Server) Listen(address gio.SocketAddresser, options ServerListenOptions) error {
 	var _arg0 *C.SoupServer             // out
 	var _arg1 *C.GSocketAddress         // out
@@ -737,6 +778,12 @@ func (server *Server) Listen(address gio.SocketAddresser, options ServerListenOp
 // soup_server_get_uris() to find out what port it ended up choosing.)
 //
 // See soup_server_listen() for more details.
+//
+// The function takes the following parameters:
+//
+//    - port to listen on, or 0.
+//    - options: listening options for this server.
+//
 func (server *Server) ListenAll(port uint, options ServerListenOptions) error {
 	var _arg0 *C.SoupServer             // out
 	var _arg1 C.guint                   // out
@@ -767,6 +814,12 @@ func (server *Server) ListenAll(port uint, options ServerListenOptions) error {
 //
 // Note that server will close fd when you free it or call
 // soup_server_disconnect().
+//
+// The function takes the following parameters:
+//
+//    - fd: file descriptor of a listening socket.
+//    - options: listening options for this server.
+//
 func (server *Server) ListenFd(fd int, options ServerListenOptions) error {
 	var _arg0 *C.SoupServer             // out
 	var _arg1 C.int                     // out
@@ -800,6 +853,12 @@ func (server *Server) ListenFd(fd int, options ServerListenOptions) error {
 // soup_server_get_uris() to find out what port it ended up choosing.)
 //
 // See soup_server_listen() for more details.
+//
+// The function takes the following parameters:
+//
+//    - port to listen on, or 0.
+//    - options: listening options for this server.
+//
 func (server *Server) ListenLocal(port uint, options ServerListenOptions) error {
 	var _arg0 *C.SoupServer             // out
 	var _arg1 C.guint                   // out
@@ -828,6 +887,12 @@ func (server *Server) ListenLocal(port uint, options ServerListenOptions) error 
 // socket.
 //
 // See soup_server_listen() for more details.
+//
+// The function takes the following parameters:
+//
+//    - socket: listening #GSocket.
+//    - options: listening options for this server.
+//
 func (server *Server) ListenSocket(socket *gio.Socket, options ServerListenOptions) error {
 	var _arg0 *C.SoupServer             // out
 	var _arg1 *C.GSocket                // out
@@ -859,6 +924,11 @@ func (server *Server) ListenSocket(socket *gio.Socket, options ServerListenOptio
 // This must only be called on Messages which were created by the Server and are
 // currently doing I/O, such as those passed into a ServerCallback or emitted in
 // a Server::request-read signal.
+//
+// The function takes the following parameters:
+//
+//    - msg associated with server.
+//
 func (server *Server) PauseMessage(msg *Message) {
 	var _arg0 *C.SoupServer  // out
 	var _arg1 *C.SoupMessage // out
@@ -894,6 +964,11 @@ func (server *Server) Quit() {
 }
 
 // RemoveAuthDomain removes auth_domain from server.
+//
+// The function takes the following parameters:
+//
+//    - authDomain: AuthDomain.
+//
 func (server *Server) RemoveAuthDomain(authDomain AuthDomainer) {
 	var _arg0 *C.SoupServer     // out
 	var _arg1 *C.SoupAuthDomain // out
@@ -907,6 +982,11 @@ func (server *Server) RemoveAuthDomain(authDomain AuthDomainer) {
 }
 
 // RemoveHandler removes all handlers (early and normal) registered at path.
+//
+// The function takes the following parameters:
+//
+//    - path: toplevel path for the handler.
+//
 func (server *Server) RemoveHandler(path string) {
 	var _arg0 *C.SoupServer // out
 	var _arg1 *C.char       // out
@@ -924,6 +1004,11 @@ func (server *Server) RemoveHandler(path string) {
 // extension_type (or any subclass of extension_type) from server. You can also
 // remove extensions enabled by default from the server at construct time by
 // using the SOUP_SERVER_REMOVE_WEBSOCKET_EXTENSION property.
+//
+// The function takes the following parameters:
+//
+//    - extensionType: #GType.
+//
 func (server *Server) RemoveWebsocketExtension(extensionType externglib.Type) {
 	var _arg0 *C.SoupServer // out
 	var _arg1 C.GType       // out
@@ -979,7 +1064,14 @@ func (server *Server) RunAsync() {
 //
 // Alternatively, you can set the Server:tls-certificate property at
 // construction time, if you already have a Certificate.
-func (server *Server) SetSSLCertFile(sslCertFile string, sslKeyFile string) error {
+//
+// The function takes the following parameters:
+//
+//    - sslCertFile: path to a file containing a PEM-encoded SSL/TLS
+//    certificate.
+//    - sslKeyFile: path to a file containing a PEM-encoded private key.
+//
+func (server *Server) SetSSLCertFile(sslCertFile, sslKeyFile string) error {
 	var _arg0 *C.SoupServer // out
 	var _arg1 *C.char       // out
 	var _arg2 *C.char       // out
@@ -1014,6 +1106,11 @@ func (server *Server) SetSSLCertFile(sslCertFile string, sslKeyFile string) erro
 // This must only be called on Messages which were created by the Server and are
 // currently doing I/O, such as those passed into a ServerCallback or emitted in
 // a Server::request-read signal.
+//
+// The function takes the following parameters:
+//
+//    - msg associated with server.
+//
 func (server *Server) UnpauseMessage(msg *Message) {
 	var _arg0 *C.SoupServer  // out
 	var _arg1 *C.SoupMessage // out
@@ -1024,6 +1121,48 @@ func (server *Server) UnpauseMessage(msg *Message) {
 	C.soup_server_unpause_message(_arg0, _arg1)
 	runtime.KeepAlive(server)
 	runtime.KeepAlive(msg)
+}
+
+// ConnectRequestAborted: emitted when processing has failed for a message; this
+// could mean either that it could not be read (if Server::request_read has not
+// been emitted for it yet), or that the response could not be written back (if
+// Server::request_read has been emitted but Server::request_finished has not
+// been).
+//
+// message is in an undefined state when this signal is emitted; the signal
+// exists primarily to allow the server to free any state that it may have
+// allocated in Server::request_started.
+func (server *Server) ConnectRequestAborted(f func(message Message, client *ClientContext)) externglib.SignalHandle {
+	return server.Connect("request-aborted", f)
+}
+
+// ConnectRequestFinished: emitted when the server has finished writing a
+// response to a request.
+func (server *Server) ConnectRequestFinished(f func(message Message, client *ClientContext)) externglib.SignalHandle {
+	return server.Connect("request-finished", f)
+}
+
+// ConnectRequestRead: emitted when the server has successfully read a request.
+// message will have all of its request-side information filled in, and if the
+// message was authenticated, client will have information about that. This
+// signal is emitted before any (non-early) handlers are called for the message,
+// and if it sets the message's #status_code, then normal handler processing
+// will be skipped.
+func (server *Server) ConnectRequestRead(f func(message Message, client *ClientContext)) externglib.SignalHandle {
+	return server.Connect("request-read", f)
+}
+
+// ConnectRequestStarted: emitted when the server has started reading a new
+// request. message will be completely blank; not even the Request-Line will
+// have been read yet. About the only thing you can usefully do with it is
+// connect to its signals.
+//
+// If the request is read successfully, this will eventually be followed by a
+// Server::request_read signal. If a response is then sent, the request
+// processing will end with a Server::request_finished signal. If a network
+// error occurs, the processing will instead end with Server::request_aborted.
+func (server *Server) ConnectRequestStarted(f func(message Message, client *ClientContext)) externglib.SignalHandle {
+	return server.Connect("request-started", f)
 }
 
 // ClientContext provides additional information about the client making a
@@ -1048,8 +1187,8 @@ type clientContext struct {
 }
 
 func marshalClientContext(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &ClientContext{&clientContext{(*C.SoupClientContext)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &ClientContext{&clientContext{(*C.SoupClientContext)(b)}}, nil
 }
 
 // Address retrieves the Address associated with the remote end of a connection.

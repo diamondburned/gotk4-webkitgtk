@@ -51,9 +51,7 @@ func wrapContentSniffer(obj *externglib.Object) *ContentSniffer {
 }
 
 func marshalContentSnifferer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapContentSniffer(obj), nil
+	return wrapContentSniffer(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewContentSniffer creates a new ContentSniffer.
@@ -89,6 +87,12 @@ func (sniffer *ContentSniffer) BufferSize() uint {
 
 // Sniff sniffs buffer to determine its Content-Type. The result may also be
 // influenced by the Content-Type declared in msg's response headers.
+//
+// The function takes the following parameters:
+//
+//    - msg: message to sniff.
+//    - buffer containing the start of msg's response body.
+//
 func (sniffer *ContentSniffer) Sniff(msg *Message, buffer *Buffer) (map[string]string, string) {
 	var _arg0 *C.SoupContentSniffer // out
 	var _arg1 *C.SoupMessage        // out

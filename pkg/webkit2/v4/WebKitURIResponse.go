@@ -34,9 +34,7 @@ func wrapURIResponse(obj *externglib.Object) *URIResponse {
 }
 
 func marshalURIResponser(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapURIResponse(obj), nil
+	return wrapURIResponse(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // ContentLength: get the expected content length of the KitURIResponse. It can
@@ -57,8 +55,8 @@ func (response *URIResponse) ContentLength() uint64 {
 	return _guint64
 }
 
-// HttpHeaders: get the HTTP headers of a KitURIResponse as a MessageHeaders.
-func (response *URIResponse) HttpHeaders() *soup.MessageHeaders {
+// HTTPHeaders: get the HTTP headers of a KitURIResponse as a MessageHeaders.
+func (response *URIResponse) HTTPHeaders() *soup.MessageHeaders {
 	var _arg0 *C.WebKitURIResponse  // out
 	var _cret *C.SoupMessageHeaders // in
 

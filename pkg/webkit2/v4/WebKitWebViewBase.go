@@ -46,9 +46,5 @@ func wrapWebViewBase(obj *externglib.Object) *WebViewBase {
 }
 
 func marshalWebViewBaser(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapWebViewBase(obj), nil
+	return wrapWebViewBase(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*WebViewBase) privateWebViewBase() {}

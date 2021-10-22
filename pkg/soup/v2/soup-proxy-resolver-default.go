@@ -38,9 +38,5 @@ func wrapProxyResolverDefault(obj *externglib.Object) *ProxyResolverDefault {
 }
 
 func marshalProxyResolverDefaulter(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapProxyResolverDefault(obj), nil
+	return wrapProxyResolverDefault(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*ProxyResolverDefault) privateProxyResolverDefault() {}

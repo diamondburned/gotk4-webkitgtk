@@ -36,13 +36,13 @@ func init() {
 type DateFormat int
 
 const (
-	// DateHttp: RFC 1123 format, used by the HTTP "Date" header. Eg "Sun, 06
-	// Nov 1994 08:49:37 GMT"
-	DateHttp DateFormat = 1
+	// DateHTTP: RFC 1123 format, used by the HTTP "Date" header. Eg "Sun, 06
+	// Nov 1994 08:49:37 GMT".
+	DateHTTP DateFormat = 1
 	// DateCookie: format for the "Expires" timestamp in the Netscape cookie
 	// specification. Eg, "Sun, 06-Nov-1994 08:49:37 GMT".
 	DateCookie DateFormat = 2
-	// DateRfc2822: RFC 2822 format, eg "Sun, 6 Nov 1994 09:49:37 -0100"
+	// DateRfc2822: RFC 2822 format, eg "Sun, 6 Nov 1994 09:49:37 -0100".
 	DateRfc2822 DateFormat = 3
 	// DateISO8601Compact: ISO 8601 date/time with no optional punctuation. Eg,
 	// "19941106T094937-0100".
@@ -58,14 +58,14 @@ const (
 )
 
 func marshalDateFormat(p uintptr) (interface{}, error) {
-	return DateFormat(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return DateFormat(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for DateFormat.
 func (d DateFormat) String() string {
 	switch d {
-	case DateHttp:
-		return "Http"
+	case DateHTTP:
+		return "HTTP"
 	case DateCookie:
 		return "Cookie"
 	case DateRfc2822:
@@ -99,8 +99,8 @@ type date struct {
 }
 
 func marshalDate(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &Date{&date{(*C.SoupDate)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &Date{&date{(*C.SoupDate)(b)}}, nil
 }
 
 // NewDate constructs a struct Date.
@@ -338,8 +338,8 @@ func (date *Date) Second() int {
 	return _gint
 }
 
-// Utc gets date's UTC flag
-func (date *Date) Utc() int {
+// UTC gets date's UTC flag.
+func (date *Date) UTC() int {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
 
@@ -416,7 +416,7 @@ func (date *Date) String(format DateFormat) string {
 //
 // If date is not representable as a <type>time_t</type>, it will be clamped
 // into range. (In particular, some HTTP cookies have expiration dates after
-// "Y2.038k" (2038-01-19T03:14:07Z).)
+// "Y2.038k" (2038-01-19T03:14:07Z).).
 func (date *Date) ToTimeT() int32 {
 	var _arg0 *C.SoupDate // out
 	var _cret C.time_t    // in

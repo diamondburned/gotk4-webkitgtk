@@ -23,6 +23,11 @@ func init() {
 
 // MediaKeySystemPermissionGetName: get the key system for which access
 // permission is being requested.
+//
+// The function takes the following parameters:
+//
+//    - request: KitMediaKeySystemPermissionRequest.
+//
 func MediaKeySystemPermissionGetName(request *MediaKeySystemPermissionRequest) string {
 	var _arg1 *C.WebKitMediaKeySystemPermissionRequest // out
 	var _cret *C.gchar                                 // in
@@ -55,9 +60,5 @@ func wrapMediaKeySystemPermissionRequest(obj *externglib.Object) *MediaKeySystem
 }
 
 func marshalMediaKeySystemPermissionRequester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapMediaKeySystemPermissionRequest(obj), nil
+	return wrapMediaKeySystemPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*MediaKeySystemPermissionRequest) privateMediaKeySystemPermissionRequest() {}

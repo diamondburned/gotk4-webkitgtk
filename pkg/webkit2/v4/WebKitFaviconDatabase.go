@@ -35,18 +35,18 @@ func init() {
 type FaviconDatabaseError int
 
 const (
-	// FaviconDatabaseErrorNotInitialized has not been initialized yet
+	// FaviconDatabaseErrorNotInitialized has not been initialized yet.
 	FaviconDatabaseErrorNotInitialized FaviconDatabaseError = iota
 	// FaviconDatabaseErrorFaviconNotFound: there is not an icon available for
-	// the requested URL
+	// the requested URL.
 	FaviconDatabaseErrorFaviconNotFound
 	// FaviconDatabaseErrorFaviconUnknown: there might be an icon for the
-	// requested URL, but its data is unknown at the moment
+	// requested URL, but its data is unknown at the moment.
 	FaviconDatabaseErrorFaviconUnknown
 )
 
 func marshalFaviconDatabaseError(p uintptr) (interface{}, error) {
-	return FaviconDatabaseError(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return FaviconDatabaseError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for FaviconDatabaseError.
@@ -74,9 +74,7 @@ func wrapFaviconDatabase(obj *externglib.Object) *FaviconDatabase {
 }
 
 func marshalFaviconDatabaser(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapFaviconDatabase(obj), nil
+	return wrapFaviconDatabase(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Clear clears all icons from the database.
@@ -101,6 +99,14 @@ func (database *FaviconDatabase) Clear() {
 // KitWebContext associated with this KitFaviconDatabase before attempting to
 // use this function; otherwise, webkit_favicon_database_get_favicon_finish()
 // will return WEBKIT_FAVICON_DATABASE_ERROR_NOT_INITIALIZED.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL.
+//    - pageUri: URI of the page for which we want to retrieve the favicon.
+//    - callback to call when the request is satisfied or NULL if you don't
+//    care about the result.
+//
 func (database *FaviconDatabase) Favicon(ctx context.Context, pageUri string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitFaviconDatabase // out
 	var _arg2 *C.GCancellable          // out
@@ -130,6 +136,12 @@ func (database *FaviconDatabase) Favicon(ctx context.Context, pageUri string, ca
 
 // FaviconFinish finishes an operation started with
 // webkit_favicon_database_get_favicon().
+//
+// The function takes the following parameters:
+//
+//    - result obtained from the ReadyCallback passed to
+//    webkit_favicon_database_get_favicon().
+//
 func (database *FaviconDatabase) FaviconFinish(result gio.AsyncResulter) (*cairo.Surface, error) {
 	var _arg0 *C.WebKitFaviconDatabase // out
 	var _arg1 *C.GAsyncResult          // out
@@ -158,6 +170,11 @@ func (database *FaviconDatabase) FaviconFinish(result gio.AsyncResulter) (*cairo
 }
 
 // FaviconURI obtains the URI of the favicon for the given page_uri.
+//
+// The function takes the following parameters:
+//
+//    - pageUri: URI of the page containing the icon.
+//
 func (database *FaviconDatabase) FaviconURI(pageUri string) string {
 	var _arg0 *C.WebKitFaviconDatabase // out
 	var _arg1 *C.gchar                 // out
@@ -177,4 +194,14 @@ func (database *FaviconDatabase) FaviconURI(pageUri string) string {
 	defer C.free(unsafe.Pointer(_cret))
 
 	return _utf8
+}
+
+// ConnectFaviconChanged: this signal is emitted when the favicon URI of
+// page_uri has been changed to favicon_uri in the database. You can connect to
+// this signal and call webkit_favicon_database_get_favicon() to get the
+// favicon. If you are interested in the favicon of a KitWebView it's easier to
+// use the KitWebView:favicon property. See webkit_web_view_get_favicon() for
+// more details.
+func (database *FaviconDatabase) ConnectFaviconChanged(f func(pageUri, faviconUri string)) externglib.SignalHandle {
+	return database.Connect("favicon-changed", f)
 }

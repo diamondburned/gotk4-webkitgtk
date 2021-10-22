@@ -33,8 +33,8 @@ type securityOrigin struct {
 }
 
 func marshalSecurityOrigin(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &SecurityOrigin{&securityOrigin{(*C.WebKitSecurityOrigin)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &SecurityOrigin{&securityOrigin{(*C.WebKitSecurityOrigin)(b)}}, nil
 }
 
 // NewSecurityOrigin constructs a struct SecurityOrigin.

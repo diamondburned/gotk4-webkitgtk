@@ -33,9 +33,7 @@ func wrapUserContentManager(obj *externglib.Object) *UserContentManager {
 }
 
 func marshalUserContentManagerer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapUserContentManager(obj), nil
+	return wrapUserContentManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewUserContentManager creates a new user content manager.
@@ -56,6 +54,11 @@ func NewUserContentManager() *UserContentManager {
 // instances.
 //
 // Filters need to be saved and loaded from KitUserContentFilterStore.
+//
+// The function takes the following parameters:
+//
+//    - filter: KitUserContentFilter.
+//
 func (manager *UserContentManager) AddFilter(filter *UserContentFilter) {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.WebKitUserContentFilter  // out
@@ -70,6 +73,11 @@ func (manager *UserContentManager) AddFilter(filter *UserContentFilter) {
 
 // AddScript adds a KitUserScript to the given KitUserContentManager. The same
 // KitUserScript can be reused with multiple KitUserContentManager instances.
+//
+// The function takes the following parameters:
+//
+//    - script: KitUserScript.
+//
 func (manager *UserContentManager) AddScript(script *UserScript) {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.WebKitUserScript         // out
@@ -85,6 +93,11 @@ func (manager *UserContentManager) AddScript(script *UserScript) {
 // AddStyleSheet adds a KitUserStyleSheet to the given KitUserContentManager.
 // The same KitUserStyleSheet can be reused with multiple KitUserContentManager
 // instances.
+//
+// The function takes the following parameters:
+//
+//    - stylesheet: KitUserStyleSheet.
+//
 func (manager *UserContentManager) AddStyleSheet(stylesheet *UserStyleSheet) {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.WebKitUserStyleSheet     // out
@@ -115,6 +128,11 @@ func (manager *UserContentManager) AddStyleSheet(stylesheet *UserStyleSheet) {
 //
 // Registering a script message handler will fail if the requested name has been
 // already registered before.
+//
+// The function takes the following parameters:
+//
+//    - name: name of the script message channel.
+//
 func (manager *UserContentManager) RegisterScriptMessageHandler(name string) bool {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.gchar                    // out
@@ -144,7 +162,13 @@ func (manager *UserContentManager) RegisterScriptMessageHandler(name string) boo
 //
 // Registering a script message handler will fail if the requested name has been
 // already registered before.
-func (manager *UserContentManager) RegisterScriptMessageHandlerInWorld(name string, worldName string) bool {
+//
+// The function takes the following parameters:
+//
+//    - name: name of the script message channel.
+//    - worldName: name of a KitScriptWorld.
+//
+func (manager *UserContentManager) RegisterScriptMessageHandlerInWorld(name, worldName string) bool {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.gchar                    // out
 	var _arg2 *C.gchar                    // out
@@ -207,7 +231,12 @@ func (manager *UserContentManager) RemoveAllStyleSheets() {
 
 // RemoveFilter removes a filter from the given KitUserContentManager.
 //
-// Since 2.24
+// Since 2.24.
+//
+// The function takes the following parameters:
+//
+//    - filter: KitUserContentFilter.
+//
 func (manager *UserContentManager) RemoveFilter(filter *UserContentFilter) {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.WebKitUserContentFilter  // out
@@ -223,6 +252,11 @@ func (manager *UserContentManager) RemoveFilter(filter *UserContentFilter) {
 // RemoveFilterByID removes a filter from the given KitUserContentManager given
 // the identifier of a KitUserContentFilter as returned by
 // webkit_user_content_filter_get_identifier().
+//
+// The function takes the following parameters:
+//
+//    - filterId: filter identifier.
+//
 func (manager *UserContentManager) RemoveFilterByID(filterId string) {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.char                     // out
@@ -239,6 +273,11 @@ func (manager *UserContentManager) RemoveFilterByID(filterId string) {
 // RemoveScript removes a KitUserScript from the given KitUserContentManager.
 //
 // See also webkit_user_content_manager_remove_all_scripts().
+//
+// The function takes the following parameters:
+//
+//    - script: KitUserScript.
+//
 func (manager *UserContentManager) RemoveScript(script *UserScript) {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.WebKitUserScript         // out
@@ -255,6 +294,11 @@ func (manager *UserContentManager) RemoveScript(script *UserScript) {
 // KitUserContentManager.
 //
 // See also webkit_user_content_manager_remove_all_style_sheets().
+//
+// The function takes the following parameters:
+//
+//    - stylesheet: KitUserStyleSheet.
+//
 func (manager *UserContentManager) RemoveStyleSheet(stylesheet *UserStyleSheet) {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.WebKitUserStyleSheet     // out
@@ -276,6 +320,11 @@ func (manager *UserContentManager) RemoveStyleSheet(stylesheet *UserStyleSheet) 
 // registered again.
 //
 // See also webkit_user_content_manager_register_script_message_handler().
+//
+// The function takes the following parameters:
+//
+//    - name: name of the script message channel.
+//
 func (manager *UserContentManager) UnregisterScriptMessageHandler(name string) {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.gchar                    // out
@@ -299,7 +348,13 @@ func (manager *UserContentManager) UnregisterScriptMessageHandler(name string) {
 //
 // See also
 // webkit_user_content_manager_register_script_message_handler_in_world().
-func (manager *UserContentManager) UnregisterScriptMessageHandlerInWorld(name string, worldName string) {
+//
+// The function takes the following parameters:
+//
+//    - name: name of the script message channel.
+//    - worldName: name of a KitScriptWorld.
+//
+func (manager *UserContentManager) UnregisterScriptMessageHandlerInWorld(name, worldName string) {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.gchar                    // out
 	var _arg2 *C.gchar                    // out
@@ -314,4 +369,13 @@ func (manager *UserContentManager) UnregisterScriptMessageHandlerInWorld(name st
 	runtime.KeepAlive(manager)
 	runtime.KeepAlive(name)
 	runtime.KeepAlive(worldName)
+}
+
+// ConnectScriptMessageReceived: this signal is emitted when JavaScript in a web
+// view calls
+// <code>window.webkit.messageHandlers.&lt;name&gt;.postMessage()</code>, after
+// registering <code>&lt;name&gt;</code> using
+// webkit_user_content_manager_register_script_message_handler().
+func (manager *UserContentManager) ConnectScriptMessageReceived(f func(jsResult *JavascriptResult)) externglib.SignalHandle {
+	return manager.Connect("script-message-received", f)
 }

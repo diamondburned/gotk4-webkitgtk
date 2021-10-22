@@ -33,8 +33,8 @@ type optionMenuItem struct {
 }
 
 func marshalOptionMenuItem(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &OptionMenuItem{&optionMenuItem{(*C.WebKitOptionMenuItem)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &OptionMenuItem{&optionMenuItem{(*C.WebKitOptionMenuItem)(b)}}, nil
 }
 
 // Copy: make a copy of the KitOptionMenuItem.

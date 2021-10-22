@@ -51,8 +51,8 @@ type hstsPolicy struct {
 }
 
 func marshalHSTSPolicy(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &HSTSPolicy{&hstsPolicy{(*C.SoupHSTSPolicy)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &HSTSPolicy{&hstsPolicy{(*C.SoupHSTSPolicy)(b)}}, nil
 }
 
 // NewHSTSPolicy constructs a struct HSTSPolicy.
@@ -176,21 +176,21 @@ func NewHSTSPolicySessionPolicy(domain string, includeSubdomains bool) *HSTSPoli
 	return _hstsPolicy
 }
 
-// MaxAge: maximum age, in seconds, that the policy is valid
+// MaxAge: maximum age, in seconds, that the policy is valid.
 func (h *HSTSPolicy) MaxAge() uint32 {
 	var v uint32 // out
 	v = uint32(h.native.max_age)
 	return v
 }
 
-// Expires: policy expiration time, or NULL for a permanent session policy
+// Expires: policy expiration time, or NULL for a permanent session policy.
 func (h *HSTSPolicy) Expires() *Date {
 	var v *Date // out
 	v = (*Date)(gextras.NewStructNative(unsafe.Pointer(h.native.expires)))
 	return v
 }
 
-// IncludeSubdomains: TRUE if the policy applies on subdomains
+// IncludeSubdomains: TRUE if the policy applies on subdomains.
 func (h *HSTSPolicy) IncludeSubdomains() bool {
 	var v bool // out
 	if h.native.include_subdomains != 0 {

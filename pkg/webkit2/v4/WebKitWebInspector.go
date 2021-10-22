@@ -32,9 +32,7 @@ func wrapWebInspector(obj *externglib.Object) *WebInspector {
 }
 
 func marshalWebInspectorrer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapWebInspector(obj), nil
+	return wrapWebInspector(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Attach: request inspector to be attached. The signal KitWebInspector::attach
@@ -173,4 +171,61 @@ func (inspector *WebInspector) Show() {
 
 	C.webkit_web_inspector_show(_arg0)
 	runtime.KeepAlive(inspector)
+}
+
+// ConnectAttach: emitted when the inspector is requested to be attached to the
+// window where the inspected web view is. If this signal is not handled the
+// inspector view will be automatically attached to the inspected view, so you
+// only need to handle this signal if you want to attach the inspector view
+// yourself (for example, to add the inspector view to a browser tab).
+//
+// To prevent the inspector view from being attached you can connect to this
+// signal and simply return TRUE.
+func (inspector *WebInspector) ConnectAttach(f func() bool) externglib.SignalHandle {
+	return inspector.Connect("attach", f)
+}
+
+// ConnectBringToFront: emitted when the inspector should be shown.
+//
+// If the inspector is not attached the inspector window should be shown on top
+// of any other windows. If the inspector is attached the inspector view should
+// be made visible. For example, if the inspector view is attached using a tab
+// in a browser window, the browser window should be raised and the tab
+// containing the inspector view should be the active one. In both cases, if
+// this signal is not handled, the default implementation calls
+// gtk_window_present() on the current toplevel Window of the inspector view.
+func (inspector *WebInspector) ConnectBringToFront(f func() bool) externglib.SignalHandle {
+	return inspector.Connect("bring-to-front", f)
+}
+
+// ConnectClosed: emitted when the inspector page is closed. If you are using
+// your own inspector window, you should connect to this signal and destroy your
+// window.
+func (inspector *WebInspector) ConnectClosed(f func()) externglib.SignalHandle {
+	return inspector.Connect("closed", f)
+}
+
+// ConnectDetach: emitted when the inspector is requested to be detached from
+// the window it is currently attached to. The inspector is detached when the
+// inspector page is about to be closed, and this signal is emitted right before
+// KitWebInspector::closed, or when the user clicks on the detach button in the
+// inspector view to show the inspector in a separate window. In this case the
+// signal KitWebInspector::open-window is emitted after this one.
+//
+// To prevent the inspector view from being detached you can connect to this
+// signal and simply return TRUE.
+func (inspector *WebInspector) ConnectDetach(f func() bool) externglib.SignalHandle {
+	return inspector.Connect("detach", f)
+}
+
+// ConnectOpenWindow: emitted when the inspector is requested to open in a
+// separate window. If this signal is not handled, a Window with the inspector
+// will be created and shown, so you only need to handle this signal if you want
+// to use your own window. This signal is emitted after KitWebInspector::detach
+// to show the inspector in a separate window after being detached.
+//
+// To prevent the inspector from being shown you can connect to this signal and
+// simply return TRUE.
+func (inspector *WebInspector) ConnectOpenWindow(f func() bool) externglib.SignalHandle {
+	return inspector.Connect("open-window", f)
 }

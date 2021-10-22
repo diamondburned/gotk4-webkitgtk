@@ -36,9 +36,5 @@ func wrapDeviceInfoPermissionRequest(obj *externglib.Object) *DeviceInfoPermissi
 }
 
 func marshalDeviceInfoPermissionRequester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapDeviceInfoPermissionRequest(obj), nil
+	return wrapDeviceInfoPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*DeviceInfoPermissionRequest) privateDeviceInfoPermissionRequest() {}

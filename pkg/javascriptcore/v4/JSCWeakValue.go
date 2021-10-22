@@ -32,13 +32,16 @@ func wrapWeakValue(obj *externglib.Object) *WeakValue {
 }
 
 func marshalWeakValueer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapWeakValue(obj), nil
+	return wrapWeakValue(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewWeakValue: create a new CWeakValue for the JavaScript value referenced by
 // value.
+//
+// The function takes the following parameters:
+//
+//    - value: CValue.
+//
 func NewWeakValue(value *Value) *WeakValue {
 	var _arg1 *C.JSCValue     // out
 	var _cret *C.JSCWeakValue // in
@@ -70,4 +73,10 @@ func (weakValue *WeakValue) Value() *Value {
 	_value = wrapValue(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _value
+}
+
+// ConnectCleared: this signal is emitted when the JavaScript value is
+// destroyed.
+func (weakValue *WeakValue) ConnectCleared(f func()) externglib.SignalHandle {
+	return weakValue.Connect("cleared", f)
 }

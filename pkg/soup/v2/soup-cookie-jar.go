@@ -28,7 +28,7 @@ func init() {
 const COOKIE_JAR_ACCEPT_POLICY = "accept-policy"
 
 // COOKIE_JAR_READ_ONLY alias for the CookieJar:read-only property. (Whether or
-// not the cookie jar is read-only.)
+// not the cookie jar is read-only.).
 const COOKIE_JAR_READ_ONLY = "read-only"
 
 // CookieJarAcceptPolicy: policy for accepting or rejecting cookies returned in
@@ -69,7 +69,7 @@ const (
 )
 
 func marshalCookieJarAcceptPolicy(p uintptr) (interface{}, error) {
-	return CookieJarAcceptPolicy(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return CookieJarAcceptPolicy(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for CookieJarAcceptPolicy.
@@ -93,7 +93,7 @@ func (c CookieJarAcceptPolicy) String() string {
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type CookieJarOverrider interface {
-	Changed(oldCookie *Cookie, newCookie *Cookie)
+	Changed(oldCookie, newCookie *Cookie)
 	// IsPersistent gets whether jar stores cookies persistenly.
 	IsPersistent() bool
 	// Save: this function exists for backward compatibility, but does not do
@@ -120,9 +120,7 @@ func wrapCookieJar(obj *externglib.Object) *CookieJar {
 }
 
 func marshalCookieJarrer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapCookieJar(obj), nil
+	return wrapCookieJar(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewCookieJar creates a new CookieJar. The base CookieJar class does not
@@ -144,6 +142,11 @@ func NewCookieJar() *CookieJar {
 // the cookie's expire date is not in the past).
 //
 // cookie will be 'stolen' by the jar, so don't free it afterwards.
+//
+// The function takes the following parameters:
+//
+//    - cookie: Cookie.
+//
 func (jar *CookieJar) AddCookie(cookie *Cookie) {
 	var _arg0 *C.SoupCookieJar // out
 	var _arg1 *C.SoupCookie    // out
@@ -168,7 +171,14 @@ func (jar *CookieJar) AddCookie(cookie *Cookie) {
 // insecure origins. NULL is treated as secure.
 //
 // cookie will be 'stolen' by the jar, so don't free it afterwards.
-func (jar *CookieJar) AddCookieFull(cookie *Cookie, uri *URI, firstParty *URI) {
+//
+// The function takes the following parameters:
+//
+//    - cookie: Cookie.
+//    - uri: URI setting the cookie.
+//    - firstParty: URI for the main document.
+//
+func (jar *CookieJar) AddCookieFull(cookie *Cookie, uri, firstParty *URI) {
 	var _arg0 *C.SoupCookieJar // out
 	var _arg1 *C.SoupCookie    // out
 	var _arg2 *C.SoupURI       // out
@@ -202,6 +212,12 @@ func (jar *CookieJar) AddCookieFull(cookie *Cookie, uri *URI, firstParty *URI) {
 //
 // For secure cookies to work properly you may want to use
 // soup_cookie_jar_add_cookie_full().
+//
+// The function takes the following parameters:
+//
+//    - firstParty: URI for the main document.
+//    - cookie: Cookie.
+//
 func (jar *CookieJar) AddCookieWithFirstParty(firstParty *URI, cookie *Cookie) {
 	var _arg0 *C.SoupCookieJar // out
 	var _arg1 *C.SoupURI       // out
@@ -250,6 +266,11 @@ func (jar *CookieJar) AllCookies() []Cookie {
 }
 
 // DeleteCookie deletes cookie from jar, emitting the 'changed' signal.
+//
+// The function takes the following parameters:
+//
+//    - cookie: Cookie.
+//
 func (jar *CookieJar) DeleteCookie(cookie *Cookie) {
 	var _arg0 *C.SoupCookieJar // out
 	var _arg1 *C.SoupCookie    // out
@@ -262,7 +283,7 @@ func (jar *CookieJar) DeleteCookie(cookie *Cookie) {
 	runtime.KeepAlive(cookie)
 }
 
-// AcceptPolicy gets jar's CookieJarAcceptPolicy
+// AcceptPolicy gets jar's CookieJarAcceptPolicy.
 func (jar *CookieJar) AcceptPolicy() CookieJarAcceptPolicy {
 	var _arg0 *C.SoupCookieJar            // out
 	var _cret C.SoupCookieJarAcceptPolicy // in
@@ -288,6 +309,13 @@ func (jar *CookieJar) AcceptPolicy() CookieJarAcceptPolicy {
 // CookieJar sets the Cookie header itself when making the actual HTTP request,
 // you should almost certainly be setting for_http to FALSE if you are calling
 // this.
+//
+// The function takes the following parameters:
+//
+//    - uri: URI.
+//    - forHttp: whether or not the return value is being passed directly to an
+//    HTTP operation.
+//
 func (jar *CookieJar) CookieList(uri *URI, forHttp bool) []Cookie {
 	var _arg0 *C.SoupCookieJar // out
 	var _arg1 *C.SoupURI       // out
@@ -329,7 +357,20 @@ func (jar *CookieJar) CookieList(uri *URI, forHttp bool) []Cookie {
 // use SameSite cookies. See the SameSite cookies spec
 // (https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00) for more
 // detailed information.
-func (jar *CookieJar) CookieListWithSameSiteInfo(uri *URI, topLevel *URI, siteForCookies *URI, forHttp bool, isSafeMethod bool, isTopLevelNavigation bool) []Cookie {
+//
+// The function takes the following parameters:
+//
+//    - uri: URI.
+//    - topLevel for the top level document.
+//    - siteForCookies indicating the origin to get cookies for.
+//    - forHttp: whether or not the return value is being passed directly to an
+//    HTTP operation.
+//    - isSafeMethod: if the HTTP method is safe, as defined by RFC 7231,
+//    ignored when for_http is FALSE.
+//    - isTopLevelNavigation: whether or not the HTTP request is part of top
+//    level navigation.
+//
+func (jar *CookieJar) CookieListWithSameSiteInfo(uri, topLevel, siteForCookies *URI, forHttp, isSafeMethod, isTopLevelNavigation bool) []Cookie {
 	var _arg0 *C.SoupCookieJar // out
 	var _arg1 *C.SoupURI       // out
 	var _arg2 *C.SoupURI       // out
@@ -394,6 +435,13 @@ func (jar *CookieJar) CookieListWithSameSiteInfo(uri *URI, topLevel *URI, siteFo
 // CookieJar sets the Cookie header itself when making the actual HTTP request,
 // you should almost certainly be setting for_http to FALSE if you are calling
 // this.
+//
+// The function takes the following parameters:
+//
+//    - uri: URI.
+//    - forHttp: whether or not the return value is being passed directly to an
+//    HTTP operation.
+//
 func (jar *CookieJar) Cookies(uri *URI, forHttp bool) string {
 	var _arg0 *C.SoupCookieJar // out
 	var _arg1 *C.SoupURI       // out
@@ -454,6 +502,11 @@ func (jar *CookieJar) Save() {
 }
 
 // SetAcceptPolicy sets policy as the cookie acceptance policy for jar.
+//
+// The function takes the following parameters:
+//
+//    - policy: CookieJarAcceptPolicy.
+//
 func (jar *CookieJar) SetAcceptPolicy(policy CookieJarAcceptPolicy) {
 	var _arg0 *C.SoupCookieJar            // out
 	var _arg1 C.SoupCookieJarAcceptPolicy // out
@@ -474,6 +527,12 @@ func (jar *CookieJar) SetAcceptPolicy(policy CookieJarAcceptPolicy) {
 // SOUP_COOKIE_JAR_ACCEPT_GRANDFATHERED_THIRD_PARTY you'll need to use
 // soup_cookie_jar_set_cookie_with_first_party(), otherwise the jar will have no
 // way of knowing if the cookie is being set by a third party or not.
+//
+// The function takes the following parameters:
+//
+//    - uri: URI setting the cookie.
+//    - cookie: stringified cookie to set.
+//
 func (jar *CookieJar) SetCookie(uri *URI, cookie string) {
 	var _arg0 *C.SoupCookieJar // out
 	var _arg1 *C.SoupURI       // out
@@ -494,7 +553,14 @@ func (jar *CookieJar) SetCookie(uri *URI, cookie string) {
 // in a Set-Cookie header returned from a request to uri. first_party will be
 // used to reject cookies coming from third party resources in case such a
 // security policy is set in the jar.
-func (jar *CookieJar) SetCookieWithFirstParty(uri *URI, firstParty *URI, cookie string) {
+//
+// The function takes the following parameters:
+//
+//    - uri: URI setting the cookie.
+//    - firstParty: URI for the main document.
+//    - cookie: stringified cookie to set.
+//
+func (jar *CookieJar) SetCookieWithFirstParty(uri, firstParty *URI, cookie string) {
 	var _arg0 *C.SoupCookieJar // out
 	var _arg1 *C.SoupURI       // out
 	var _arg2 *C.SoupURI       // out
@@ -511,4 +577,13 @@ func (jar *CookieJar) SetCookieWithFirstParty(uri *URI, firstParty *URI, cookie 
 	runtime.KeepAlive(uri)
 	runtime.KeepAlive(firstParty)
 	runtime.KeepAlive(cookie)
+}
+
+// ConnectChanged: emitted when jar changes. If a cookie has been added,
+// new_cookie will contain the newly-added cookie and old_cookie will be NULL.
+// If a cookie has been deleted, old_cookie will contain the to-be-deleted
+// cookie and new_cookie will be NULL. If a cookie has been changed, old_cookie
+// will contain its old value, and new_cookie its new value.
+func (jar *CookieJar) ConnectChanged(f func(oldCookie, newCookie Cookie)) externglib.SignalHandle {
+	return jar.Connect("changed", f)
 }

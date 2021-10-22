@@ -33,8 +33,8 @@ type mimeInfo struct {
 }
 
 func marshalMIMEInfo(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &MIMEInfo{&mimeInfo{(*C.WebKitMimeInfo)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &MIMEInfo{&mimeInfo{(*C.WebKitMimeInfo)(b)}}, nil
 }
 
 // Description: deprecated: since version 2.32.

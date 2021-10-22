@@ -33,9 +33,5 @@ func wrapWebsocketExtensionDeflate(obj *externglib.Object) *WebsocketExtensionDe
 }
 
 func marshalWebsocketExtensionDeflater(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapWebsocketExtensionDeflate(obj), nil
+	return wrapWebsocketExtensionDeflate(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*WebsocketExtensionDeflate) privateWebsocketExtensionDeflate() {}

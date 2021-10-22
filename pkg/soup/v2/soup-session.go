@@ -113,19 +113,19 @@ const SESSION_USE_THREAD_CONTEXT = "use-thread-context"
 type RequestError int
 
 const (
-	// RequestErrorBadURI: URI could not be parsed
+	// RequestErrorBadURI: URI could not be parsed.
 	RequestErrorBadURI RequestError = iota
 	// RequestErrorUnsupportedURIScheme: URI scheme is not supported by this
-	// Session
+	// Session.
 	RequestErrorUnsupportedURIScheme
-	// RequestErrorParsing server's response could not be parsed
+	// RequestErrorParsing server's response could not be parsed.
 	RequestErrorParsing
-	// RequestErrorEncoding server's response was in an unsupported format
+	// RequestErrorEncoding server's response was in an unsupported format.
 	RequestErrorEncoding
 )
 
 func marshalRequestError(p uintptr) (interface{}, error) {
-	return RequestError(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return RequestError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for RequestError.
@@ -279,9 +279,7 @@ func wrapSession(obj *externglib.Object) *Session {
 }
 
 func marshalSessioner(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapSession(obj), nil
+	return wrapSession(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewSession creates a Session with the default options.
@@ -319,6 +317,11 @@ func (session *Session) Abort() {
 //
 // See the main Session documentation for information on what features are
 // present in sessions by default.
+//
+// The function takes the following parameters:
+//
+//    - feature: object that implements SessionFeature.
+//
 func (session *Session) AddFeature(feature SessionFeaturer) {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 *C.SoupSessionFeature // out
@@ -345,6 +348,11 @@ func (session *Session) AddFeature(feature SessionFeaturer) {
 //
 // See the main Session documentation for information on what features are
 // present in sessions by default.
+//
+// The function takes the following parameters:
+//
+//    - featureType: #GType.
+//
 func (session *Session) AddFeatureByType(featureType externglib.Type) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 C.GType        // out
@@ -376,6 +384,12 @@ func (session *Session) AddFeatureByType(featureType externglib.Type) {
 // soup_session_cancel_message() returns. The plain Session does not have this
 // behavior; cancelling an asynchronous message will merely queue its callback
 // to be run after returning to the main loop.
+//
+// The function takes the following parameters:
+//
+//    - msg: message to cancel.
+//    - statusCode status code to set on msg (generally SOUP_STATUS_CANCELLED).
+//
 func (session *Session) CancelMessage(msg *Message, statusCode uint) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
@@ -397,6 +411,15 @@ func (session *Session) CancelMessage(msg *Message, statusCode uint) {
 //
 // Call soup_session_connect_finish() to get the OStream to communicate with the
 // server.
+//
+// The function takes the following parameters:
+//
+//    - ctx: #GCancellable.
+//    - uri to connect to.
+//    - progressCallback which will be called for every network event that
+//    occurs during the connection.
+//    - callback to invoke when the operation finishes.
+//
 func (session *Session) ConnectAsync(ctx context.Context, uri *URI, progressCallback SessionConnectProgressCallback, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.SoupSession                       // out
 	var _arg2 *C.GCancellable                      // out
@@ -429,6 +452,11 @@ func (session *Session) ConnectAsync(ctx context.Context, uri *URI, progressCall
 
 // ConnectFinish gets the OStream created for the connection to communicate with
 // the server.
+//
+// The function takes the following parameters:
+//
+//    - result passed to your callback.
+//
 func (session *Session) ConnectFinish(result gio.AsyncResulter) (gio.IOStreamer, error) {
 	var _arg0 *C.SoupSession  // out
 	var _arg1 *C.GAsyncResult // out
@@ -499,6 +527,11 @@ func (session *Session) AsyncContext() *glib.MainContext {
 // Feature gets the first feature in session of type feature_type. For features
 // where there may be more than one feature of a given type, use
 // soup_session_get_features().
+//
+// The function takes the following parameters:
+//
+//    - featureType of the feature to get.
+//
 func (session *Session) Feature(featureType externglib.Type) SessionFeaturer {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 C.GType               // out
@@ -535,6 +568,12 @@ func (session *Session) Feature(featureType externglib.Type) SessionFeaturer {
 // match a single feature. In particular, if there are two matching features,
 // and the first is disabled on msg, and the second is not, then this will
 // return NULL, not the second feature.
+//
+// The function takes the following parameters:
+//
+//    - featureType of the feature to get.
+//    - msg: Message.
+//
 func (session *Session) FeatureForMessage(featureType externglib.Type, msg *Message) SessionFeaturer {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 C.GType               // out
@@ -570,7 +609,12 @@ func (session *Session) FeatureForMessage(featureType externglib.Type, msg *Mess
 
 // Features generates a list of session's features of type feature_type. (If you
 // want to see all features, you can pass SOUP_TYPE_SESSION_FEATURE for
-// feature_type.)
+// feature_type.).
+//
+// The function takes the following parameters:
+//
+//    - featureType of the class of features to get.
+//
 func (session *Session) Features(featureType externglib.Type) []SessionFeaturer {
 	var _arg0 *C.SoupSession // out
 	var _arg1 C.GType        // out
@@ -611,6 +655,11 @@ func (session *Session) Features(featureType externglib.Type) []SessionFeaturer 
 // HasFeature tests if session has at a feature of type feature_type (which can
 // be the type of either a SessionFeature, or else a subtype of some class
 // managed by another feature, such as Auth or Request).
+//
+// The function takes the following parameters:
+//
+//    - featureType of the class of features to check for.
+//
 func (session *Session) HasFeature(featureType externglib.Type) bool {
 	var _arg0 *C.SoupSession // out
 	var _arg1 C.GType        // out
@@ -637,6 +686,11 @@ func (session *Session) HasFeature(featureType externglib.Type) bool {
 //
 // This may only be called for asynchronous messages (those sent on a
 // SessionAsync or using soup_session_queue_message()).
+//
+// The function takes the following parameters:
+//
+//    - msg currently running on session.
+//
 func (session *Session) PauseMessage(msg *Message) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
@@ -656,6 +710,13 @@ func (session *Session) PauseMessage(msg *Message) {
 //
 // If cancellable is non-NULL, it can be used to cancel the resolution. callback
 // will still be invoked in this case, with a status of SOUP_STATUS_CANCELLED.
+//
+// The function takes the following parameters:
+//
+//    - ctx object, or NULL.
+//    - hostname to be resolved.
+//    - callback to call with the result, or NULL.
+//
 func (session *Session) PrefetchDns(ctx context.Context, hostname string, callback AddressCallback) {
 	var _arg0 *C.SoupSession        // out
 	var _arg2 *C.GCancellable       // out
@@ -689,6 +750,11 @@ func (session *Session) PrefetchDns(ctx context.Context, hostname string, callba
 // requested.
 //
 // Deprecated: use soup_session_prefetch_dns() instead.
+//
+// The function takes the following parameters:
+//
+//    - uri which may be required.
+//
 func (session *Session) PrepareForURI(uri *URI) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupURI     // out
@@ -719,6 +785,13 @@ func (session *Session) PrepareForURI(uri *URI) {
 // Contrast this method with soup_session_send_async(), which also
 // asynchronously sends a message, but returns before reading the response body,
 // and allows you to read the response via a Stream.
+//
+// The function takes the following parameters:
+//
+//    - msg: message to queue.
+//    - callback which will be called after the message completes or when an
+//    unrecoverable error occurs.
+//
 func (session *Session) QueueMessage(msg *Message, callback SessionCallback) {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 *C.SoupMessage        // out
@@ -750,6 +823,11 @@ func (session *Session) QueueMessage(msg *Message, callback SessionCallback) {
 //
 // If msg has already been redirected too many times, this will cause it to fail
 // with SOUP_STATUS_TOO_MANY_REDIRECTS.
+//
+// The function takes the following parameters:
+//
+//    - msg that has received a 3xx response.
+//
 func (session *Session) RedirectMessage(msg *Message) bool {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
@@ -772,6 +850,11 @@ func (session *Session) RedirectMessage(msg *Message) bool {
 }
 
 // RemoveFeature removes feature's functionality from session.
+//
+// The function takes the following parameters:
+//
+//    - feature that has previously been added to session.
+//
 func (session *Session) RemoveFeature(feature SessionFeaturer) {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 *C.SoupSessionFeature // out
@@ -788,6 +871,11 @@ func (session *Session) RemoveFeature(feature SessionFeaturer) {
 // subclass of feature_type) from session. You can also remove standard features
 // from the session at construct time by using the
 // SOUP_SESSION_REMOVE_FEATURE_BY_TYPE property.
+//
+// The function takes the following parameters:
+//
+//    - featureType: #GType.
+//
 func (session *Session) RemoveFeatureByType(featureType externglib.Type) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 C.GType        // out
@@ -801,6 +889,11 @@ func (session *Session) RemoveFeatureByType(featureType externglib.Type) {
 }
 
 // Request creates a Request for retrieving uri_string.
+//
+// The function takes the following parameters:
+//
+//    - uriString: URI, in string form.
+//
 func (session *Session) Request(uriString string) (*Request, error) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.char        // out
@@ -826,10 +919,16 @@ func (session *Session) Request(uriString string) (*Request, error) {
 	return _request, _goerr
 }
 
-// RequestHttp creates a Request for retrieving uri_string, which must be an
+// RequestHTTP creates a Request for retrieving uri_string, which must be an
 // "http" or "https" URI (or another protocol listed in session's
 // Session:http-aliases or Session:https-aliases).
-func (session *Session) RequestHttp(method string, uriString string) (*RequestHTTP, error) {
+//
+// The function takes the following parameters:
+//
+//    - method: HTTP method.
+//    - uriString: URI, in string form.
+//
+func (session *Session) RequestHTTP(method, uriString string) (*RequestHTTP, error) {
 	var _arg0 *C.SoupSession     // out
 	var _arg1 *C.char            // out
 	var _arg2 *C.char            // out
@@ -858,10 +957,16 @@ func (session *Session) RequestHttp(method string, uriString string) (*RequestHT
 	return _requestHTTP, _goerr
 }
 
-// RequestHttpURI creates a Request for retrieving uri, which must be an "http"
+// RequestHTTPURI creates a Request for retrieving uri, which must be an "http"
 // or "https" URI (or another protocol listed in session's Session:http-aliases
 // or Session:https-aliases).
-func (session *Session) RequestHttpURI(method string, uri *URI) (*RequestHTTP, error) {
+//
+// The function takes the following parameters:
+//
+//    - method: HTTP method.
+//    - uri representing the URI to retrieve.
+//
+func (session *Session) RequestHTTPUri(method string, uri *URI) (*RequestHTTP, error) {
 	var _arg0 *C.SoupSession     // out
 	var _arg1 *C.char            // out
 	var _arg2 *C.SoupURI         // out
@@ -890,6 +995,11 @@ func (session *Session) RequestHttpURI(method string, uri *URI) (*RequestHTTP, e
 }
 
 // RequestURI creates a Request for retrieving uri.
+//
+// The function takes the following parameters:
+//
+//    - uri representing the URI to retrieve.
+//
 func (session *Session) RequestURI(uri *URI) (*Request, error) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupURI     // out
@@ -916,6 +1026,11 @@ func (session *Session) RequestURI(uri *URI) (*Request, error) {
 
 // RequeueMessage: this causes msg to be placed back on the queue to be
 // attempted again.
+//
+// The function takes the following parameters:
+//
+//    - msg: message to requeue.
+//
 func (session *Session) RequeueMessage(msg *Message) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
@@ -950,7 +1065,13 @@ func (session *Session) RequeueMessage(msg *Message) {
 // completely read.
 //
 // (Note that this method cannot be called on the deprecated SessionAsync
-// subclass.)
+// subclass.).
+//
+// The function takes the following parameters:
+//
+//    - ctx: #GCancellable.
+//    - msg: Message.
+//
 func (session *Session) Send(ctx context.Context, msg *Message) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupSession  // out
 	var _arg2 *C.GCancellable // out
@@ -1007,7 +1128,14 @@ func (session *Session) Send(ctx context.Context, msg *Message) (gio.InputStream
 //
 // (Note that this method cannot be called on the deprecated SessionSync
 // subclass, and can only be called on SessionAsync if you have set the
-// Session:use-thread-context property.)
+// Session:use-thread-context property.).
+//
+// The function takes the following parameters:
+//
+//    - ctx: #GCancellable.
+//    - msg: Message.
+//    - callback to invoke.
+//
 func (session *Session) SendAsync(ctx context.Context, msg *Message, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.SoupSession        // out
 	var _arg2 *C.GCancellable       // out
@@ -1036,6 +1164,11 @@ func (session *Session) SendAsync(ctx context.Context, msg *Message, callback gi
 
 // SendFinish gets the response to a soup_session_send_async() call and (if
 // successful), returns a Stream that can be used to read the response body.
+//
+// The function takes the following parameters:
+//
+//    - result passed to your callback.
+//
 func (session *Session) SendFinish(result gio.AsyncResulter) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupSession  // out
 	var _arg1 *C.GAsyncResult // out
@@ -1084,6 +1217,11 @@ func (session *Session) SendFinish(result gio.AsyncResulter) (gio.InputStreamer,
 // Contrast this method with soup_session_send(), which also synchronously sends
 // a message, but returns before reading the response body, and allows you to
 // read the response via a Stream.
+//
+// The function takes the following parameters:
+//
+//    - msg: message to send.
+//
 func (session *Session) SendMessage(msg *Message) uint {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
@@ -1111,6 +1249,11 @@ func (session *Session) SendMessage(msg *Message) uint {
 //
 // Calling this function may cause msg to be freed if you are not holding any
 // other reference to it.
+//
+// The function takes the following parameters:
+//
+//    - msg: message whose connection is to be stolen.
+//
 func (session *Session) StealConnection(msg *Message) gio.IOStreamer {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
@@ -1151,6 +1294,11 @@ func (session *Session) StealConnection(msg *Message) gio.IOStreamer {
 //
 // This may only be called for asynchronous messages (those sent on a
 // SessionAsync or using soup_session_queue_message()).
+//
+// The function takes the following parameters:
+//
+//    - msg currently running on session.
+//
 func (session *Session) UnpauseMessage(msg *Message) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
@@ -1179,6 +1327,15 @@ func (session *Session) UnpauseMessage(msg *Message) {
 // will contain the complete response headers and body from the server's
 // response, and soup_session_websocket_connect_finish() will return
 // SOUP_WEBSOCKET_ERROR_NOT_WEBSOCKET.
+//
+// The function takes the following parameters:
+//
+//    - ctx: #GCancellable.
+//    - msg indicating the WebSocket server to connect to.
+//    - origin of the connection.
+//    - protocols: a NULL-terminated array of protocols supported.
+//    - callback to invoke.
+//
 func (session *Session) WebsocketConnectAsync(ctx context.Context, msg *Message, origin string, protocols []string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.SoupSession        // out
 	var _arg4 *C.GCancellable       // out
@@ -1229,6 +1386,11 @@ func (session *Session) WebsocketConnectAsync(ctx context.Context, msg *Message,
 // WebsocketConnectFinish gets the WebsocketConnection response to a
 // soup_session_websocket_connect_async() call and (if successful), returns a
 // WebsocketConnection that can be used to communicate with the server.
+//
+// The function takes the following parameters:
+//
+//    - result passed to your callback.
+//
 func (session *Session) WebsocketConnectFinish(result gio.AsyncResulter) (*WebsocketConnection, error) {
 	var _arg0 *C.SoupSession             // out
 	var _arg1 *C.GAsyncResult            // out
@@ -1256,6 +1418,11 @@ func (session *Session) WebsocketConnectFinish(result gio.AsyncResulter) (*Webso
 // WouldRedirect checks if msg contains a response that would cause session to
 // redirect it to a new URL (ignoring msg's SOUP_MESSAGE_NO_REDIRECT flag, and
 // the number of times it has already been redirected).
+//
+// The function takes the following parameters:
+//
+//    - msg that has response headers.
+//
 func (session *Session) WouldRedirect(msg *Message) bool {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
@@ -1275,4 +1442,80 @@ func (session *Session) WouldRedirect(msg *Message) bool {
 	}
 
 	return _ok
+}
+
+// ConnectAuthenticate: emitted when the session requires authentication. If
+// credentials are available call soup_auth_authenticate() on auth. If these
+// credentials fail, the signal will be emitted again, with retrying set to
+// TRUE, which will continue until you return without calling
+// soup_auth_authenticate() on auth.
+//
+// Note that this may be emitted before msg's body has been fully read.
+//
+// If you call soup_session_pause_message() on msg before returning, then you
+// can authenticate auth asynchronously (as long as you g_object_ref() it to
+// make sure it doesn't get destroyed), and then unpause msg when you are ready
+// for it to continue.
+func (session *Session) ConnectAuthenticate(f func(msg Message, auth Auther, retrying bool)) externglib.SignalHandle {
+	return session.Connect("authenticate", f)
+}
+
+// ConnectConnectionCreated: emitted when a new connection is created. This is
+// an internal signal intended only to be used for debugging purposes, and may
+// go away in the future.
+func (session *Session) ConnectConnectionCreated(f func(connection *externglib.Object)) externglib.SignalHandle {
+	return session.Connect("connection-created", f)
+}
+
+// ConnectRequestQueued: emitted when a request is queued on session. (Note that
+// "queued" doesn't just mean soup_session_queue_message();
+// soup_session_send_message() implicitly queues the message as well.)
+//
+// When sending a request, first Session::request_queued is emitted, indicating
+// that the session has become aware of the request.
+//
+// Once a connection is available to send the request on, the session emits
+// Session::request_started. Then, various Message signals are emitted as the
+// message is processed. If the message is requeued, it will emit
+// Message::restarted, which will then be followed by another
+// Session::request_started and another set of Message signals when the message
+// is re-sent.
+//
+// Eventually, the message will emit Message::finished. Normally, this signals
+// the completion of message processing. However, it is possible that the
+// application will requeue the message from the "finished" handler (or
+// equivalently, from the soup_session_queue_message() callback). In that case,
+// the process will loop back to Session::request_started.
+//
+// Eventually, a message will reach "finished" and not be requeued. At that
+// point, the session will emit Session::request_unqueued to indicate that it is
+// done with the message.
+//
+// To sum up: Session::request_queued and Session::request_unqueued are
+// guaranteed to be emitted exactly once, but Session::request_started and
+// Message::finished (and all of the other Message signals) may be invoked
+// multiple times for a given message.
+func (session *Session) ConnectRequestQueued(f func(msg Message)) externglib.SignalHandle {
+	return session.Connect("request-queued", f)
+}
+
+// ConnectRequestStarted: emitted just before a request is sent. See
+// Session::request_queued for a detailed description of the message lifecycle
+// within a session.
+func (session *Session) ConnectRequestStarted(f func(msg Message, socket Socket)) externglib.SignalHandle {
+	return session.Connect("request-started", f)
+}
+
+// ConnectRequestUnqueued: emitted when a request is removed from session's
+// queue, indicating that session is done with it. See Session::request_queued
+// for a detailed description of the message lifecycle within a session.
+func (session *Session) ConnectRequestUnqueued(f func(msg Message)) externglib.SignalHandle {
+	return session.Connect("request-unqueued", f)
+}
+
+// ConnectTunneling: emitted when an SSL tunnel is being created on a proxy
+// connection. This is an internal signal intended only to be used for debugging
+// purposes, and may go away in the future.
+func (session *Session) ConnectTunneling(f func(connection *externglib.Object)) externglib.SignalHandle {
+	return session.Connect("tunneling", f)
 }

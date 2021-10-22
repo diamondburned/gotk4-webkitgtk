@@ -30,26 +30,26 @@ func init() {
 }
 
 // SOCKET_ASYNC_CONTEXT alias for the Socket:async-context property. (The
-// socket's Context.)
+// socket's Context.).
 const SOCKET_ASYNC_CONTEXT = "async-context"
 
 // SOCKET_FLAG_NONBLOCKING alias for the Socket:non-blocking property. (Whether
-// or not the socket uses non-blocking I/O.)
+// or not the socket uses non-blocking I/O.).
 const SOCKET_FLAG_NONBLOCKING = "non-blocking"
 
 // SOCKET_IS_SERVER alias for the Socket:is-server property, qv.
 const SOCKET_IS_SERVER = "is-server"
 
 // SOCKET_LOCAL_ADDRESS alias for the Socket:local-address property. (Address of
-// local end of socket.)
+// local end of socket.).
 const SOCKET_LOCAL_ADDRESS = "local-address"
 
 // SOCKET_REMOTE_ADDRESS alias for the Socket:remote-address property. (Address
-// of remote end of socket.)
+// of remote end of socket.).
 const SOCKET_REMOTE_ADDRESS = "remote-address"
 
 // SOCKET_SSL_CREDENTIALS alias for the Socket:ssl-creds property. (SSL
-// credential information.)
+// credential information.).
 const SOCKET_SSL_CREDENTIALS = "ssl-creds"
 
 // SOCKET_SSL_FALLBACK alias for the Socket:ssl-fallback property.
@@ -59,7 +59,7 @@ const SOCKET_SSL_FALLBACK = "ssl-fallback"
 const SOCKET_SSL_STRICT = "ssl-strict"
 
 // SOCKET_TIMEOUT alias for the Socket:timeout property. (The timeout in seconds
-// for blocking socket I/O operations.)
+// for blocking socket I/O operations.).
 const SOCKET_TIMEOUT = "timeout"
 
 // SOCKET_TLS_CERTIFICATE alias for the Socket:tls-certificate property. Note
@@ -77,25 +77,25 @@ const SOCKET_TLS_ERRORS = "tls-errors"
 const SOCKET_TRUSTED_CERTIFICATE = "trusted-certificate"
 
 // SOCKET_USE_THREAD_CONTEXT alias for the Socket:use-thread-context property.
-// (Use g_main_context_get_thread_default())
+// (Use g_main_context_get_thread_default()).
 const SOCKET_USE_THREAD_CONTEXT = "use-thread-context"
 
 // SocketIOStatus: return value from the Socket IO methods.
 type SocketIOStatus int
 
 const (
-	// SocketOK: success
+	// SocketOK: success.
 	SocketOK SocketIOStatus = iota
-	// SocketWouldBlock: cannot read/write any more at this time
+	// SocketWouldBlock: cannot read/write any more at this time.
 	SocketWouldBlock
-	// SocketEOF: end of file
+	// SocketEOF: end of file.
 	SocketEOF
-	// SocketError: other error
+	// SocketError: other error.
 	SocketError
 )
 
 func marshalSocketIOStatus(p uintptr) (interface{}, error) {
-	return SocketIOStatus(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return SocketIOStatus(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for SocketIOStatus.
@@ -161,9 +161,7 @@ func wrapSocket(obj *externglib.Object) *Socket {
 }
 
 func marshalSocketter(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapSocket(obj), nil
+	return wrapSocket(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // ConnectAsync begins asynchronously connecting to sock's remote address. The
@@ -172,6 +170,12 @@ func marshalSocketter(p uintptr) (interface{}, error) {
 //
 // If cancellable is non-NULL, it can be used to cancel the connection. callback
 // will still be invoked in this case, with a status of SOUP_STATUS_CANCELLED.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL.
+//    - callback to call after connecting.
+//
 func (sock *Socket) ConnectAsync(ctx context.Context, callback SocketCallback) {
 	var _arg0 *C.SoupSocket        // out
 	var _arg1 *C.GCancellable      // out
@@ -197,6 +201,11 @@ func (sock *Socket) ConnectAsync(ctx context.Context, callback SocketCallback) {
 //
 // If cancellable is non-NULL, it can be used to cancel the connection, in which
 // case soup_socket_connect_sync() will return SOUP_STATUS_CANCELLED.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL.
+//
 func (sock *Socket) ConnectSync(ctx context.Context) uint {
 	var _arg0 *C.SoupSocket   // out
 	var _arg1 *C.GCancellable // out
@@ -290,7 +299,7 @@ func (sock *Socket) RemoteAddress() *Address {
 	return _address
 }
 
-// IsConnected tests if sock is connected to another host
+// IsConnected tests if sock is connected to another host.
 func (sock *Socket) IsConnected() bool {
 	var _arg0 *C.SoupSocket // out
 	var _cret C.gboolean    // in
@@ -357,7 +366,13 @@ func (sock *Socket) Listen() bool {
 // Socket::readable signal to know when there is more data to read. (NB: You
 // MUST read all available data off the socket first. Socket::readable is only
 // emitted after soup_socket_read() returns SOUP_SOCKET_WOULD_BLOCK, and it is
-// only emitted once. See the documentation for Socket:non-blocking.)
+// only emitted once. See the documentation for Socket:non-blocking.).
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL.
+//    - buffer to read into.
+//
 func (sock *Socket) Read(ctx context.Context, buffer []byte) (uint, SocketIOStatus, error) {
 	var _arg0 *C.SoupSocket   // out
 	var _arg4 *C.GCancellable // out
@@ -398,6 +413,12 @@ func (sock *Socket) Read(ctx context.Context, buffer []byte) (uint, SocketIOStat
 
 // StartProxySsl starts using SSL on socket, expecting to find a host named
 // ssl_host.
+//
+// The function takes the following parameters:
+//
+//    - ctx: #GCancellable.
+//    - sslHost: hostname of the SSL server.
+//
 func (sock *Socket) StartProxySsl(ctx context.Context, sslHost string) bool {
 	var _arg0 *C.SoupSocket   // out
 	var _arg2 *C.GCancellable // out
@@ -428,6 +449,11 @@ func (sock *Socket) StartProxySsl(ctx context.Context, sslHost string) bool {
 }
 
 // StartSSL starts using SSL on socket.
+//
+// The function takes the following parameters:
+//
+//    - ctx: #GCancellable.
+//
 func (sock *Socket) StartSSL(ctx context.Context) bool {
 	var _arg0 *C.SoupSocket   // out
 	var _arg1 *C.GCancellable // out
@@ -463,7 +489,13 @@ func (sock *Socket) StartSSL(ctx context.Context) bool {
 // to the Socket::writable signal to know when more data can be written. (NB:
 // Socket::writable is only emitted after soup_socket_write() returns
 // SOUP_SOCKET_WOULD_BLOCK, and it is only emitted once. See the documentation
-// for Socket:non-blocking.)
+// for Socket:non-blocking.).
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL.
+//    - buffer: data to write.
+//
 func (sock *Socket) Write(ctx context.Context, buffer []byte) (uint, SocketIOStatus, error) {
 	var _arg0 *C.SoupSocket   // out
 	var _arg4 *C.GCancellable // out
@@ -500,4 +532,37 @@ func (sock *Socket) Write(ctx context.Context, buffer []byte) (uint, SocketIOSta
 	}
 
 	return _nwrote, _socketIOStatus, _goerr
+}
+
+// ConnectDisconnected: emitted when the socket is disconnected, for whatever
+// reason.
+func (sock *Socket) ConnectDisconnected(f func()) externglib.SignalHandle {
+	return sock.Connect("disconnected", f)
+}
+
+// ConnectEvent: emitted when a network-related event occurs. See Client::event
+// for more details.
+func (sock *Socket) ConnectEvent(f func(event gio.SocketClientEvent, connection gio.IOStreamer)) externglib.SignalHandle {
+	return sock.Connect("event", f)
+}
+
+// ConnectNewConnection: emitted when a listening socket (set up with
+// soup_socket_listen()) receives a new connection.
+//
+// You must ref the new if you want to keep it; otherwise it will be destroyed
+// after the signal is emitted.
+func (sock *Socket) ConnectNewConnection(f func(new Socket)) externglib.SignalHandle {
+	return sock.Connect("new-connection", f)
+}
+
+// ConnectReadable: emitted when an async socket is readable. See
+// soup_socket_read(), soup_socket_read_until() and Socket:non-blocking.
+func (sock *Socket) ConnectReadable(f func()) externglib.SignalHandle {
+	return sock.Connect("readable", f)
+}
+
+// ConnectWritable: emitted when an async socket is writable. See
+// soup_socket_write() and Socket:non-blocking.
+func (sock *Socket) ConnectWritable(f func()) externglib.SignalHandle {
+	return sock.Connect("writable", f)
 }

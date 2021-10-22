@@ -32,12 +32,10 @@ func wrapClass(obj *externglib.Object) *Class {
 }
 
 func marshalClasser(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapClass(obj), nil
+	return wrapClass(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// Name: get the class name of jsc_class
+// Name: get the class name of jsc_class.
 func (jscClass *Class) Name() string {
 	var _arg0 *C.JSCClass // out
 	var _cret *C.char     // in
@@ -54,7 +52,7 @@ func (jscClass *Class) Name() string {
 	return _utf8
 }
 
-// Parent: get the parent class of jsc_class
+// Parent: get the parent class of jsc_class.
 func (jscClass *Class) Parent() *Class {
 	var _arg0 *C.JSCClass // out
 	var _cret *C.JSCClass // in

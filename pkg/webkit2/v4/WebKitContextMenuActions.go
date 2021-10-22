@@ -22,7 +22,7 @@ func init() {
 }
 
 // ContextMenuAction: enum values used to denote the stock actions for
-// KitContextMenuItem<!-- -->s
+// KitContextMenuItem<!-- -->s.
 type ContextMenuAction int
 
 const (
@@ -124,21 +124,21 @@ const (
 	ContextMenuActionMediaPause ContextMenuAction = 40
 	// ContextMenuActionMediaMute: mute current media element.
 	ContextMenuActionMediaMute ContextMenuAction = 41
-	// ContextMenuActionDownloadVideoToDisk: download video to disk. Since 2.2
+	// ContextMenuActionDownloadVideoToDisk: download video to disk. Since 2.2.
 	ContextMenuActionDownloadVideoToDisk ContextMenuAction = 42
-	// ContextMenuActionDownloadAudioToDisk: download audio to disk. Since 2.2
+	// ContextMenuActionDownloadAudioToDisk: download audio to disk. Since 2.2.
 	ContextMenuActionDownloadAudioToDisk ContextMenuAction = 43
-	// ContextMenuActionInsertEmoji: insert an emoji. Since 2.26
+	// ContextMenuActionInsertEmoji: insert an emoji. Since 2.26.
 	ContextMenuActionInsertEmoji ContextMenuAction = 44
 	// ContextMenuActionPasteAsPlainText: paste clipboard contents as plain
-	// text. Since 2.30
+	// text. Since 2.30.
 	ContextMenuActionPasteAsPlainText ContextMenuAction = 45
 	// ContextMenuActionCustom: custom action defined by applications.
 	ContextMenuActionCustom ContextMenuAction = 10000
 )
 
 func marshalContextMenuAction(p uintptr) (interface{}, error) {
-	return ContextMenuAction(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return ContextMenuAction(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for ContextMenuAction.

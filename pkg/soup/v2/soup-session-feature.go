@@ -50,7 +50,7 @@ type SessionFeature struct {
 	*externglib.Object
 }
 
-// SessionFeaturer describes SessionFeature's abstract methods.
+// SessionFeaturer describes SessionFeature's interface methods.
 type SessionFeaturer interface {
 	externglib.Objector
 
@@ -74,14 +74,17 @@ func wrapSessionFeature(obj *externglib.Object) *SessionFeature {
 }
 
 func marshalSessionFeaturer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapSessionFeature(obj), nil
+	return wrapSessionFeature(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // AddFeature adds a "sub-feature" of type type to the base feature feature.
 // This is used for features that can be extended with multiple different types.
 // Eg, the authentication manager can be extended with subtypes of Auth.
+//
+// The function takes the following parameters:
+//
+//    - typ of a "sub-feature".
+//
 func (feature *SessionFeature) AddFeature(typ externglib.Type) bool {
 	var _arg0 *C.SoupSessionFeature // out
 	var _arg1 C.GType               // out
@@ -103,6 +106,11 @@ func (feature *SessionFeature) AddFeature(typ externglib.Type) bool {
 	return _ok
 }
 
+//
+// The function takes the following parameters:
+//
+
+//
 func (feature *SessionFeature) Attach(session *Session) {
 	var _arg0 *C.SoupSessionFeature // out
 	var _arg1 *C.SoupSession        // out
@@ -115,6 +123,11 @@ func (feature *SessionFeature) Attach(session *Session) {
 	runtime.KeepAlive(session)
 }
 
+//
+// The function takes the following parameters:
+//
+
+//
 func (feature *SessionFeature) Detach(session *Session) {
 	var _arg0 *C.SoupSessionFeature // out
 	var _arg1 *C.SoupSession        // out
@@ -129,6 +142,11 @@ func (feature *SessionFeature) Detach(session *Session) {
 
 // HasFeature tests if feature has a "sub-feature" of type type. See
 // soup_session_feature_add_feature().
+//
+// The function takes the following parameters:
+//
+//    - typ of a "sub-feature".
+//
 func (feature *SessionFeature) HasFeature(typ externglib.Type) bool {
 	var _arg0 *C.SoupSessionFeature // out
 	var _arg1 C.GType               // out
@@ -152,6 +170,11 @@ func (feature *SessionFeature) HasFeature(typ externglib.Type) bool {
 
 // RemoveFeature removes the "sub-feature" of type type from the base feature
 // feature. See soup_session_feature_add_feature().
+//
+// The function takes the following parameters:
+//
+//    - typ of a "sub-feature".
+//
 func (feature *SessionFeature) RemoveFeature(typ externglib.Type) bool {
 	var _arg0 *C.SoupSessionFeature // out
 	var _arg1 C.GType               // out

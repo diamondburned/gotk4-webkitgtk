@@ -34,8 +34,8 @@ type javascriptResult struct {
 }
 
 func marshalJavascriptResult(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &JavascriptResult{&javascriptResult{(*C.WebKitJavascriptResult)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &JavascriptResult{&javascriptResult{(*C.WebKitJavascriptResult)(b)}}, nil
 }
 
 // JsValue: get the CValue of js_result.

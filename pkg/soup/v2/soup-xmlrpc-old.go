@@ -39,6 +39,12 @@ import "C"
 // and related methods can help with this.
 //
 // Deprecated: Use soup_xmlrpc_build_request() instead.
+//
+// The function takes the following parameters:
+//
+//    - methodName: name of the XML-RPC method.
+//    - params arguments to method.
+//
 func XmlrpcBuildMethodCall(methodName string, params []externglib.Value) string {
 	var _arg1 *C.char   // out
 	var _arg2 *C.GValue // out
@@ -79,6 +85,11 @@ func XmlrpcBuildMethodCall(methodName string, params []externglib.Value) string 
 // soup_xmlrpc_build_method_call(), qv.
 //
 // Deprecated: Use soup_xmlrpc_build_response() instead.
+//
+// The function takes the following parameters:
+//
+//    - value: return value.
+//
 func XmlrpcBuildMethodResponse(value *externglib.Value) string {
 	var _arg1 *C.GValue // out
 	var _cret *C.char   // in
@@ -107,6 +118,12 @@ func XmlrpcBuildMethodResponse(value *externglib.Value) string {
 // unset.)
 //
 // Deprecated: Use soup_xmlrpc_parse_response() instead.
+//
+// The function takes the following parameters:
+//
+//    - methodResponse: XML-RPC methodResponse string.
+//    - length of method_response, or -1 if it is NUL-terminated.
+//
 func XmlrpcParseMethodResponse(methodResponse string, length int) (externglib.Value, error) {
 	var _arg1 *C.char   // out
 	var _arg2 C.int     // out

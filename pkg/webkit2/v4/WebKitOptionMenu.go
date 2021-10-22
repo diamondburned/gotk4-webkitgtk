@@ -33,15 +33,18 @@ func wrapOptionMenu(obj *externglib.Object) *OptionMenu {
 }
 
 func marshalOptionMenuer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapOptionMenu(obj), nil
+	return wrapOptionMenu(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // ActivateItem activates the KitOptionMenuItem at index in menu. Activating an
 // item changes the value of the element making the item the active one. You are
 // expected to close the menu with webkit_option_menu_close() after activating
 // an item, calling this function again will have no effect.
+//
+// The function takes the following parameters:
+//
+//    - index of the item.
+//
 func (menu *OptionMenu) ActivateItem(index uint) {
 	var _arg0 *C.WebKitOptionMenu // out
 	var _arg1 C.guint             // out
@@ -69,6 +72,11 @@ func (menu *OptionMenu) Close() {
 }
 
 // Item returns the KitOptionMenuItem at index in menu.
+//
+// The function takes the following parameters:
+//
+//    - index of the item.
+//
 func (menu *OptionMenu) Item(index uint) *OptionMenuItem {
 	var _arg0 *C.WebKitOptionMenu     // out
 	var _arg1 C.guint                 // out
@@ -111,6 +119,11 @@ func (menu *OptionMenu) NItems() uint {
 // webkit_option_menu_select_item() or close the menu with
 // webkit_option_menu_close() in which case the currently selected item will be
 // activated.
+//
+// The function takes the following parameters:
+//
+//    - index of the item.
+//
 func (menu *OptionMenu) SelectItem(index uint) {
 	var _arg0 *C.WebKitOptionMenu // out
 	var _arg1 C.guint             // out
@@ -121,4 +134,11 @@ func (menu *OptionMenu) SelectItem(index uint) {
 	C.webkit_option_menu_select_item(_arg0, _arg1)
 	runtime.KeepAlive(menu)
 	runtime.KeepAlive(index)
+}
+
+// ConnectClose: emitted when closing a KitOptionMenu is requested. This can
+// happen when the user explicitly calls webkit_option_menu_close() or when the
+// element is detached from the current page.
+func (menu *OptionMenu) ConnectClose(f func()) externglib.SignalHandle {
+	return menu.Connect("close", f)
 }

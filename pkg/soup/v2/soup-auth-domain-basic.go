@@ -25,11 +25,11 @@ func init() {
 }
 
 // AUTH_DOMAIN_BASIC_AUTH_CALLBACK alias for the AuthDomainBasic:auth-callback
-// property. (The AuthDomainBasicAuthCallback.)
+// property. (The AuthDomainBasicAuthCallback.).
 const AUTH_DOMAIN_BASIC_AUTH_CALLBACK = "auth-callback"
 
 // AUTH_DOMAIN_BASIC_AUTH_DATA alias for the AuthDomainBasic:auth-data property.
-// (The data to pass to the AuthDomainBasicAuthCallback.)
+// (The data to pass to the AuthDomainBasicAuthCallback.).
 const AUTH_DOMAIN_BASIC_AUTH_DATA = "auth-data"
 
 // AuthDomainBasicAuthCallback: callback used by AuthDomainBasic for
@@ -45,7 +45,7 @@ const AUTH_DOMAIN_BASIC_AUTH_DATA = "auth-data"
 // sites, and so compromising any site with a cleartext (or easily-cracked)
 // password database may give attackers access to other more-interesting sites
 // as well.
-type AuthDomainBasicAuthCallback func(domain *AuthDomainBasic, msg *Message, username string, password string) (ok bool)
+type AuthDomainBasicAuthCallback func(domain *AuthDomainBasic, msg *Message, username, password string) (ok bool)
 
 //export _gotk4_soup2_AuthDomainBasicAuthCallback
 func _gotk4_soup2_AuthDomainBasicAuthCallback(arg0 *C.SoupAuthDomain, arg1 *C.SoupMessage, arg2 *C.char, arg3 *C.char, arg4 C.gpointer) (cret C.gboolean) {
@@ -87,9 +87,7 @@ func wrapAuthDomainBasic(obj *externglib.Object) *AuthDomainBasic {
 }
 
 func marshalAuthDomainBasiccer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapAuthDomainBasic(obj), nil
+	return wrapAuthDomainBasic(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // SetAuthCallback sets the callback that domain will use to authenticate
@@ -100,6 +98,11 @@ func marshalAuthDomainBasiccer(p uintptr) (interface{}, error) {
 // You can also set the auth callback by setting the
 // SOUP_AUTH_DOMAIN_BASIC_AUTH_CALLBACK and SOUP_AUTH_DOMAIN_BASIC_AUTH_DATA
 // properties, which can also be used to set the callback at construct time.
+//
+// The function takes the following parameters:
+//
+//    - callback: callback.
+//
 func (domain *AuthDomainBasic) SetAuthCallback(callback AuthDomainBasicAuthCallback) {
 	var _arg0 *C.SoupAuthDomain                 // out
 	var _arg1 C.SoupAuthDomainBasicAuthCallback // out

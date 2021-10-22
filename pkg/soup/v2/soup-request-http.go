@@ -38,12 +38,10 @@ func wrapRequestHTTP(obj *externglib.Object) *RequestHTTP {
 }
 
 func marshalRequestHTTPer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapRequestHTTP(obj), nil
+	return wrapRequestHTTP(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// Message gets a new reference to the Message associated to this SoupRequest
+// Message gets a new reference to the Message associated to this SoupRequest.
 func (http *RequestHTTP) Message() *Message {
 	var _arg0 *C.SoupRequestHTTP // out
 	var _cret *C.SoupMessage     // in

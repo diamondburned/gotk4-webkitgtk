@@ -34,9 +34,7 @@ func wrapWindowProperties(obj *externglib.Object) *WindowProperties {
 }
 
 func marshalWindowPropertieser(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapWindowProperties(obj), nil
+	return wrapWindowProperties(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Fullscreen: get whether the window should be shown in fullscreen state or

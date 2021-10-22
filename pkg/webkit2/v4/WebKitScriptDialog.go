@@ -25,7 +25,7 @@ func init() {
 }
 
 // ScriptDialogType: enum values used for determining the type of
-// KitScriptDialog
+// KitScriptDialog.
 type ScriptDialogType int
 
 const (
@@ -39,12 +39,12 @@ const (
 	// user.
 	ScriptDialogPrompt
 	// ScriptDialogBeforeUnloadConfirm: before unload confirm dialog, used to
-	// ask confirmation to leave the current page to the user. Since 2.12
+	// ask confirmation to leave the current page to the user. Since 2.12.
 	ScriptDialogBeforeUnloadConfirm
 )
 
 func marshalScriptDialogType(p uintptr) (interface{}, error) {
-	return ScriptDialogType(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return ScriptDialogType(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for ScriptDialogType.
@@ -74,8 +74,8 @@ type scriptDialog struct {
 }
 
 func marshalScriptDialog(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &ScriptDialog{&scriptDialog{(*C.WebKitScriptDialog)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &ScriptDialog{&scriptDialog{(*C.WebKitScriptDialog)(b)}}, nil
 }
 
 // Close dialog. When handling a KitScriptDialog asynchronously
@@ -98,7 +98,7 @@ func (dialog *ScriptDialog) Close() {
 // the dialog or not. The default implementation of KitWebView::script-dialog
 // signal sets TRUE when the OK or Stay buttons are clicked and FALSE otherwise.
 // It's an error to use this method with a KitScriptDialog that is not of type
-// WEBKIT_SCRIPT_DIALOG_CONFIRM or WEBKIT_SCRIPT_DIALOG_BEFORE_UNLOAD_CONFIRM
+// WEBKIT_SCRIPT_DIALOG_CONFIRM or WEBKIT_SCRIPT_DIALOG_BEFORE_UNLOAD_CONFIRM.
 func (dialog *ScriptDialog) ConfirmSetConfirmed(confirmed bool) {
 	var _arg0 *C.WebKitScriptDialog // out
 	var _arg1 C.gboolean            // out

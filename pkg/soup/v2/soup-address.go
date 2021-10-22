@@ -35,43 +35,43 @@ func init() {
 const ADDRESS_ANY_PORT = 0
 
 // ADDRESS_FAMILY alias for the Address:family property. (The AddressFamily for
-// this address.)
+// this address.).
 const ADDRESS_FAMILY = "family"
 
 // ADDRESS_NAME alias for the Address:name property. (The hostname for this
-// address.)
+// address.).
 const ADDRESS_NAME = "name"
 
 // ADDRESS_PHYSICAL alias for the Address:physical property. (The stringified IP
-// address for this address.)
+// address for this address.).
 const ADDRESS_PHYSICAL = "physical"
 
 // ADDRESS_PORT alias for the Address:port property. (The port for this
-// address.)
+// address.).
 const ADDRESS_PORT = "port"
 
 // ADDRESS_PROTOCOL alias for the Address:protocol property. (The URI scheme
-// used with this address.)
+// used with this address.).
 const ADDRESS_PROTOCOL = "protocol"
 
 // ADDRESS_SOCKADDR alias for the Address:sockaddr property. (A pointer to the
-// struct sockaddr for this address.)
+// struct sockaddr for this address.).
 const ADDRESS_SOCKADDR = "sockaddr"
 
 // AddressFamily: supported address families.
 type AddressFamily int
 
 const (
-	// AddressFamilyInvalid SoupAddress
+	// AddressFamilyInvalid: invalid SoupAddress.
 	AddressFamilyInvalid AddressFamily = -1
-	// AddressFamilyIPv4: IPv4 address
+	// AddressFamilyIPv4: IPv4 address.
 	AddressFamilyIPv4 AddressFamily = 2
-	// AddressFamilyIPv6: IPv6 address
+	// AddressFamilyIPv6: IPv6 address.
 	AddressFamilyIPv6 AddressFamily = 10
 )
 
 func marshalAddressFamily(p uintptr) (interface{}, error) {
-	return AddressFamily(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return AddressFamily(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for AddressFamily.
@@ -124,14 +124,18 @@ func wrapAddress(obj *externglib.Object) *Address {
 }
 
 func marshalAddresser(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapAddress(obj), nil
+	return wrapAddress(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewAddress creates a Address from name and port. The Address's IP address may
 // not be available right away; the caller can call soup_address_resolve_async()
 // or soup_address_resolve_sync() to force a DNS resolution.
+//
+// The function takes the following parameters:
+//
+//    - name or physical address.
+//    - port number.
+//
 func NewAddress(name string, port uint) *Address {
 	var _arg1 *C.char        // out
 	var _arg2 C.guint        // out
@@ -155,6 +159,12 @@ func NewAddress(name string, port uint) *Address {
 // NewAddressAny returns a Address corresponding to the "any" address for family
 // (or NULL if family isn't supported), suitable for using as a listening
 // Socket.
+//
+// The function takes the following parameters:
+//
+//    - family address family.
+//    - port number (usually SOUP_ADDRESS_ANY_PORT).
+//
 func NewAddressAny(family AddressFamily, port uint) *Address {
 	var _arg1 C.SoupAddressFamily // out
 	var _arg2 C.guint             // out
@@ -187,6 +197,11 @@ func NewAddressAny(family AddressFamily, port uint) *Address {
 //
 // See also soup_address_equal_by_name(), which compares by name rather than by
 // IP address.
+//
+// The function takes the following parameters:
+//
+//    - addr2: another Address with a resolved IP address.
+//
 func (addr1 *Address) EqualByIP(addr2 *Address) bool {
 	var _arg0 C.gconstpointer // out
 	var _arg1 C.gconstpointer // out
@@ -228,6 +243,11 @@ func (addr1 *Address) EqualByIP(addr2 *Address) bool {
 //
 // See also soup_address_equal_by_ip(), which compares by IP address rather than
 // by name.
+//
+// The function takes the following parameters:
+//
+//    - addr2: another Address with a resolved name.
+//
 func (addr1 *Address) EqualByName(addr2 *Address) bool {
 	var _arg0 C.gconstpointer // out
 	var _arg1 C.gconstpointer // out
@@ -346,7 +366,7 @@ func (addr *Address) Port() uint {
 }
 
 // HashByIP: hash function (for Table) that corresponds to
-// soup_address_equal_by_ip(), qv
+// soup_address_equal_by_ip(), qv.
 func (addr *Address) HashByIP() uint {
 	var _arg0 C.gconstpointer // out
 	var _cret C.guint         // in
@@ -364,7 +384,7 @@ func (addr *Address) HashByIP() uint {
 }
 
 // HashByName: hash function (for Table) that corresponds to
-// soup_address_equal_by_name(), qv
+// soup_address_equal_by_name(), qv.
 func (addr *Address) HashByName() uint {
 	var _arg0 C.gconstpointer // out
 	var _cret C.guint         // in
@@ -414,6 +434,13 @@ func (addr *Address) IsResolved() bool {
 // redundant DNS queries being made). But it is not safe to call from multiple
 // threads, or with different async_contexts, or mixed with calls to
 // soup_address_resolve_sync().
+//
+// The function takes the following parameters:
+//
+//    - ctx object, or NULL.
+//    - asyncContext to call callback from.
+//    - callback to call with the result.
+//
 func (addr *Address) ResolveAsync(ctx context.Context, asyncContext *glib.MainContext, callback AddressCallback) {
 	var _arg0 *C.SoupAddress        // out
 	var _arg2 *C.GCancellable       // out
@@ -450,6 +477,11 @@ func (addr *Address) ResolveAsync(ctx context.Context, asyncContext *glib.MainCo
 // It is safe to call this more than once, even from different threads, but it
 // is not safe to mix calls to soup_address_resolve_sync() with calls to
 // soup_address_resolve_async() on the same address.
+//
+// The function takes the following parameters:
+//
+//    - ctx object, or NULL.
+//
 func (addr *Address) ResolveSync(ctx context.Context) uint {
 	var _arg0 *C.SoupAddress  // out
 	var _arg1 *C.GCancellable // out

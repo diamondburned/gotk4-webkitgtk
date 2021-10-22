@@ -37,9 +37,5 @@ func wrapRequestData(obj *externglib.Object) *RequestData {
 }
 
 func marshalRequestDatar(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapRequestData(obj), nil
+	return wrapRequestData(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*RequestData) privateRequestData() {}

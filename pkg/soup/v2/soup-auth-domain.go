@@ -26,36 +26,36 @@ func init() {
 }
 
 // AUTH_DOMAIN_ADD_PATH alias for the AuthDomain:add-path property. (Shortcut
-// for calling soup_auth_domain_add_path().)
+// for calling soup_auth_domain_add_path().).
 const AUTH_DOMAIN_ADD_PATH = "add-path"
 
 // AUTH_DOMAIN_FILTER alias for the AuthDomain:filter property. (The
-// AuthDomainFilter for the domain.)
+// AuthDomainFilter for the domain.).
 const AUTH_DOMAIN_FILTER = "filter"
 
 // AUTH_DOMAIN_FILTER_DATA alias for the AuthDomain:filter-data property. (Data
-// to pass to the AuthDomainFilter.)
+// to pass to the AuthDomainFilter.).
 const AUTH_DOMAIN_FILTER_DATA = "filter-data"
 
 // AUTH_DOMAIN_GENERIC_AUTH_CALLBACK alias for the
 // AuthDomain:generic-auth-callback property. (The
-// AuthDomainGenericAuthCallback.)
+// AuthDomainGenericAuthCallback.).
 const AUTH_DOMAIN_GENERIC_AUTH_CALLBACK = "generic-auth-callback"
 
 // AUTH_DOMAIN_GENERIC_AUTH_DATA alias for the AuthDomain:generic-auth-data
-// property. (The data to pass to the AuthDomainGenericAuthCallback.)
+// property. (The data to pass to the AuthDomainGenericAuthCallback.).
 const AUTH_DOMAIN_GENERIC_AUTH_DATA = "generic-auth-data"
 
 // AUTH_DOMAIN_PROXY alias for the AuthDomain:proxy property. (Whether or not
-// this is a proxy auth domain.)
+// this is a proxy auth domain.).
 const AUTH_DOMAIN_PROXY = "proxy"
 
 // AUTH_DOMAIN_REALM alias for the AuthDomain:realm property. (The realm of this
-// auth domain.)
+// auth domain.).
 const AUTH_DOMAIN_REALM = "realm"
 
 // AUTH_DOMAIN_REMOVE_PATH alias for the AuthDomain:remove-path property.
-// (Shortcut for calling soup_auth_domain_remove_path().)
+// (Shortcut for calling soup_auth_domain_remove_path().).
 const AUTH_DOMAIN_REMOVE_PATH = "remove-path"
 
 // AuthDomainFilter: prototype for a AuthDomain filter; see
@@ -167,45 +167,21 @@ type AuthDomainOverrider interface {
 	// CheckPassword checks if msg authenticates to domain via username and
 	// password. This would normally be called from a
 	// AuthDomainGenericAuthCallback.
-	CheckPassword(msg *Message, username string, password string) bool
+	CheckPassword(msg *Message, username, password string) bool
 }
 
 type AuthDomain struct {
 	*externglib.Object
 }
 
-// AuthDomainer describes AuthDomain's abstract methods.
+// AuthDomainer describes types inherited from class AuthDomain.
+// To get the original type, the caller must assert this to an interface or
+// another type.
 type AuthDomainer interface {
 	externglib.Objector
 
-	// Accepts checks if msg contains appropriate authorization for domain to
-	// accept it.
-	Accepts(msg *Message) string
-	// AddPath adds path to domain, such that requests under path on domain's
-	// server will require authentication (unless overridden by
-	// soup_auth_domain_remove_path() or soup_auth_domain_set_filter()).
-	AddPath(path string)
-	// Challenge adds a "WWW-Authenticate" or "Proxy-Authenticate" header to
-	// msg, requesting that the client authenticate, and sets msg's status
-	// accordingly.
-	Challenge(msg *Message)
-	// CheckPassword checks if msg authenticates to domain via username and
-	// password.
-	CheckPassword(msg *Message, username string, password string) bool
-	// Covers checks if domain requires msg to be authenticated (according to
-	// its paths and filter function).
-	Covers(msg *Message) bool
-	// Realm gets the realm name associated with domain
-	Realm() string
-	// RemovePath removes path from domain, such that requests under path on
-	// domain's server will NOT require authentication.
-	RemovePath(path string)
-	// SetFilter adds filter as an authentication filter to domain.
-	SetFilter(filter AuthDomainFilter)
-	// SetGenericAuthCallback sets auth_callback as an authentication-handling
-	// callback for domain.
-	SetGenericAuthCallback(authCallback AuthDomainGenericAuthCallback)
-	TryGenericAuthCallback(msg *Message, username string) bool
+	// BaseAuthDomain returns the underlying base class.
+	BaseAuthDomain() *AuthDomain
 }
 
 var _ AuthDomainer = (*AuthDomain)(nil)
@@ -217,9 +193,7 @@ func wrapAuthDomain(obj *externglib.Object) *AuthDomain {
 }
 
 func marshalAuthDomainer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapAuthDomain(obj), nil
+	return wrapAuthDomain(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Accepts checks if msg contains appropriate authorization for domain to accept
@@ -227,6 +201,11 @@ func marshalAuthDomainer(p uintptr) (interface{}, error) {
 // domain <emphasis>cares</emphasis> if msg is authorized.
 //
 // This is used by Server internally and is probably of no use to anyone else.
+//
+// The function takes the following parameters:
+//
+//    - msg: Message.
+//
 func (domain *AuthDomain) Accepts(msg *Message) string {
 	var _arg0 *C.SoupAuthDomain // out
 	var _arg1 *C.SoupMessage    // out
@@ -255,6 +234,11 @@ func (domain *AuthDomain) Accepts(msg *Message) string {
 //
 // You can also add paths by setting the SOUP_AUTH_DOMAIN_ADD_PATH property,
 // which can also be used to add one or more paths at construct time.
+//
+// The function takes the following parameters:
+//
+//    - path to add to domain.
+//
 func (domain *AuthDomain) AddPath(path string) {
 	var _arg0 *C.SoupAuthDomain // out
 	var _arg1 *C.char           // out
@@ -272,6 +256,11 @@ func (domain *AuthDomain) AddPath(path string) {
 // requesting that the client authenticate, and sets msg's status accordingly.
 //
 // This is used by Server internally and is probably of no use to anyone else.
+//
+// The function takes the following parameters:
+//
+//    - msg: Message.
+//
 func (domain *AuthDomain) Challenge(msg *Message) {
 	var _arg0 *C.SoupAuthDomain // out
 	var _arg1 *C.SoupMessage    // out
@@ -286,7 +275,14 @@ func (domain *AuthDomain) Challenge(msg *Message) {
 
 // CheckPassword checks if msg authenticates to domain via username and
 // password. This would normally be called from a AuthDomainGenericAuthCallback.
-func (domain *AuthDomain) CheckPassword(msg *Message, username string, password string) bool {
+//
+// The function takes the following parameters:
+//
+//    - msg: Message.
+//    - username: username.
+//    - password: password.
+//
+func (domain *AuthDomain) CheckPassword(msg *Message, username, password string) bool {
 	var _arg0 *C.SoupAuthDomain // out
 	var _arg1 *C.SoupMessage    // out
 	var _arg2 *C.char           // out
@@ -320,6 +316,11 @@ func (domain *AuthDomain) CheckPassword(msg *Message, username string, password 
 // <emphasis>is</emphasis> authenticated, merely whether or not it needs to be.
 //
 // This is used by Server internally and is probably of no use to anyone else.
+//
+// The function takes the following parameters:
+//
+//    - msg: Message.
+//
 func (domain *AuthDomain) Covers(msg *Message) bool {
 	var _arg0 *C.SoupAuthDomain // out
 	var _arg1 *C.SoupMessage    // out
@@ -341,7 +342,7 @@ func (domain *AuthDomain) Covers(msg *Message) bool {
 	return _ok
 }
 
-// Realm gets the realm name associated with domain
+// Realm gets the realm name associated with domain.
 func (domain *AuthDomain) Realm() string {
 	var _arg0 *C.SoupAuthDomain // out
 	var _cret *C.char           // in
@@ -371,6 +372,11 @@ func (domain *AuthDomain) Realm() string {
 // You can also remove paths by setting the SOUP_AUTH_DOMAIN_REMOVE_PATH
 // property, which can also be used to remove one or more paths at construct
 // time.
+//
+// The function takes the following parameters:
+//
+//    - path to remove from domain.
+//
 func (domain *AuthDomain) RemovePath(path string) {
 	var _arg0 *C.SoupAuthDomain // out
 	var _arg1 *C.char           // out
@@ -406,6 +412,11 @@ func (domain *AuthDomain) RemovePath(path string) {
 // You can also set the filter by setting the SOUP_AUTH_DOMAIN_FILTER and
 // SOUP_AUTH_DOMAIN_FILTER_DATA properties, which can also be used to set the
 // filter at construct time.
+//
+// The function takes the following parameters:
+//
+//    - filter: auth filter for domain.
+//
 func (domain *AuthDomain) SetFilter(filter AuthDomainFilter) {
 	var _arg0 *C.SoupAuthDomain      // out
 	var _arg1 C.SoupAuthDomainFilter // out
@@ -427,6 +438,11 @@ func (domain *AuthDomain) SetFilter(filter AuthDomainFilter) {
 // authenticated via a domain-specific auth callback (eg,
 // AuthDomainDigestAuthCallback), the generic auth callback will be invoked. See
 // AuthDomainGenericAuthCallback for information on what the callback should do.
+//
+// The function takes the following parameters:
+//
+//    - authCallback: auth callback.
+//
 func (domain *AuthDomain) SetGenericAuthCallback(authCallback AuthDomainGenericAuthCallback) {
 	var _arg0 *C.SoupAuthDomain                   // out
 	var _arg1 C.SoupAuthDomainGenericAuthCallback // out
@@ -443,6 +459,11 @@ func (domain *AuthDomain) SetGenericAuthCallback(authCallback AuthDomainGenericA
 	runtime.KeepAlive(authCallback)
 }
 
+//
+// The function takes the following parameters:
+//
+
+//
 func (domain *AuthDomain) TryGenericAuthCallback(msg *Message, username string) bool {
 	var _arg0 *C.SoupAuthDomain // out
 	var _arg1 *C.SoupMessage    // out
@@ -466,4 +487,9 @@ func (domain *AuthDomain) TryGenericAuthCallback(msg *Message, username string) 
 	}
 
 	return _ok
+}
+
+// BaseAuthDomain returns domain.
+func (domain *AuthDomain) BaseAuthDomain() *AuthDomain {
+	return domain
 }

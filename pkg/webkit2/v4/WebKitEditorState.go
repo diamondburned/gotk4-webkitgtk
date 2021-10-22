@@ -42,7 +42,7 @@ const (
 )
 
 func marshalEditorTypingAttributes(p uintptr) (interface{}, error) {
-	return EditorTypingAttributes(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
+	return EditorTypingAttributes(externglib.ValueFromNative(unsafe.Pointer(p)).Flags()), nil
 }
 
 // String returns the names in string for EditorTypingAttributes.
@@ -95,9 +95,7 @@ func wrapEditorState(obj *externglib.Object) *EditorState {
 }
 
 func marshalEditorStater(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapEditorState(obj), nil
+	return wrapEditorState(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // TypingAttributes gets the typing attributes at the current cursor position.

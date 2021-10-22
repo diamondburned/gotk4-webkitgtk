@@ -34,13 +34,18 @@ func wrapURISchemeRequest(obj *externglib.Object) *URISchemeRequest {
 }
 
 func marshalURISchemeRequester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapURISchemeRequest(obj), nil
+	return wrapURISchemeRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Finish a KitURISchemeRequest by setting the contents of the request and its
 // mime type.
+//
+// The function takes the following parameters:
+//
+//    - stream to read the contents of the request.
+//    - streamLength: length of the stream or -1 if not known.
+//    - contentType: content type of the stream or NULL if not known.
+//
 func (request *URISchemeRequest) Finish(stream gio.InputStreamer, streamLength int64, contentType string) {
 	var _arg0 *C.WebKitURISchemeRequest // out
 	var _arg1 *C.GInputStream           // out
@@ -63,6 +68,11 @@ func (request *URISchemeRequest) Finish(stream gio.InputStreamer, streamLength i
 }
 
 // FinishError: finish a KitURISchemeRequest with a #GError.
+//
+// The function takes the following parameters:
+//
+//    - err that will be passed to the KitWebView.
+//
 func (request *URISchemeRequest) FinishError(err error) {
 	var _arg0 *C.WebKitURISchemeRequest // out
 	var _arg1 *C.GError                 // out
@@ -75,7 +85,7 @@ func (request *URISchemeRequest) FinishError(err error) {
 	runtime.KeepAlive(err)
 }
 
-// Path: get the URI path of request
+// Path: get the URI path of request.
 func (request *URISchemeRequest) Path() string {
 	var _arg0 *C.WebKitURISchemeRequest // out
 	var _cret *C.gchar                  // in
@@ -92,7 +102,7 @@ func (request *URISchemeRequest) Path() string {
 	return _utf8
 }
 
-// Scheme: get the URI scheme of request
+// Scheme: get the URI scheme of request.
 func (request *URISchemeRequest) Scheme() string {
 	var _arg0 *C.WebKitURISchemeRequest // out
 	var _cret *C.gchar                  // in
@@ -109,7 +119,7 @@ func (request *URISchemeRequest) Scheme() string {
 	return _utf8
 }
 
-// URI: get the URI of request
+// URI: get the URI of request.
 func (request *URISchemeRequest) URI() string {
 	var _arg0 *C.WebKitURISchemeRequest // out
 	var _cret *C.gchar                  // in

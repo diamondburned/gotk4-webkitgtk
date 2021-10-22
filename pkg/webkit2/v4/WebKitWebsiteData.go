@@ -39,32 +39,32 @@ const (
 	WebsiteDataSessionStorage WebsiteDataTypes = 0b1000
 	// WebsiteDataLocalStorage: local storage data.
 	WebsiteDataLocalStorage WebsiteDataTypes = 0b10000
-	// WebsiteDataWebsqlDatabases: webSQL databases. Deprecated 2.24
+	// WebsiteDataWebsqlDatabases: webSQL databases. Deprecated 2.24.
 	WebsiteDataWebsqlDatabases WebsiteDataTypes = 0b100000
 	// WebsiteDataIndexeddbDatabases: indexedDB databases.
 	WebsiteDataIndexeddbDatabases WebsiteDataTypes = 0b1000000
-	// WebsiteDataPluginData plugins data. Deprecated 2.32
+	// WebsiteDataPluginData plugins data. Deprecated 2.32.
 	WebsiteDataPluginData WebsiteDataTypes = 0b10000000
 	// WebsiteDataCookies: cookies.
 	WebsiteDataCookies WebsiteDataTypes = 0b100000000
 	// WebsiteDataDeviceIDHashSalt: hash salt used to generate the device ids
-	// used by webpages. Since 2.24
+	// used by webpages. Since 2.24.
 	WebsiteDataDeviceIDHashSalt WebsiteDataTypes = 0b1000000000
-	// WebsiteDataHstsCache: HSTS cache. Since 2.26
+	// WebsiteDataHstsCache: HSTS cache. Since 2.26.
 	WebsiteDataHstsCache WebsiteDataTypes = 0b10000000000
 	// WebsiteDataITP: intelligent Tracking Prevention data. Since 2.30.
 	WebsiteDataITP WebsiteDataTypes = 0b100000000000
 	// WebsiteDataServiceWorkerRegistrations: service worker registrations.
-	// Since 2.30
+	// Since 2.30.
 	WebsiteDataServiceWorkerRegistrations WebsiteDataTypes = 0b1000000000000
-	// WebsiteDataDomCache: DOM (CacheStorage) cache. Since 2.30
+	// WebsiteDataDomCache: DOM (CacheStorage) cache. Since 2.30.
 	WebsiteDataDomCache WebsiteDataTypes = 0b10000000000000
 	// WebsiteDataAll: all types.
 	WebsiteDataAll WebsiteDataTypes = 0b11111111111111
 )
 
 func marshalWebsiteDataTypes(p uintptr) (interface{}, error) {
-	return WebsiteDataTypes(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
+	return WebsiteDataTypes(externglib.ValueFromNative(unsafe.Pointer(p)).Flags()), nil
 }
 
 // String returns the names in string for WebsiteDataTypes.
@@ -74,7 +74,7 @@ func (w WebsiteDataTypes) String() string {
 	}
 
 	var builder strings.Builder
-	builder.Grow(363)
+	builder.Grow(256)
 
 	for w != 0 {
 		next := w & (w - 1)
@@ -137,8 +137,8 @@ type websiteData struct {
 }
 
 func marshalWebsiteData(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &WebsiteData{&websiteData{(*C.WebKitWebsiteData)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &WebsiteData{&websiteData{(*C.WebKitWebsiteData)(b)}}, nil
 }
 
 // Name gets the name of KitWebsiteData. This is the website name, normally

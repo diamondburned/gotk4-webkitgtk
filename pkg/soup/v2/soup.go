@@ -42,7 +42,7 @@ const (
 )
 
 func marshalCacheResponse(p uintptr) (interface{}, error) {
-	return CacheResponse(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return CacheResponse(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for CacheResponse.
@@ -71,7 +71,7 @@ const (
 )
 
 func marshalConnectionState(p uintptr) (interface{}, error) {
-	return ConnectionState(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return ConnectionState(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for ConnectionState.
@@ -157,13 +157,13 @@ const (
 	KnownStatusCodeBadGateway                   KnownStatusCode = 502
 	KnownStatusCodeServiceUnavailable           KnownStatusCode = 503
 	KnownStatusCodeGatewayTimeout               KnownStatusCode = 504
-	KnownStatusCodeHttpVersionNotSupported      KnownStatusCode = 505
+	KnownStatusCodeHTTPVersionNotSupported      KnownStatusCode = 505
 	KnownStatusCodeInsufficientStorage          KnownStatusCode = 507
 	KnownStatusCodeNotExtended                  KnownStatusCode = 510
 )
 
 func marshalKnownStatusCode(p uintptr) (interface{}, error) {
-	return KnownStatusCode(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return KnownStatusCode(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for KnownStatusCode.
@@ -283,8 +283,8 @@ func (k KnownStatusCode) String() string {
 		return "ServiceUnavailable"
 	case KnownStatusCodeGatewayTimeout:
 		return "GatewayTimeout"
-	case KnownStatusCodeHttpVersionNotSupported:
-		return "HttpVersionNotSupported"
+	case KnownStatusCodeHTTPVersionNotSupported:
+		return "HTTPVersionNotSupported"
 	case KnownStatusCodeInsufficientStorage:
 		return "InsufficientStorage"
 	case KnownStatusCodeNotExtended:
@@ -314,7 +314,7 @@ const (
 )
 
 func marshalRequesterError(p uintptr) (interface{}, error) {
-	return RequesterError(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return RequesterError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for RequesterError.
@@ -333,17 +333,17 @@ type SameSitePolicy int
 
 const (
 	// SameSitePolicyNone: cookie is exposed with both cross-site and same-site
-	// requests
+	// requests.
 	SameSitePolicyNone SameSitePolicy = iota
 	// SameSitePolicyLax: cookie is withheld on cross-site requests but exposed
-	// on cross-site navigations
+	// on cross-site navigations.
 	SameSitePolicyLax
-	// SameSitePolicyStrict: cookie is only exposed for same-site requests
+	// SameSitePolicyStrict: cookie is only exposed for same-site requests.
 	SameSitePolicyStrict
 )
 
 func marshalSameSitePolicy(p uintptr) (interface{}, error) {
-	return SameSitePolicy(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return SameSitePolicy(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for SameSitePolicy.
@@ -380,7 +380,7 @@ const (
 )
 
 func marshalXMLRPCError(p uintptr) (interface{}, error) {
-	return XMLRPCError(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return XMLRPCError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for XMLRPCError.
@@ -417,7 +417,7 @@ const (
 )
 
 func marshalCacheability(p uintptr) (interface{}, error) {
-	return Cacheability(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
+	return Cacheability(externglib.ValueFromNative(unsafe.Pointer(p)).Flags()), nil
 }
 
 // String returns the names in string for Cacheability.
@@ -457,7 +457,7 @@ func (c Cacheability) Has(other Cacheability) bool {
 	return (c & other) == other
 }
 
-func HttpErrorQuark() glib.Quark {
+func HTTPErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
 	_cret = C.soup_http_error_quark()
@@ -482,12 +482,8 @@ func wrapAuthBasic(obj *externglib.Object) *AuthBasic {
 }
 
 func marshalAuthBasiccer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapAuthBasic(obj), nil
+	return wrapAuthBasic(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*AuthBasic) privateAuthBasic() {}
 
 type AuthDigest struct {
 	Auth
@@ -502,12 +498,8 @@ func wrapAuthDigest(obj *externglib.Object) *AuthDigest {
 }
 
 func marshalAuthDigester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapAuthDigest(obj), nil
+	return wrapAuthDigest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*AuthDigest) privateAuthDigest() {}
 
 type AuthNTLM struct {
 	Auth
@@ -522,12 +514,8 @@ func wrapAuthNTLM(obj *externglib.Object) *AuthNTLM {
 }
 
 func marshalAuthNTLMer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapAuthNTLM(obj), nil
+	return wrapAuthNTLM(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*AuthNTLM) privateAuthNTLM() {}
 
 type AuthNegotiate struct {
 	Auth
@@ -542,9 +530,5 @@ func wrapAuthNegotiate(obj *externglib.Object) *AuthNegotiate {
 }
 
 func marshalAuthNegotiater(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapAuthNegotiate(obj), nil
+	return wrapAuthNegotiate(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*AuthNegotiate) privateAuthNegotiate() {}

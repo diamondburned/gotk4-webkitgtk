@@ -42,7 +42,7 @@ const (
 )
 
 func marshalTLDError(p uintptr) (interface{}, error) {
-	return TLDError(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return TLDError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for TLDError.
@@ -68,6 +68,11 @@ func (t TLDError) String() string {
 //
 // Prior to libsoup 2.46, this function required that domain be in UTF-8 if it
 // was an IDN. From 2.46 on, the name can be in either UTF-8 or ASCII format.
+//
+// The function takes the following parameters:
+//
+//    - domain name.
+//
 func TldDomainIsPublicSuffix(domain string) bool {
 	var _arg1 *C.char    // out
 	var _cret C.gboolean // in
@@ -99,6 +104,11 @@ func TldDomainIsPublicSuffix(domain string) bool {
 // Prior to libsoup 2.46, this function required that hostname be in UTF-8 if it
 // was an IDN. From 2.46 on, the name can be in either UTF-8 or ASCII format
 // (and the return value will be in the same format).
+//
+// The function takes the following parameters:
+//
+//    - hostname: hostname.
+//
 func TldGetBaseDomain(hostname string) (string, error) {
 	var _arg1 *C.char   // out
 	var _cret *C.char   // in

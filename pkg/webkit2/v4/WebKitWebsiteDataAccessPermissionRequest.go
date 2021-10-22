@@ -37,9 +37,7 @@ func wrapWebsiteDataAccessPermissionRequest(obj *externglib.Object) *WebsiteData
 }
 
 func marshalWebsiteDataAccessPermissionRequester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapWebsiteDataAccessPermissionRequest(obj), nil
+	return wrapWebsiteDataAccessPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // CurrentDomain: get the current domain being browsed.

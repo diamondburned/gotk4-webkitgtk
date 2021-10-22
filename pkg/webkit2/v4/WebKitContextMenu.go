@@ -34,9 +34,7 @@ func wrapContextMenu(obj *externglib.Object) *ContextMenu {
 }
 
 func marshalContextMenuer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapContextMenu(obj), nil
+	return wrapContextMenu(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewContextMenu creates a new KitContextMenu object to be used as a submenu of
@@ -60,7 +58,12 @@ func NewContextMenu() *ContextMenu {
 
 // NewContextMenuWithItems creates a new KitContextMenu object to be used as a
 // submenu of an existing KitContextMenu with the given initial items. See also
-// webkit_context_menu_new()
+// webkit_context_menu_new().
+//
+// The function takes the following parameters:
+//
+//    - items of KitContextMenuItem.
+//
 func NewContextMenuWithItems(items []ContextMenuItem) *ContextMenu {
 	var _arg1 *C.GList             // out
 	var _cret *C.WebKitContextMenu // in
@@ -84,6 +87,11 @@ func NewContextMenuWithItems(items []ContextMenuItem) *ContextMenu {
 }
 
 // Append adds item at the end of the menu.
+//
+// The function takes the following parameters:
+//
+//    - item to add.
+//
 func (menu *ContextMenu) Append(item *ContextMenuItem) {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _arg1 *C.WebKitContextMenuItem // out
@@ -114,6 +122,11 @@ func (menu *ContextMenu) First() *ContextMenuItem {
 }
 
 // ItemAtPosition gets the item at the given position in the menu.
+//
+// The function takes the following parameters:
+//
+//    - position of the item, counting from 0.
+//
 func (menu *ContextMenu) ItemAtPosition(position uint) *ContextMenuItem {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _arg1 C.guint                  // out
@@ -202,6 +215,12 @@ func (menu *ContextMenu) UserData() *glib.Variant {
 // Insert inserts item into the menu at the given position. If position is
 // negative, or is larger than the number of items in the KitContextMenu, the
 // item is added on to the end of the menu. The first position is 0.
+//
+// The function takes the following parameters:
+//
+//    - item to add.
+//    - position to insert the item.
+//
 func (menu *ContextMenu) Insert(item *ContextMenuItem, position int) {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _arg1 *C.WebKitContextMenuItem // out
@@ -237,6 +256,12 @@ func (menu *ContextMenu) Last() *ContextMenuItem {
 // MoveItem moves item to the given position in the menu. If position is
 // negative, or is larger than the number of items in the KitContextMenu, the
 // item is added on to the end of the menu. The first position is 0.
+//
+// The function takes the following parameters:
+//
+//    - item to add.
+//    - position: new position to move the item.
+//
 func (menu *ContextMenu) MoveItem(item *ContextMenuItem, position int) {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _arg1 *C.WebKitContextMenuItem // out
@@ -253,6 +278,11 @@ func (menu *ContextMenu) MoveItem(item *ContextMenuItem, position int) {
 }
 
 // Prepend adds item at the beginning of the menu.
+//
+// The function takes the following parameters:
+//
+//    - item to add.
+//
 func (menu *ContextMenu) Prepend(item *ContextMenuItem) {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _arg1 *C.WebKitContextMenuItem // out
@@ -267,6 +297,11 @@ func (menu *ContextMenu) Prepend(item *ContextMenuItem) {
 
 // Remove removes item from the menu. See also webkit_context_menu_remove_all()
 // to remove all items.
+//
+// The function takes the following parameters:
+//
+//    - item to remove.
+//
 func (menu *ContextMenu) Remove(item *ContextMenuItem) {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _arg1 *C.WebKitContextMenuItem // out
@@ -293,6 +328,11 @@ func (menu *ContextMenu) RemoveAll() {
 // Process extension to set user data that can be retrieved from the UI Process
 // using webkit_context_menu_get_user_data(). If the user_data #GVariant is
 // floating, it is consumed.
+//
+// The function takes the following parameters:
+//
+//    - userData: #GVariant.
+//
 func (menu *ContextMenu) SetUserData(userData *glib.Variant) {
 	var _arg0 *C.WebKitContextMenu // out
 	var _arg1 *C.GVariant          // out

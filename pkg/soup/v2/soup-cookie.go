@@ -42,7 +42,12 @@ const COOKIE_MAX_AGE_ONE_YEAR = 0
 // Cookie<!-- -->s. As the "Cookie" header, unlike "Set-Cookie", only contains
 // cookie names and values, none of the other Cookie fields will be filled in.
 // (Thus, you can't generally pass a cookie returned from this method directly
-// to soup_cookies_to_response().)
+// to soup_cookies_to_response().).
+//
+// The function takes the following parameters:
+//
+//    - msg containing a "Cookie" request header.
+//
 func CookiesFromRequest(msg *Message) []Cookie {
 	var _arg1 *C.SoupMessage // out
 	var _cret *C.GSList      // in
@@ -74,6 +79,11 @@ func CookiesFromRequest(msg *Message) []Cookie {
 // CookiesFromResponse parses msg's Set-Cookie response headers and returns a
 // List of Cookie<!-- -->s. Cookies that do not specify "path" or "domain"
 // attributes will have their values defaulted from msg.
+//
+// The function takes the following parameters:
+//
+//    - msg containing a "Set-Cookie" response header.
+//
 func CookiesFromResponse(msg *Message) []Cookie {
 	var _arg1 *C.SoupMessage // out
 	var _cret *C.GSList      // in
@@ -104,6 +114,11 @@ func CookiesFromResponse(msg *Message) []Cookie {
 
 // CookiesToCookieHeader serializes a List of Cookie into a string suitable for
 // setting as the value of the "Cookie" header.
+//
+// The function takes the following parameters:
+//
+//    - cookies of Cookie.
+//
 func CookiesToCookieHeader(cookies []Cookie) string {
 	var _arg1 *C.GSList // out
 	var _cret *C.char   // in
@@ -130,7 +145,13 @@ func CookiesToCookieHeader(cookies []Cookie) string {
 // CookiesToRequest adds the name and value of each cookie in cookies to msg's
 // "Cookie" request. (If msg already has a "Cookie" request header, these
 // cookies will be appended to the cookies already present. Be careful that you
-// do not append the same cookies twice, eg, when requeuing a message.)
+// do not append the same cookies twice, eg, when requeuing a message.).
+//
+// The function takes the following parameters:
+//
+//    - cookies of Cookie.
+//    - msg: Message.
+//
 func CookiesToRequest(cookies []Cookie, msg *Message) {
 	var _arg1 *C.GSList      // out
 	var _arg2 *C.SoupMessage // out
@@ -151,7 +172,13 @@ func CookiesToRequest(cookies []Cookie, msg *Message) {
 
 // CookiesToResponse appends a "Set-Cookie" response header to msg for each
 // cookie in cookies. (This is in addition to any other "Set-Cookie" headers msg
-// may already have.)
+// may already have.).
+//
+// The function takes the following parameters:
+//
+//    - cookies of Cookie.
+//    - msg: Message.
+//
 func CookiesToResponse(cookies []Cookie, msg *Message) {
 	var _arg1 *C.GSList      // out
 	var _arg2 *C.SoupMessage // out
@@ -200,8 +227,8 @@ type cookie struct {
 }
 
 func marshalCookie(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &Cookie{&cookie{(*C.SoupCookie)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &Cookie{&cookie{(*C.SoupCookie)(b)}}, nil
 }
 
 // NewCookie constructs a struct Cookie.
@@ -247,7 +274,7 @@ func NewCookie(name string, value string, domain string, path string, maxAge int
 //
 // (At the moment, this does not check that cookie's domain matches uri, because
 // it assumes that the caller has already done that. But don't rely on that; it
-// may change in the future.)
+// may change in the future.).
 func (cookie *Cookie) AppliesToURI(uri *URI) bool {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.SoupURI    // out
@@ -342,7 +369,7 @@ func (cookie1 *Cookie) Equal(cookie2 *Cookie) bool {
 	return _ok
 }
 
-// Domain gets cookie's domain
+// Domain gets cookie's domain.
 func (cookie *Cookie) Domain() string {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.char       // in
@@ -378,8 +405,8 @@ func (cookie *Cookie) Expires() *Date {
 	return _date
 }
 
-// HttpOnly gets cookie's HttpOnly attribute
-func (cookie *Cookie) HttpOnly() bool {
+// HTTPOnly gets cookie's HttpOnly attribute.
+func (cookie *Cookie) HTTPOnly() bool {
 	var _arg0 *C.SoupCookie // out
 	var _cret C.gboolean    // in
 
@@ -397,7 +424,7 @@ func (cookie *Cookie) HttpOnly() bool {
 	return _ok
 }
 
-// Name gets cookie's name
+// Name gets cookie's name.
 func (cookie *Cookie) Name() string {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.char       // in
@@ -414,7 +441,7 @@ func (cookie *Cookie) Name() string {
 	return _utf8
 }
 
-// Path gets cookie's path
+// Path gets cookie's path.
 func (cookie *Cookie) Path() string {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.char       // in
@@ -447,7 +474,7 @@ func (cookie *Cookie) SameSitePolicy() SameSitePolicy {
 	return _sameSitePolicy
 }
 
-// Secure gets cookie's secure attribute
+// Secure gets cookie's secure attribute.
 func (cookie *Cookie) Secure() bool {
 	var _arg0 *C.SoupCookie // out
 	var _cret C.gboolean    // in
@@ -466,7 +493,7 @@ func (cookie *Cookie) Secure() bool {
 	return _ok
 }
 
-// Value gets cookie's value
+// Value gets cookie's value.
 func (cookie *Cookie) Value() string {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.char       // in
@@ -483,7 +510,7 @@ func (cookie *Cookie) Value() string {
 	return _utf8
 }
 
-// SetDomain sets cookie's domain to domain
+// SetDomain sets cookie's domain to domain.
 func (cookie *Cookie) SetDomain(domain string) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.char       // out
@@ -501,7 +528,7 @@ func (cookie *Cookie) SetDomain(domain string) {
 // cookie will be a session cookie and will expire at the end of the client's
 // session.
 //
-// (This sets the same property as soup_cookie_set_max_age().)
+// (This sets the same property as soup_cookie_set_max_age().).
 func (cookie *Cookie) SetExpires(expires *Date) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.SoupDate   // out
@@ -514,10 +541,10 @@ func (cookie *Cookie) SetExpires(expires *Date) {
 	runtime.KeepAlive(expires)
 }
 
-// SetHttpOnly sets cookie's HttpOnly attribute to http_only. If TRUE, cookie
+// SetHTTPOnly sets cookie's HttpOnly attribute to http_only. If TRUE, cookie
 // will be marked as "http only", meaning it should not be exposed to web page
 // scripts or other untrusted code.
-func (cookie *Cookie) SetHttpOnly(httpOnly bool) {
+func (cookie *Cookie) SetHTTPOnly(httpOnly bool) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 C.gboolean    // out
 
@@ -539,7 +566,7 @@ func (cookie *Cookie) SetHttpOnly(httpOnly bool) {
 // thereof) to calculate this value. (A value of 0 indicates that the cookie
 // should be considered already-expired.)
 //
-// (This sets the same property as soup_cookie_set_expires().)
+// (This sets the same property as soup_cookie_set_expires().).
 func (cookie *Cookie) SetMaxAge(maxAge int) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 C.int         // out
@@ -552,7 +579,7 @@ func (cookie *Cookie) SetMaxAge(maxAge int) {
 	runtime.KeepAlive(maxAge)
 }
 
-// SetName sets cookie's name to name
+// SetName sets cookie's name to name.
 func (cookie *Cookie) SetName(name string) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.char       // out
@@ -566,7 +593,7 @@ func (cookie *Cookie) SetName(name string) {
 	runtime.KeepAlive(name)
 }
 
-// SetPath sets cookie's path to path
+// SetPath sets cookie's path to path.
 func (cookie *Cookie) SetPath(path string) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.char       // out
@@ -611,7 +638,7 @@ func (cookie *Cookie) SetSecure(secure bool) {
 	runtime.KeepAlive(secure)
 }
 
-// SetValue sets cookie's value to value
+// SetValue sets cookie's value to value.
 func (cookie *Cookie) SetValue(value string) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.char       // out
@@ -671,6 +698,12 @@ func (cookie *Cookie) ToSetCookieHeader() string {
 // left as NULL. Note that this is not a valid state for a Cookie, and you will
 // need to fill in some appropriate string for the domain if you want to
 // actually make use of the cookie.
+//
+// The function takes the following parameters:
+//
+//    - header: cookie string (eg, the value of a Set-Cookie header).
+//    - origin of the cookie, or NULL.
+//
 func CookieParse(header string, origin *URI) *Cookie {
 	var _arg1 *C.char       // out
 	var _arg2 *C.SoupURI    // out

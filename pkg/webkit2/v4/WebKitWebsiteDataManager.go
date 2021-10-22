@@ -14,6 +14,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
+	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
@@ -46,7 +47,7 @@ const (
 )
 
 func marshalTLSErrorsPolicy(p uintptr) (interface{}, error) {
-	return TLSErrorsPolicy(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return TLSErrorsPolicy(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for TLSErrorsPolicy.
@@ -72,9 +73,7 @@ func wrapWebsiteDataManager(obj *externglib.Object) *WebsiteDataManager {
 }
 
 func marshalWebsiteDataManagerer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapWebsiteDataManager(obj), nil
+	return wrapWebsiteDataManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewWebsiteDataManagerEphemeral creates an ephemeral KitWebsiteDataManager.
@@ -91,8 +90,60 @@ func NewWebsiteDataManagerEphemeral() *WebsiteDataManager {
 	return _websiteDataManager
 }
 
+// Clear: asynchronously clear the website data of the given types modified in
+// the past timespan. If timespan is 0, all website data will be removed.
+//
+// When the operation is finished, callback will be called. You can then call
+// webkit_website_data_manager_clear_finish() to get the result of the
+// operation.
+//
+// Due to implementation limitations, this function does not currently delete
+// any stored cookies if timespan is nonzero. This behavior may change in the
+// future.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - types: KitWebsiteDataTypes.
+//    - timespan: Span.
+//    - callback to call when the request is satisfied.
+//
+func (manager *WebsiteDataManager) Clear(ctx context.Context, types WebsiteDataTypes, timespan glib.TimeSpan, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebsiteDataManager // out
+	var _arg3 *C.GCancellable             // out
+	var _arg1 C.WebKitWebsiteDataTypes    // out
+	var _arg2 C.GTimeSpan                 // out
+	var _arg4 C.GAsyncReadyCallback       // out
+	var _arg5 C.gpointer
+
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = C.WebKitWebsiteDataTypes(types)
+	_arg2 = C.gint64(timespan)
+	if callback != nil {
+		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg5 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_website_data_manager_clear(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(types)
+	runtime.KeepAlive(timespan)
+	runtime.KeepAlive(callback)
+}
+
 // ClearFinish: finish an asynchronous operation started with
-// webkit_website_data_manager_clear()
+// webkit_website_data_manager_clear().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (manager *WebsiteDataManager) ClearFinish(result gio.AsyncResulter) error {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 *C.GAsyncResult             // out
@@ -119,6 +170,13 @@ func (manager *WebsiteDataManager) ClearFinish(result gio.AsyncResulter) error {
 // When the operation is finished, callback will be called. You can then call
 // webkit_website_data_manager_fetch_finish() to get the result of the
 // operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - types: KitWebsiteDataTypes.
+//    - callback to call when the request is satisfied.
+//
 func (manager *WebsiteDataManager) Fetch(ctx context.Context, types WebsiteDataTypes, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg2 *C.GCancellable             // out
@@ -147,6 +205,11 @@ func (manager *WebsiteDataManager) Fetch(ctx context.Context, types WebsiteDataT
 
 // FetchFinish: finish an asynchronous operation started with
 // webkit_website_data_manager_fetch().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (manager *WebsiteDataManager) FetchFinish(result gio.AsyncResulter) ([]*WebsiteData, error) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 *C.GAsyncResult             // out
@@ -366,6 +429,12 @@ func (manager *WebsiteDataManager) ITPEnabled() bool {
 // When the operation is finished, callback will be called. You can then call
 // webkit_website_data_manager_get_itp_summary_finish() to get the result of the
 // operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - callback to call when the request is satisfied.
+//
 func (manager *WebsiteDataManager) ITPSummary(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 *C.GCancellable             // out
@@ -391,6 +460,11 @@ func (manager *WebsiteDataManager) ITPSummary(ctx context.Context, callback gio.
 
 // ITPSummaryFinish: finish an asynchronous operation started with
 // webkit_website_data_manager_get_itp_summary().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (manager *WebsiteDataManager) ITPSummaryFinish(result gio.AsyncResulter) ([]*ITPThirdParty, error) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 *C.GAsyncResult             // out
@@ -508,7 +582,7 @@ func (manager *WebsiteDataManager) ServiceWorkerRegistrationsDirectory() string 
 	return _utf8
 }
 
-// TLSErrorsPolicy: get the TLS errors policy of manager
+// TLSErrorsPolicy: get the TLS errors policy of manager.
 func (manager *WebsiteDataManager) TLSErrorsPolicy() TLSErrorsPolicy {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret C.WebKitTLSErrorsPolicy     // in
@@ -574,6 +648,14 @@ func (manager *WebsiteDataManager) IsEphemeral() bool {
 // When the operation is finished, callback will be called. You can then call
 // webkit_website_data_manager_remove_finish() to get the result of the
 // operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - types: KitWebsiteDataTypes.
+//    - websiteData of KitWebsiteData.
+//    - callback to call when the request is satisfied.
+//
 func (manager *WebsiteDataManager) Remove(ctx context.Context, types WebsiteDataTypes, websiteData []*WebsiteData, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg3 *C.GCancellable             // out
@@ -611,6 +693,11 @@ func (manager *WebsiteDataManager) Remove(ctx context.Context, types WebsiteData
 
 // RemoveFinish: finish an asynchronous operation started with
 // webkit_website_data_manager_remove().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (manager *WebsiteDataManager) RemoveFinish(result gio.AsyncResulter) error {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 *C.GAsyncResult             // out
@@ -639,6 +726,11 @@ func (manager *WebsiteDataManager) RemoveFinish(result gio.AsyncResulter) error 
 // WEBKIT_COOKIE_POLICY_ACCEPT_NO_THIRD_PARTY is ignored and
 // WEBKIT_COOKIE_POLICY_ACCEPT_ALWAYS is used instead. See also
 // webkit_cookie_manager_set_accept_policy().
+//
+// The function takes the following parameters:
+//
+//    - enabled: value to set.
+//
 func (manager *WebsiteDataManager) SetITPEnabled(enabled bool) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 C.gboolean                  // out
@@ -662,6 +754,12 @@ func (manager *WebsiteDataManager) SetITPEnabled(enabled bool) {
 // or WEBKIT_NETWORK_PROXY_MODE_CUSTOM to provide your own proxy settings. When
 // proxy_mode is WEBKIT_NETWORK_PROXY_MODE_CUSTOM proxy_settings must be a valid
 // KitNetworkProxySettings; otherwise, proxy_settings must be NULL.
+//
+// The function takes the following parameters:
+//
+//    - proxyMode: KitNetworkProxyMode.
+//    - proxySettings or NULL.
+//
 func (manager *WebsiteDataManager) SetNetworkProxySettings(proxyMode NetworkProxyMode, proxySettings *NetworkProxySettings) {
 	var _arg0 *C.WebKitWebsiteDataManager   // out
 	var _arg1 C.WebKitNetworkProxyMode      // out
@@ -683,6 +781,11 @@ func (manager *WebsiteDataManager) SetNetworkProxySettings(proxyMode NetworkProx
 // credential storage. When enabled, which is the default for non-ephemeral
 // sessions, the network process will try to read and write HTTP authentiacation
 // credentials from persistent storage.
+//
+// The function takes the following parameters:
+//
+//    - enabled: value to set.
+//
 func (manager *WebsiteDataManager) SetPersistentCredentialStorageEnabled(enabled bool) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 C.gboolean                  // out
@@ -697,7 +800,12 @@ func (manager *WebsiteDataManager) SetPersistentCredentialStorageEnabled(enabled
 	runtime.KeepAlive(enabled)
 }
 
-// SetTLSErrorsPolicy: set the TLS errors policy of manager as policy
+// SetTLSErrorsPolicy: set the TLS errors policy of manager as policy.
+//
+// The function takes the following parameters:
+//
+//    - policy: KitTLSErrorsPolicy.
+//
 func (manager *WebsiteDataManager) SetTLSErrorsPolicy(policy TLSErrorsPolicy) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 C.WebKitTLSErrorsPolicy     // out
@@ -721,11 +829,11 @@ type itpFirstParty struct {
 }
 
 func marshalITPFirstParty(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &ITPFirstParty{&itpFirstParty{(*C.WebKitITPFirstParty)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &ITPFirstParty{&itpFirstParty{(*C.WebKitITPFirstParty)(b)}}, nil
 }
 
-// Domain: get the domain name of itp_first_party
+// Domain: get the domain name of itp_first_party.
 func (itpFirstParty *ITPFirstParty) Domain() string {
 	var _arg0 *C.WebKitITPFirstParty // out
 	var _cret *C.char                // in
@@ -740,6 +848,33 @@ func (itpFirstParty *ITPFirstParty) Domain() string {
 	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
 
 	return _utf8
+}
+
+// LastUpdateTime: get the last time a KitITPThirdParty has been seen under
+// itp_first_party. Each WebKitITPFirstParty is created by
+// webkit_itp_third_party_get_first_parties() and therefore corresponds to
+// exactly one KitITPThirdParty.
+func (itpFirstParty *ITPFirstParty) LastUpdateTime() *glib.DateTime {
+	var _arg0 *C.WebKitITPFirstParty // out
+	var _cret *C.GDateTime           // in
+
+	_arg0 = (*C.WebKitITPFirstParty)(gextras.StructNative(unsafe.Pointer(itpFirstParty)))
+
+	_cret = C.webkit_itp_first_party_get_last_update_time(_arg0)
+	runtime.KeepAlive(itpFirstParty)
+
+	var _dateTime *glib.DateTime // out
+
+	_dateTime = (*glib.DateTime)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+	C.g_date_time_ref(_cret)
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_dateTime)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.g_date_time_unref((*C.GDateTime)(intern.C))
+		},
+	)
+
+	return _dateTime
 }
 
 // WebsiteDataAccessAllowed: get whether itp_first_party has granted website
@@ -775,11 +910,11 @@ type itpThirdParty struct {
 }
 
 func marshalITPThirdParty(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &ITPThirdParty{&itpThirdParty{(*C.WebKitITPThirdParty)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &ITPThirdParty{&itpThirdParty{(*C.WebKitITPThirdParty)(b)}}, nil
 }
 
-// Domain: get the domain name of itp_third_party
+// Domain: get the domain name of itp_third_party.
 func (itpThirdParty *ITPThirdParty) Domain() string {
 	var _arg0 *C.WebKitITPThirdParty // out
 	var _cret *C.char                // in

@@ -20,6 +20,13 @@ import "C"
 // g_hash_table_insert(), both the key and the value are copied).
 //
 // Deprecated: Use #GVariant API instead.
+//
+// The function takes the following parameters:
+//
+//    - hash: value hash.
+//    - key: key.
+//    - value: value.
+//
 func ValueHashInsertValue(hash map[string]externglib.Value, key string, value *externglib.Value) {
 	var _arg1 *C.GHashTable // out
 	var _arg2 *C.char       // out

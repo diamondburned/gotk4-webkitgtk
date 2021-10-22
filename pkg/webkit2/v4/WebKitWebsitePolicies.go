@@ -37,7 +37,7 @@ const (
 )
 
 func marshalAutoplayPolicy(p uintptr) (interface{}, error) {
-	return AutoplayPolicy(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return AutoplayPolicy(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for AutoplayPolicy.
@@ -65,12 +65,10 @@ func wrapWebsitePolicies(obj *externglib.Object) *WebsitePolicies {
 }
 
 func marshalWebsitePolicieser(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapWebsitePolicies(obj), nil
+	return wrapWebsitePolicies(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewWebsitePolicies: create a new KitWebsitePolicies
+// NewWebsitePolicies: create a new KitWebsitePolicies.
 func NewWebsitePolicies() *WebsitePolicies {
 	var _cret *C.WebKitWebsitePolicies // in
 

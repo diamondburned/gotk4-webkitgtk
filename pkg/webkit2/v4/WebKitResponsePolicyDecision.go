@@ -34,9 +34,7 @@ func wrapResponsePolicyDecision(obj *externglib.Object) *ResponsePolicyDecision 
 }
 
 func marshalResponsePolicyDecisioner(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapResponsePolicyDecision(obj), nil
+	return wrapResponsePolicyDecision(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Request: return the KitURIRequest associated with the response decision.

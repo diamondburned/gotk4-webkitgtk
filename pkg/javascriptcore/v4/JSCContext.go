@@ -31,9 +31,9 @@ func init() {
 type CheckSyntaxMode int
 
 const (
-	// CheckSyntaxModeScript: mode to check syntax of a script
+	// CheckSyntaxModeScript: mode to check syntax of a script.
 	CheckSyntaxModeScript CheckSyntaxMode = iota
-	// CheckSyntaxModeModule: mode to check syntax of a module
+	// CheckSyntaxModeModule: mode to check syntax of a module.
 	CheckSyntaxModeModule
 )
 
@@ -54,17 +54,17 @@ func (c CheckSyntaxMode) String() string {
 type CheckSyntaxResult int
 
 const (
-	// CheckSyntaxResultSuccess: no errors
+	// CheckSyntaxResultSuccess: no errors.
 	CheckSyntaxResultSuccess CheckSyntaxResult = iota
-	// CheckSyntaxResultRecoverableError: recoverable syntax error
+	// CheckSyntaxResultRecoverableError: recoverable syntax error.
 	CheckSyntaxResultRecoverableError
-	// CheckSyntaxResultIrrecoverableError: irrecoverable syntax error
+	// CheckSyntaxResultIrrecoverableError: irrecoverable syntax error.
 	CheckSyntaxResultIrrecoverableError
-	// CheckSyntaxResultUnterminatedLiteralError: unterminated literal error
+	// CheckSyntaxResultUnterminatedLiteralError: unterminated literal error.
 	CheckSyntaxResultUnterminatedLiteralError
-	// CheckSyntaxResultOutOfMemoryError: out of memory error
+	// CheckSyntaxResultOutOfMemoryError: out of memory error.
 	CheckSyntaxResultOutOfMemoryError
-	// CheckSyntaxResultStackOverflowError: stack overflow error
+	// CheckSyntaxResultStackOverflowError: stack overflow error.
 	CheckSyntaxResultStackOverflowError
 )
 
@@ -120,9 +120,7 @@ func wrapContext(obj *externglib.Object) *Context {
 }
 
 func marshalContexter(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapContext(obj), nil
+	return wrapContext(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewContext: create a new CContext. The context is created in a new
@@ -141,6 +139,11 @@ func NewContext() *Context {
 }
 
 // NewContextWithVirtualMachine: create a new CContext in virtual_machine.
+//
+// The function takes the following parameters:
+//
+//    - vm: CVirtualMachine.
+//
 func NewContextWithVirtualMachine(vm *VirtualMachine) *Context {
 	var _arg1 *C.JSCVirtualMachine // out
 	var _cret *C.JSCContext        // in
@@ -162,6 +165,15 @@ func NewContextWithVirtualMachine(vm *VirtualMachine) *Context {
 // first line is 1. uri and line_number are only used to fill the exception. In
 // case of errors exception will be set to a new CException with the details.
 // You can pass NULL to exception to ignore the error details.
+//
+// The function takes the following parameters:
+//
+//    - code: javaScript script to check.
+//    - length of code, or -1 if code is a nul-terminated string.
+//    - mode: CCheckSyntaxMode.
+//    - uri: source URI.
+//    - lineNumber: starting line number.
+//
 func (context *Context) CheckSyntax(code string, length int, mode CheckSyntaxMode, uri string, lineNumber uint) (*Exception, CheckSyntaxResult) {
 	var _arg0 *C.JSCContext          // out
 	var _arg1 *C.char                // out
@@ -211,6 +223,12 @@ func (context *Context) ClearException() {
 }
 
 // Evaluate code in context.
+//
+// The function takes the following parameters:
+//
+//    - code: javaScript script to evaluate.
+//    - length of code, or -1 if code is a nul-terminated string.
+//
 func (context *Context) Evaluate(code string, length int) *Value {
 	var _arg0 *C.JSCContext // out
 	var _arg1 *C.char       // out
@@ -242,6 +260,16 @@ func (context *Context) Evaluate(code string, length int) *Value {
 // number in uri; the value is one-based so the first line is 1. uri and
 // line_number will be shown in exceptions and they don't affect the behavior of
 // the script.
+//
+// The function takes the following parameters:
+//
+//    - code: javaScript script to evaluate.
+//    - length of code, or -1 if code is a nul-terminated string.
+//    - objectInstance: object instance.
+//    - objectClass or NULL to use the default.
+//    - uri: source URI.
+//    - lineNumber: starting line number.
+//
 func (context *Context) EvaluateInObject(code string, length int, objectInstance cgo.Handle, objectClass *Class, uri string, lineNumber uint) (object *Value, value *Value) {
 	var _arg0 *C.JSCContext // out
 	var _arg1 *C.char       // out
@@ -287,6 +315,14 @@ func (context *Context) EvaluateInObject(code string, length int, objectInstance
 // The line_number is the starting line number in uri; the value is one-based so
 // the first line is 1. uri and line_number will be shown in exceptions and they
 // don't affect the behavior of the script.
+//
+// The function takes the following parameters:
+//
+//    - code: javaScript script to evaluate.
+//    - length of code, or -1 if code is a nul-terminated string.
+//    - uri: source URI.
+//    - lineNumber: starting line number.
+//
 func (context *Context) EvaluateWithSourceURI(code string, length int, uri string, lineNumber uint) *Value {
 	var _arg0 *C.JSCContext // out
 	var _arg1 *C.char       // out
@@ -337,7 +373,7 @@ func (context *Context) Exception() *Exception {
 	return _exception
 }
 
-// GlobalObject: get a CValue referencing the context global object
+// GlobalObject: get a CValue referencing the context global object.
 func (context *Context) GlobalObject() *Value {
 	var _arg0 *C.JSCContext // out
 	var _cret *C.JSCValue   // in
@@ -355,6 +391,11 @@ func (context *Context) GlobalObject() *Value {
 }
 
 // Value: get a property of context global object with name.
+//
+// The function takes the following parameters:
+//
+//    - name: value name.
+//
 func (context *Context) Value(name string) *Value {
 	var _arg0 *C.JSCContext // out
 	var _arg1 *C.char       // out
@@ -413,6 +454,11 @@ func (context *Context) PopExceptionHandler() {
 // jsc_context_pop_exception_handler() to remove it and set the previous one.
 // When handler is removed from the context, destroy_notify i called with
 // user_data as parameter.
+//
+// The function takes the following parameters:
+//
+//    - handler: CExceptionHandler.
+//
 func (context *Context) PushExceptionHandler(handler ExceptionHandler) {
 	var _arg0 *C.JSCContext         // out
 	var _arg1 C.JSCExceptionHandler // out
@@ -430,6 +476,12 @@ func (context *Context) PushExceptionHandler(handler ExceptionHandler) {
 }
 
 // SetValue: set a property of context global object with name and value.
+//
+// The function takes the following parameters:
+//
+//    - name: value name.
+//    - value: CValue.
+//
 func (context *Context) SetValue(name string, value *Value) {
 	var _arg0 *C.JSCContext // out
 	var _arg1 *C.char       // out
@@ -448,6 +500,11 @@ func (context *Context) SetValue(name string, value *Value) {
 
 // Throw an exception to context using the given error message. The created
 // CException can be retrieved with jsc_context_get_exception().
+//
+// The function takes the following parameters:
+//
+//    - errorMessage: error message.
+//
 func (context *Context) Throw(errorMessage string) {
 	var _arg0 *C.JSCContext // out
 	var _arg1 *C.char       // out
@@ -462,6 +519,11 @@ func (context *Context) Throw(errorMessage string) {
 }
 
 // ThrowException: throw exception to context.
+//
+// The function takes the following parameters:
+//
+//    - exception: CException.
+//
 func (context *Context) ThrowException(exception *Exception) {
 	var _arg0 *C.JSCContext   // out
 	var _arg1 *C.JSCException // out
@@ -477,7 +539,13 @@ func (context *Context) ThrowException(exception *Exception) {
 // ThrowWithName: throw an exception to context using the given error name and
 // message. The created CException can be retrieved with
 // jsc_context_get_exception().
-func (context *Context) ThrowWithName(errorName string, errorMessage string) {
+//
+// The function takes the following parameters:
+//
+//    - errorName: error name.
+//    - errorMessage: error message.
+//
+func (context *Context) ThrowWithName(errorName, errorMessage string) {
 	var _arg0 *C.JSCContext // out
 	var _arg1 *C.char       // out
 	var _arg2 *C.char       // out

@@ -29,14 +29,14 @@ func init() {
 type AutomationBrowsingContextPresentation int
 
 const (
-	// AutomationBrowsingContextPresentationWindow: window
+	// AutomationBrowsingContextPresentationWindow: window.
 	AutomationBrowsingContextPresentationWindow AutomationBrowsingContextPresentation = iota
-	// AutomationBrowsingContextPresentationTab: tab
+	// AutomationBrowsingContextPresentationTab: tab.
 	AutomationBrowsingContextPresentationTab
 )
 
 func marshalAutomationBrowsingContextPresentation(p uintptr) (interface{}, error) {
-	return AutomationBrowsingContextPresentation(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return AutomationBrowsingContextPresentation(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for AutomationBrowsingContextPresentation.
@@ -62,9 +62,7 @@ func wrapAutomationSession(obj *externglib.Object) *AutomationSession {
 }
 
 func marshalAutomationSessioner(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapAutomationSession(obj), nil
+	return wrapAutomationSession(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // ApplicationInfo: get the KitAutomationSession previously set with
@@ -92,7 +90,7 @@ func (session *AutomationSession) ApplicationInfo() *ApplicationInfo {
 	return _applicationInfo
 }
 
-// ID: get the unique identifier of a KitAutomationSession
+// ID: get the unique identifier of a KitAutomationSession.
 func (session *AutomationSession) ID() string {
 	var _arg0 *C.WebKitAutomationSession // out
 	var _cret *C.char                    // in
@@ -117,6 +115,11 @@ func (session *AutomationSession) ID() string {
 // version. This will not have any effect when called after the automation
 // session has been fully created, so this must be called in the callback of
 // KitWebContext::automation-started signal.
+//
+// The function takes the following parameters:
+//
+//    - info: KitApplicationInfo.
+//
 func (session *AutomationSession) SetApplicationInfo(info *ApplicationInfo) {
 	var _arg0 *C.WebKitAutomationSession // out
 	var _arg1 *C.WebKitApplicationInfo   // out
@@ -127,4 +130,20 @@ func (session *AutomationSession) SetApplicationInfo(info *ApplicationInfo) {
 	C.webkit_automation_session_set_application_info(_arg0, _arg1)
 	runtime.KeepAlive(session)
 	runtime.KeepAlive(info)
+}
+
+// ConnectCreateWebView: this signal is emitted when the automation client
+// requests a new browsing context to interact with it. The callback handler
+// should return a KitWebView created with
+// KitWebView:is-controlled-by-automation construct property enabled and
+// KitWebView:automation-presentation-type construct property set if needed.
+//
+// If the signal is emitted with "tab" detail, the returned KitWebView should be
+// a new web view added to a new tab of the current browsing context window. If
+// the signal is emitted with "window" detail, the returned KitWebView should be
+// a new web view added to a new window. When creating a new web view and
+// there's an active browsing context, the new window or tab shouldn't be
+// focused.
+func (session *AutomationSession) ConnectCreateWebView(f func() WebView) externglib.SignalHandle {
+	return session.Connect("create-web-view", f)
 }

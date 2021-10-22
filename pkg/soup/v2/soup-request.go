@@ -84,9 +84,7 @@ func wrapRequest(obj *externglib.Object) *Request {
 }
 
 func marshalRequester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapRequest(obj), nil
+	return wrapRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // ContentLength gets the length of the data represented by request. For most
@@ -132,7 +130,7 @@ func (request *Request) ContentType() string {
 	return _utf8
 }
 
-// Session gets request's Session
+// Session gets request's Session.
 func (request *Request) Session() *Session {
 	var _arg0 *C.SoupRequest // out
 	var _cret *C.SoupSession // in
@@ -149,7 +147,7 @@ func (request *Request) Session() *Session {
 	return _session
 }
 
-// URI gets request's URI
+// URI gets request's URI.
 func (request *Request) URI() *URI {
 	var _arg0 *C.SoupRequest // out
 	var _cret *C.SoupURI     // in
@@ -171,6 +169,11 @@ func (request *Request) URI() *URI {
 //
 // Note that you cannot use this method with Requests attached to a
 // SessionAsync.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL.
+//
 func (request *Request) Send(ctx context.Context) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupRequest  // out
 	var _arg1 *C.GCancellable // out
@@ -214,6 +217,12 @@ func (request *Request) Send(ctx context.Context) (gio.InputStreamer, error) {
 // SendAsync begins an asynchronously request for the URI pointed to by request.
 //
 // Note that you cannot use this method with Requests attached to a SessionSync.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL.
+//    - callback: ReadyCallback.
+//
 func (request *Request) SendAsync(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.SoupRequest        // out
 	var _arg1 *C.GCancellable       // out
@@ -238,6 +247,11 @@ func (request *Request) SendAsync(ctx context.Context, callback gio.AsyncReadyCa
 }
 
 // SendFinish gets the result of a soup_request_send_async().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (request *Request) SendFinish(result gio.AsyncResulter) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupRequest  // out
 	var _arg1 *C.GAsyncResult // out

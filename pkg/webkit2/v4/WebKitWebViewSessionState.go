@@ -34,8 +34,8 @@ type webViewSessionState struct {
 }
 
 func marshalWebViewSessionState(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &WebViewSessionState{&webViewSessionState{(*C.WebKitWebViewSessionState)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &WebViewSessionState{&webViewSessionState{(*C.WebKitWebViewSessionState)(b)}}, nil
 }
 
 // NewWebViewSessionState constructs a struct WebViewSessionState.

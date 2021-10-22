@@ -40,9 +40,7 @@ func wrapDownload(obj *externglib.Object) *Download {
 }
 
 func marshalDownloader(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapDownload(obj), nil
+	return wrapDownload(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Cancel cancels the download. When the ongoing download operation is
@@ -210,6 +208,11 @@ func (download *Download) WebView() *WebView {
 // SetAllowOverwrite sets the KitDownload:allow-overwrite property, which
 // determines whether the download may overwrite an existing file on disk, or if
 // it will fail if the destination already exists.
+//
+// The function takes the following parameters:
+//
+//    - allowed: new value for the KitDownload:allow-overwrite property.
+//
 func (download *Download) SetAllowOverwrite(allowed bool) {
 	var _arg0 *C.WebKitDownload // out
 	var _arg1 C.gboolean        // out
@@ -235,6 +238,11 @@ func (download *Download) SetAllowOverwrite(allowed bool) {
 // KitDownload::decide-destination signal is not handled and destination URI is
 // not set when the download transfer starts, the file will be saved with the
 // filename suggested by the server in G_USER_DIRECTORY_DOWNLOAD directory.
+//
+// The function takes the following parameters:
+//
+//    - uri: destination URI.
+//
 func (download *Download) SetDestination(uri string) {
 	var _arg0 *C.WebKitDownload // out
 	var _arg1 *C.gchar          // out
@@ -246,4 +254,33 @@ func (download *Download) SetDestination(uri string) {
 	C.webkit_download_set_destination(_arg0, _arg1)
 	runtime.KeepAlive(download)
 	runtime.KeepAlive(uri)
+}
+
+// ConnectCreatedDestination: this signal is emitted after
+// KitDownload::decide-destination and before KitDownload::received-data to
+// notify that destination file has been created successfully at destination.
+func (download *Download) ConnectCreatedDestination(f func(destination string)) externglib.SignalHandle {
+	return download.Connect("created-destination", f)
+}
+
+// ConnectDecideDestination: this signal is emitted after response is received
+// to decide a destination URI for the download. If this signal is not handled
+// the file will be downloaded to G_USER_DIRECTORY_DOWNLOAD directory using
+// suggested_filename.
+func (download *Download) ConnectDecideDestination(f func(suggestedFilename string) bool) externglib.SignalHandle {
+	return download.Connect("decide-destination", f)
+}
+
+// ConnectFinished: this signal is emitted when download finishes successfully
+// or due to an error. In case of errors KitDownload::failed signal is emitted
+// before this one.
+func (download *Download) ConnectFinished(f func()) externglib.SignalHandle {
+	return download.Connect("finished", f)
+}
+
+// ConnectReceivedData: this signal is emitted after response is received, every
+// time new data has been written to the destination. It's useful to know the
+// progress of the download operation.
+func (download *Download) ConnectReceivedData(f func(dataLength uint64)) externglib.SignalHandle {
+	return download.Connect("received-data", f)
 }

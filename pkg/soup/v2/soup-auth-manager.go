@@ -46,12 +46,10 @@ func wrapAuthManager(obj *externglib.Object) *AuthManager {
 }
 
 func marshalAuthManagerer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapAuthManager(obj), nil
+	return wrapAuthManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// ClearCachedCredentials: clear all credentials cached by manager
+// ClearCachedCredentials: clear all credentials cached by manager.
 func (manager *AuthManager) ClearCachedCredentials() {
 	var _arg0 *C.SoupAuthManager // out
 
@@ -68,7 +66,13 @@ func (manager *AuthManager) ClearCachedCredentials() {
 //
 // This is only useful for authentication types where the initial Authorization
 // header does not depend on any additional information from the server. (Eg,
-// Basic or NTLM, but not Digest.)
+// Basic or NTLM, but not Digest.).
+//
+// The function takes the following parameters:
+//
+//    - uri under which auth is to be used.
+//    - auth to use.
+//
 func (manager *AuthManager) UseAuth(uri *URI, auth Auther) {
 	var _arg0 *C.SoupAuthManager // out
 	var _arg1 *C.SoupURI         // out
@@ -82,4 +86,13 @@ func (manager *AuthManager) UseAuth(uri *URI, auth Auther) {
 	runtime.KeepAlive(manager)
 	runtime.KeepAlive(uri)
 	runtime.KeepAlive(auth)
+}
+
+// ConnectAuthenticate: emitted when the manager requires the application to
+// provide authentication credentials.
+//
+// Session connects to this signal and emits its own Session::authenticate
+// signal when it is emitted, so you shouldn't need to use this signal directly.
+func (manager *AuthManager) ConnectAuthenticate(f func(msg Message, auth Auther, retrying bool)) externglib.SignalHandle {
+	return manager.Connect("authenticate", f)
 }

@@ -25,11 +25,11 @@ func init() {
 }
 
 // AUTH_DOMAIN_DIGEST_AUTH_CALLBACK alias for the AuthDomainDigest:auth-callback
-// property. (The AuthDomainDigestAuthCallback.)
+// property. (The AuthDomainDigestAuthCallback.).
 const AUTH_DOMAIN_DIGEST_AUTH_CALLBACK = "auth-callback"
 
 // AUTH_DOMAIN_DIGEST_AUTH_DATA alias for the AuthDomainDigest:auth-callback
-// property. (The AuthDomainDigestAuthCallback.)
+// property. (The AuthDomainDigestAuthCallback.).
 const AUTH_DOMAIN_DIGEST_AUTH_DATA = "auth-data"
 
 // AuthDomainDigestAuthCallback: callback used by AuthDomainDigest for
@@ -76,9 +76,7 @@ func wrapAuthDomainDigest(obj *externglib.Object) *AuthDomainDigest {
 }
 
 func marshalAuthDomainDigester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapAuthDomainDigest(obj), nil
+	return wrapAuthDomainDigest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // SetAuthCallback sets the callback that domain will use to authenticate
@@ -89,6 +87,11 @@ func marshalAuthDomainDigester(p uintptr) (interface{}, error) {
 // You can also set the auth callback by setting the
 // SOUP_AUTH_DOMAIN_DIGEST_AUTH_CALLBACK and SOUP_AUTH_DOMAIN_DIGEST_AUTH_DATA
 // properties, which can also be used to set the callback at construct time.
+//
+// The function takes the following parameters:
+//
+//    - callback: callback.
+//
 func (domain *AuthDomainDigest) SetAuthCallback(callback AuthDomainDigestAuthCallback) {
 	var _arg0 *C.SoupAuthDomain                  // out
 	var _arg1 C.SoupAuthDomainDigestAuthCallback // out
@@ -115,8 +118,15 @@ func (domain *AuthDomainDigest) SetAuthCallback(callback AuthDomainDigestAuthCal
 // verify it. This way, if your server is compromised, the attackers will not
 // gain access to cleartext passwords which might also be usable at other sites.
 // (Note also that the encoded password returned by this method is identical to
-// the encoded password stored in an Apache .htdigest file.)
-func AuthDomainDigestEncodePassword(username string, realm string, password string) string {
+// the encoded password stored in an Apache .htdigest file.).
+//
+// The function takes the following parameters:
+//
+//    - username: username.
+//    - realm: auth realm name.
+//    - password for username in realm.
+//
+func AuthDomainDigestEncodePassword(username, realm, password string) string {
 	var _arg1 *C.char // out
 	var _arg2 *C.char // out
 	var _arg3 *C.char // out

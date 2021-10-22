@@ -34,12 +34,15 @@ func wrapGeolocationManager(obj *externglib.Object) *GeolocationManager {
 }
 
 func marshalGeolocationManagerer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapGeolocationManager(obj), nil
+	return wrapGeolocationManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Failed: notify manager that determining the position failed.
+//
+// The function takes the following parameters:
+//
+//    - errorMessage: error message.
+//
 func (manager *GeolocationManager) Failed(errorMessage string) {
 	var _arg0 *C.WebKitGeolocationManager // out
 	var _arg1 *C.char                     // out
@@ -73,6 +76,11 @@ func (manager *GeolocationManager) EnableHighAccuracy() bool {
 }
 
 // UpdatePosition: notify manager that position has been updated to position.
+//
+// The function takes the following parameters:
+//
+//    - position: KitGeolocationPosition.
+//
 func (manager *GeolocationManager) UpdatePosition(position *GeolocationPosition) {
 	var _arg0 *C.WebKitGeolocationManager  // out
 	var _arg1 *C.WebKitGeolocationPosition // out
@@ -83,6 +91,24 @@ func (manager *GeolocationManager) UpdatePosition(position *GeolocationPosition)
 	C.webkit_geolocation_manager_update_position(_arg0, _arg1)
 	runtime.KeepAlive(manager)
 	runtime.KeepAlive(position)
+}
+
+// ConnectStart: signal is emitted to notify that manager needs to start
+// receiving position updates. After this signal is emitted the user should
+// provide the updates using webkit_geolocation_manager_update_position() every
+// time the position changes, or use webkit_geolocation_manager_failed() in case
+// it isn't possible to determine the current position.
+//
+// If the signal is not handled, WebKit will try to determine the position using
+// GeoClue if available.
+func (manager *GeolocationManager) ConnectStart(f func() bool) externglib.SignalHandle {
+	return manager.Connect("start", f)
+}
+
+// ConnectStop: signal is emitted to notify that manager doesn't need to receive
+// position updates anymore.
+func (manager *GeolocationManager) ConnectStop(f func()) externglib.SignalHandle {
+	return manager.Connect("stop", f)
 }
 
 // GeolocationPosition is an opaque struct used to provide position updates to a
@@ -99,8 +125,8 @@ type geolocationPosition struct {
 }
 
 func marshalGeolocationPosition(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &GeolocationPosition{&geolocationPosition{(*C.WebKitGeolocationPosition)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &GeolocationPosition{&geolocationPosition{(*C.WebKitGeolocationPosition)(b)}}, nil
 }
 
 // NewGeolocationPosition constructs a struct GeolocationPosition.
@@ -132,7 +158,7 @@ func NewGeolocationPosition(latitude float64, longitude float64, accuracy float6
 	return _geolocationPosition
 }
 
-// Copy: make a copy of the KitGeolocationPosition
+// Copy: make a copy of the KitGeolocationPosition.
 func (position *GeolocationPosition) Copy() *GeolocationPosition {
 	var _arg0 *C.WebKitGeolocationPosition // out
 	var _cret *C.WebKitGeolocationPosition // in
@@ -155,7 +181,7 @@ func (position *GeolocationPosition) Copy() *GeolocationPosition {
 	return _geolocationPosition
 }
 
-// SetAltitude: set the position altitude
+// SetAltitude: set the position altitude.
 func (position *GeolocationPosition) SetAltitude(altitude float64) {
 	var _arg0 *C.WebKitGeolocationPosition // out
 	var _arg1 C.double                     // out
@@ -168,7 +194,7 @@ func (position *GeolocationPosition) SetAltitude(altitude float64) {
 	runtime.KeepAlive(altitude)
 }
 
-// SetAltitudeAccuracy: set the accuracy of position altitude
+// SetAltitudeAccuracy: set the accuracy of position altitude.
 func (position *GeolocationPosition) SetAltitudeAccuracy(altitudeAccuracy float64) {
 	var _arg0 *C.WebKitGeolocationPosition // out
 	var _arg1 C.double                     // out
@@ -195,7 +221,7 @@ func (position *GeolocationPosition) SetHeading(heading float64) {
 	runtime.KeepAlive(heading)
 }
 
-// SetSpeed: set the position speed
+// SetSpeed: set the position speed.
 func (position *GeolocationPosition) SetSpeed(speed float64) {
 	var _arg0 *C.WebKitGeolocationPosition // out
 	var _arg1 C.double                     // out

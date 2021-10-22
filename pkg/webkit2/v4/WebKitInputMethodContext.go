@@ -33,24 +33,24 @@ func init() {
 type InputPurpose int
 
 const (
-	// InputPurposeFreeForm: editable element expects any characters
+	// InputPurposeFreeForm: editable element expects any characters.
 	InputPurposeFreeForm InputPurpose = iota
-	// InputPurposeDigits: editable element expects digits
+	// InputPurposeDigits: editable element expects digits.
 	InputPurposeDigits
-	// InputPurposeNumber: editable element expects a number
+	// InputPurposeNumber: editable element expects a number.
 	InputPurposeNumber
-	// InputPurposePhone: editable element expects a telephone
+	// InputPurposePhone: editable element expects a telephone.
 	InputPurposePhone
-	// InputPurposeURL: editable element expects a URL
+	// InputPurposeURL: editable element expects a URL.
 	InputPurposeURL
-	// InputPurposeEmail: editable element expects an email
+	// InputPurposeEmail: editable element expects an email.
 	InputPurposeEmail
-	// InputPurposePassword: editable element expects a password
+	// InputPurposePassword: editable element expects a password.
 	InputPurposePassword
 )
 
 func marshalInputPurpose(p uintptr) (interface{}, error) {
-	return InputPurpose(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return InputPurpose(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for InputPurpose.
@@ -80,26 +80,26 @@ func (i InputPurpose) String() string {
 type InputHints int
 
 const (
-	// InputHintNone: no special behavior suggested
+	// InputHintNone: no special behavior suggested.
 	InputHintNone InputHints = 0b0
-	// InputHintSpellcheck: suggest spell checking
+	// InputHintSpellcheck: suggest spell checking.
 	InputHintSpellcheck InputHints = 0b1
-	// InputHintLowercase: suggest to not autocapitlize
+	// InputHintLowercase: suggest to not autocapitlize.
 	InputHintLowercase InputHints = 0b10
-	// InputHintUppercaseChars: suggest to capitalize all text
+	// InputHintUppercaseChars: suggest to capitalize all text.
 	InputHintUppercaseChars InputHints = 0b100
 	// InputHintUppercaseWords: suggest to capitalize the first character of
-	// each word
+	// each word.
 	InputHintUppercaseWords InputHints = 0b1000
 	// InputHintUppercaseSentences: suggest to capitalize the first word of each
-	// sentence
+	// sentence.
 	InputHintUppercaseSentences InputHints = 0b10000
-	// InputHintInhibitOSK: suggest to not show an onscreen keyboard
+	// InputHintInhibitOSK: suggest to not show an onscreen keyboard.
 	InputHintInhibitOSK InputHints = 0b100000
 )
 
 func marshalInputHints(p uintptr) (interface{}, error) {
-	return InputHints(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
+	return InputHints(externglib.ValueFromNative(unsafe.Pointer(p)).Flags()), nil
 }
 
 // String returns the names in string for InputHints.
@@ -162,7 +162,7 @@ type InputMethodContextOverrider interface {
 	Preedit() (string, []InputMethodUnderline, uint)
 	// NotifyCursorArea: notify context that cursor area changed in input
 	// associated.
-	NotifyCursorArea(x int, y int, width int, height int)
+	NotifyCursorArea(x, y, width, height int)
 	// NotifyFocusIn: notify context that input associated has gained focus.
 	NotifyFocusIn()
 	// NotifyFocusOut: notify context that input associated has lost focus.
@@ -170,7 +170,7 @@ type InputMethodContextOverrider interface {
 	// NotifySurrounding: notify context that the context surrounding the cursor
 	// has changed. If there's no selection selection_index is the same as
 	// cursor_index.
-	NotifySurrounding(text string, length uint, cursorIndex uint, selectionIndex uint)
+	NotifySurrounding(text string, length, cursorIndex, selectionIndex uint)
 	PreeditChanged()
 	PreeditFinished()
 	PreeditStarted()
@@ -186,40 +186,14 @@ type InputMethodContext struct {
 	*externglib.Object
 }
 
-// InputMethodContexter describes InputMethodContext's abstract methods.
+// InputMethodContexter describes types inherited from class InputMethodContext.
+// To get the original type, the caller must assert this to an interface or
+// another type.
 type InputMethodContexter interface {
 	externglib.Objector
 
-	// FilterKeyEvent: allow key_event to be handled by the input method.
-	FilterKeyEvent(keyEvent *gdk.EventKey) bool
-	// InputHints: get the value of the KitInputMethodContext:input-hints
-	// property.
-	InputHints() InputHints
-	// InputPurpose: get the value of the KitInputMethodContext:input-purpose
-	// property.
-	InputPurpose() InputPurpose
-	// Preedit: get the current preedit string for the context, and a list of
-	// WebKitInputMethodUnderline to apply to the string.
-	Preedit() (string, []InputMethodUnderline, uint)
-	// NotifyCursorArea: notify context that cursor area changed in input
-	// associated.
-	NotifyCursorArea(x int, y int, width int, height int)
-	// NotifyFocusIn: notify context that input associated has gained focus.
-	NotifyFocusIn()
-	// NotifyFocusOut: notify context that input associated has lost focus.
-	NotifyFocusOut()
-	// NotifySurrounding: notify context that the context surrounding the cursor
-	// has changed.
-	NotifySurrounding(text string, length int, cursorIndex uint, selectionIndex uint)
-	// Reset the context.
-	Reset()
-	// SetEnablePreedit: set whether context should enable preedit to display
-	// feedback.
-	SetEnablePreedit(enabled bool)
-	SetInputHints(hints InputHints)
-	// SetInputPurpose: set the value of the KitInputMethodContext:input-purpose
-	// property.
-	SetInputPurpose(purpose InputPurpose)
+	// BaseInputMethodContext returns the underlying base class.
+	BaseInputMethodContext() *InputMethodContext
 }
 
 var _ InputMethodContexter = (*InputMethodContext)(nil)
@@ -231,13 +205,16 @@ func wrapInputMethodContext(obj *externglib.Object) *InputMethodContext {
 }
 
 func marshalInputMethodContexter(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapInputMethodContext(obj), nil
+	return wrapInputMethodContext(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // FilterKeyEvent: allow key_event to be handled by the input method. If TRUE is
 // returned, then no further processing should be done for the key event.
+//
+// The function takes the following parameters:
+//
+//    - keyEvent: key event to filter.
+//
 func (context *InputMethodContext) FilterKeyEvent(keyEvent *gdk.EventKey) bool {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _arg1 *C.GdkEventKey              // out
@@ -332,7 +309,15 @@ func (context *InputMethodContext) Preedit() (string, []InputMethodUnderline, ui
 
 // NotifyCursorArea: notify context that cursor area changed in input
 // associated.
-func (context *InputMethodContext) NotifyCursorArea(x int, y int, width int, height int) {
+//
+// The function takes the following parameters:
+//
+//    - x coordinate of cursor location.
+//    - y coordinate of cursor location.
+//    - width of cursor area.
+//    - height of cursor area.
+//
+func (context *InputMethodContext) NotifyCursorArea(x, y, width, height int) {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _arg1 C.int                       // out
 	var _arg2 C.int                       // out
@@ -375,7 +360,15 @@ func (context *InputMethodContext) NotifyFocusOut() {
 
 // NotifySurrounding: notify context that the context surrounding the cursor has
 // changed. If there's no selection selection_index is the same as cursor_index.
-func (context *InputMethodContext) NotifySurrounding(text string, length int, cursorIndex uint, selectionIndex uint) {
+//
+// The function takes the following parameters:
+//
+//    - text surrounding the insertion point.
+//    - length of text, or -1 if text is nul-terminated.
+//    - cursorIndex: byte index of the insertion cursor within text.
+//    - selectionIndex: byte index of the selection cursor within text.
+//
+func (context *InputMethodContext) NotifySurrounding(text string, length int, cursorIndex, selectionIndex uint) {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _arg1 *C.gchar                    // out
 	var _arg2 C.int                       // out
@@ -410,6 +403,11 @@ func (context *InputMethodContext) Reset() {
 
 // SetEnablePreedit: set whether context should enable preedit to display
 // feedback.
+//
+// The function takes the following parameters:
+//
+//    - enabled: whether to enable preedit.
+//
 func (context *InputMethodContext) SetEnablePreedit(enabled bool) {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _arg1 C.gboolean                  // out
@@ -424,6 +422,11 @@ func (context *InputMethodContext) SetEnablePreedit(enabled bool) {
 	runtime.KeepAlive(enabled)
 }
 
+//
+// The function takes the following parameters:
+//
+
+//
 func (context *InputMethodContext) SetInputHints(hints InputHints) {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _arg1 C.WebKitInputHints          // out
@@ -438,6 +441,11 @@ func (context *InputMethodContext) SetInputHints(hints InputHints) {
 
 // SetInputPurpose: set the value of the KitInputMethodContext:input-purpose
 // property.
+//
+// The function takes the following parameters:
+//
+//    - purpose: KitInputPurpose.
+//
 func (context *InputMethodContext) SetInputPurpose(purpose InputPurpose) {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _arg1 C.WebKitInputPurpose        // out
@@ -448,6 +456,44 @@ func (context *InputMethodContext) SetInputPurpose(purpose InputPurpose) {
 	C.webkit_input_method_context_set_input_purpose(_arg0, _arg1)
 	runtime.KeepAlive(context)
 	runtime.KeepAlive(purpose)
+}
+
+// BaseInputMethodContext returns context.
+func (context *InputMethodContext) BaseInputMethodContext() *InputMethodContext {
+	return context
+}
+
+// ConnectCommitted: emitted when a complete input sequence has been entered by
+// the user. This can be a single character immediately after a key press or the
+// final result of preediting.
+func (context *InputMethodContext) ConnectCommitted(f func(text string)) externglib.SignalHandle {
+	return context.Connect("committed", f)
+}
+
+// ConnectDeleteSurrounding: emitted when the input method wants to delete the
+// context surrounding the cursor. If offset is a negative value, it means a
+// position before the cursor.
+func (context *InputMethodContext) ConnectDeleteSurrounding(f func(offset int, nChars uint)) externglib.SignalHandle {
+	return context.Connect("delete-surrounding", f)
+}
+
+// ConnectPreeditChanged: emitted whenever the preedit sequence currently being
+// entered has changed. It is also emitted at the end of a preedit sequence, in
+// which case webkit_input_method_context_get_preedit() returns the empty
+// string.
+func (context *InputMethodContext) ConnectPreeditChanged(f func()) externglib.SignalHandle {
+	return context.Connect("preedit-changed", f)
+}
+
+// ConnectPreeditFinished: emitted when a preediting sequence has been completed
+// or canceled.
+func (context *InputMethodContext) ConnectPreeditFinished(f func()) externglib.SignalHandle {
+	return context.Connect("preedit-finished", f)
+}
+
+// ConnectPreeditStarted: emitted when a new preediting sequence starts.
+func (context *InputMethodContext) ConnectPreeditStarted(f func()) externglib.SignalHandle {
+	return context.Connect("preedit-started", f)
 }
 
 // InputMethodUnderline: instance of this type is always passed by reference.
@@ -461,8 +507,8 @@ type inputMethodUnderline struct {
 }
 
 func marshalInputMethodUnderline(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &InputMethodUnderline{&inputMethodUnderline{(*C.WebKitInputMethodUnderline)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &InputMethodUnderline{&inputMethodUnderline{(*C.WebKitInputMethodUnderline)(b)}}, nil
 }
 
 // NewInputMethodUnderline constructs a struct InputMethodUnderline.

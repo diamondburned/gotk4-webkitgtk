@@ -31,12 +31,12 @@ func init() {
 type UserMessageError int
 
 const (
-	// UserMessageUnhandledMessage was not handled by the receiver.
+	// UserMessageUnhandledMessage: message was not handled by the receiver.
 	UserMessageUnhandledMessage UserMessageError = iota
 )
 
 func marshalUserMessageError(p uintptr) (interface{}, error) {
-	return UserMessageError(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return UserMessageError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for UserMessageError.
@@ -62,12 +62,16 @@ func wrapUserMessage(obj *externglib.Object) *UserMessage {
 }
 
 func marshalUserMessager(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapUserMessage(obj), nil
+	return wrapUserMessage(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewUserMessage: create a new KitUserMessage with name.
+//
+// The function takes the following parameters:
+//
+//    - name: message name.
+//    - parameters: message parameters as a #GVariant, or NULL.
+//
 func NewUserMessage(name string, parameters *glib.Variant) *UserMessage {
 	var _arg1 *C.char              // out
 	var _arg2 *C.GVariant          // out
@@ -92,6 +96,13 @@ func NewUserMessage(name string, parameters *glib.Variant) *UserMessage {
 
 // NewUserMessageWithFdList: create a new KitUserMessage including also a list
 // of UNIX file descriptors to be sent.
+//
+// The function takes the following parameters:
+//
+//    - name: message name.
+//    - parameters: message parameters as a #GVariant.
+//    - fdList: message file descriptors.
+//
 func NewUserMessageWithFdList(name string, parameters *glib.Variant, fdList *gio.UnixFDList) *UserMessage {
 	var _arg1 *C.char              // out
 	var _arg2 *C.GVariant          // out
@@ -119,7 +130,7 @@ func NewUserMessageWithFdList(name string, parameters *glib.Variant, fdList *gio
 	return _userMessage
 }
 
-// FdList: get the message list of file descritpor
+// FdList: get the message list of file descritpor.
 func (message *UserMessage) FdList() *gio.UnixFDList {
 	var _arg0 *C.WebKitUserMessage // out
 	var _cret *C.GUnixFDList       // in
@@ -143,7 +154,7 @@ func (message *UserMessage) FdList() *gio.UnixFDList {
 	return _unixFDList
 }
 
-// Name: get the message name
+// Name: get the message name.
 func (message *UserMessage) Name() string {
 	var _arg0 *C.WebKitUserMessage // out
 	var _cret *C.char              // in
@@ -160,7 +171,7 @@ func (message *UserMessage) Name() string {
 	return _utf8
 }
 
-// Parameters: get the message parameters
+// Parameters: get the message parameters.
 func (message *UserMessage) Parameters() *glib.Variant {
 	var _arg0 *C.WebKitUserMessage // out
 	var _cret *C.GVariant          // in
@@ -188,6 +199,11 @@ func (message *UserMessage) Parameters() *glib.Variant {
 
 // SendReply: send a reply to message. If reply is floating, it's consumed. You
 // can only send a reply to a KitUserMessage that has been received.
+//
+// The function takes the following parameters:
+//
+//    - reply to send as reply.
+//
 func (message *UserMessage) SendReply(reply *UserMessage) {
 	var _arg0 *C.WebKitUserMessage // out
 	var _arg1 *C.WebKitUserMessage // out

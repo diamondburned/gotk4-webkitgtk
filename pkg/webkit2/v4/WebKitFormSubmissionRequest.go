@@ -34,9 +34,7 @@ func wrapFormSubmissionRequest(obj *externglib.Object) *FormSubmissionRequest {
 }
 
 func marshalFormSubmissionRequester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapFormSubmissionRequest(obj), nil
+	return wrapFormSubmissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // TextFields: get a Table with the values of the text fields contained in the

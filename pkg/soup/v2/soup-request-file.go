@@ -38,12 +38,10 @@ func wrapRequestFile(obj *externglib.Object) *RequestFile {
 }
 
 func marshalRequestFiler(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapRequestFile(obj), nil
+	return wrapRequestFile(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// File gets a #GFile corresponding to file's URI
+// File gets a #GFile corresponding to file's URI.
 func (file *RequestFile) File() gio.Filer {
 	var _arg0 *C.SoupRequestFile // out
 	var _cret *C.GFile           // in

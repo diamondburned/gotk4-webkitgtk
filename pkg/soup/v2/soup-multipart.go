@@ -44,8 +44,8 @@ type multipart struct {
 }
 
 func marshalMultipart(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &Multipart{&multipart{(*C.SoupMultipart)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &Multipart{&multipart{(*C.SoupMultipart)(b)}}, nil
 }
 
 // NewMultipart constructs a struct Multipart.
@@ -149,7 +149,7 @@ func (multipart *Multipart) AppendFormString(controlName string, data string) {
 
 // AppendPart adds a new MIME part to multipart with the given headers and body.
 // (The multipart will make its own copies of headers and body, so you should
-// free your copies if you are not using them for anything else.)
+// free your copies if you are not using them for anything else.).
 func (multipart *Multipart) AppendPart(headers *MessageHeaders, body *Buffer) {
 	var _arg0 *C.SoupMultipart      // out
 	var _arg1 *C.SoupMessageHeaders // out
@@ -165,7 +165,7 @@ func (multipart *Multipart) AppendPart(headers *MessageHeaders, body *Buffer) {
 	runtime.KeepAlive(body)
 }
 
-// Length gets the number of body parts in multipart
+// Length gets the number of body parts in multipart.
 func (multipart *Multipart) Length() int {
 	var _arg0 *C.SoupMultipart // out
 	var _cret C.int            // in

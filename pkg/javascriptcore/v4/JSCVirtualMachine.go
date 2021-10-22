@@ -31,9 +31,7 @@ func wrapVirtualMachine(obj *externglib.Object) *VirtualMachine {
 }
 
 func marshalVirtualMachiner(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapVirtualMachine(obj), nil
+	return wrapVirtualMachine(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewVirtualMachine: create a new CVirtualMachine.
@@ -48,5 +46,3 @@ func NewVirtualMachine() *VirtualMachine {
 
 	return _virtualMachine
 }
-
-func (*VirtualMachine) privateVirtualMachine() {}

@@ -28,7 +28,7 @@ func init() {
 }
 
 // ProxyURIResolverCallback: callback for
-// soup_proxy_uri_resolver_get_proxy_uri_async()
+// soup_proxy_uri_resolver_get_proxy_uri_async().
 type ProxyURIResolverCallback func(resolver ProxyURIResolverer, status uint, proxyUri *URI)
 
 //export _gotk4_soup2_ProxyURIResolverCallback
@@ -84,7 +84,7 @@ type ProxyURIResolver struct {
 	SessionFeature
 }
 
-// ProxyURIResolverer describes ProxyURIResolver's abstract methods.
+// ProxyURIResolverer describes ProxyURIResolver's interface methods.
 type ProxyURIResolverer interface {
 	externglib.Objector
 
@@ -106,15 +106,21 @@ func wrapProxyURIResolver(obj *externglib.Object) *ProxyURIResolver {
 }
 
 func marshalProxyURIResolverer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapProxyURIResolver(obj), nil
+	return wrapProxyURIResolver(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // ProxyUriAsync: asynchronously determines a proxy URI to use for msg and calls
 // callback.
 //
 // Deprecated: ProxyURIResolver is deprecated in favor of Resolver.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL.
+//    - uri you want a proxy for.
+//    - asyncContext to invoke callback in.
+//    - callback to invoke with the proxy address.
+//
 func (proxyUriResolver *ProxyURIResolver) ProxyUriAsync(ctx context.Context, uri *URI, asyncContext *glib.MainContext, callback ProxyURIResolverCallback) {
 	var _arg0 *C.SoupProxyURIResolver        // out
 	var _arg3 *C.GCancellable                // out
@@ -149,6 +155,12 @@ func (proxyUriResolver *ProxyURIResolver) ProxyUriAsync(ctx context.Context, uri
 // else it will be set to NULL.
 //
 // Deprecated: ProxyURIResolver is deprecated in favor of Resolver.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL.
+//    - uri you want a proxy for.
+//
 func (proxyUriResolver *ProxyURIResolver) ProxyUriSync(ctx context.Context, uri *URI) (*URI, uint) {
 	var _arg0 *C.SoupProxyURIResolver // out
 	var _arg2 *C.GCancellable         // out

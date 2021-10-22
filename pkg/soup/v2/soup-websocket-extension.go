@@ -28,7 +28,7 @@ func init() {
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type WebsocketExtensionOverrider interface {
-	// Configure configures extension with the given params
+	// Configure configures extension with the given params.
 	Configure(connectionType WebsocketConnectionType, params map[cgo.Handle]cgo.Handle) error
 	// RequestParams: get the parameters strings to be included in the request
 	// header. If the extension doesn't include any parameter in the request,
@@ -44,18 +44,14 @@ type WebsocketExtension struct {
 	*externglib.Object
 }
 
-// WebsocketExtensioner describes WebsocketExtension's abstract methods.
+// WebsocketExtensioner describes types inherited from class WebsocketExtension.
+// To get the original type, the caller must assert this to an interface or
+// another type.
 type WebsocketExtensioner interface {
 	externglib.Objector
 
-	// Configure configures extension with the given params
-	Configure(connectionType WebsocketConnectionType, params map[cgo.Handle]cgo.Handle) error
-	// RequestParams: get the parameters strings to be included in the request
-	// header.
-	RequestParams() string
-	// ResponseParams: get the parameters strings to be included in the response
-	// header.
-	ResponseParams() string
+	// BaseWebsocketExtension returns the underlying base class.
+	BaseWebsocketExtension() *WebsocketExtension
 }
 
 var _ WebsocketExtensioner = (*WebsocketExtension)(nil)
@@ -67,12 +63,17 @@ func wrapWebsocketExtension(obj *externglib.Object) *WebsocketExtension {
 }
 
 func marshalWebsocketExtensioner(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapWebsocketExtension(obj), nil
+	return wrapWebsocketExtension(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// Configure configures extension with the given params
+// Configure configures extension with the given params.
+//
+// The function takes the following parameters:
+//
+//    - connectionType: either SOUP_WEBSOCKET_CONNECTION_CLIENT or
+//    SOUP_WEBSOCKET_CONNECTION_SERVER.
+//    - params: parameters, or NULL.
+//
 func (extension *WebsocketExtension) Configure(connectionType WebsocketConnectionType, params map[cgo.Handle]cgo.Handle) error {
 	var _arg0 *C.SoupWebsocketExtension     // out
 	var _arg1 C.SoupWebsocketConnectionType // out
@@ -149,4 +150,9 @@ func (extension *WebsocketExtension) ResponseParams() string {
 	}
 
 	return _utf8
+}
+
+// BaseWebsocketExtension returns extension.
+func (extension *WebsocketExtension) BaseWebsocketExtension() *WebsocketExtension {
+	return extension
 }

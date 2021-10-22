@@ -21,6 +21,11 @@ func init() {
 	})
 }
 
+//
+// The function takes the following parameters:
+//
+//    - request: KitUserMediaPermissionRequest.
+//
 func UserMediaPermissionIsForAudioDevice(request *UserMediaPermissionRequest) bool {
 	var _arg1 *C.WebKitUserMediaPermissionRequest // out
 	var _cret C.gboolean                          // in
@@ -39,6 +44,11 @@ func UserMediaPermissionIsForAudioDevice(request *UserMediaPermissionRequest) bo
 	return _ok
 }
 
+//
+// The function takes the following parameters:
+//
+//    - request: KitUserMediaPermissionRequest.
+//
 func UserMediaPermissionIsForVideoDevice(request *UserMediaPermissionRequest) bool {
 	var _arg1 *C.WebKitUserMediaPermissionRequest // out
 	var _cret C.gboolean                          // in
@@ -73,9 +83,5 @@ func wrapUserMediaPermissionRequest(obj *externglib.Object) *UserMediaPermission
 }
 
 func marshalUserMediaPermissionRequester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapUserMediaPermissionRequest(obj), nil
+	return wrapUserMediaPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*UserMediaPermissionRequest) privateUserMediaPermissionRequest() {}

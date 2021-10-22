@@ -29,14 +29,14 @@ func init() {
 type PrintOperationResponse int
 
 const (
-	// PrintOperationResponsePrint: print button was clicked in print dialog
+	// PrintOperationResponsePrint: print button was clicked in print dialog.
 	PrintOperationResponsePrint PrintOperationResponse = iota
-	// PrintOperationResponseCancel: print dialog was cancelled
+	// PrintOperationResponseCancel: print dialog was cancelled.
 	PrintOperationResponseCancel
 )
 
 func marshalPrintOperationResponse(p uintptr) (interface{}, error) {
-	return PrintOperationResponse(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return PrintOperationResponse(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for PrintOperationResponse.
@@ -62,12 +62,15 @@ func wrapPrintOperation(obj *externglib.Object) *PrintOperation {
 }
 
 func marshalPrintOperationer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapPrintOperation(obj), nil
+	return wrapPrintOperation(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewPrintOperation: create a new KitPrintOperation to print web_view contents.
+//
+// The function takes the following parameters:
+//
+//    - webView: KitWebView.
+//
 func NewPrintOperation(webView *WebView) *PrintOperation {
 	var _arg1 *C.WebKitWebView        // out
 	var _cret *C.WebKitPrintOperation // in
@@ -162,6 +165,11 @@ func (printOperation *PrintOperation) Print() {
 // print dialog. You can get the updated print settings and page setup by
 // calling webkit_print_operation_get_print_settings() and
 // webkit_print_operation_get_page_setup() after this method.
+//
+// The function takes the following parameters:
+//
+//    - parent: transient parent of the print dialog.
+//
 func (printOperation *PrintOperation) RunDialog(parent *gtk.Window) PrintOperationResponse {
 	var _arg0 *C.WebKitPrintOperation        // out
 	var _arg1 *C.GtkWindow                   // out
@@ -186,6 +194,11 @@ func (printOperation *PrintOperation) RunDialog(parent *gtk.Window) PrintOperati
 // SetPageSetup: set the current page setup of print_operation. Current page
 // setup is used for the initial values of the print dialog when
 // webkit_print_operation_run_dialog() is called.
+//
+// The function takes the following parameters:
+//
+//    - pageSetup to set.
+//
 func (printOperation *PrintOperation) SetPageSetup(pageSetup *gtk.PageSetup) {
 	var _arg0 *C.WebKitPrintOperation // out
 	var _arg1 *C.GtkPageSetup         // out
@@ -201,6 +214,11 @@ func (printOperation *PrintOperation) SetPageSetup(pageSetup *gtk.PageSetup) {
 // SetPrintSettings: set the current print settings of print_operation. Current
 // print settings are used for the initial values of the print dialog when
 // webkit_print_operation_run_dialog() is called.
+//
+// The function takes the following parameters:
+//
+//    - printSettings to set.
+//
 func (printOperation *PrintOperation) SetPrintSettings(printSettings *gtk.PrintSettings) {
 	var _arg0 *C.WebKitPrintOperation // out
 	var _arg1 *C.GtkPrintSettings     // out
@@ -211,4 +229,19 @@ func (printOperation *PrintOperation) SetPrintSettings(printSettings *gtk.PrintS
 	C.webkit_print_operation_set_print_settings(_arg0, _arg1)
 	runtime.KeepAlive(printOperation)
 	runtime.KeepAlive(printSettings)
+}
+
+// ConnectCreateCustomWidget: emitted when displaying the print dialog with
+// webkit_print_operation_run_dialog(). The returned KitPrintCustomWidget will
+// be added to the print dialog and it will be owned by the print_operation.
+// However, the object is guaranteed to be alive until the
+// KitPrintCustomWidget::apply is emitted.
+func (printOperation *PrintOperation) ConnectCreateCustomWidget(f func() PrintCustomWidget) externglib.SignalHandle {
+	return printOperation.Connect("create-custom-widget", f)
+}
+
+// ConnectFinished: emitted when the print operation has finished doing
+// everything required for printing.
+func (printOperation *PrintOperation) ConnectFinished(f func()) externglib.SignalHandle {
+	return printOperation.Connect("finished", f)
 }

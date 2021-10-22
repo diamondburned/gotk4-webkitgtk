@@ -29,16 +29,16 @@ func init() {
 type CredentialPersistence int
 
 const (
-	// CredentialPersistenceNone: credential does not persist
+	// CredentialPersistenceNone: credential does not persist.
 	CredentialPersistenceNone CredentialPersistence = iota
-	// CredentialPersistenceForSession: credential persists for session only
+	// CredentialPersistenceForSession: credential persists for session only.
 	CredentialPersistenceForSession
-	// CredentialPersistencePermanent: credential persists permanently
+	// CredentialPersistencePermanent: credential persists permanently.
 	CredentialPersistencePermanent
 )
 
 func marshalCredentialPersistence(p uintptr) (interface{}, error) {
-	return CredentialPersistence(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return CredentialPersistence(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for CredentialPersistence.
@@ -66,8 +66,8 @@ type credential struct {
 }
 
 func marshalCredential(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &Credential{&credential{(*C.WebKitCredential)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &Credential{&credential{(*C.WebKitCredential)(b)}}, nil
 }
 
 // NewCredential constructs a struct Credential.

@@ -31,16 +31,16 @@ func init() {
 type DownloadError int
 
 const (
-	// DownloadErrorNetwork: download failure due to network error
+	// DownloadErrorNetwork: download failure due to network error.
 	DownloadErrorNetwork DownloadError = 499
-	// DownloadErrorCancelledByUser: download was cancelled by user
+	// DownloadErrorCancelledByUser: download was cancelled by user.
 	DownloadErrorCancelledByUser DownloadError = 400
-	// DownloadErrorDestination: download failure due to destination error
+	// DownloadErrorDestination: download failure due to destination error.
 	DownloadErrorDestination DownloadError = 401
 )
 
 func marshalDownloadError(p uintptr) (interface{}, error) {
-	return DownloadError(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return DownloadError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for DownloadError.
@@ -58,16 +58,17 @@ func (d DownloadError) String() string {
 }
 
 // JavascriptError: enum values used to denote errors happening when executing
-// JavaScript
+// JavaScript.
 type JavascriptError int
 
 const (
-	// JavascriptErrorScriptFailed: exception was raised in JavaScript execution
+	// JavascriptErrorScriptFailed: exception was raised in JavaScript
+	// execution.
 	JavascriptErrorScriptFailed JavascriptError = 699
 )
 
 func marshalJavascriptError(p uintptr) (interface{}, error) {
-	return JavascriptError(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return JavascriptError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for JavascriptError.
@@ -84,20 +85,20 @@ func (j JavascriptError) String() string {
 type NetworkError int
 
 const (
-	// NetworkErrorFailed: generic load failure
+	// NetworkErrorFailed: generic load failure.
 	NetworkErrorFailed NetworkError = 399
-	// NetworkErrorTransport: load failure due to transport error
+	// NetworkErrorTransport: load failure due to transport error.
 	NetworkErrorTransport NetworkError = 300
-	// NetworkErrorUnknownProtocol: load failure due to unknown protocol
+	// NetworkErrorUnknownProtocol: load failure due to unknown protocol.
 	NetworkErrorUnknownProtocol NetworkError = 301
-	// NetworkErrorCancelled: load failure due to cancellation
+	// NetworkErrorCancelled: load failure due to cancellation.
 	NetworkErrorCancelled NetworkError = 302
-	// NetworkErrorFileDoesNotExist: load failure due to missing file
+	// NetworkErrorFileDoesNotExist: load failure due to missing file.
 	NetworkErrorFileDoesNotExist NetworkError = 303
 )
 
 func marshalNetworkError(p uintptr) (interface{}, error) {
-	return NetworkError(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return NetworkError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for NetworkError.
@@ -123,19 +124,19 @@ func (n NetworkError) String() string {
 type PluginError int
 
 const (
-	// PluginErrorFailed: generic plugin load failure. Deprecated 2.32
+	// PluginErrorFailed: generic plugin load failure. Deprecated 2.32.
 	PluginErrorFailed PluginError = 299
 	// PluginErrorCannotFindPlugin: load failure due to missing plugin.
-	// Deprecated 2.32
+	// Deprecated 2.32.
 	PluginErrorCannotFindPlugin PluginError = 200
 	// PluginErrorCannotLoadPlugin: load failure due to inability to load
-	// plugin. Deprecated 2.32
+	// plugin. Deprecated 2.32.
 	PluginErrorCannotLoadPlugin PluginError = 201
 	// PluginErrorJavaUnavailable: load failure due to missing Java support that
-	// is required to load plugin. Deprecated 2.32
+	// is required to load plugin. Deprecated 2.32.
 	PluginErrorJavaUnavailable PluginError = 202
 	// PluginErrorConnectionCancelled: load failure due to connection
-	// cancellation. Deprecated 2.32
+	// cancellation. Deprecated 2.32.
 	PluginErrorConnectionCancelled PluginError = 203
 	// PluginErrorWillHandleLoad: preliminary load failure for media content
 	// types. A new load will be started to perform the media load.
@@ -143,7 +144,7 @@ const (
 )
 
 func marshalPluginError(p uintptr) (interface{}, error) {
-	return PluginError(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return PluginError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for PluginError.
@@ -170,21 +171,21 @@ func (p PluginError) String() string {
 type PolicyError int
 
 const (
-	// PolicyErrorFailed: generic load failure due to policy error
+	// PolicyErrorFailed: generic load failure due to policy error.
 	PolicyErrorFailed PolicyError = 199
-	// PolicyErrorCannotShowMIMEType: load failure due to unsupported mime type
+	// PolicyErrorCannotShowMIMEType: load failure due to unsupported mime type.
 	PolicyErrorCannotShowMIMEType PolicyError = 100
-	// PolicyErrorCannotShowURI: load failure due to URI that can not be shown
+	// PolicyErrorCannotShowURI: load failure due to URI that can not be shown.
 	PolicyErrorCannotShowURI PolicyError = 101
 	// PolicyErrorFrameLoadInterruptedByPolicyChange: load failure due to frame
-	// load interruption by policy change
+	// load interruption by policy change.
 	PolicyErrorFrameLoadInterruptedByPolicyChange PolicyError = 102
-	// PolicyErrorCannotUseRestrictedPort: load failure due to port restriction
+	// PolicyErrorCannotUseRestrictedPort: load failure due to port restriction.
 	PolicyErrorCannotUseRestrictedPort PolicyError = 103
 )
 
 func marshalPolicyError(p uintptr) (interface{}, error) {
-	return PolicyError(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return PolicyError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for PolicyError.
@@ -209,16 +210,16 @@ func (p PolicyError) String() string {
 type PrintError int
 
 const (
-	// PrintErrorGeneral: unspecified error during a print operation
+	// PrintErrorGeneral: unspecified error during a print operation.
 	PrintErrorGeneral PrintError = 599
-	// PrintErrorPrinterNotFound: selected printer cannot be found
+	// PrintErrorPrinterNotFound: selected printer cannot be found.
 	PrintErrorPrinterNotFound PrintError = 500
-	// PrintErrorInvalidPageRange: invalid page range
+	// PrintErrorInvalidPageRange: invalid page range.
 	PrintErrorInvalidPageRange PrintError = 501
 )
 
 func marshalPrintError(p uintptr) (interface{}, error) {
-	return PrintError(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return PrintError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for PrintError.
@@ -236,7 +237,7 @@ func (p PrintError) String() string {
 }
 
 // SnapshotError: enum values used to denote errors happening when creating
-// snapshots of KitWebView
+// snapshots of KitWebView.
 type SnapshotError int
 
 const (
@@ -246,7 +247,7 @@ const (
 )
 
 func marshalSnapshotError(p uintptr) (interface{}, error) {
-	return SnapshotError(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return SnapshotError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for SnapshotError.

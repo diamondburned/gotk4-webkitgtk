@@ -33,9 +33,7 @@ func wrapFileChooserRequest(obj *externglib.Object) *FileChooserRequest {
 }
 
 func marshalFileChooserRequester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapFileChooserRequest(obj), nil
+	return wrapFileChooserRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Cancel: ask WebKit to cancel the request. It's important to do this in case
@@ -180,6 +178,12 @@ func (request *FileChooserRequest) SelectedFiles() []string {
 
 // SelectFiles: ask WebKit to select local files for upload and complete the
 // request.
+//
+// The function takes the following parameters:
+//
+//    - files: a NULL-terminated array of strings, containing paths to local
+//    files.
+//
 func (request *FileChooserRequest) SelectFiles(files []string) {
 	var _arg0 *C.WebKitFileChooserRequest // out
 	var _arg1 **C.gchar                   // out

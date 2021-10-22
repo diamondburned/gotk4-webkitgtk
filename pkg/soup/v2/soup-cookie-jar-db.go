@@ -22,7 +22,7 @@ func init() {
 }
 
 // COOKIE_JAR_DB_FILENAME alias for the CookieJarDB:filename property. (The
-// cookie-storage filename.)
+// cookie-storage filename.).
 const COOKIE_JAR_DB_FILENAME = "filename"
 
 type CookieJarDB struct {
@@ -41,9 +41,7 @@ func wrapCookieJarDB(obj *externglib.Object) *CookieJarDB {
 }
 
 func marshalCookieJarDBer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapCookieJarDB(obj), nil
+	return wrapCookieJarDB(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewCookieJarDB creates a CookieJarDB.
@@ -52,7 +50,13 @@ func marshalCookieJarDBer(p uintptr) (interface{}, error) {
 // read_only is FALSE, then the non-session cookies will be written to filename
 // when the 'changed' signal is emitted from the jar. (If read_only is TRUE,
 // then the cookie jar will only be used for this session, and changes made to
-// it will be lost when the jar is destroyed.)
+// it will be lost when the jar is destroyed.).
+//
+// The function takes the following parameters:
+//
+//    - filename to read to/write from, or NULL.
+//    - readOnly: TRUE if filename is read-only.
+//
 func NewCookieJarDB(filename string, readOnly bool) *CookieJarDB {
 	var _arg1 *C.char          // out
 	var _arg2 C.gboolean       // out
@@ -74,5 +78,3 @@ func NewCookieJarDB(filename string, readOnly bool) *CookieJarDB {
 
 	return _cookieJarDB
 }
-
-func (*CookieJarDB) privateCookieJarDB() {}

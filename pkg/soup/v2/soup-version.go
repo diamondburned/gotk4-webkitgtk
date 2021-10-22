@@ -42,7 +42,14 @@ const VERSION_MIN_REQUIRED = 2
 // CheckVersion: like SOUP_CHECK_VERSION, but the check for soup_check_version
 // is at runtime instead of compile time. This is useful for compiling against
 // older versions of libsoup, but using features from newer versions.
-func CheckVersion(major uint, minor uint, micro uint) bool {
+//
+// The function takes the following parameters:
+//
+//    - major version to check.
+//    - minor version to check.
+//    - micro version to check.
+//
+func CheckVersion(major, minor, micro uint) bool {
 	var _arg1 C.guint    // out
 	var _arg2 C.guint    // out
 	var _arg3 C.guint    // out

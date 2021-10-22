@@ -4,6 +4,7 @@ package webkit2
 
 import (
 	"runtime"
+	"runtime/cgo"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
@@ -33,9 +34,7 @@ func wrapBackForwardList(obj *externglib.Object) *BackForwardList {
 }
 
 func marshalBackForwardLister(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapBackForwardList(obj), nil
+	return wrapBackForwardList(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // BackItem returns the item that precedes the current item.
@@ -79,6 +78,11 @@ func (backForwardList *BackForwardList) BackList() []BackForwardListItem {
 	return _list
 }
 
+//
+// The function takes the following parameters:
+//
+//    - limit: number of items to retrieve.
+//
 func (backForwardList *BackForwardList) BackListWithLimit(limit uint) []BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList // out
 	var _arg1 C.guint                  // out
@@ -164,6 +168,11 @@ func (backForwardList *BackForwardList) ForwardList() []BackForwardListItem {
 	return _list
 }
 
+//
+// The function takes the following parameters:
+//
+//    - limit: number of items to retrieve.
+//
 func (backForwardList *BackForwardList) ForwardListWithLimit(limit uint) []BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList // out
 	var _arg1 C.guint                  // out
@@ -206,6 +215,11 @@ func (backForwardList *BackForwardList) Length() uint {
 }
 
 // NthItem returns the item at a given index relative to the current item.
+//
+// The function takes the following parameters:
+//
+//    - index of the item.
+//
 func (backForwardList *BackForwardList) NthItem(index int) *BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList     // out
 	var _arg1 C.gint                       // out
@@ -225,4 +239,13 @@ func (backForwardList *BackForwardList) NthItem(index int) *BackForwardListItem 
 	}
 
 	return _backForwardListItem
+}
+
+// ConnectChanged: this signal is emitted when back_forward_list changes. This
+// happens when the current item is updated, a new item is added or one or more
+// items are removed. Note that both item_added and items_removed can NULL when
+// only the current item is updated. Items are only removed when the list is
+// cleared or the maximum items limit is reached.
+func (backForwardList *BackForwardList) ConnectChanged(f func(itemAdded BackForwardListItem, itemsRemoved cgo.Handle)) externglib.SignalHandle {
+	return backForwardList.Connect("changed", f)
 }

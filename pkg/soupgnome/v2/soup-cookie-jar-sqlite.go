@@ -42,11 +42,14 @@ func wrapCookieJarSqlite(obj *externglib.Object) *CookieJarSqlite {
 }
 
 func marshalCookieJarSqliter(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapCookieJarSqlite(obj), nil
+	return wrapCookieJarSqlite(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+//
+// The function takes the following parameters:
+//
+
+//
 func NewCookieJarSqlite(filename string, readOnly bool) *CookieJarSqlite {
 	var _arg1 *C.char          // out
 	var _arg2 C.gboolean       // out
@@ -68,5 +71,3 @@ func NewCookieJarSqlite(filename string, readOnly bool) *CookieJarSqlite {
 
 	return _cookieJarSqlite
 }
-
-func (*CookieJarSqlite) privateCookieJarSqlite() {}

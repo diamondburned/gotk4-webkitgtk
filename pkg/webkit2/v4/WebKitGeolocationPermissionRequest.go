@@ -36,9 +36,5 @@ func wrapGeolocationPermissionRequest(obj *externglib.Object) *GeolocationPermis
 }
 
 func marshalGeolocationPermissionRequester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapGeolocationPermissionRequest(obj), nil
+	return wrapGeolocationPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*GeolocationPermissionRequest) privateGeolocationPermissionRequest() {}

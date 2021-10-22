@@ -17,7 +17,13 @@ import "C"
 // HeaderContains parses header to see if it contains the token token (matched
 // case-insensitively). Note that this can't be used with lists that have
 // qvalues.
-func HeaderContains(header string, token string) bool {
+//
+// The function takes the following parameters:
+//
+//    - header: HTTP header suitable for parsing with soup_header_parse_list().
+//    - token: token.
+//
+func HeaderContains(header, token string) bool {
 	var _arg1 *C.char    // out
 	var _arg2 *C.char    // out
 	var _cret C.gboolean // in
@@ -41,6 +47,12 @@ func HeaderContains(header string, token string) bool {
 }
 
 // HeaderFreeParamList frees param_list.
+//
+// The function takes the following parameters:
+//
+//    - paramList returned from soup_header_parse_param_list() or
+//    soup_header_parse_semi_param_list().
+//
 func HeaderFreeParamList(paramList map[string]string) {
 	var _arg1 *C.GHashTable // out
 
@@ -63,6 +75,11 @@ func HeaderFreeParamList(paramList map[string]string) {
 // HeaderParseList parses a header whose content is described by RFC2616 as
 // "#something", where "something" does not itself contain commas, except as
 // part of quoted-strings.
+//
+// The function takes the following parameters:
+//
+//    - header value.
+//
 func HeaderParseList(header string) []string {
 	var _arg1 *C.char   // out
 	var _cret *C.GSList // in
@@ -95,6 +112,11 @@ func HeaderParseList(header string) []string {
 //
 // This also handles RFC5987 encoding (which in HTTP is mostly used for giving
 // UTF8-encoded filenames in the Content-Disposition header).
+//
+// The function takes the following parameters:
+//
+//    - header value.
+//
 func HeaderParseParamList(header string) map[string]string {
 	var _arg1 *C.char       // out
 	var _cret *C.GHashTable // in
@@ -128,6 +150,11 @@ func HeaderParseParamList(header string) map[string]string {
 // will treat RFC5987-encoded parameters as duplicated if an ASCII version is
 // also present. For header fields that might contain RFC5987-encoded
 // parameters, use soup_header_parse_param_list() instead.
+//
+// The function takes the following parameters:
+//
+//    - header value.
+//
 func HeaderParseParamListStrict(header string) map[string]string {
 	var _arg1 *C.char       // out
 	var _cret *C.GHashTable // in
@@ -164,6 +191,11 @@ func HeaderParseParamListStrict(header string) map[string]string {
 //
 // If unacceptable is not NULL, then on return, it will contain the items with
 // qvalue 0. Either way, those items will be removed from the main list.
+//
+// The function takes the following parameters:
+//
+//    - header value.
+//
 func HeaderParseQualityList(header string) (unacceptable []string, sList []string) {
 	var _arg1 *C.char   // out
 	var _arg2 *C.GSList // in
@@ -208,6 +240,11 @@ func HeaderParseQualityList(header string) (unacceptable []string, sList []strin
 //
 // This also handles RFC5987 encoding (which in HTTP is mostly used for giving
 // UTF8-encoded filenames in the Content-Disposition header).
+//
+// The function takes the following parameters:
+//
+//    - header value.
+//
 func HeaderParseSemiParamList(header string) map[string]string {
 	var _arg1 *C.char       // out
 	var _cret *C.GHashTable // in
@@ -242,6 +279,11 @@ func HeaderParseSemiParamList(header string) map[string]string {
 // duplicated if an ASCII version is also present. For header fields that might
 // contain RFC5987-encoded parameters, use soup_header_parse_semi_param_list()
 // instead.
+//
+// The function takes the following parameters:
+//
+//    - header value.
+//
 func HeaderParseSemiParamListStrict(header string) map[string]string {
 	var _arg1 *C.char       // out
 	var _cret *C.GHashTable // in
@@ -277,6 +319,14 @@ func HeaderParseSemiParamListStrict(header string) map[string]string {
 //
 // This is a low-level method; normally you would use
 // soup_headers_parse_request() or soup_headers_parse_response().
+//
+// The function takes the following parameters:
+//
+//    - str: header string (including the Request-Line or Status-Line, but not
+//    the trailing blank line).
+//    - len: length of str.
+//    - dest to store the header values in.
+//
 func HeadersParse(str string, len int, dest *MessageHeaders) bool {
 	var _arg1 *C.char               // out
 	var _arg2 C.int                 // out
@@ -306,6 +356,13 @@ func HeadersParse(str string, len int, dest *MessageHeaders) bool {
 // the results in req_method, req_path, ver, and req_headers.
 //
 // Beware that req_headers may be modified even on failure.
+//
+// The function takes the following parameters:
+//
+//    - str headers (up to, but not including, the trailing blank line).
+//    - len: length of str.
+//    - reqHeaders to store the header values in.
+//
 func HeadersParseRequest(str string, len int, reqHeaders *MessageHeaders) (reqMethod string, reqPath string, ver HTTPVersion, guint uint) {
 	var _arg1 *C.char               // out
 	var _arg2 C.int                 // out
@@ -348,6 +405,13 @@ func HeadersParseRequest(str string, len int, reqHeaders *MessageHeaders) (reqMe
 // the results in ver, status_code, reason_phrase, and headers.
 //
 // Beware that headers may be modified even on failure.
+//
+// The function takes the following parameters:
+//
+//    - str headers (up to, but not including, the trailing blank line).
+//    - len: length of str.
+//    - headers to store the header values in.
+//
 func HeadersParseResponse(str string, len int, headers *MessageHeaders) (HTTPVersion, uint, string, bool) {
 	var _arg1 *C.char               // out
 	var _arg2 C.int                 // out
@@ -388,6 +452,11 @@ func HeadersParseResponse(str string, len int, headers *MessageHeaders) (HTTPVer
 // HeadersParseStatusLine parses the HTTP Status-Line string in status_line into
 // ver, status_code, and reason_phrase. status_line must be terminated by either
 // "\0" or "\r\n".
+//
+// The function takes the following parameters:
+//
+//    - statusLine: HTTP Status-Line.
+//
 func HeadersParseStatusLine(statusLine string) (HTTPVersion, uint, string, bool) {
 	var _arg1 *C.char           // out
 	var _arg2 C.SoupHTTPVersion // in

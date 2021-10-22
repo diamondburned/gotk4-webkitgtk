@@ -36,9 +36,5 @@ func wrapPointerLockPermissionRequest(obj *externglib.Object) *PointerLockPermis
 }
 
 func marshalPointerLockPermissionRequester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapPointerLockPermissionRequest(obj), nil
+	return wrapPointerLockPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*PointerLockPermissionRequest) privatePointerLockPermissionRequest() {}

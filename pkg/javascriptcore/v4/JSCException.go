@@ -32,12 +32,16 @@ func wrapException(obj *externglib.Object) *Exception {
 }
 
 func marshalExceptioner(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapException(obj), nil
+	return wrapException(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewException: create a new CException in context with message.
+//
+// The function takes the following parameters:
+//
+//    - context: CContext.
+//    - message: error message.
+//
 func NewException(context *Context, message string) *Exception {
 	var _arg1 *C.JSCContext   // out
 	var _arg2 *C.char         // out
@@ -60,7 +64,14 @@ func NewException(context *Context, message string) *Exception {
 
 // NewExceptionWithName: create a new CException in context with name and
 // message.
-func NewExceptionWithName(context *Context, name string, message string) *Exception {
+//
+// The function takes the following parameters:
+//
+//    - context: CContext.
+//    - name: error name.
+//    - message: error message.
+//
+func NewExceptionWithName(context *Context, name, message string) *Exception {
 	var _arg1 *C.JSCContext   // out
 	var _arg2 *C.char         // out
 	var _arg3 *C.char         // out
@@ -154,7 +165,7 @@ func (exception *Exception) Message() string {
 	return _utf8
 }
 
-// Name: get the error name of exception
+// Name: get the error name of exception.
 func (exception *Exception) Name() string {
 	var _arg0 *C.JSCException // out
 	var _cret *C.char         // in

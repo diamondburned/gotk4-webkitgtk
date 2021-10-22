@@ -33,9 +33,7 @@ func wrapSessionAsync(obj *externglib.Object) *SessionAsync {
 }
 
 func marshalSessionAsyncer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapSessionAsync(obj), nil
+	return wrapSessionAsync(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewSessionAsync creates an asynchronous Session with the default options.
@@ -54,5 +52,3 @@ func NewSessionAsync() *SessionAsync {
 
 	return _sessionAsync
 }
-
-func (*SessionAsync) privateSessionAsync() {}

@@ -19,8 +19,14 @@ const CHAR_URI_GEN_DELIMS = 2
 const CHAR_URI_PERCENT_ENCODED = 1
 const CHAR_URI_SUB_DELIMS = 4
 
-// StrCaseEqual compares v1 and v2 in a case-insensitive manner
-func StrCaseEqual(v1 cgo.Handle, v2 cgo.Handle) bool {
+// StrCaseEqual compares v1 and v2 in a case-insensitive manner.
+//
+// The function takes the following parameters:
+//
+//    - v1: ASCII string.
+//    - v2: another ASCII string.
+//
+func StrCaseEqual(v1, v2 cgo.Handle) bool {
 	var _arg1 C.gconstpointer // out
 	var _arg2 C.gconstpointer // out
 	var _cret C.gboolean      // in
@@ -42,6 +48,11 @@ func StrCaseEqual(v1 cgo.Handle, v2 cgo.Handle) bool {
 }
 
 // StrCaseHash hashes key in a case-insensitive manner.
+//
+// The function takes the following parameters:
+//
+//    - key: ASCII string to hash.
+//
 func StrCaseHash(key cgo.Handle) uint {
 	var _arg1 C.gconstpointer // out
 	var _cret C.guint         // in

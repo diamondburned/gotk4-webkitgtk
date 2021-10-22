@@ -34,12 +34,15 @@ func wrapURIRequest(obj *externglib.Object) *URIRequest {
 }
 
 func marshalURIRequester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapURIRequest(obj), nil
+	return wrapURIRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewURIRequest creates a new KitURIRequest for the given URI.
+//
+// The function takes the following parameters:
+//
+//    - uri: URI.
+//
 func NewURIRequest(uri string) *URIRequest {
 	var _arg1 *C.gchar            // out
 	var _cret *C.WebKitURIRequest // in
@@ -57,8 +60,8 @@ func NewURIRequest(uri string) *URIRequest {
 	return _uriRequest
 }
 
-// HttpHeaders: get the HTTP headers of a KitURIRequest as a MessageHeaders.
-func (request *URIRequest) HttpHeaders() *soup.MessageHeaders {
+// HTTPHeaders: get the HTTP headers of a KitURIRequest as a MessageHeaders.
+func (request *URIRequest) HTTPHeaders() *soup.MessageHeaders {
 	var _arg0 *C.WebKitURIRequest   // out
 	var _cret *C.SoupMessageHeaders // in
 
@@ -74,8 +77,8 @@ func (request *URIRequest) HttpHeaders() *soup.MessageHeaders {
 	return _messageHeaders
 }
 
-// HttpMethod: get the HTTP method of the KitURIRequest.
-func (request *URIRequest) HttpMethod() string {
+// HTTPMethod: get the HTTP method of the KitURIRequest.
+func (request *URIRequest) HTTPMethod() string {
 	var _arg0 *C.WebKitURIRequest // out
 	var _cret *C.gchar            // in
 
@@ -107,7 +110,12 @@ func (request *URIRequest) URI() string {
 	return _utf8
 }
 
-// SetURI: set the URI of request
+// SetURI: set the URI of request.
+//
+// The function takes the following parameters:
+//
+//    - uri: URI.
+//
 func (request *URIRequest) SetURI(uri string) {
 	var _arg0 *C.WebKitURIRequest // out
 	var _arg1 *C.gchar            // out

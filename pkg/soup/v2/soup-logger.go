@@ -37,19 +37,19 @@ const LOGGER_MAX_BODY_SIZE = "max-body-size"
 type LoggerLogLevel int
 
 const (
-	// LoggerLogNone: no logging
+	// LoggerLogNone: no logging.
 	LoggerLogNone LoggerLogLevel = iota
 	// LoggerLogMinimal: log the Request-Line or Status-Line and the Soup-Debug
-	// pseudo-headers
+	// pseudo-headers.
 	LoggerLogMinimal
-	// LoggerLogHeaders: log the full request/response headers
+	// LoggerLogHeaders: log the full request/response headers.
 	LoggerLogHeaders
 	// LoggerLogBody: log the full headers and request/response bodies.
 	LoggerLogBody
 )
 
 func marshalLoggerLogLevel(p uintptr) (interface{}, error) {
-	return LoggerLogLevel(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return LoggerLogLevel(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for LoggerLogLevel.
@@ -107,7 +107,7 @@ func _gotk4_soup2_LoggerFilter(arg0 *C.SoupLogger, arg1 *C.SoupMessage, arg2 C.g
 // To get the effect of the default printer, you would do:
 //
 // <informalexample><programlisting> printf ("c s\n", direction, data);
-// </programlisting></informalexample>
+// </programlisting></informalexample>.
 type LoggerPrinter func(logger *Logger, level LoggerLogLevel, direction byte, data string)
 
 //export _gotk4_soup2_LoggerPrinter
@@ -147,9 +147,7 @@ func wrapLogger(obj *externglib.Object) *Logger {
 }
 
 func marshalLoggerer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapLogger(obj), nil
+	return wrapLogger(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewLogger creates a new Logger with the given debug level. If level is
@@ -158,6 +156,12 @@ func marshalLoggerer(p uintptr) (interface{}, error) {
 //
 // If you need finer control over what message parts are and aren't logged, use
 // soup_logger_set_request_filter() and soup_logger_set_response_filter().
+//
+// The function takes the following parameters:
+//
+//    - level: debug level.
+//    - maxBodySize: maximum body size to output, or -1.
+//
 func NewLogger(level LoggerLogLevel, maxBodySize int) *Logger {
 	var _arg1 C.SoupLoggerLogLevel // out
 	var _arg2 C.int                // out
@@ -184,6 +188,11 @@ func NewLogger(level LoggerLogLevel, maxBodySize int) *Logger {
 // call soup_logger_detach(), or when the session is destroyed.)
 //
 // Deprecated: Use soup_session_add_feature() instead.
+//
+// The function takes the following parameters:
+//
+//    - session: Session.
+//
 func (logger *Logger) Attach(session *Session) {
 	var _arg0 *C.SoupLogger  // out
 	var _arg1 *C.SoupSession // out
@@ -199,6 +208,11 @@ func (logger *Logger) Attach(session *Session) {
 // Detach stops logger from watching session.
 //
 // Deprecated: Use soup_session_remove_feature() instead.
+//
+// The function takes the following parameters:
+//
+//    - session: Session.
+//
 func (logger *Logger) Detach(session *Session) {
 	var _arg0 *C.SoupLogger  // out
 	var _arg1 *C.SoupSession // out
@@ -213,6 +227,11 @@ func (logger *Logger) Detach(session *Session) {
 
 // SetPrinter sets up an alternate log printing routine, if you don't want the
 // log to go to <literal>stdout</literal>.
+//
+// The function takes the following parameters:
+//
+//    - printer: callback for printing logging output.
+//
 func (logger *Logger) SetPrinter(printer LoggerPrinter) {
 	var _arg0 *C.SoupLogger       // out
 	var _arg1 C.SoupLoggerPrinter // out
@@ -233,7 +252,12 @@ func (logger *Logger) SetPrinter(printer LoggerPrinter) {
 // request. For each HTTP request logger will invoke request_filter to determine
 // how much (if any) of that request to log. (If you do not set a request
 // filter, logger will just always log requests at the level passed to
-// soup_logger_new().)
+// soup_logger_new().).
+//
+// The function takes the following parameters:
+//
+//    - requestFilter: callback for request debugging.
+//
 func (logger *Logger) SetRequestFilter(requestFilter LoggerFilter) {
 	var _arg0 *C.SoupLogger      // out
 	var _arg1 C.SoupLoggerFilter // out
@@ -254,7 +278,12 @@ func (logger *Logger) SetRequestFilter(requestFilter LoggerFilter) {
 // response. For each HTTP response logger will invoke response_filter to
 // determine how much (if any) of that response to log. (If you do not set a
 // response filter, logger will just always log responses at the level passed to
-// soup_logger_new().)
+// soup_logger_new().).
+//
+// The function takes the following parameters:
+//
+//    - responseFilter: callback for response debugging.
+//
 func (logger *Logger) SetResponseFilter(responseFilter LoggerFilter) {
 	var _arg0 *C.SoupLogger      // out
 	var _arg1 C.SoupLoggerFilter // out

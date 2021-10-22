@@ -34,9 +34,7 @@ func wrapColorChooserRequest(obj *externglib.Object) *ColorChooserRequest {
 }
 
 func marshalColorChooserRequester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapColorChooserRequest(obj), nil
+	return wrapColorChooserRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Cancel cancels request and the input element changes to use the initial color
@@ -81,7 +79,7 @@ func (request *ColorChooserRequest) ElementRectangle() gdk.Rectangle {
 	return _rect
 }
 
-// RGBA gets the current RGBA color of request
+// RGBA gets the current RGBA color of request.
 func (request *ColorChooserRequest) RGBA() gdk.RGBA {
 	var _arg0 *C.WebKitColorChooserRequest // out
 	var _arg1 C.GdkRGBA                    // in
@@ -98,7 +96,12 @@ func (request *ColorChooserRequest) RGBA() gdk.RGBA {
 	return _rgba
 }
 
-// SetRGBA sets the current RGBA color of request
+// SetRGBA sets the current RGBA color of request.
+//
+// The function takes the following parameters:
+//
+//    - rgba: pointer RGBA.
+//
 func (request *ColorChooserRequest) SetRGBA(rgba *gdk.RGBA) {
 	var _arg0 *C.WebKitColorChooserRequest // out
 	var _arg1 *C.GdkRGBA                   // out
@@ -109,4 +112,13 @@ func (request *ColorChooserRequest) SetRGBA(rgba *gdk.RGBA) {
 	C.webkit_color_chooser_request_set_rgba(_arg0, _arg1)
 	runtime.KeepAlive(request)
 	runtime.KeepAlive(rgba)
+}
+
+// ConnectFinished: emitted when the request finishes. This signal can be
+// emitted because the user completed the request calling
+// webkit_color_chooser_request_finish(), or cancelled it with
+// webkit_color_chooser_request_cancel() or because the color input element is
+// removed from the DOM.
+func (request *ColorChooserRequest) ConnectFinished(f func()) externglib.SignalHandle {
+	return request.Connect("finished", f)
 }

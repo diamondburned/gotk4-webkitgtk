@@ -27,6 +27,11 @@ const FORM_MIME_TYPE_URLENCODED = "application/x-www-form-urlencoded"
 
 // FormDecode decodes form, which is an urlencoded dataset as defined in the
 // HTML 4.01 spec.
+//
+// The function takes the following parameters:
+//
+//    - encodedForm: data of type "application/x-www-form-urlencoded".
+//
 func FormDecode(encodedForm string) map[string]string {
 	var _arg1 *C.char       // out
 	var _cret *C.GHashTable // in
@@ -71,6 +76,12 @@ func FormDecode(encodedForm string) map[string]string {
 // If you have a form with more than one file upload control, you will need to
 // decode it manually, using soup_multipart_new_from_message() and
 // soup_multipart_get_part().
+//
+// The function takes the following parameters:
+//
+//    - msg containing a "multipart/form-data" request body.
+//    - fileControlName: name of the HTML file upload control, or NULL.
+//
 func FormDecodeMultipart(msg *Message, fileControlName string) (filename string, contentType string, file *Buffer, hashTable map[string]string) {
 	var _arg1 *C.SoupMessage // out
 	var _arg2 *C.char        // out
@@ -134,6 +145,11 @@ func FormDecodeMultipart(msg *Message, fileControlName string) (filename string,
 // the order they appear in the document." Since this method takes a hash table,
 // it cannot enforce that; if you care about the ordering of the form fields,
 // use soup_form_encode_datalist().
+//
+// The function takes the following parameters:
+//
+//    - formDataSet: hash table containing name/value pairs (as strings).
+//
 func FormEncodeHash(formDataSet map[string]string) string {
 	var _arg1 *C.GHashTable // out
 	var _cret *C.char       // in
@@ -163,7 +179,14 @@ func FormEncodeHash(formDataSet map[string]string) string {
 
 // FormRequestNewFromHash creates a new SoupMessage and sets it up to send
 // form_data_set to uri via method, as with soup_form_request_new().
-func FormRequestNewFromHash(method string, uri string, formDataSet map[string]string) *Message {
+//
+// The function takes the following parameters:
+//
+//    - method: HTTP method, either "GET" or "POST".
+//    - uri: URI to send the form data to.
+//    - formDataSet: data to send to uri.
+//
+func FormRequestNewFromHash(method, uri string, formDataSet map[string]string) *Message {
 	var _arg1 *C.char        // out
 	var _arg2 *C.char        // out
 	var _arg3 *C.GHashTable  // out
@@ -208,6 +231,12 @@ func FormRequestNewFromHash(method string, uri string, formDataSet map[string]st
 // greater control over the part headers.) Finally, call
 // soup_form_request_new_from_multipart() to serialize the multipart structure
 // and create a Message.
+//
+// The function takes the following parameters:
+//
+//    - uri: URI to send the form data to.
+//    - multipart: "multipart/form-data" Multipart.
+//
 func FormRequestNewFromMultipart(uri string, multipart *Multipart) *Message {
 	var _arg1 *C.char          // out
 	var _arg2 *C.SoupMultipart // out

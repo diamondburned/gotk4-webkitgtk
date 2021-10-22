@@ -36,9 +36,5 @@ func wrapContentDecoder(obj *externglib.Object) *ContentDecoder {
 }
 
 func marshalContentDecoderer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapContentDecoder(obj), nil
+	return wrapContentDecoder(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*ContentDecoder) privateContentDecoder() {}

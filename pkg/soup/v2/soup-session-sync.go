@@ -33,9 +33,7 @@ func wrapSessionSync(obj *externglib.Object) *SessionSync {
 }
 
 func marshalSessionSyncer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapSessionSync(obj), nil
+	return wrapSessionSync(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewSessionSync creates an synchronous Session with the default options.
@@ -54,5 +52,3 @@ func NewSessionSync() *SessionSync {
 
 	return _sessionSync
 }
-
-func (*SessionSync) privateSessionSync() {}

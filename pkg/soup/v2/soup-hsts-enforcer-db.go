@@ -39,9 +39,7 @@ func wrapHSTSEnforcerDB(obj *externglib.Object) *HSTSEnforcerDB {
 }
 
 func marshalHSTSEnforcerDBer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapHSTSEnforcerDB(obj), nil
+	return wrapHSTSEnforcerDB(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewHSTSEnforcerDB creates a HSTSEnforcerDB.
@@ -51,6 +49,11 @@ func marshalHSTSEnforcerDBer(p uintptr) (interface{}, error) {
 // new database will be created and initialized. Changes to the policies during
 // the lifetime of a HSTSEnforcerDB will be written to filename when
 // HSTSEnforcer::changed is emitted.
+//
+// The function takes the following parameters:
+//
+//    - filename of the database to read/write from.
+//
 func NewHSTSEnforcerDB(filename string) *HSTSEnforcerDB {
 	var _arg1 *C.char             // out
 	var _cret *C.SoupHSTSEnforcer // in
@@ -67,5 +70,3 @@ func NewHSTSEnforcerDB(filename string) *HSTSEnforcerDB {
 
 	return _hstsEnforcerDB
 }
-
-func (*HSTSEnforcerDB) privateHSTSEnforcerDB() {}

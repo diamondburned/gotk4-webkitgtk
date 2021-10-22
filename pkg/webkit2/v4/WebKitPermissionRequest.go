@@ -36,7 +36,7 @@ type PermissionRequest struct {
 	*externglib.Object
 }
 
-// PermissionRequester describes PermissionRequest's abstract methods.
+// PermissionRequester describes PermissionRequest's interface methods.
 type PermissionRequester interface {
 	externglib.Objector
 
@@ -55,9 +55,7 @@ func wrapPermissionRequest(obj *externglib.Object) *PermissionRequest {
 }
 
 func marshalPermissionRequester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapPermissionRequest(obj), nil
+	return wrapPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Allow the action which triggered this request.

@@ -4,6 +4,7 @@ package soup
 
 import (
 	"fmt"
+	"reflect"
 	"runtime"
 	"runtime/cgo"
 	"strings"
@@ -33,20 +34,20 @@ func init() {
 }
 
 // MESSAGE_FIRST_PARTY alias for the Message:first-party property. (The URI
-// loaded in the application when the message was queued.)
+// loaded in the application when the message was queued.).
 const MESSAGE_FIRST_PARTY = "first-party"
 
 // MESSAGE_FLAGS alias for the Message:flags property. (The message's
-// MessageFlags.)
+// MessageFlags.).
 const MESSAGE_FLAGS = "flags"
 
 // MESSAGE_HTTP_VERSION alias for the Message:http-version property. (The
-// message's HTTPVersion.)
+// message's HTTPVersion.).
 const MESSAGE_HTTP_VERSION = "http-version"
 const MESSAGE_IS_TOP_LEVEL_NAVIGATION = "is-top-level-navigation"
 
 // MESSAGE_METHOD alias for the Message:method property. (The message's HTTP
-// method.)
+// method.).
 const MESSAGE_METHOD = "method"
 
 // MESSAGE_PRIORITY sets the priority of the Message. See
@@ -54,74 +55,74 @@ const MESSAGE_METHOD = "method"
 const MESSAGE_PRIORITY = "priority"
 
 // MESSAGE_REASON_PHRASE alias for the Message:reason-phrase property. (The
-// message's HTTP response reason phrase.)
+// message's HTTP response reason phrase.).
 const MESSAGE_REASON_PHRASE = "reason-phrase"
 
 // MESSAGE_REQUEST_BODY alias for the Message:request-body property. (The
-// message's HTTP request body.)
+// message's HTTP request body.).
 const MESSAGE_REQUEST_BODY = "request-body"
 
 // MESSAGE_REQUEST_BODY_DATA alias for the Message:request-body-data property.
-// (The message's HTTP request body, as a #GBytes.)
+// (The message's HTTP request body, as a #GBytes.).
 const MESSAGE_REQUEST_BODY_DATA = "request-body-data"
 
 // MESSAGE_REQUEST_HEADERS alias for the Message:request-headers property. (The
-// message's HTTP request headers.)
+// message's HTTP request headers.).
 const MESSAGE_REQUEST_HEADERS = "request-headers"
 
 // MESSAGE_RESPONSE_BODY alias for the Message:response-body property. (The
-// message's HTTP response body.)
+// message's HTTP response body.).
 const MESSAGE_RESPONSE_BODY = "response-body"
 
 // MESSAGE_RESPONSE_BODY_DATA alias for the Message:response-body-data property.
-// (The message's HTTP response body, as a #GBytes.)
+// (The message's HTTP response body, as a #GBytes.).
 const MESSAGE_RESPONSE_BODY_DATA = "response-body-data"
 
 // MESSAGE_RESPONSE_HEADERS alias for the Message:response-headers property.
-// (The message's HTTP response headers.)
+// (The message's HTTP response headers.).
 const MESSAGE_RESPONSE_HEADERS = "response-headers"
 
 // MESSAGE_SERVER_SIDE alias for the Message:server-side property. (TRUE if the
-// message was created by Server.)
+// message was created by Server.).
 const MESSAGE_SERVER_SIDE = "server-side"
 const MESSAGE_SITE_FOR_COOKIES = "site-for-cookies"
 
 // MESSAGE_STATUS_CODE alias for the Message:status-code property. (The
-// message's HTTP response status code.)
+// message's HTTP response status code.).
 const MESSAGE_STATUS_CODE = "status-code"
 
 // MESSAGE_TLS_CERTIFICATE alias for the Message:tls-certificate property. (The
-// TLS certificate associated with the message, if any.)
+// TLS certificate associated with the message, if any.).
 const MESSAGE_TLS_CERTIFICATE = "tls-certificate"
 
 // MESSAGE_TLS_ERRORS alias for the Message:tls-errors property. (The
-// verification errors on Message:tls-certificate.)
+// verification errors on Message:tls-certificate.).
 const MESSAGE_TLS_ERRORS = "tls-errors"
 
-// MESSAGE_URI alias for the Message:uri property. (The message's URI.)
+// MESSAGE_URI alias for the Message:uri property. (The message's URI.).
 const MESSAGE_URI = "uri"
 
 // HTTPVersion indicates the HTTP protocol version being used.
 type HTTPVersion int
 
 const (
-	// Http10: HTTP 1.0 (RFC 1945)
-	Http10 HTTPVersion = iota
-	// Http11: HTTP 1.1 (RFC 2616)
-	Http11
+	// HTTP10: HTTP 1.0 (RFC 1945).
+	HTTP10 HTTPVersion = iota
+	// HTTP11: HTTP 1.1 (RFC 2616).
+	HTTP11
 )
 
 func marshalHTTPVersion(p uintptr) (interface{}, error) {
-	return HTTPVersion(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return HTTPVersion(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for HTTPVersion.
 func (h HTTPVersion) String() string {
 	switch h {
-	case Http10:
-		return "Http10"
-	case Http11:
-		return "Http11"
+	case HTTP10:
+		return "HTTP10"
+	case HTTP11:
+		return "HTTP11"
 	default:
 		return fmt.Sprintf("HTTPVersion(%d)", h)
 	}
@@ -150,7 +151,7 @@ const (
 )
 
 func marshalMessagePriority(p uintptr) (interface{}, error) {
-	return MessagePriority(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return MessagePriority(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for MessagePriority.
@@ -207,7 +208,7 @@ const (
 	// for the message if there aren't idle connections available and it's not
 	// possible to create new connections due to any of the connection limits
 	// has been reached. If a dedicated connection is eventually created for
-	// this message, it will be dropped when the message finishes. Since 2.50
+	// this message, it will be dropped when the message finishes. Since 2.50.
 	MessageIgnoreConnectionLimits MessageFlags = 0b100000000
 	// MessageDoNotUseAuthCache should not use the credentials cache for this
 	// message, neither to use cached credentials to automatically authenticate
@@ -216,12 +217,12 @@ const (
 	// authentication. Note that Session::authenticate signal will be emitted,
 	// if you want to disable authentication for a message use
 	// soup_message_disable_feature() passing UP_TYPE_AUTH_MANAGER instead.
-	// Since 2.58
+	// Since 2.58.
 	MessageDoNotUseAuthCache MessageFlags = 0b1000000000
 )
 
 func marshalMessageFlags(p uintptr) (interface{}, error) {
-	return MessageFlags(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
+	return MessageFlags(externglib.ValueFromNative(unsafe.Pointer(p)).Flags()), nil
 }
 
 // String returns the names in string for MessageFlags.
@@ -376,13 +377,17 @@ func wrapMessage(obj *externglib.Object) *Message {
 }
 
 func marshalMessager(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapMessage(obj), nil
+	return wrapMessage(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewMessage creates a new empty Message, which will connect to uri
-func NewMessage(method string, uriString string) *Message {
+// NewMessage creates a new empty Message, which will connect to uri.
+//
+// The function takes the following parameters:
+//
+//    - method: HTTP method for the created request.
+//    - uriString: destination endpoint (as a string).
+//
+func NewMessage(method, uriString string) *Message {
 	var _arg1 *C.char        // out
 	var _arg2 *C.char        // out
 	var _cret *C.SoupMessage // in
@@ -405,7 +410,13 @@ func NewMessage(method string, uriString string) *Message {
 	return _message
 }
 
-// NewMessageFromURI creates a new empty Message, which will connect to uri
+// NewMessageFromURI creates a new empty Message, which will connect to uri.
+//
+// The function takes the following parameters:
+//
+//    - method: HTTP method for the created request.
+//    - uri: destination endpoint (as a URI).
+//
 func NewMessageFromURI(method string, uri *URI) *Message {
 	var _arg1 *C.char        // out
 	var _arg2 *C.SoupURI     // out
@@ -426,6 +437,11 @@ func NewMessageFromURI(method string, uri *URI) *Message {
 	return _message
 }
 
+//
+// The function takes the following parameters:
+//
+
+//
 func (msg *Message) ContentSniffed(contentType string, params map[cgo.Handle]cgo.Handle) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 *C.char        // out
@@ -459,6 +475,11 @@ func (msg *Message) ContentSniffed(contentType string, params map[cgo.Handle]cgo
 // You must call this before queueing msg on a session; calling it on a message
 // that has already been queued is undefined. In particular, you cannot call
 // this on a message that is being requeued after a redirect or authentication.
+//
+// The function takes the following parameters:
+//
+//    - featureType of a SessionFeature.
+//
 func (msg *Message) DisableFeature(featureType externglib.Type) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.GType        // out
@@ -499,7 +520,7 @@ func (msg *Message) Address() *Address {
 	return _address
 }
 
-// FirstParty gets msg's first-party URI
+// FirstParty gets msg's first-party URI.
 func (msg *Message) FirstParty() *URI {
 	var _arg0 *C.SoupMessage // out
 	var _cret *C.SoupURI     // in
@@ -516,7 +537,7 @@ func (msg *Message) FirstParty() *URI {
 	return _urI
 }
 
-// Flags gets the flags on msg
+// Flags gets the flags on msg.
 func (msg *Message) Flags() MessageFlags {
 	var _arg0 *C.SoupMessage     // out
 	var _cret C.SoupMessageFlags // in
@@ -533,9 +554,9 @@ func (msg *Message) Flags() MessageFlags {
 	return _messageFlags
 }
 
-// HttpVersion gets the HTTP version of msg. This is the minimum of the version
+// HTTPVersion gets the HTTP version of msg. This is the minimum of the version
 // from the request and the version from the response.
-func (msg *Message) HttpVersion() HTTPVersion {
+func (msg *Message) HTTPVersion() HTTPVersion {
 	var _arg0 *C.SoupMessage    // out
 	var _cret C.SoupHTTPVersion // in
 
@@ -551,14 +572,14 @@ func (msg *Message) HttpVersion() HTTPVersion {
 	return _httpVersion
 }
 
-// HttpsStatus: if msg is using https (or attempted to use https but got
+// HTTPSStatus: if msg is using https (or attempted to use https but got
 // SOUP_STATUS_SSL_FAILED), this retrieves the Certificate associated with its
 // connection, and the CertificateFlags showing what problems, if any, have been
 // found with that certificate.
 //
 // <note><para>This is only meaningful with messages processed by a Session and
-// is not useful for messages received by a Server</para></note>
-func (msg *Message) HttpsStatus() (gio.TLSCertificater, gio.TLSCertificateFlags, bool) {
+// is not useful for messages received by a Server</para></note>.
+func (msg *Message) HTTPSStatus() (gio.TLSCertificater, gio.TLSCertificateFlags, bool) {
 	var _arg0 *C.SoupMessage         // out
 	var _arg1 *C.GTlsCertificate     // in
 	var _arg2 C.GTlsCertificateFlags // in
@@ -630,7 +651,7 @@ func (msg *Message) Priority() MessagePriority {
 	return _messagePriority
 }
 
-// SiteForCookies gets msg's site for cookies URI
+// SiteForCookies gets msg's site for cookies URI.
 func (msg *Message) SiteForCookies() *URI {
 	var _arg0 *C.SoupMessage // out
 	var _cret *C.SoupURI     // in
@@ -665,7 +686,7 @@ func (msg *Message) SoupRequest() *Request {
 	return _request
 }
 
-// URI gets msg's URI
+// URI gets msg's URI.
 func (msg *Message) URI() *URI {
 	var _arg0 *C.SoupMessage // out
 	var _cret *C.SoupURI     // in
@@ -691,6 +712,11 @@ func (msg *Message) GotBody() {
 	runtime.KeepAlive(msg)
 }
 
+//
+// The function takes the following parameters:
+//
+
+//
 func (msg *Message) GotChunk(chunk *Buffer) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 *C.SoupBuffer  // out
@@ -724,6 +750,11 @@ func (msg *Message) GotInformational() {
 // IsFeatureDisabled: get whether SessionFeature<!-- -->s of the given
 // feature_type (or a subclass of that type) are disabled on msg. See
 // soup_message_disable_feature().
+//
+// The function takes the following parameters:
+//
+//    - featureType of a SessionFeature.
+//
 func (msg *Message) IsFeatureDisabled(featureType externglib.Type) bool {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.GType        // out
@@ -801,6 +832,11 @@ func (msg *Message) Restarted() {
 // Deprecated: Request provides a much simpler API that lets you read the
 // response directly into your own buffers without needing to mess with
 // callbacks, pausing/unpausing, etc.
+//
+// The function takes the following parameters:
+//
+//    - allocator: chunk allocator callback.
+//
 func (msg *Message) SetChunkAllocator(allocator ChunkAllocator) {
 	var _arg0 *C.SoupMessage       // out
 	var _arg1 C.SoupChunkAllocator // out
@@ -820,6 +856,11 @@ func (msg *Message) SetChunkAllocator(allocator ChunkAllocator) {
 // SetFirstParty sets first_party as the main document URI for msg. For details
 // of when and how this is used refer to the documentation for
 // CookieJarAcceptPolicy.
+//
+// The function takes the following parameters:
+//
+//    - firstParty for the msg's first party.
+//
 func (msg *Message) SetFirstParty(firstParty *URI) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 *C.SoupURI     // out
@@ -833,6 +874,11 @@ func (msg *Message) SetFirstParty(firstParty *URI) {
 }
 
 // SetFlags sets the specified flags on msg.
+//
+// The function takes the following parameters:
+//
+//    - flags: set of MessageFlags values.
+//
 func (msg *Message) SetFlags(flags MessageFlags) {
 	var _arg0 *C.SoupMessage     // out
 	var _arg1 C.SoupMessageFlags // out
@@ -845,10 +891,15 @@ func (msg *Message) SetFlags(flags MessageFlags) {
 	runtime.KeepAlive(flags)
 }
 
-// SetHttpVersion sets the HTTP version on msg. The default version is
+// SetHTTPVersion sets the HTTP version on msg. The default version is
 // SOUP_HTTP_1_1. Setting it to SOUP_HTTP_1_0 will prevent certain functionality
 // from being used.
-func (msg *Message) SetHttpVersion(version HTTPVersion) {
+//
+// The function takes the following parameters:
+//
+//    - version: HTTP version.
+//
+func (msg *Message) SetHTTPVersion(version HTTPVersion) {
 	var _arg0 *C.SoupMessage    // out
 	var _arg1 C.SoupHTTPVersion // out
 
@@ -863,6 +914,12 @@ func (msg *Message) SetHttpVersion(version HTTPVersion) {
 // SetIsTopLevelNavigation: see the same-site spec
 // (https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00) for more
 // information.
+//
+// The function takes the following parameters:
+//
+//    - isTopLevelNavigation: if TRUE indicate the current request is a
+//    top-level navigation.
+//
 func (msg *Message) SetIsTopLevelNavigation(isTopLevelNavigation bool) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.gboolean     // out
@@ -888,6 +945,11 @@ func (msg *Message) SetIsTopLevelNavigation(isTopLevelNavigation bool) {
 // Setting priorities does not currently work with SessionSync (or with
 // synchronous messages on a plain Session) because in the synchronous/blocking
 // case, priority ends up being determined semi-randomly by thread scheduling.
+//
+// The function takes the following parameters:
+//
+//    - priority: MessagePriority.
+//
 func (msg *Message) SetPriority(priority MessagePriority) {
 	var _arg0 *C.SoupMessage        // out
 	var _arg1 C.SoupMessagePriority // out
@@ -907,6 +969,12 @@ func (msg *Message) SetPriority(priority MessagePriority) {
 // redirect_uri can be a relative URI, in which case it is interpreted relative
 // to msg's current URI. In particular, if redirect_uri is just a path, it will
 // replace the path <emphasis>and query</emphasis> of msg's URI.
+//
+// The function takes the following parameters:
+//
+//    - statusCode: 3xx status code.
+//    - redirectUri: URI to redirect msg to.
+//
 func (msg *Message) SetRedirect(statusCode uint, redirectUri string) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.guint        // out
@@ -925,7 +993,14 @@ func (msg *Message) SetRedirect(statusCode uint, redirectUri string) {
 
 // SetRequest: convenience function to set the request body of a Message. If
 // content_type is NULL, the request body must be empty as well.
-func (msg *Message) SetRequest(contentType string, reqUse MemoryUse, reqBody []byte) {
+//
+// The function takes the following parameters:
+//
+//    - contentType: MIME Content-Type of the body.
+//    - reqUse describing how to handle req_body.
+//    - reqBody: a data buffer containing the body of the message request.
+//
+func (msg *Message) SetRequest(contentType string, reqUse MemoryUse, reqBody string) {
 	var _arg0 *C.SoupMessage  // out
 	var _arg1 *C.char         // out
 	var _arg2 C.SoupMemoryUse // out
@@ -940,7 +1015,7 @@ func (msg *Message) SetRequest(contentType string, reqUse MemoryUse, reqBody []b
 	_arg2 = C.SoupMemoryUse(reqUse)
 	_arg4 = (C.gsize)(len(reqBody))
 	if len(reqBody) > 0 {
-		_arg3 = (*C.char)(unsafe.Pointer(&reqBody[0]))
+		_arg3 = (*C.char)(unsafe.Pointer((*reflect.StringHeader)(unsafe.Pointer(&reqBody)).Data))
 	}
 
 	C.soup_message_set_request(_arg0, _arg1, _arg2, _arg3, _arg4)
@@ -952,7 +1027,14 @@ func (msg *Message) SetRequest(contentType string, reqUse MemoryUse, reqBody []b
 
 // SetResponse: convenience function to set the response body of a Message. If
 // content_type is NULL, the response body must be empty as well.
-func (msg *Message) SetResponse(contentType string, respUse MemoryUse, respBody []byte) {
+//
+// The function takes the following parameters:
+//
+//    - contentType: MIME Content-Type of the body.
+//    - respUse describing how to handle resp_body.
+//    - respBody: a data buffer containing the body of the message response.
+//
+func (msg *Message) SetResponse(contentType string, respUse MemoryUse, respBody string) {
 	var _arg0 *C.SoupMessage  // out
 	var _arg1 *C.char         // out
 	var _arg2 C.SoupMemoryUse // out
@@ -967,7 +1049,7 @@ func (msg *Message) SetResponse(contentType string, respUse MemoryUse, respBody 
 	_arg2 = C.SoupMemoryUse(respUse)
 	_arg4 = (C.gsize)(len(respBody))
 	if len(respBody) > 0 {
-		_arg3 = (*C.char)(unsafe.Pointer(&respBody[0]))
+		_arg3 = (*C.char)(unsafe.Pointer((*reflect.StringHeader)(unsafe.Pointer(&respBody)).Data))
 	}
 
 	C.soup_message_set_response(_arg0, _arg1, _arg2, _arg3, _arg4)
@@ -988,6 +1070,11 @@ func (msg *Message) SetResponse(contentType string, respUse MemoryUse, respBody 
 // See the same-site spec
 // (https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00) for more
 // information.
+//
+// The function takes the following parameters:
+//
+//    - siteForCookies for the msg's site for cookies.
+//
 func (msg *Message) SetSiteForCookies(siteForCookies *URI) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 *C.SoupURI     // out
@@ -1004,6 +1091,11 @@ func (msg *Message) SetSiteForCookies(siteForCookies *URI) {
 
 // SetStatus sets msg's status code to status_code. If status_code is a known
 // value, it will also set msg's reason_phrase.
+//
+// The function takes the following parameters:
+//
+//    - statusCode: HTTP status code.
+//
 func (msg *Message) SetStatus(statusCode uint) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.guint        // out
@@ -1017,6 +1109,12 @@ func (msg *Message) SetStatus(statusCode uint) {
 }
 
 // SetStatusFull sets msg's status code and reason phrase.
+//
+// The function takes the following parameters:
+//
+//    - statusCode: HTTP status code.
+//    - reasonPhrase: description of the status.
+//
 func (msg *Message) SetStatusFull(statusCode uint, reasonPhrase string) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.guint        // out
@@ -1035,6 +1133,11 @@ func (msg *Message) SetStatusFull(statusCode uint, reasonPhrase string) {
 
 // SetURI sets msg's URI to uri. If msg has already been sent and you want to
 // re-send it with the new URI, you need to call soup_session_requeue_message().
+//
+// The function takes the following parameters:
+//
+//    - uri: new URI.
+//
 func (msg *Message) SetURI(uri *URI) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 *C.SoupURI     // out
@@ -1065,6 +1168,11 @@ func (msg *Message) WroteBody() {
 	runtime.KeepAlive(msg)
 }
 
+//
+// The function takes the following parameters:
+//
+
+//
 func (msg *Message) WroteBodyData(chunk *Buffer) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 *C.SoupBuffer  // out
@@ -1102,4 +1210,151 @@ func (msg *Message) WroteInformational() {
 
 	C.soup_message_wrote_informational(_arg0)
 	runtime.KeepAlive(msg)
+}
+
+// ConnectContentSniffed: this signal is emitted after Message::got-headers, and
+// before the first Message::got-chunk. If content sniffing is disabled, or no
+// content sniffing will be performed, due to the sniffer deciding to trust the
+// Content-Type sent by the server, this signal is emitted immediately after
+// Message::got-headers, and type is NULL.
+//
+// If the ContentSniffer feature is enabled, and the sniffer decided to perform
+// sniffing, the first Message::got-chunk emission may be delayed, so that the
+// sniffer has enough data to correctly sniff the content. It notified the
+// library user that the content has been sniffed, and allows it to change the
+// header contents in the message, if desired.
+//
+// After this signal is emitted, the data that was spooled so that sniffing
+// could be done is delivered on the first emission of Message::got-chunk.
+func (msg *Message) ConnectContentSniffed(f func(typ string, params map[string]string)) externglib.SignalHandle {
+	return msg.Connect("content-sniffed", f)
+}
+
+// ConnectFinished: emitted when all HTTP processing is finished for a message.
+// (After Message::got_body for client-side messages, or after
+// Message::wrote_body for server-side messages.).
+func (msg *Message) ConnectFinished(f func()) externglib.SignalHandle {
+	return msg.Connect("finished", f)
+}
+
+// ConnectGotBody: emitted after receiving the complete message body. (For a
+// server-side message, this means it has received the request body. For a
+// client-side message, this means it has received the response body and is
+// nearly done with the message.)
+//
+// See also soup_message_add_header_handler() and
+// soup_message_add_status_code_handler(), which can be used to connect to a
+// subset of emissions of this signal.
+func (msg *Message) ConnectGotBody(f func()) externglib.SignalHandle {
+	return msg.Connect("got-body", f)
+}
+
+// ConnectGotChunk: emitted after receiving a chunk of a message body. Note that
+// "chunk" in this context means any subpiece of the body, not necessarily the
+// specific HTTP 1.1 chunks sent by the other side.
+//
+// If you cancel or requeue msg while processing this signal, then the current
+// HTTP I/O will be stopped after this signal emission finished, and msg's
+// connection will be closed.
+func (msg *Message) ConnectGotChunk(f func(chunk Buffer)) externglib.SignalHandle {
+	return msg.Connect("got-chunk", f)
+}
+
+// ConnectGotHeaders: emitted after receiving all message headers for a message.
+// (For a client-side message, this is after receiving the Status-Line and
+// response headers; for a server-side message, it is after receiving the
+// Request-Line and request headers.)
+//
+// See also soup_message_add_header_handler() and
+// soup_message_add_status_code_handler(), which can be used to connect to a
+// subset of emissions of this signal.
+//
+// If you cancel or requeue msg while processing this signal, then the current
+// HTTP I/O will be stopped after this signal emission finished, and msg's
+// connection will be closed. (If you need to requeue a message--eg, after
+// handling authentication or redirection--it is usually better to requeue it
+// from a Message::got_body handler rather than a Message::got_headers handler,
+// so that the existing HTTP connection can be reused.).
+func (msg *Message) ConnectGotHeaders(f func()) externglib.SignalHandle {
+	return msg.Connect("got-headers", f)
+}
+
+// ConnectGotInformational: emitted after receiving a 1xx (Informational)
+// response for a (client-side) message. The response_headers will be filled in
+// with the headers associated with the informational response; however, those
+// header values will be erased after this signal is done.
+//
+// If you cancel or requeue msg while processing this signal, then the current
+// HTTP I/O will be stopped after this signal emission finished, and msg's
+// connection will be closed.
+func (msg *Message) ConnectGotInformational(f func()) externglib.SignalHandle {
+	return msg.Connect("got-informational", f)
+}
+
+// ConnectNetworkEvent: emitted to indicate that some network-related event
+// related to msg has occurred. This essentially proxies the Client::event
+// signal, but only for events that occur while msg "owns" the connection; if
+// msg is sent on an existing persistent connection, then this signal will not
+// be emitted. (If you want to force the message to be sent on a new connection,
+// set the SOUP_MESSAGE_NEW_CONNECTION flag on it.)
+//
+// See Client::event for more information on what the different values of event
+// correspond to, and what connection will be in each case.
+func (msg *Message) ConnectNetworkEvent(f func(event gio.SocketClientEvent, connection gio.IOStreamer)) externglib.SignalHandle {
+	return msg.Connect("network-event", f)
+}
+
+// ConnectRestarted: emitted when a request that was already sent once is now
+// being sent again (eg, because the first attempt received a redirection
+// response, or because we needed to use authentication).
+func (msg *Message) ConnectRestarted(f func()) externglib.SignalHandle {
+	return msg.Connect("restarted", f)
+}
+
+// ConnectStarting: emitted just before a message is sent.
+func (msg *Message) ConnectStarting(f func()) externglib.SignalHandle {
+	return msg.Connect("starting", f)
+}
+
+// ConnectWroteBody: emitted immediately after writing the complete body for a
+// message. (For a client-side message, this means that libsoup is done writing
+// and is now waiting for the response from the server. For a server-side
+// message, this means that libsoup has finished writing the response and is
+// nearly done with the message.).
+func (msg *Message) ConnectWroteBody(f func()) externglib.SignalHandle {
+	return msg.Connect("wrote-body", f)
+}
+
+// ConnectWroteBodyData: emitted immediately after writing a portion of the
+// message body to the network.
+//
+// Unlike Message::wrote_chunk, this is emitted after every successful write()
+// call, not only after finishing a complete "chunk".
+func (msg *Message) ConnectWroteBodyData(f func(chunk Buffer)) externglib.SignalHandle {
+	return msg.Connect("wrote-body-data", f)
+}
+
+// ConnectWroteChunk: emitted immediately after writing a body chunk for a
+// message.
+//
+// Note that this signal is not parallel to Message::got_chunk; it is emitted
+// only when a complete chunk (added with soup_message_body_append() or
+// soup_message_body_append_buffer()) has been written. To get more useful
+// continuous progress information, use Message::wrote_body_data.
+func (msg *Message) ConnectWroteChunk(f func()) externglib.SignalHandle {
+	return msg.Connect("wrote-chunk", f)
+}
+
+// ConnectWroteHeaders: emitted immediately after writing the headers for a
+// message. (For a client-side message, this is after writing the request
+// headers; for a server-side message, it is after writing the response
+// headers.).
+func (msg *Message) ConnectWroteHeaders(f func()) externglib.SignalHandle {
+	return msg.Connect("wrote-headers", f)
+}
+
+// ConnectWroteInformational: emitted immediately after writing a 1xx
+// (Informational) response for a (server-side) message.
+func (msg *Message) ConnectWroteInformational(f func()) externglib.SignalHandle {
+	return msg.Connect("wrote-informational", f)
 }

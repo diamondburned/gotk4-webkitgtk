@@ -40,14 +40,17 @@ func wrapUserContentFilterStore(obj *externglib.Object) *UserContentFilterStore 
 }
 
 func marshalUserContentFilterStorer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapUserContentFilterStore(obj), nil
+	return wrapUserContentFilterStore(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewUserContentFilterStore: create a new KitUserContentFilterStore to
 // manipulate filters stored at storage_path. The path must point to a local
 // filesystem, and will be created if needed.
+//
+// The function takes the following parameters:
+//
+//    - storagePath: path where data for filters will be stored on disk.
+//
 func NewUserContentFilterStore(storagePath string) *UserContentFilterStore {
 	var _arg1 *C.gchar                        // out
 	var _cret *C.WebKitUserContentFilterStore // in
@@ -71,6 +74,12 @@ func NewUserContentFilterStore(storagePath string) *UserContentFilterStore {
 // When the operation is finished, callback will be invoked, which then can use
 // webkit_user_content_filter_store_fetch_identifiers_finish() to obtain the
 // list of filter identifiers.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - callback to call when the removal is completed.
+//
 func (store *UserContentFilterStore) FetchIdentifiers(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitUserContentFilterStore // out
 	var _arg1 *C.GCancellable                 // out
@@ -97,6 +106,11 @@ func (store *UserContentFilterStore) FetchIdentifiers(ctx context.Context, callb
 // FetchIdentifiersFinish finishes an asynchronous fetch of the list of
 // identifiers for the stored filters previously started with
 // webkit_user_content_filter_store_fetch_identifiers().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (store *UserContentFilterStore) FetchIdentifiersFinish(result gio.AsyncResulter) []string {
 	var _arg0 *C.WebKitUserContentFilterStore // out
 	var _arg1 *C.GAsyncResult                 // out
@@ -153,6 +167,13 @@ func (store *UserContentFilterStore) Path() string {
 // When the operation is finished, callback will be invoked, which then can use
 // webkit_user_content_filter_store_load_finish() to obtain the resulting
 // filter.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - identifier: filter identifier.
+//    - callback to call when the load is completed.
+//
 func (store *UserContentFilterStore) Load(ctx context.Context, identifier string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitUserContentFilterStore // out
 	var _arg2 *C.GCancellable                 // out
@@ -182,6 +203,11 @@ func (store *UserContentFilterStore) Load(ctx context.Context, identifier string
 
 // LoadFinish finishes an asynchronous filter load previously started with
 // webkit_user_content_filter_store_load().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (store *UserContentFilterStore) LoadFinish(result gio.AsyncResulter) (*UserContentFilter, error) {
 	var _arg0 *C.WebKitUserContentFilterStore // out
 	var _arg1 *C.GAsyncResult                 // out
@@ -217,6 +243,13 @@ func (store *UserContentFilterStore) LoadFinish(result gio.AsyncResulter) (*User
 // When the operation is finished, callback will be invoked, which then can use
 // webkit_user_content_filter_store_remove_finish() to check whether the removal
 // was successful.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - identifier: filter identifier.
+//    - callback to call when the removal is completed.
+//
 func (store *UserContentFilterStore) Remove(ctx context.Context, identifier string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitUserContentFilterStore // out
 	var _arg2 *C.GCancellable                 // out
@@ -246,6 +279,11 @@ func (store *UserContentFilterStore) Remove(ctx context.Context, identifier stri
 
 // RemoveFinish finishes an asynchronous filter removal previously started with
 // webkit_user_content_filter_store_remove().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (store *UserContentFilterStore) RemoveFinish(result gio.AsyncResulter) error {
 	var _arg0 *C.WebKitUserContentFilterStore // out
 	var _arg1 *C.GAsyncResult                 // out
@@ -280,6 +318,14 @@ func (store *UserContentFilterStore) RemoveFinish(result gio.AsyncResulter) erro
 // When the operation is finished, callback will be invoked, which then can use
 // webkit_user_content_filter_store_save_finish() to obtain the resulting
 // filter.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - identifier: string used to identify the saved filter.
+//    - source containing the rule set in JSON format.
+//    - callback to call when saving is completed.
+//
 func (store *UserContentFilterStore) Save(ctx context.Context, identifier string, source *glib.Bytes, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitUserContentFilterStore // out
 	var _arg3 *C.GCancellable                 // out
@@ -312,6 +358,11 @@ func (store *UserContentFilterStore) Save(ctx context.Context, identifier string
 
 // SaveFinish finishes an asynchronous filter save previously started with
 // webkit_user_content_filter_store_save().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (store *UserContentFilterStore) SaveFinish(result gio.AsyncResulter) (*UserContentFilter, error) {
 	var _arg0 *C.WebKitUserContentFilterStore // out
 	var _arg1 *C.GAsyncResult                 // out
@@ -349,6 +400,14 @@ func (store *UserContentFilterStore) SaveFinish(result gio.AsyncResulter) (*User
 // When the operation is finished, callback will be invoked, which then can use
 // webkit_user_content_filter_store_save_finish() to obtain the resulting
 // filter.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - identifier: string used to identify the saved filter.
+//    - file containing the rule set in JSON format.
+//    - callback to call when saving is completed.
+//
 func (store *UserContentFilterStore) SaveFromFile(ctx context.Context, identifier string, file gio.Filer, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitUserContentFilterStore // out
 	var _arg3 *C.GCancellable                 // out
@@ -381,6 +440,11 @@ func (store *UserContentFilterStore) SaveFromFile(ctx context.Context, identifie
 
 // SaveFromFileFinish finishes and asynchronous filter save previously started
 // with webkit_user_content_filter_store_save_from_file().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (store *UserContentFilterStore) SaveFromFileFinish(result gio.AsyncResulter) (*UserContentFilter, error) {
 	var _arg0 *C.WebKitUserContentFilterStore // out
 	var _arg1 *C.GAsyncResult                 // out

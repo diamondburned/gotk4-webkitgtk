@@ -46,7 +46,7 @@ const (
 )
 
 func marshalNavigationType(p uintptr) (interface{}, error) {
-	return NavigationType(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return NavigationType(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for NavigationType.
@@ -80,8 +80,8 @@ type navigationAction struct {
 }
 
 func marshalNavigationAction(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &NavigationAction{&navigationAction{(*C.WebKitNavigationAction)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &NavigationAction{&navigationAction{(*C.WebKitNavigationAction)(b)}}, nil
 }
 
 // Copy: make a copy of navigation.
@@ -108,7 +108,7 @@ func (navigation *NavigationAction) Copy() *NavigationAction {
 }
 
 // Modifiers: return a bitmask of ModifierType values describing the modifier
-// keys that were in effect when the navigation was requested
+// keys that were in effect when the navigation was requested.
 func (navigation *NavigationAction) Modifiers() uint {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret C.guint                   // in

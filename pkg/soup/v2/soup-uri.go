@@ -70,8 +70,8 @@ type urI struct {
 }
 
 func marshalURI(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &URI{&urI{(*C.SoupURI)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &URI{&urI{(*C.SoupURI)(b)}}, nil
 }
 
 // NewURI constructs a struct URI.
@@ -129,7 +129,7 @@ func NewURIWithBase(base *URI, uriString string) *URI {
 	return _urI
 }
 
-// Copy copies uri
+// Copy copies uri.
 func (uri *URI) Copy() *URI {
 	var _arg0 *C.SoupURI // out
 	var _cret *C.SoupURI // in
@@ -152,7 +152,7 @@ func (uri *URI) Copy() *URI {
 	return _urI
 }
 
-// CopyHost makes a copy of uri, considering only the protocol, host, and port
+// CopyHost makes a copy of uri, considering only the protocol, host, and port.
 func (uri *URI) CopyHost() *URI {
 	var _arg0 *C.SoupURI // out
 	var _cret *C.SoupURI // in
@@ -175,7 +175,7 @@ func (uri *URI) CopyHost() *URI {
 	return _urI
 }
 
-// Equal tests whether or not uri1 and uri2 are equal in all parts
+// Equal tests whether or not uri1 and uri2 are equal in all parts.
 func (uri1 *URI) Equal(uri2 *URI) bool {
 	var _arg0 *C.SoupURI // out
 	var _arg1 *C.SoupURI // out
@@ -556,7 +556,7 @@ func (uri *URI) String(justPathAndQuery bool) string {
 
 // UsesDefaultPort tests if uri uses the default port for its scheme. (Eg, 80
 // for http.) (This only works for http, https and ftp; libsoup does not know
-// the default ports of other protocols.)
+// the default ports of other protocols.).
 func (uri *URI) UsesDefaultPort() bool {
 	var _arg0 *C.SoupURI // out
 	var _cret C.gboolean // in
@@ -580,6 +580,11 @@ func (uri *URI) UsesDefaultPort() bool {
 // In the past, this would return NULL if part contained invalid
 // percent-encoding, but now it just ignores the problem (as soup_uri_new()
 // already did).
+//
+// The function takes the following parameters:
+//
+//    - part: URI part.
+//
 func URIDecode(part string) string {
 	var _arg1 *C.char // out
 	var _cret *C.char // in
@@ -600,7 +605,13 @@ func URIDecode(part string) string {
 
 // URIEncode: this %<!-- -->-encodes the given URI part and returns the escaped
 // version in allocated memory, which the caller must free when it is done.
-func URIEncode(part string, escapeExtra string) string {
+//
+// The function takes the following parameters:
+//
+//    - part: URI part.
+//    - escapeExtra: additional reserved characters to escape (or NULL).
+//
+func URIEncode(part, escapeExtra string) string {
 	var _arg1 *C.char // out
 	var _arg2 *C.char // out
 	var _cret *C.char // in
@@ -639,7 +650,13 @@ func URIEncode(part string, escapeExtra string) string {
 // In the past, this would return NULL if part contained invalid
 // percent-encoding, but now it just ignores the problem (as soup_uri_new()
 // already did).
-func URINormalize(part string, unescapeExtra string) string {
+//
+// The function takes the following parameters:
+//
+//    - part: URI part.
+//    - unescapeExtra: reserved characters to unescape (or NULL).
+//
+func URINormalize(part, unescapeExtra string) string {
 	var _arg1 *C.char // out
 	var _arg2 *C.char // out
 	var _cret *C.char // in

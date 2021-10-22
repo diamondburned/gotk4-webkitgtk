@@ -28,14 +28,14 @@ func init() {
 type AuthenticationScheme int
 
 const (
-	// AuthenticationSchemeDefault authentication scheme of WebKit.
+	// AuthenticationSchemeDefault: default authentication scheme of WebKit.
 	AuthenticationSchemeDefault AuthenticationScheme = 1
-	// AuthenticationSchemeHttpBasic: basic authentication scheme as defined in
+	// AuthenticationSchemeHTTPBasic: basic authentication scheme as defined in
 	// RFC 2617.
-	AuthenticationSchemeHttpBasic AuthenticationScheme = 2
-	// AuthenticationSchemeHttpDigest: digest authentication scheme as defined
+	AuthenticationSchemeHTTPBasic AuthenticationScheme = 2
+	// AuthenticationSchemeHTTPDigest: digest authentication scheme as defined
 	// in RFC 2617.
-	AuthenticationSchemeHttpDigest AuthenticationScheme = 3
+	AuthenticationSchemeHTTPDigest AuthenticationScheme = 3
 	// AuthenticationSchemeHtmlForm: HTML Form authentication.
 	AuthenticationSchemeHtmlForm AuthenticationScheme = 4
 	// AuthenticationSchemeNtlm: NTLM Microsoft proprietary authentication
@@ -55,7 +55,7 @@ const (
 )
 
 func marshalAuthenticationScheme(p uintptr) (interface{}, error) {
-	return AuthenticationScheme(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return AuthenticationScheme(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for AuthenticationScheme.
@@ -63,10 +63,10 @@ func (a AuthenticationScheme) String() string {
 	switch a {
 	case AuthenticationSchemeDefault:
 		return "Default"
-	case AuthenticationSchemeHttpBasic:
-		return "HttpBasic"
-	case AuthenticationSchemeHttpDigest:
-		return "HttpDigest"
+	case AuthenticationSchemeHTTPBasic:
+		return "HTTPBasic"
+	case AuthenticationSchemeHTTPDigest:
+		return "HTTPDigest"
 	case AuthenticationSchemeHtmlForm:
 		return "HtmlForm"
 	case AuthenticationSchemeNtlm:
@@ -95,13 +95,16 @@ func wrapAuthenticationRequest(obj *externglib.Object) *AuthenticationRequest {
 }
 
 func marshalAuthenticationRequester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapAuthenticationRequest(obj), nil
+	return wrapAuthenticationRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Authenticate the KitAuthenticationRequest using the KitCredential supplied.
 // To continue without credentials, pass NULL as credential.
+//
+// The function takes the following parameters:
+//
+//    - credential or NULL.
+//
 func (request *AuthenticationRequest) Authenticate(credential *Credential) {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _arg1 *C.WebKitCredential            // out
@@ -316,6 +319,11 @@ func (request *AuthenticationRequest) IsRetry() bool {
 // should be supported even when internal credential storage is disabled or
 // unsupported. Note that storing of credentials will not be allowed on
 // ephemeral sessions in any case.
+//
+// The function takes the following parameters:
+//
+//    - enabled: value to set.
+//
 func (request *AuthenticationRequest) SetCanSaveCredentials(enabled bool) {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _arg1 C.gboolean                     // out
@@ -337,6 +345,11 @@ func (request *AuthenticationRequest) SetCanSaveCredentials(enabled bool) {
 // webkit_authentication_request_get_proposed_credential() already contains
 // previously-stored credentials.) Passing a NULL credential will clear the
 // proposed credential.
+//
+// The function takes the following parameters:
+//
+//    - credential or NULL.
+//
 func (request *AuthenticationRequest) SetProposedCredential(credential *Credential) {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _arg1 *C.WebKitCredential            // out
@@ -347,4 +360,18 @@ func (request *AuthenticationRequest) SetProposedCredential(credential *Credenti
 	C.webkit_authentication_request_set_proposed_credential(_arg0, _arg1)
 	runtime.KeepAlive(request)
 	runtime.KeepAlive(credential)
+}
+
+// ConnectAuthenticated: this signal is emitted when the user authentication
+// request succeeded. Applications handling their own credential storage should
+// connect to this signal to save the credentials.
+func (request *AuthenticationRequest) ConnectAuthenticated(f func(credential *Credential)) externglib.SignalHandle {
+	return request.Connect("authenticated", f)
+}
+
+// ConnectCancelled: this signal is emitted when the user authentication request
+// is cancelled. It allows the application to dismiss its authentication dialog
+// in case of page load failure for example.
+func (request *AuthenticationRequest) ConnectCancelled(f func()) externglib.SignalHandle {
+	return request.Connect("cancelled", f)
 }

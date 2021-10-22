@@ -36,9 +36,5 @@ func wrapNotificationPermissionRequest(obj *externglib.Object) *NotificationPerm
 }
 
 func marshalNotificationPermissionRequester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapNotificationPermissionRequest(obj), nil
+	return wrapNotificationPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*NotificationPermissionRequest) privateNotificationPermissionRequest() {}

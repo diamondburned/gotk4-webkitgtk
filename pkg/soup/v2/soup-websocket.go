@@ -31,15 +31,15 @@ func init() {
 // WebsocketCloseCode: pre-defined close codes that can be passed to
 // soup_websocket_connection_close() or received from
 // soup_websocket_connection_get_close_code(). (However, other codes are also
-// allowed.)
+// allowed.).
 type WebsocketCloseCode int
 
 const (
-	// WebsocketCloseNormal: normal, non-error close
+	// WebsocketCloseNormal: normal, non-error close.
 	WebsocketCloseNormal WebsocketCloseCode = 1000
-	// WebsocketCloseGoingAway: client/server is going away
+	// WebsocketCloseGoingAway: client/server is going away.
 	WebsocketCloseGoingAway WebsocketCloseCode = 1001
-	// WebsocketCloseProtocolError: protocol error occurred
+	// WebsocketCloseProtocolError: protocol error occurred.
 	WebsocketCloseProtocolError WebsocketCloseCode = 1002
 	// WebsocketCloseUnsupportedData: endpoint received data of a type that it
 	// does not support.
@@ -71,7 +71,7 @@ const (
 )
 
 func marshalWebsocketCloseCode(p uintptr) (interface{}, error) {
-	return WebsocketCloseCode(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return WebsocketCloseCode(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for WebsocketCloseCode.
@@ -110,16 +110,16 @@ func (w WebsocketCloseCode) String() string {
 type WebsocketConnectionType int
 
 const (
-	// WebsocketConnectionUnknown: unknown/invalid connection
+	// WebsocketConnectionUnknown: unknown/invalid connection.
 	WebsocketConnectionUnknown WebsocketConnectionType = iota
-	// WebsocketConnectionClient: client-side connection
+	// WebsocketConnectionClient: client-side connection.
 	WebsocketConnectionClient
-	// WebsocketConnectionServer: server-side connection
+	// WebsocketConnectionServer: server-side connection.
 	WebsocketConnectionServer
 )
 
 func marshalWebsocketConnectionType(p uintptr) (interface{}, error) {
-	return WebsocketConnectionType(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return WebsocketConnectionType(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for WebsocketConnectionType.
@@ -141,14 +141,14 @@ func (w WebsocketConnectionType) String() string {
 type WebsocketDataType int
 
 const (
-	// WebsocketDataText: UTF-8 text
+	// WebsocketDataText: UTF-8 text.
 	WebsocketDataText WebsocketDataType = 1
-	// WebsocketDataBinary data
+	// WebsocketDataBinary: binary data.
 	WebsocketDataBinary WebsocketDataType = 2
 )
 
 func marshalWebsocketDataType(p uintptr) (interface{}, error) {
-	return WebsocketDataType(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return WebsocketDataType(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for WebsocketDataType.
@@ -167,7 +167,7 @@ func (w WebsocketDataType) String() string {
 type WebsocketError int
 
 const (
-	// WebsocketErrorFailed: generic error
+	// WebsocketErrorFailed: generic error.
 	WebsocketErrorFailed WebsocketError = iota
 	// WebsocketErrorNotWebsocket: attempted to handshake with a server that
 	// does not appear to understand WebSockets.
@@ -181,7 +181,7 @@ const (
 )
 
 func marshalWebsocketError(p uintptr) (interface{}, error) {
-	return WebsocketError(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return WebsocketError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for WebsocketError.
@@ -216,17 +216,17 @@ func WebsocketErrorGetQuark() glib.Quark {
 type WebsocketState int
 
 const (
-	// WebsocketStateOpen: connection is ready to send messages
+	// WebsocketStateOpen: connection is ready to send messages.
 	WebsocketStateOpen WebsocketState = 1
 	// WebsocketStateClosing: connection is in the process of closing down;
-	// messages may be received, but not sent
+	// messages may be received, but not sent.
 	WebsocketStateClosing WebsocketState = 2
-	// WebsocketStateClosed: connection is completely closed down
+	// WebsocketStateClosed: connection is completely closed down.
 	WebsocketStateClosed WebsocketState = 3
 )
 
 func marshalWebsocketState(p uintptr) (interface{}, error) {
-	return WebsocketState(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return WebsocketState(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for WebsocketState.
@@ -253,6 +253,13 @@ func (w WebsocketState) String() string {
 // This is a low-level function; if you use
 // soup_session_websocket_connect_async() to create a WebSocket connection, it
 // will call this for you.
+//
+// The function takes the following parameters:
+//
+//    - msg: Message.
+//    - origin: "Origin" header to set.
+//    - protocols: list of protocols to offer.
+//
 func WebsocketClientPrepareHandshake(msg *Message, origin string, protocols []string) {
 	var _arg1 *C.SoupMessage // out
 	var _arg2 *C.char        // out
@@ -295,6 +302,11 @@ func WebsocketClientPrepareHandshake(msg *Message, origin string, protocols []st
 // This is a low-level function; if you use
 // soup_session_websocket_connect_async() to create a WebSocket connection, it
 // will call this for you.
+//
+// The function takes the following parameters:
+//
+//    - msg containing both client and server sides of a WebSocket handshake.
+//
 func WebsocketClientVerifyHandshake(msg *Message) error {
 	var _arg1 *C.SoupMessage // out
 	var _cerr *C.GError      // in
@@ -331,6 +343,13 @@ func WebsocketClientVerifyHandshake(msg *Message) error {
 // be useful if you need to perform more complicated validation; eg, accepting
 // multiple different Origins, or handling different protocols depending on the
 // path.
+//
+// The function takes the following parameters:
+//
+//    - msg containing the client side of a WebSocket handshake.
+//    - origin: expected Origin header.
+//    - protocols: allowed WebSocket protocols.
+//
 func WebsocketServerCheckHandshake(msg *Message, origin string, protocols []string) error {
 	var _arg1 *C.SoupMessage // out
 	var _arg2 *C.char        // out
@@ -386,6 +405,13 @@ func WebsocketServerCheckHandshake(msg *Message, origin string, protocols []stri
 //
 // This is a low-level function; if you use soup_server_add_websocket_handler()
 // to handle accepting WebSocket connections, it will call this for you.
+//
+// The function takes the following parameters:
+//
+//    - msg containing the client side of a WebSocket handshake.
+//    - expectedOrigin: expected Origin header.
+//    - protocols: allowed WebSocket protocols.
+//
 func WebsocketServerProcessHandshake(msg *Message, expectedOrigin string, protocols []string) bool {
 	var _arg1 *C.SoupMessage // out
 	var _arg2 *C.char        // out

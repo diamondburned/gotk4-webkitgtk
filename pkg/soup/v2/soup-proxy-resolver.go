@@ -80,7 +80,7 @@ type ProxyResolver struct {
 	SessionFeature
 }
 
-// ProxyResolverer describes ProxyResolver's abstract methods.
+// ProxyResolverer describes ProxyResolver's interface methods.
 type ProxyResolverer interface {
 	externglib.Objector
 
@@ -103,12 +103,15 @@ func wrapProxyResolver(obj *externglib.Object) *ProxyResolver {
 }
 
 func marshalProxyResolverer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapProxyResolver(obj), nil
+	return wrapProxyResolver(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // ProxyAsync: deprecated: Use SoupProxyURIResolver.get_proxy_uri_async instead.
+//
+// The function takes the following parameters:
+//
+
+//
 func (proxyResolver *ProxyResolver) ProxyAsync(ctx context.Context, msg *Message, asyncContext *glib.MainContext, callback ProxyResolverCallback) {
 	var _arg0 *C.SoupProxyResolver        // out
 	var _arg3 *C.GCancellable             // out
@@ -137,6 +140,11 @@ func (proxyResolver *ProxyResolver) ProxyAsync(ctx context.Context, msg *Message
 }
 
 // ProxySync: deprecated: Use SoupProxyURIResolver.get_proxy_uri_sync() instead.
+//
+// The function takes the following parameters:
+//
+
+//
 func (proxyResolver *ProxyResolver) ProxySync(ctx context.Context, msg *Message) (*Address, uint) {
 	var _arg0 *C.SoupProxyResolver // out
 	var _arg2 *C.GCancellable      // out

@@ -33,9 +33,7 @@ func wrapPlugin(obj *externglib.Object) *Plugin {
 }
 
 func marshalPluginner(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapPlugin(obj), nil
+	return wrapPlugin(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Description: deprecated: since version 2.32.

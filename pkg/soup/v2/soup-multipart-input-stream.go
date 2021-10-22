@@ -52,15 +52,19 @@ func wrapMultipartInputStream(obj *externglib.Object) *MultipartInputStream {
 }
 
 func marshalMultipartInputStreamer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapMultipartInputStream(obj), nil
+	return wrapMultipartInputStream(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewMultipartInputStream creates a new MultipartInputStream that wraps the
 // Stream obtained by sending the Request. Reads should not be done directly
 // through this object, use the input streams returned by
 // soup_multipart_input_stream_next_part() or its async counterpart instead.
+//
+// The function takes the following parameters:
+//
+//    - msg the response is related to.
+//    - baseStream returned by sending the request.
+//
 func NewMultipartInputStream(msg *Message, baseStream gio.InputStreamer) *MultipartInputStream {
 	var _arg1 *C.SoupMessage              // out
 	var _arg2 *C.GInputStream             // out
@@ -115,6 +119,11 @@ func (multipart *MultipartInputStream) Headers() *MessageHeaders {
 // used to obtain the headers for the first part. A read of 0 bytes indicates
 // the end of the part; a new call to this function should be done at that
 // point, to obtain the next part.
+//
+// The function takes the following parameters:
+//
+//    - ctx: #GCancellable.
+//
 func (multipart *MultipartInputStream) NextPart(ctx context.Context) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupMultipartInputStream // out
 	var _arg1 *C.GCancellable             // out
@@ -156,6 +165,13 @@ func (multipart *MultipartInputStream) NextPart(ctx context.Context) (gio.InputS
 
 // NextPartAsync obtains a Stream for the next request. See
 // soup_multipart_input_stream_next_part() for details on the workflow.
+//
+// The function takes the following parameters:
+//
+//    - ctx: #GCancellable.
+//    - ioPriority: i/O priority for the request.
+//    - callback to call when request is satisfied.
+//
 func (multipart *MultipartInputStream) NextPartAsync(ctx context.Context, ioPriority int, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.SoupMultipartInputStream // out
 	var _arg2 *C.GCancellable             // out
@@ -183,6 +199,11 @@ func (multipart *MultipartInputStream) NextPartAsync(ctx context.Context, ioPrio
 }
 
 // NextPartFinish finishes an asynchronous request for the next part.
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (multipart *MultipartInputStream) NextPartFinish(result gio.AsyncResulter) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupMultipartInputStream // out
 	var _arg1 *C.GAsyncResult             // out

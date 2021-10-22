@@ -25,20 +25,14 @@ type PolicyDecision struct {
 	*externglib.Object
 }
 
-// PolicyDecisioner describes PolicyDecision's abstract methods.
+// PolicyDecisioner describes types inherited from class PolicyDecision.
+// To get the original type, the caller must assert this to an interface or
+// another type.
 type PolicyDecisioner interface {
 	externglib.Objector
 
-	// Download: spawn a download from this decision.
-	Download()
-	// Ignore the action which triggered this decision.
-	Ignore()
-	// Use: accept the action which triggered this decision.
-	Use()
-	// UseWithPolicies: accept the navigation action which triggered this
-	// decision, and continue with policies affecting all subsequent loads of
-	// resources in the origin associated with the accepted navigation action.
-	UseWithPolicies(policies *WebsitePolicies)
+	// BasePolicyDecision returns the underlying base class.
+	BasePolicyDecision() *PolicyDecision
 }
 
 var _ PolicyDecisioner = (*PolicyDecision)(nil)
@@ -50,9 +44,7 @@ func wrapPolicyDecision(obj *externglib.Object) *PolicyDecision {
 }
 
 func marshalPolicyDecisioner(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapPolicyDecision(obj), nil
+	return wrapPolicyDecision(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Download: spawn a download from this decision.
@@ -93,6 +85,11 @@ func (decision *PolicyDecision) Use() {
 // For example, a navigation decision to a video sharing website may be accepted
 // under the priviso no movies are allowed to autoplay. The autoplay policy in
 // this case would be set in the policies.
+//
+// The function takes the following parameters:
+//
+//    - policies: KitWebsitePolicies.
+//
 func (decision *PolicyDecision) UseWithPolicies(policies *WebsitePolicies) {
 	var _arg0 *C.WebKitPolicyDecision  // out
 	var _arg1 *C.WebKitWebsitePolicies // out
@@ -103,4 +100,9 @@ func (decision *PolicyDecision) UseWithPolicies(policies *WebsitePolicies) {
 	C.webkit_policy_decision_use_with_policies(_arg0, _arg1)
 	runtime.KeepAlive(decision)
 	runtime.KeepAlive(policies)
+}
+
+// BasePolicyDecision returns decision.
+func (decision *PolicyDecision) BasePolicyDecision() *PolicyDecision {
+	return decision
 }

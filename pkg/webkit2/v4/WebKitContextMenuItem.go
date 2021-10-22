@@ -38,14 +38,17 @@ func wrapContextMenuItem(obj *externglib.Object) *ContextMenuItem {
 }
 
 func marshalContextMenuItemmer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapContextMenuItem(obj), nil
+	return wrapContextMenuItem(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewContextMenuItem creates a new KitContextMenuItem for the given action.
 //
 // Deprecated: Use webkit_context_menu_item_new_from_gaction() instead.
+//
+// The function takes the following parameters:
+//
+//    - action: Action.
+//
 func NewContextMenuItem(action *gtk.Action) *ContextMenuItem {
 	var _arg1 *C.GtkAction             // out
 	var _cret *C.WebKitContextMenuItem // in
@@ -65,6 +68,13 @@ func NewContextMenuItem(action *gtk.Action) *ContextMenuItem {
 // NewContextMenuItemFromGaction creates a new KitContextMenuItem for the given
 // action and label. On activation target will be passed as parameter to the
 // callback.
+//
+// The function takes the following parameters:
+//
+//    - action: #GAction.
+//    - label: menu item label text.
+//    - target to use as the action target.
+//
 func NewContextMenuItemFromGaction(action gio.Actioner, label string, target *glib.Variant) *ContextMenuItem {
 	var _arg1 *C.GAction               // out
 	var _arg2 *C.gchar                 // out
@@ -99,6 +109,11 @@ func NewContextMenuItemFromGaction(action gio.Actioner, label string, target *gl
 // webkit_context_menu_item_get_gaction() and connect to the Action::activate
 // signal to be notified when the item is activated, but you can't prevent the
 // associated action from being performed.
+//
+// The function takes the following parameters:
+//
+//    - action stock action.
+//
 func NewContextMenuItemFromStockAction(action ContextMenuAction) *ContextMenuItem {
 	var _arg1 C.WebKitContextMenuAction // out
 	var _cret *C.WebKitContextMenuItem  // in
@@ -119,6 +134,12 @@ func NewContextMenuItemFromStockAction(action ContextMenuAction) *ContextMenuIte
 // for the given stock action using the given label. Stock actions have a
 // predefined label, this method can be used to create a KitContextMenuItem for
 // a KitContextMenuAction but using a custom label.
+//
+// The function takes the following parameters:
+//
+//    - action stock action.
+//    - label: custom label text to use instead of the predefined one.
+//
 func NewContextMenuItemFromStockActionWithLabel(action ContextMenuAction, label string) *ContextMenuItem {
 	var _arg1 C.WebKitContextMenuAction // out
 	var _arg2 *C.gchar                  // out
@@ -155,6 +176,12 @@ func NewContextMenuItemSeparator() *ContextMenuItem {
 
 // NewContextMenuItemWithSubmenu creates a new KitContextMenuItem using the
 // given label with a submenu.
+//
+// The function takes the following parameters:
+//
+//    - label: menu item label text.
+//    - submenu to set.
+//
 func NewContextMenuItemWithSubmenu(label string, submenu *ContextMenu) *ContextMenuItem {
 	var _arg1 *C.gchar                 // out
 	var _arg2 *C.WebKitContextMenu     // out
@@ -289,6 +316,11 @@ func (item *ContextMenuItem) IsSeparator() bool {
 
 // SetSubmenu sets or replaces the item submenu. If submenu is NULL the current
 // submenu of item is removed.
+//
+// The function takes the following parameters:
+//
+//    - submenu: KitContextMenu.
+//
 func (item *ContextMenuItem) SetSubmenu(submenu *ContextMenu) {
 	var _arg0 *C.WebKitContextMenuItem // out
 	var _arg1 *C.WebKitContextMenu     // out

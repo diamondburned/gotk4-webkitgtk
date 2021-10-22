@@ -39,12 +39,8 @@ func wrapPasswordManagerGNOME(obj *externglib.Object) *PasswordManagerGNOME {
 }
 
 func marshalPasswordManagerGNOMEer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapPasswordManagerGNOME(obj), nil
+	return wrapPasswordManagerGNOME(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*PasswordManagerGNOME) privatePasswordManagerGNOME() {}
 
 type ProxyResolverGNOME struct {
 	soup.ProxyResolverDefault
@@ -64,9 +60,5 @@ func wrapProxyResolverGNOME(obj *externglib.Object) *ProxyResolverGNOME {
 }
 
 func marshalProxyResolverGNOMEer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapProxyResolverGNOME(obj), nil
+	return wrapProxyResolverGNOME(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*ProxyResolverGNOME) privateProxyResolverGNOME() {}

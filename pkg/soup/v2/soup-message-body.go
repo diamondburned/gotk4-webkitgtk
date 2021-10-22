@@ -54,7 +54,7 @@ const (
 )
 
 func marshalMemoryUse(p uintptr) (interface{}, error) {
-	return MemoryUse(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return MemoryUse(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for MemoryUse.
@@ -89,8 +89,8 @@ type buffer struct {
 }
 
 func marshalBuffer(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &Buffer{&buffer{(*C.SoupBuffer)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &Buffer{&buffer{(*C.SoupBuffer)(b)}}, nil
 }
 
 // NewBuffer constructs a struct Buffer.
@@ -119,7 +119,7 @@ func NewBuffer(data []byte) *Buffer {
 	return _buffer
 }
 
-// Length: length of data
+// Length: length of data.
 func (b *Buffer) Length() uint {
 	var v uint // out
 	v = uint(b.native.length)
@@ -219,7 +219,7 @@ func (buffer *Buffer) Owner() cgo.Handle {
 
 // NewSubbuffer creates a new Buffer containing length bytes "copied" from
 // parent starting at offset. (Normally this will not actually copy any data,
-// but will instead simply reference the same data as parent does.)
+// but will instead simply reference the same data as parent does.).
 func (parent *Buffer) NewSubbuffer(offset uint, length uint) *Buffer {
 	var _arg0 *C.SoupBuffer // out
 	var _arg1 C.gsize       // out
@@ -272,8 +272,8 @@ type messageBody struct {
 }
 
 func marshalMessageBody(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &MessageBody{&messageBody{(*C.SoupMessageBody)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &MessageBody{&messageBody{(*C.SoupMessageBody)(b)}}, nil
 }
 
 // NewMessageBody constructs a struct MessageBody.
@@ -295,14 +295,14 @@ func NewMessageBody() *MessageBody {
 	return _messageBody
 }
 
-// Data: data
+// Data: data.
 func (m *MessageBody) Data() string {
 	var v string // out
 	v = C.GoString((*C.gchar)(unsafe.Pointer(m.native.data)))
 	return v
 }
 
-// Length: length of data
+// Length: length of data.
 func (m *MessageBody) Length() int64 {
 	var v int64 // out
 	v = int64(m.native.length)
@@ -311,7 +311,7 @@ func (m *MessageBody) Length() int64 {
 
 // AppendBuffer appends the data from buffer to body. (MessageBody uses Buffers
 // internally, so this is normally a constant-time operation that doesn't
-// actually require copying the data in buffer.)
+// actually require copying the data in buffer.).
 func (body *MessageBody) AppendBuffer(buffer *Buffer) {
 	var _arg0 *C.SoupMessageBody // out
 	var _arg1 *C.SoupBuffer      // out

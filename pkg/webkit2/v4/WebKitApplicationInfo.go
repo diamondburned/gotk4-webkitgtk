@@ -33,8 +33,8 @@ type applicationInfo struct {
 }
 
 func marshalApplicationInfo(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &ApplicationInfo{&applicationInfo{(*C.WebKitApplicationInfo)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &ApplicationInfo{&applicationInfo{(*C.WebKitApplicationInfo)(b)}}, nil
 }
 
 // NewApplicationInfo constructs a struct ApplicationInfo.

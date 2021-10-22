@@ -18,7 +18,7 @@ const EDITING_COMMAND_COPY = "Copy"
 // is inserted at the current cursor position. If there's a selection, the
 // selected text will be used as the link text, otherwise the URL itself will be
 // used. It receives the link URL as argument. This command should be executed
-// with webkit_web_view_execute_editing_command_with_argument()
+// with webkit_web_view_execute_editing_command_with_argument().
 const EDITING_COMMAND_CREATE_LINK = "CreateLink"
 
 // EDITING_COMMAND_CUT: cut clipboard command. Copies the current selection

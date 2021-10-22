@@ -56,7 +56,7 @@ const (
 )
 
 func marshalInsecureContentEvent(p uintptr) (interface{}, error) {
-	return InsecureContentEvent(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return InsecureContentEvent(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for InsecureContentEvent.
@@ -92,7 +92,7 @@ const (
 )
 
 func marshalLoadEvent(p uintptr) (interface{}, error) {
-	return LoadEvent(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return LoadEvent(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for LoadEvent.
@@ -145,7 +145,7 @@ const (
 )
 
 func marshalPolicyDecisionType(p uintptr) (interface{}, error) {
-	return PolicyDecisionType(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return PolicyDecisionType(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for PolicyDecisionType.
@@ -172,7 +172,7 @@ const (
 )
 
 func marshalSaveMode(p uintptr) (interface{}, error) {
-	return SaveMode(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return SaveMode(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for SaveMode.
@@ -186,19 +186,19 @@ func (s SaveMode) String() string {
 }
 
 // SnapshotRegion: enum values used to specify the region from which to get a
-// KitWebView snapshot
+// KitWebView snapshot.
 type SnapshotRegion int
 
 const (
 	// SnapshotRegionVisible specifies a snapshot only for the area that is
-	// visible in the webview
+	// visible in the webview.
 	SnapshotRegionVisible SnapshotRegion = iota
 	// SnapshotRegionFullDocument: snapshot of the entire document.
 	SnapshotRegionFullDocument
 )
 
 func marshalSnapshotRegion(p uintptr) (interface{}, error) {
-	return SnapshotRegion(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return SnapshotRegion(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for SnapshotRegion.
@@ -225,7 +225,7 @@ const (
 )
 
 func marshalWebProcessTerminationReason(p uintptr) (interface{}, error) {
-	return WebProcessTerminationReason(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return WebProcessTerminationReason(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for WebProcessTerminationReason.
@@ -251,12 +251,12 @@ const (
 	// snapshot the highlight of the selected content.
 	SnapshotOptionsIncludeSelectionHighlighting SnapshotOptions = 0b1
 	// SnapshotOptionsTransparentBackground: do not fill the background with
-	// white before rendering the snapshot. Since 2.8
+	// white before rendering the snapshot. Since 2.8.
 	SnapshotOptionsTransparentBackground SnapshotOptions = 0b10
 )
 
 func marshalSnapshotOptions(p uintptr) (interface{}, error) {
-	return SnapshotOptions(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
+	return SnapshotOptions(externglib.ValueFromNative(unsafe.Pointer(p)).Flags()), nil
 }
 
 // String returns the names in string for SnapshotOptions.
@@ -352,9 +352,7 @@ func wrapWebView(obj *externglib.Object) *WebView {
 }
 
 func marshalWebViewer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapWebView(obj), nil
+	return wrapWebView(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewWebView creates a new KitWebView with the default KitWebContext and no
@@ -378,6 +376,11 @@ func NewWebView() *WebView {
 // and no KitUserContentManager associated with it. See also
 // webkit_web_view_new_with_user_content_manager() and
 // webkit_web_view_new_with_settings().
+//
+// The function takes the following parameters:
+//
+//    - context to be used by the KitWebView.
+//
 func NewWebViewWithContext(context *WebContext) *WebView {
 	var _arg1 *C.WebKitWebContext // out
 	var _cret *C.GtkWidget        // in
@@ -407,6 +410,11 @@ func NewWebViewWithContext(context *WebContext) *WebView {
 //
 // The newly created KitWebView will also have the same KitUserContentManager,
 // KitSettings, and KitWebsitePolicies as web_view.
+//
+// The function takes the following parameters:
+//
+//    - webView: related KitWebView.
+//
 func NewWebViewWithRelatedView(webView *WebView) *WebView {
 	var _arg1 *C.WebKitWebView // out
 	var _cret *C.GtkWidget     // in
@@ -426,6 +434,11 @@ func NewWebViewWithRelatedView(webView *WebView) *WebView {
 // NewWebViewWithSettings creates a new KitWebView with the given KitSettings.
 // See also webkit_web_view_new_with_context(), and
 // webkit_web_view_new_with_user_content_manager().
+//
+// The function takes the following parameters:
+//
+//    - settings: KitSettings.
+//
 func NewWebViewWithSettings(settings *Settings) *WebView {
 	var _arg1 *C.WebKitSettings // out
 	var _cret *C.GtkWidget      // in
@@ -445,6 +458,11 @@ func NewWebViewWithSettings(settings *Settings) *WebView {
 // NewWebViewWithUserContentManager creates a new KitWebView with the given
 // KitUserContentManager. The content loaded in the view may be affected by the
 // content injected in the view by the user content manager.
+//
+// The function takes the following parameters:
+//
+//    - userContentManager: KitUserContentManager.
+//
 func NewWebViewWithUserContentManager(userContentManager *UserContentManager) *WebView {
 	var _arg1 *C.WebKitUserContentManager // out
 	var _cret *C.GtkWidget                // in
@@ -467,6 +485,13 @@ func NewWebViewWithUserContentManager(userContentManager *UserContentManager) *W
 // When the operation is finished, callback will be called. You can then call
 // webkit_web_view_can_execute_editing_command_finish() to get the result of the
 // operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - command to check.
+//    - callback to call when the request is satisfied.
+//
 func (webView *WebView) CanExecuteEditingCommand(ctx context.Context, command string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebView      // out
 	var _arg2 *C.GCancellable       // out
@@ -496,6 +521,11 @@ func (webView *WebView) CanExecuteEditingCommand(ctx context.Context, command st
 
 // CanExecuteEditingCommandFinish: finish an asynchronous operation started with
 // webkit_web_view_can_execute_editing_command().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (webView *WebView) CanExecuteEditingCommandFinish(result gio.AsyncResulter) error {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.GAsyncResult  // out
@@ -556,6 +586,11 @@ func (webView *WebView) CanGoForward() bool {
 }
 
 // CanShowMIMEType: whether or not a MIME type can be displayed in web_view.
+//
+// The function takes the following parameters:
+//
+//    - mimeType: MIME type.
+//
 func (webView *WebView) CanShowMIMEType(mimeType string) bool {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.gchar         // out
@@ -579,6 +614,11 @@ func (webView *WebView) CanShowMIMEType(mimeType string) bool {
 }
 
 // DownloadURI requests downloading of the specified URI string for web_view.
+//
+// The function takes the following parameters:
+//
+//    - uri: URI to download.
+//
 func (webView *WebView) DownloadURI(uri string) *Download {
 	var _arg0 *C.WebKitWebView  // out
 	var _arg1 *C.char           // out
@@ -602,6 +642,11 @@ func (webView *WebView) DownloadURI(uri string) *Download {
 // ExecuteEditingCommand: request to execute the given command for web_view. You
 // can use webkit_web_view_can_execute_editing_command() to check whether it's
 // possible to execute the command.
+//
+// The function takes the following parameters:
+//
+//    - command to execute.
+//
 func (webView *WebView) ExecuteEditingCommand(command string) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.gchar         // out
@@ -619,7 +664,13 @@ func (webView *WebView) ExecuteEditingCommand(command string) {
 // argument for web_view. You can use
 // webkit_web_view_can_execute_editing_command() to check whether it's possible
 // to execute the command.
-func (webView *WebView) ExecuteEditingCommandWithArgument(command string, argument string) {
+//
+// The function takes the following parameters:
+//
+//    - command to execute.
+//    - argument: command argument.
+//
+func (webView *WebView) ExecuteEditingCommandWithArgument(command, argument string) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.char          // out
 	var _arg2 *C.char          // out
@@ -674,7 +725,7 @@ func (webView *WebView) BackForwardList() *BackForwardList {
 
 // BackgroundColor gets the color that is used to draw the web_view background
 // before the actual contents are rendered. For more information see also
-// webkit_web_view_set_background_color()
+// webkit_web_view_set_background_color().
 func (webView *WebView) BackgroundColor() gdk.RGBA {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 C.GdkRGBA        // in
@@ -832,7 +883,7 @@ func (webView *WebView) InputMethodContext() InputMethodContexter {
 	return _inputMethodContext
 }
 
-// Inspector: get the KitWebInspector associated to web_view
+// Inspector: get the KitWebInspector associated to web_view.
 func (webView *WebView) Inspector() *WebInspector {
 	var _arg0 *C.WebKitWebView      // out
 	var _cret *C.WebKitWebInspector // in
@@ -885,7 +936,7 @@ func (webView *WebView) MainResource() *WebResource {
 	return _webResource
 }
 
-// PageID: get the identifier of the KitWebPage corresponding to the KitWebView
+// PageID: get the identifier of the KitWebPage corresponding to the KitWebView.
 func (webView *WebView) PageID() uint64 {
 	var _arg0 *C.WebKitWebView // out
 	var _cret C.guint64        // in
@@ -902,7 +953,7 @@ func (webView *WebView) PageID() uint64 {
 	return _guint64
 }
 
-// SessionState gets the current session state of web_view
+// SessionState gets the current session state of web_view.
 func (webView *WebView) SessionState() *WebViewSessionState {
 	var _arg0 *C.WebKitWebView             // out
 	var _cret *C.WebKitWebViewSessionState // in
@@ -956,6 +1007,14 @@ func (webView *WebView) Settings() *Settings {
 //
 // When the operation is finished, callback will be called. You must call
 // webkit_web_view_get_snapshot_finish() to get the result of the operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx: #GCancellable.
+//    - region for this snapshot.
+//    - options for the snapshot.
+//    - callback: ReadyCallback.
+//
 func (webView *WebView) Snapshot(ctx context.Context, region SnapshotRegion, options SnapshotOptions, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebView        // out
 	var _arg3 *C.GCancellable         // out
@@ -987,6 +1046,11 @@ func (webView *WebView) Snapshot(ctx context.Context, region SnapshotRegion, opt
 
 // SnapshotFinish finishes an asynchronous operation started with
 // webkit_web_view_get_snapshot().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (webView *WebView) SnapshotFinish(result gio.AsyncResulter) (*cairo.Surface, error) {
 	var _arg0 *C.WebKitWebView   // out
 	var _arg1 *C.GAsyncResult    // out
@@ -1245,6 +1309,11 @@ func (webView *WebView) GoForward() {
 
 // GoToBackForwardListItem loads the specific history item list_item. You can
 // monitor the load operation by connecting to KitWebView::load-changed signal.
+//
+// The function takes the following parameters:
+//
+//    - listItem: KitBackForwardListItem.
+//
 func (webView *WebView) GoToBackForwardListItem(listItem *BackForwardListItem) {
 	var _arg0 *C.WebKitWebView             // out
 	var _arg1 *C.WebKitBackForwardListItem // out
@@ -1371,7 +1440,14 @@ func (webView *WebView) IsPlayingAudio() bool {
 // error page, then the back-forward list is maintained appropriately. For
 // everything else this method works the same way as
 // webkit_web_view_load_html().
-func (webView *WebView) LoadAlternateHtml(content string, contentUri string, baseUri string) {
+//
+// The function takes the following parameters:
+//
+//    - content: new content to display as the main page of the web_view.
+//    - contentUri: URI for the alternate page content.
+//    - baseUri: base URI for relative locations or NULL.
+//
+func (webView *WebView) LoadAlternateHtml(content, contentUri, baseUri string) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.gchar         // out
 	var _arg2 *C.gchar         // out
@@ -1399,7 +1475,15 @@ func (webView *WebView) LoadAlternateHtml(content string, contentUri string, bas
 // encoding is NULL, it defaults to "UTF-8". When base_uri is NULL, it defaults
 // to "about:blank". You can monitor the load operation by connecting to
 // KitWebView::load-changed signal.
-func (webView *WebView) LoadBytes(bytes *glib.Bytes, mimeType string, encoding string, baseUri string) {
+//
+// The function takes the following parameters:
+//
+//    - bytes: input data to load.
+//    - mimeType: MIME type of bytes, or NULL.
+//    - encoding: character encoding of bytes, or NULL.
+//    - baseUri: base URI for relative locations or NULL.
+//
+func (webView *WebView) LoadBytes(bytes *glib.Bytes, mimeType, encoding, baseUri string) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.GBytes        // out
 	var _arg2 *C.gchar         // out
@@ -1438,7 +1522,13 @@ func (webView *WebView) LoadBytes(bytes *glib.Bytes, mimeType string, encoding s
 // data URI for them. When base_uri is NULL, it defaults to "about:blank". The
 // mime type of the document will be "text/html". You can monitor the load
 // operation by connecting to KitWebView::load-changed signal.
-func (webView *WebView) LoadHtml(content string, baseUri string) {
+//
+// The function takes the following parameters:
+//
+//    - content: HTML string to load.
+//    - baseUri: base URI for relative locations or NULL.
+//
+func (webView *WebView) LoadHtml(content, baseUri string) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.gchar         // out
 	var _arg2 *C.gchar         // out
@@ -1460,6 +1550,11 @@ func (webView *WebView) LoadHtml(content string, baseUri string) {
 // LoadPlainText: load the specified plain_text string into web_view. The mime
 // type of document will be "text/plain". You can monitor the load operation by
 // connecting to KitWebView::load-changed signal.
+//
+// The function takes the following parameters:
+//
+//    - plainText: plain text to load.
+//
 func (webView *WebView) LoadPlainText(plainText string) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.gchar         // out
@@ -1475,6 +1570,11 @@ func (webView *WebView) LoadPlainText(plainText string) {
 
 // LoadRequest requests loading of the specified KitURIRequest. You can monitor
 // the load operation by connecting to KitWebView::load-changed signal.
+//
+// The function takes the following parameters:
+//
+//    - request to load.
+//
 func (webView *WebView) LoadRequest(request *URIRequest) {
 	var _arg0 *C.WebKitWebView    // out
 	var _arg1 *C.WebKitURIRequest // out
@@ -1489,6 +1589,11 @@ func (webView *WebView) LoadRequest(request *URIRequest) {
 
 // LoadURI requests loading of the specified URI string. You can monitor the
 // load operation by connecting to KitWebView::load-changed signal.
+//
+// The function takes the following parameters:
+//
+//    - uri: URI string.
+//
 func (webView *WebView) LoadURI(uri string) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.gchar         // out
@@ -1524,7 +1629,12 @@ func (webView *WebView) ReloadBypassCache() {
 	runtime.KeepAlive(webView)
 }
 
-// RestoreSessionState: restore the web_view session state from state
+// RestoreSessionState: restore the web_view session state from state.
+//
+// The function takes the following parameters:
+//
+//    - state: KitWebViewSessionState.
+//
 func (webView *WebView) RestoreSessionState(state *WebViewSessionState) {
 	var _arg0 *C.WebKitWebView             // out
 	var _arg1 *C.WebKitWebViewSessionState // out
@@ -1543,6 +1653,13 @@ func (webView *WebView) RestoreSessionState(state *WebViewSessionState) {
 //
 // When the operation is finished, callback will be called. You can then call
 // webkit_web_view_run_javascript_finish() to get the result of the operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - script to run.
+//    - callback to call when the script finished.
+//
 func (webView *WebView) RunJavascript(ctx context.Context, script string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebView      // out
 	var _arg2 *C.GCancellable       // out
@@ -1613,7 +1730,12 @@ func (webView *WebView) RunJavascript(ctx context.Context, script string, callba
 //    webkit_web_view_run_javascript (web_view, script, NULL, web_view_javascript_finished, NULL);
 //    g_free (script);
 //
-// } </programlisting></informalexample>
+// } </programlisting></informalexample>.
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (webView *WebView) RunJavascriptFinish(result gio.AsyncResulter) (*JavascriptResult, error) {
 	var _arg0 *C.WebKitWebView          // out
 	var _arg1 *C.GAsyncResult           // out
@@ -1650,6 +1772,13 @@ func (webView *WebView) RunJavascriptFinish(result gio.AsyncResulter) (*Javascri
 // When the operation is finished, callback will be called. You can then call
 // webkit_web_view_run_javascript_from_gresource_finish() to get the result of
 // the operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - resource: location of the resource to load.
+//    - callback to call when the script finished.
+//
 func (webView *WebView) RunJavascriptFromGresource(ctx context.Context, resource string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebView      // out
 	var _arg2 *C.GCancellable       // out
@@ -1681,6 +1810,11 @@ func (webView *WebView) RunJavascriptFromGresource(ctx context.Context, resource
 // with webkit_web_view_run_javascript_from_gresource().
 //
 // Check webkit_web_view_run_javascript_finish() for a usage example.
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (webView *WebView) RunJavascriptFromGresourceFinish(result gio.AsyncResulter) (*JavascriptResult, error) {
 	var _arg0 *C.WebKitWebView          // out
 	var _arg1 *C.GAsyncResult           // out
@@ -1718,7 +1852,15 @@ func (webView *WebView) RunJavascriptFromGresourceFinish(result gio.AsyncResulte
 // When the operation is finished, callback will be called. You can then call
 // webkit_web_view_run_javascript_in_world_finish() to get the result of the
 // operation.
-func (webView *WebView) RunJavascriptInWorld(ctx context.Context, script string, worldName string, callback gio.AsyncReadyCallback) {
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - script to run.
+//    - worldName: name of a KitScriptWorld.
+//    - callback to call when the script finished.
+//
+func (webView *WebView) RunJavascriptInWorld(ctx context.Context, script, worldName string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebView      // out
 	var _arg3 *C.GCancellable       // out
 	var _arg1 *C.gchar              // out
@@ -1751,6 +1893,11 @@ func (webView *WebView) RunJavascriptInWorld(ctx context.Context, script string,
 
 // RunJavascriptInWorldFinish: finish an asynchronous operation started with
 // webkit_web_view_run_javascript_in_world().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (webView *WebView) RunJavascriptInWorldFinish(result gio.AsyncResulter) (*JavascriptResult, error) {
 	var _arg0 *C.WebKitWebView          // out
 	var _arg1 *C.GAsyncResult           // out
@@ -1786,6 +1933,13 @@ func (webView *WebView) RunJavascriptInWorldFinish(result gio.AsyncResulter) (*J
 //
 // When the operation is finished, callback will be called. You can then call
 // webkit_web_view_save_finish() to get the result of the operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - saveMode specifying how the web page should be saved.
+//    - callback to call when the request is satisfied.
+//
 func (webView *WebView) Save(ctx context.Context, saveMode SaveMode, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebView      // out
 	var _arg2 *C.GCancellable       // out
@@ -1814,6 +1968,11 @@ func (webView *WebView) Save(ctx context.Context, saveMode SaveMode, callback gi
 
 // SaveFinish: finish an asynchronous operation started with
 // webkit_web_view_save().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (webView *WebView) SaveFinish(result gio.AsyncResulter) (gio.InputStreamer, error) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.GAsyncResult  // out
@@ -1856,6 +2015,14 @@ func (webView *WebView) SaveFinish(result gio.AsyncResulter) (gio.InputStreamer,
 //
 // When the operation is finished, callback will be called. You can then call
 // webkit_web_view_save_to_file_finish() to get the result of the operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - file where the current web page should be saved to.
+//    - saveMode specifying how the web page should be saved.
+//    - callback to call when the request is satisfied.
+//
 func (webView *WebView) SaveToFile(ctx context.Context, file gio.Filer, saveMode SaveMode, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebView      // out
 	var _arg3 *C.GCancellable       // out
@@ -1887,6 +2054,11 @@ func (webView *WebView) SaveToFile(ctx context.Context, file gio.Filer, saveMode
 
 // SaveToFileFinish: finish an asynchronous operation started with
 // webkit_web_view_save_to_file().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (webView *WebView) SaveToFileFinish(result gio.AsyncResulter) error {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.GAsyncResult  // out
@@ -1915,6 +2087,14 @@ func (webView *WebView) SaveToFileFinish(result gio.AsyncResulter) error {
 // NULL as callback. When the operation is finished, callback will be called.
 // You can then call webkit_web_view_send_message_to_page_finish() to get the
 // message reply.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - message: KitUserMessage.
+//    - callback: (nullable): A ReadyCallback to call when the request is
+//    satisfied or NULL.
+//
 func (webView *WebView) SendMessageToPage(ctx context.Context, message *UserMessage, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebView      // out
 	var _arg2 *C.GCancellable       // out
@@ -1943,6 +2123,11 @@ func (webView *WebView) SendMessageToPage(ctx context.Context, message *UserMess
 
 // SendMessageToPageFinish: finish an asynchronous operation started with
 // webkit_web_view_send_message_to_page().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (webView *WebView) SendMessageToPageFinish(result gio.AsyncResulter) (*UserMessage, error) {
 	var _arg0 *C.WebKitWebView     // out
 	var _arg1 *C.GAsyncResult      // out
@@ -1989,7 +2174,12 @@ func (webView *WebView) SendMessageToPageFinish(result gio.AsyncResulter) (*User
 //    web_view = browser_window_get_web_view (window);
 //    webkit_web_view_set_background_color (web_view, rgba);
 //
-// } </programlisting></informalexample>
+// } </programlisting></informalexample>.
+//
+// The function takes the following parameters:
+//
+//    - rgba: RGBA.
+//
 func (webView *WebView) SetBackgroundColor(rgba *gdk.RGBA) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.GdkRGBA       // out
@@ -2007,6 +2197,11 @@ func (webView *WebView) SetBackgroundColor(rgba *gdk.RGBA) {
 // detected via HTTP headers or META tags. Calling this method will stop any
 // current load operation and reload the current page. Setting the custom
 // character encoding to NULL removes the character encoding override.
+//
+// The function takes the following parameters:
+//
+//    - charset: character encoding name or NULL.
+//
 func (webView *WebView) SetCustomCharset(charset string) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.gchar         // out
@@ -2032,6 +2227,11 @@ func (webView *WebView) SetCustomCharset(charset string) {
 // Normally, a HTML document is not editable unless the elements within the
 // document are editable. This function provides a way to make the contents of a
 // KitWebView editable without altering the document or DOM structure.
+//
+// The function takes the following parameters:
+//
+//    - editable indicating the editable state.
+//
 func (webView *WebView) SetEditable(editable bool) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 C.gboolean       // out
@@ -2049,6 +2249,11 @@ func (webView *WebView) SetEditable(editable bool) {
 // SetInputMethodContext: set the KitInputMethodContext to be used by web_view,
 // or NULL to not use any input method. Note that the same KitInputMethodContext
 // can't be set on more than one KitWebView at the same time.
+//
+// The function takes the following parameters:
+//
+//    - context to set, or NULL.
+//
 func (webView *WebView) SetInputMethodContext(context InputMethodContexter) {
 	var _arg0 *C.WebKitWebView            // out
 	var _arg1 *C.WebKitInputMethodContext // out
@@ -2064,6 +2269,11 @@ func (webView *WebView) SetInputMethodContext(context InputMethodContexter) {
 }
 
 // SetIsMuted sets the mute state of web_view.
+//
+// The function takes the following parameters:
+//
+//    - muted: mute flag.
+//
 func (webView *WebView) SetIsMuted(muted bool) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 C.gboolean       // out
@@ -2082,6 +2292,11 @@ func (webView *WebView) SetIsMuted(muted bool) {
 // KitSettings of web_view will be replaced by settings. New settings are
 // applied immediately on web_view. The same KitSettings object can be shared by
 // multiple KitWebView<!-- -->s.
+//
+// The function takes the following parameters:
+//
+//    - settings: KitSettings.
+//
 func (webView *WebView) SetSettings(settings *Settings) {
 	var _arg0 *C.WebKitWebView  // out
 	var _arg1 *C.WebKitSettings // out
@@ -2096,6 +2311,11 @@ func (webView *WebView) SetSettings(settings *Settings) {
 
 // SetZoomLevel: set the zoom level of web_view, i.e. the factor by which the
 // view contents are scaled with respect to their original size.
+//
+// The function takes the following parameters:
+//
+//    - zoomLevel: zoom level.
+//
 func (webView *WebView) SetZoomLevel(zoomLevel float64) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 C.gdouble        // out
@@ -2132,4 +2352,357 @@ func (webView *WebView) TryClose() {
 
 	C.webkit_web_view_try_close(_arg0)
 	runtime.KeepAlive(webView)
+}
+
+// ConnectAuthenticate: this signal is emitted when the user is challenged with
+// HTTP authentication. To let the application access or supply the credentials
+// as well as to allow the client application to either cancel the request or
+// perform the authentication, the signal will pass an instance of the
+// KitAuthenticationRequest in the request argument. To handle this signal
+// asynchronously you should keep a ref of the request and return TRUE. To
+// disable HTTP authentication entirely, connect to this signal and simply
+// return TRUE.
+//
+// The default signal handler will run a default authentication dialog
+// asynchronously for the user to interact with.
+func (webView *WebView) ConnectAuthenticate(f func(request AuthenticationRequest) bool) externglib.SignalHandle {
+	return webView.Connect("authenticate", f)
+}
+
+// ConnectClose: emitted when closing a KitWebView is requested. This occurs
+// when a call is made from JavaScript's <function>window.close</function>
+// function or after trying to close the web_view with
+// webkit_web_view_try_close(). It is the owner's responsibility to handle this
+// signal to hide or destroy the KitWebView, if necessary.
+func (webView *WebView) ConnectClose(f func()) externglib.SignalHandle {
+	return webView.Connect("close", f)
+}
+
+// ConnectContextMenuDismissed: emitted after KitWebView::context-menu signal,
+// if the context menu is shown, to notify that the context menu is dismissed.
+func (webView *WebView) ConnectContextMenuDismissed(f func()) externglib.SignalHandle {
+	return webView.Connect("context-menu-dismissed", f)
+}
+
+// ConnectCreate: emitted when the creation of a new KitWebView is requested. If
+// this signal is handled the signal handler should return the newly created
+// KitWebView.
+//
+// The KitNavigationAction parameter contains information about the navigation
+// action that triggered this signal.
+//
+// The new KitWebView must be related to web_view, see
+// webkit_web_view_new_with_related_view() for more details.
+//
+// The new KitWebView should not be displayed to the user until the
+// KitWebView::ready-to-show signal is emitted.
+func (webView *WebView) ConnectCreate(f func(navigationAction *NavigationAction) gtk.Widgetter) externglib.SignalHandle {
+	return webView.Connect("create", f)
+}
+
+// ConnectDecidePolicy: this signal is emitted when WebKit is requesting the
+// client to decide a policy decision, such as whether to navigate to a page,
+// open a new window or whether or not to download a resource. The
+// KitNavigationPolicyDecision passed in the decision argument is a generic
+// type, but should be casted to a more specific type when making the decision.
+// For example:
+//
+// <informalexample><programlisting> static gboolean decide_policy_cb
+// (WebKitWebView *web_view, WebKitPolicyDecision *decision,
+// WebKitPolicyDecisionType type) { switch (type) { case
+// WEBKIT_POLICY_DECISION_TYPE_NAVIGATION_ACTION: {
+// WebKitNavigationPolicyDecision *navigation_decision =
+// WEBKIT_NAVIGATION_POLICY_DECISION (decision); /<!-- -->* Make a policy
+// decision here. *<!-- -->/ break; } case
+// WEBKIT_POLICY_DECISION_TYPE_NEW_WINDOW_ACTION: {
+// WebKitNavigationPolicyDecision *navigation_decision =
+// WEBKIT_NAVIGATION_POLICY_DECISION (decision); /<!-- -->* Make a policy
+// decision here. *<!-- -->/ break; } case WEBKIT_POLICY_DECISION_TYPE_RESPONSE:
+// WebKitResponsePolicyDecision *response = WEBKIT_RESPONSE_POLICY_DECISION
+// (decision); /<!-- -->* Make a policy decision here. *<!-- -->/ break;
+// default: /<!-- -->* Making no decision results in
+// webkit_policy_decision_use(). *<!-- -->/ return FALSE; } return TRUE; }
+// </programlisting></informalexample>
+//
+// It is possible to make policy decision asynchronously, by simply calling
+// g_object_ref() on the decision argument and returning TRUE to block the
+// default signal handler. If the last reference is removed on a
+// KitPolicyDecision and no decision has been made explicitly,
+// webkit_policy_decision_use() will be the default policy decision. The default
+// signal handler will simply call webkit_policy_decision_use(). Only the first
+// policy decision chosen for a given KitPolicyDecision will have any affect.
+func (webView *WebView) ConnectDecidePolicy(f func(decision PolicyDecisioner, decisionType PolicyDecisionType) bool) externglib.SignalHandle {
+	return webView.Connect("decide-policy", f)
+}
+
+// ConnectEnterFullscreen: emitted when JavaScript code calls
+// <function>element.webkitRequestFullScreen</function>. If the signal is not
+// handled the KitWebView will proceed to full screen its top level window. This
+// signal can be used by client code to request permission to the user prior
+// doing the full screen transition and eventually prepare the top-level window
+// (e.g. hide some widgets that would otherwise be part of the full screen
+// window).
+func (webView *WebView) ConnectEnterFullscreen(f func() bool) externglib.SignalHandle {
+	return webView.Connect("enter-fullscreen", f)
+}
+
+// ConnectInsecureContentDetected: this signal is emitted when insecure content
+// has been detected in a page loaded through a secure connection. This
+// typically means that a external resource from an unstrusted source has been
+// run or displayed, resulting in a mix of HTTPS and non-HTTPS content.
+//
+// You can check the event parameter to know exactly which kind of event has
+// been detected (see KitInsecureContentEvent).
+func (webView *WebView) ConnectInsecureContentDetected(f func(event InsecureContentEvent)) externglib.SignalHandle {
+	return webView.Connect("insecure-content-detected", f)
+}
+
+// ConnectLeaveFullscreen: emitted when the KitWebView is about to restore its
+// top level window out of its full screen state. This signal can be used by
+// client code to restore widgets hidden during the KitWebView::enter-fullscreen
+// stage for instance.
+func (webView *WebView) ConnectLeaveFullscreen(f func() bool) externglib.SignalHandle {
+	return webView.Connect("leave-fullscreen", f)
+}
+
+// ConnectLoadChanged: emitted when a load operation in web_view changes. The
+// signal is always emitted with WEBKIT_LOAD_STARTED when a new load request is
+// made and WEBKIT_LOAD_FINISHED when the load finishes successfully or due to
+// an error. When the ongoing load operation fails KitWebView::load-failed
+// signal is emitted before KitWebView::load-changed is emitted with
+// WEBKIT_LOAD_FINISHED. If a redirection is received from the server, this
+// signal is emitted with WEBKIT_LOAD_REDIRECTED after the initial emission with
+// WEBKIT_LOAD_STARTED and before WEBKIT_LOAD_COMMITTED. When the page content
+// starts arriving the signal is emitted with WEBKIT_LOAD_COMMITTED event.
+//
+// You can handle this signal and use a switch to track any ongoing load
+// operation.
+//
+// <informalexample><programlisting> static void web_view_load_changed
+// (WebKitWebView *web_view, WebKitLoadEvent load_event, gpointer user_data) {
+// switch (load_event) { case WEBKIT_LOAD_STARTED: /<!-- -->* New load, we have
+// now a provisional URI *<!-- -->/ provisional_uri = webkit_web_view_get_uri
+// (web_view); /<!-- -->* Here we could start a spinner or update the <!-- -->*
+// location bar with the provisional URI *<!-- -->/ break; case
+// WEBKIT_LOAD_REDIRECTED: redirected_uri = webkit_web_view_get_uri (web_view);
+// break; case WEBKIT_LOAD_COMMITTED: /<!-- -->* The load is being performed.
+// Current URI is <!-- -->* the final one and it won't change unless a new <!--
+// -->* load is requested or a navigation within the <!-- -->* same page is
+// performed *<!-- -->/ uri = webkit_web_view_get_uri (web_view); break; case
+// WEBKIT_LOAD_FINISHED: /<!-- -->* Load finished, we can now stop the spinner
+// *<!-- -->/ break; } } </programlisting></informalexample>.
+func (webView *WebView) ConnectLoadChanged(f func(loadEvent LoadEvent)) externglib.SignalHandle {
+	return webView.Connect("load-changed", f)
+}
+
+// ConnectLoadFailedWithTLSErrors: emitted when a TLS error occurs during a load
+// operation. To allow an exception for this certificate and the host of
+// failing_uri use webkit_web_context_allow_tls_certificate_for_host().
+//
+// To handle this signal asynchronously you should call g_object_ref() on
+// certificate and return TRUE.
+//
+// If FALSE is returned, KitWebView::load-failed will be emitted. The load will
+// finish regardless of the returned value.
+func (webView *WebView) ConnectLoadFailedWithTLSErrors(f func(failingUri string, certificate gio.TLSCertificater, errors gio.TLSCertificateFlags) bool) externglib.SignalHandle {
+	return webView.Connect("load-failed-with-tls-errors", f)
+}
+
+// ConnectMouseTargetChanged: this signal is emitted when the mouse cursor moves
+// over an element such as a link, image or a media element. To determine what
+// type of element the mouse cursor is over, a Hit Test is performed on the
+// current mouse coordinates and the result is passed in the hit_test_result
+// argument. The modifiers argument is a bitmask of ModifierType flags
+// indicating the state of modifier keys. The signal is emitted again when the
+// mouse is moved out of the current element with a new hit_test_result.
+func (webView *WebView) ConnectMouseTargetChanged(f func(hitTestResult HitTestResult, modifiers uint)) externglib.SignalHandle {
+	return webView.Connect("mouse-target-changed", f)
+}
+
+// ConnectPermissionRequest: this signal is emitted when WebKit is requesting
+// the client to decide about a permission request, such as allowing the browser
+// to switch to fullscreen mode, sharing its location or similar operations.
+//
+// A possible way to use this signal could be through a dialog allowing the user
+// decide what to do with the request:
+//
+// <informalexample><programlisting> static gboolean permission_request_cb
+// (WebKitWebView *web_view, WebKitPermissionRequest *request, GtkWindow
+// *parent_window) { GtkWidget *dialog = gtk_message_dialog_new (parent_window,
+// GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "Allow Permission
+// Request?"); gtk_widget_show (dialog); gint result = gtk_dialog_run
+// (GTK_DIALOG (dialog));
+//
+//    switch (result) {
+//    case GTK_RESPONSE_YES:
+//        webkit_permission_request_allow (request);
+//        break;
+//    default:
+//        webkit_permission_request_deny (request);
+//        break;
+//    }
+//    gtk_widget_destroy (dialog);
+//
+//    return TRUE;
+//
+// } </programlisting></informalexample>
+//
+// It is possible to handle permission requests asynchronously, by simply
+// calling g_object_ref() on the request argument and returning TRUE to block
+// the default signal handler. If the last reference is removed on a
+// KitPermissionRequest and the request has not been handled,
+// webkit_permission_request_deny() will be the default action.
+//
+// If the signal is not handled, the request will be completed automatically by
+// the specific KitPermissionRequest that could allow or deny it. Check the
+// documentation of classes implementing KitPermissionRequest interface to know
+// their default action.
+func (webView *WebView) ConnectPermissionRequest(f func(request PermissionRequester) bool) externglib.SignalHandle {
+	return webView.Connect("permission-request", f)
+}
+
+// ConnectPrint: emitted when printing is requested on web_view, usually by a
+// JavaScript call, before the print dialog is shown. This signal can be used to
+// set the initial print settings and page setup of print_operation to be used
+// as default values in the print dialog. You can call
+// webkit_print_operation_set_print_settings() and
+// webkit_print_operation_set_page_setup() and then return FALSE to propagate
+// the event so that the print dialog is shown.
+//
+// You can connect to this signal and return TRUE to cancel the print operation
+// or implement your own print dialog.
+func (webView *WebView) ConnectPrint(f func(printOperation PrintOperation) bool) externglib.SignalHandle {
+	return webView.Connect("print", f)
+}
+
+// ConnectReadyToShow: emitted after KitWebView::create on the newly created
+// KitWebView when it should be displayed to the user. When this signal is
+// emitted all the information about how the window should look, including size,
+// position, whether the location, status and scrollbars should be displayed, is
+// already set on the KitWindowProperties of web_view. See also
+// webkit_web_view_get_window_properties().
+func (webView *WebView) ConnectReadyToShow(f func()) externglib.SignalHandle {
+	return webView.Connect("ready-to-show", f)
+}
+
+// ConnectResourceLoadStarted: emitted when a new resource is going to be
+// loaded. The request parameter contains the KitURIRequest that will be sent to
+// the server. You can monitor the load operation by connecting to the different
+// signals of resource.
+func (webView *WebView) ConnectResourceLoadStarted(f func(resource WebResource, request URIRequest)) externglib.SignalHandle {
+	return webView.Connect("resource-load-started", f)
+}
+
+// ConnectRunAsModal: emitted after KitWebView::ready-to-show on the newly
+// created KitWebView when JavaScript code calls
+// <function>window.showModalDialog</function>. The purpose of this signal is to
+// allow the client application to prepare the new view to behave as modal. Once
+// the signal is emitted a new main loop will be run to block user interaction
+// in the parent KitWebView until the new dialog is closed.
+func (webView *WebView) ConnectRunAsModal(f func()) externglib.SignalHandle {
+	return webView.Connect("run-as-modal", f)
+}
+
+// ConnectRunColorChooser: this signal is emitted when the user interacts with a
+// &lt;input type='color' /&gt; HTML element, requesting from WebKit to show a
+// dialog to select a color. To let the application know the details of the
+// color chooser, as well as to allow the client application to either cancel
+// the request or perform an actual color selection, the signal will pass an
+// instance of the KitColorChooserRequest in the request argument.
+//
+// It is possible to handle this request asynchronously by increasing the
+// reference count of the request.
+//
+// The default signal handler will asynchronously run a regular ColorChooser for
+// the user to interact with.
+func (webView *WebView) ConnectRunColorChooser(f func(request ColorChooserRequest) bool) externglib.SignalHandle {
+	return webView.Connect("run-color-chooser", f)
+}
+
+// ConnectRunFileChooser: this signal is emitted when the user interacts with a
+// &lt;input type='file' /&gt; HTML element, requesting from WebKit to show a
+// dialog to select one or more files to be uploaded. To let the application
+// know the details of the file chooser, as well as to allow the client
+// application to either cancel the request or perform an actual selection of
+// files, the signal will pass an instance of the KitFileChooserRequest in the
+// request argument.
+//
+// The default signal handler will asynchronously run a regular
+// FileChooserDialog for the user to interact with.
+func (webView *WebView) ConnectRunFileChooser(f func(request FileChooserRequest) bool) externglib.SignalHandle {
+	return webView.Connect("run-file-chooser", f)
+}
+
+// ConnectScriptDialog: emitted when JavaScript code calls
+// <function>window.alert</function>, <function>window.confirm</function> or
+// <function>window.prompt</function>, or when
+// <function>onbeforeunload</function> event is fired. The dialog parameter
+// should be used to build the dialog. If the signal is not handled a different
+// dialog will be built and shown depending on the dialog type: <itemizedlist>
+// <listitem><para> WEBKIT_SCRIPT_DIALOG_ALERT: message dialog with a single
+// Close button. </para></listitem> <listitem><para>
+// WEBKIT_SCRIPT_DIALOG_CONFIRM: message dialog with OK and Cancel buttons.
+// </para></listitem> <listitem><para> WEBKIT_SCRIPT_DIALOG_PROMPT: message
+// dialog with OK and Cancel buttons and a text entry with the default text.
+// </para></listitem> <listitem><para>
+// WEBKIT_SCRIPT_DIALOG_BEFORE_UNLOAD_CONFIRM: message dialog with Stay and
+// Leave buttons. </para></listitem> </itemizedlist>
+//
+// It is possible to handle the script dialog request asynchronously, by simply
+// caling webkit_script_dialog_ref() on the dialog argument and calling
+// webkit_script_dialog_close() when done. If the last reference is removed on a
+// KitScriptDialog and the dialog has not been closed,
+// webkit_script_dialog_close() will be called.
+func (webView *WebView) ConnectScriptDialog(f func(dialog *ScriptDialog) bool) externglib.SignalHandle {
+	return webView.Connect("script-dialog", f)
+}
+
+// ConnectShowNotification: this signal is emitted when a notification should be
+// presented to the user. The notification is kept alive until either: 1) the
+// web page cancels it or 2) a navigation happens.
+//
+// The default handler will emit a notification using libnotify, if built with
+// support for it.
+func (webView *WebView) ConnectShowNotification(f func(notification Notification) bool) externglib.SignalHandle {
+	return webView.Connect("show-notification", f)
+}
+
+// ConnectSubmitForm: this signal is emitted when a form is about to be
+// submitted. The request argument passed contains information about the text
+// fields of the form. This is typically used to store login information that
+// can be used later to pre-fill the form. The form will not be submitted until
+// webkit_form_submission_request_submit() is called.
+//
+// It is possible to handle the form submission request asynchronously, by
+// simply calling g_object_ref() on the request argument and calling
+// webkit_form_submission_request_submit() when done to continue with the form
+// submission. If the last reference is removed on a KitFormSubmissionRequest
+// and the form has not been submitted, webkit_form_submission_request_submit()
+// will be called.
+func (webView *WebView) ConnectSubmitForm(f func(request FormSubmissionRequest)) externglib.SignalHandle {
+	return webView.Connect("submit-form", f)
+}
+
+// ConnectUserMessageReceived: this signal is emitted when a KitUserMessage is
+// received from the KitWebPage corresponding to web_view. You can reply to the
+// message using webkit_user_message_send_reply().
+//
+// You can handle the user message asynchronously by calling g_object_ref() on
+// message and returning TRUE. If the last reference of message is removed and
+// the message has not been replied to, the operation in the KitWebPage will
+// finish with error WEBKIT_USER_MESSAGE_UNHANDLED_MESSAGE.
+func (webView *WebView) ConnectUserMessageReceived(f func(message UserMessage) bool) externglib.SignalHandle {
+	return webView.Connect("user-message-received", f)
+}
+
+// ConnectWebProcessCrashed: this signal is emitted when the web process
+// crashes.
+func (webView *WebView) ConnectWebProcessCrashed(f func() bool) externglib.SignalHandle {
+	return webView.Connect("web-process-crashed", f)
+}
+
+// ConnectWebProcessTerminated: this signal is emitted when the web process
+// terminates abnormally due to reason.
+func (webView *WebView) ConnectWebProcessTerminated(f func(reason WebProcessTerminationReason)) externglib.SignalHandle {
+	return webView.Connect("web-process-terminated", f)
 }

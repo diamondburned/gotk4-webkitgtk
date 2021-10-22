@@ -37,7 +37,7 @@ const (
 )
 
 func marshalNetworkProxyMode(p uintptr) (interface{}, error) {
-	return NetworkProxyMode(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return NetworkProxyMode(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for NetworkProxyMode.
@@ -65,8 +65,8 @@ type networkProxySettings struct {
 }
 
 func marshalNetworkProxySettings(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &NetworkProxySettings{&networkProxySettings{(*C.WebKitNetworkProxySettings)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &NetworkProxySettings{&networkProxySettings{(*C.WebKitNetworkProxySettings)(b)}}, nil
 }
 
 // NewNetworkProxySettings constructs a struct NetworkProxySettings.

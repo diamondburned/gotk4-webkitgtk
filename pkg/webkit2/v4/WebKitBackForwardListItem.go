@@ -34,9 +34,7 @@ func wrapBackForwardListItem(obj *externglib.Object) *BackForwardListItem {
 }
 
 func marshalBackForwardListItemmer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapBackForwardListItem(obj), nil
+	return wrapBackForwardListItem(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // OriginalURI: see also webkit_back_forward_list_item_get_uri().

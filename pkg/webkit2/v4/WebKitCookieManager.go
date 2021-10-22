@@ -47,7 +47,7 @@ const (
 )
 
 func marshalCookieAcceptPolicy(p uintptr) (interface{}, error) {
-	return CookieAcceptPolicy(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return CookieAcceptPolicy(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for CookieAcceptPolicy.
@@ -78,7 +78,7 @@ const (
 )
 
 func marshalCookiePersistentStorage(p uintptr) (interface{}, error) {
-	return CookiePersistentStorage(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return CookiePersistentStorage(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for CookiePersistentStorage.
@@ -104,15 +104,20 @@ func wrapCookieManager(obj *externglib.Object) *CookieManager {
 }
 
 func marshalCookieManagerer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapCookieManager(obj), nil
+	return wrapCookieManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // AddCookie: asynchronously add a Cookie to the underlying storage.
 //
 // When the operation is finished, callback will be called. You can then call
 // webkit_cookie_manager_add_cookie_finish() to get the result of the operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - cookie to be added.
+//    - callback to call when the request is satisfied.
+//
 func (cookieManager *CookieManager) AddCookie(ctx context.Context, cookie *soup.Cookie, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitCookieManager // out
 	var _arg2 *C.GCancellable        // out
@@ -141,6 +146,11 @@ func (cookieManager *CookieManager) AddCookie(ctx context.Context, cookie *soup.
 
 // AddCookieFinish: finish an asynchronous operation started with
 // webkit_cookie_manager_add_cookie().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (cookieManager *CookieManager) AddCookieFinish(result gio.AsyncResulter) error {
 	var _arg0 *C.WebKitCookieManager // out
 	var _arg1 *C.GAsyncResult        // out
@@ -179,6 +189,13 @@ func (cookieManager *CookieManager) DeleteAllCookies() {
 // When the operation is finished, callback will be called. You can then call
 // webkit_cookie_manager_delete_cookie_finish() to get the result of the
 // operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - cookie to be deleted.
+//    - callback to call when the request is satisfied.
+//
 func (cookieManager *CookieManager) DeleteCookie(ctx context.Context, cookie *soup.Cookie, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitCookieManager // out
 	var _arg2 *C.GCancellable        // out
@@ -207,6 +224,11 @@ func (cookieManager *CookieManager) DeleteCookie(ctx context.Context, cookie *so
 
 // DeleteCookieFinish: finish an asynchronous operation started with
 // webkit_cookie_manager_delete_cookie().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (cookieManager *CookieManager) DeleteCookieFinish(result gio.AsyncResulter) error {
 	var _arg0 *C.WebKitCookieManager // out
 	var _arg1 *C.GAsyncResult        // out
@@ -232,6 +254,11 @@ func (cookieManager *CookieManager) DeleteCookieFinish(result gio.AsyncResulter)
 // domain.
 //
 // Deprecated: Use webkit_website_data_manager_remove() instead.
+//
+// The function takes the following parameters:
+//
+//    - domain name.
+//
 func (cookieManager *CookieManager) DeleteCookiesForDomain(domain string) {
 	var _arg0 *C.WebKitCookieManager // out
 	var _arg1 *C.gchar               // out
@@ -254,6 +281,12 @@ func (cookieManager *CookieManager) DeleteCookiesForDomain(domain string) {
 // When the operation is finished, callback will be called. You can then call
 // webkit_cookie_manager_get_accept_policy_finish() to get the result of the
 // operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - callback to call when the request is satisfied.
+//
 func (cookieManager *CookieManager) AcceptPolicy(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitCookieManager // out
 	var _arg1 *C.GCancellable        // out
@@ -279,6 +312,11 @@ func (cookieManager *CookieManager) AcceptPolicy(ctx context.Context, callback g
 
 // AcceptPolicyFinish: finish an asynchronous operation started with
 // webkit_cookie_manager_get_accept_policy().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (cookieManager *CookieManager) AcceptPolicyFinish(result gio.AsyncResulter) (CookieAcceptPolicy, error) {
 	var _arg0 *C.WebKitCookieManager     // out
 	var _arg1 *C.GAsyncResult            // out
@@ -309,6 +347,13 @@ func (cookieManager *CookieManager) AcceptPolicyFinish(result gio.AsyncResulter)
 // When the operation is finished, callback will be called. You can then call
 // webkit_cookie_manager_get_cookies_finish() to get the result of the
 // operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - uri: URI associated to the cookies to be retrieved.
+//    - callback to call when the request is satisfied.
+//
 func (cookieManager *CookieManager) Cookies(ctx context.Context, uri string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitCookieManager // out
 	var _arg2 *C.GCancellable        // out
@@ -340,6 +385,11 @@ func (cookieManager *CookieManager) Cookies(ctx context.Context, uri string, cal
 // webkit_cookie_manager_get_cookies(). The return value is a List of Cookie
 // instances which should be released with g_list_free_full() and
 // soup_cookie_free().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (cookieManager *CookieManager) CookiesFinish(result gio.AsyncResulter) ([]soup.Cookie, error) {
 	var _arg0 *C.WebKitCookieManager // out
 	var _arg1 *C.GAsyncResult        // out
@@ -384,6 +434,12 @@ func (cookieManager *CookieManager) CookiesFinish(result gio.AsyncResulter) ([]s
 // the operation.
 //
 // Deprecated: Use webkit_website_data_manager_fetch() instead.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - callback to call when the request is satisfied.
+//
 func (cookieManager *CookieManager) DomainsWithCookies(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitCookieManager // out
 	var _arg1 *C.GCancellable        // out
@@ -412,6 +468,11 @@ func (cookieManager *CookieManager) DomainsWithCookies(ctx context.Context, call
 // terminated list of strings which should be released with g_strfreev().
 //
 // Deprecated: Use webkit_website_data_manager_fetch_finish() instead.
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (cookieManager *CookieManager) DomainsWithCookiesFinish(result gio.AsyncResulter) ([]string, error) {
 	var _arg0 *C.WebKitCookieManager // out
 	var _arg1 *C.GAsyncResult        // out
@@ -457,6 +518,11 @@ func (cookieManager *CookieManager) DomainsWithCookiesFinish(result gio.AsyncRes
 // WEBKIT_COOKIE_POLICY_ACCEPT_ALWAYS will be used instead. Once disabled, the
 // policy will be set back to WEBKIT_COOKIE_POLICY_ACCEPT_NO_THIRD_PARTY. See
 // also webkit_website_data_manager_set_itp_enabled().
+//
+// The function takes the following parameters:
+//
+//    - policy: KitCookieAcceptPolicy.
+//
 func (cookieManager *CookieManager) SetAcceptPolicy(policy CookieAcceptPolicy) {
 	var _arg0 *C.WebKitCookieManager     // out
 	var _arg1 C.WebKitCookieAcceptPolicy // out
@@ -479,6 +545,12 @@ func (cookieManager *CookieManager) SetAcceptPolicy(policy CookieAcceptPolicy) {
 //
 // This method should never be called on a KitCookieManager associated to an
 // ephemeral KitWebsiteDataManager.
+//
+// The function takes the following parameters:
+//
+//    - filename to read to/write from.
+//    - storage: KitCookiePersistentStorage.
+//
 func (cookieManager *CookieManager) SetPersistentStorage(filename string, storage CookiePersistentStorage) {
 	var _arg0 *C.WebKitCookieManager          // out
 	var _arg1 *C.gchar                        // out
@@ -493,4 +565,10 @@ func (cookieManager *CookieManager) SetPersistentStorage(filename string, storag
 	runtime.KeepAlive(cookieManager)
 	runtime.KeepAlive(filename)
 	runtime.KeepAlive(storage)
+}
+
+// ConnectChanged: this signal is emitted when cookies are added, removed or
+// modified.
+func (cookieManager *CookieManager) ConnectChanged(f func()) externglib.SignalHandle {
+	return cookieManager.Connect("changed", f)
 }

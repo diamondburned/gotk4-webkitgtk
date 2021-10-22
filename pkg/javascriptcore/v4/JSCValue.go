@@ -90,14 +90,18 @@ func wrapValue(obj *externglib.Object) *Value {
 }
 
 func marshalValueer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapValue(obj), nil
+	return wrapValue(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewValueArrayFromStrv: create a new CValue referencing an array of strings
 // with the items from strv. If array is NULL or empty a new empty array will be
 // created.
+//
+// The function takes the following parameters:
+//
+//    - context: CContext.
+//    - strv: NULL-terminated array of strings.
+//
 func NewValueArrayFromStrv(context *Context, strv []string) *Value {
 	var _arg1 *C.JSCContext // out
 	var _arg2 **C.char      // out
@@ -129,7 +133,13 @@ func NewValueArrayFromStrv(context *Context, strv []string) *Value {
 	return _value
 }
 
-// NewValueBoolean: create a new CValue from value
+// NewValueBoolean: create a new CValue from value.
+//
+// The function takes the following parameters:
+//
+//    - context: CContext.
+//    - value: #gboolean.
+//
 func NewValueBoolean(context *Context, value bool) *Value {
 	var _arg1 *C.JSCContext // out
 	var _arg2 C.gboolean    // out
@@ -153,6 +163,12 @@ func NewValueBoolean(context *Context, value bool) *Value {
 
 // NewValueFromJson: create a new CValue referencing a new value created by
 // parsing json.
+//
+// The function takes the following parameters:
+//
+//    - context: CContext.
+//    - json: JSON string to be parsed.
+//
 func NewValueFromJson(context *Context, json string) *Value {
 	var _arg1 *C.JSCContext // out
 	var _arg2 *C.char       // out
@@ -175,6 +191,11 @@ func NewValueFromJson(context *Context, json string) *Value {
 
 // NewValueNull: create a new CValue referencing <function>null</function> in
 // context.
+//
+// The function takes the following parameters:
+//
+//    - context: CContext.
+//
 func NewValueNull(context *Context) *Value {
 	var _arg1 *C.JSCContext // out
 	var _cret *C.JSCValue   // in
@@ -192,6 +213,12 @@ func NewValueNull(context *Context) *Value {
 }
 
 // NewValueNumber: create a new CValue from number.
+//
+// The function takes the following parameters:
+//
+//    - context: CContext.
+//    - number: number.
+//
 func NewValueNumber(context *Context, number float64) *Value {
 	var _arg1 *C.JSCContext // out
 	var _arg2 C.double      // out
@@ -215,6 +242,13 @@ func NewValueNumber(context *Context, number float64) *Value {
 // empty object is created. When instance is provided, jsc_class must be
 // provided too. jsc_class takes ownership of instance that will be freed by the
 // Notify passed to jsc_context_register_class().
+//
+// The function takes the following parameters:
+//
+//    - context: CContext.
+//    - instance: object instance or NULL.
+//    - jscClass of instance.
+//
 func NewValueObject(context *Context, instance cgo.Handle, jscClass *Class) *Value {
 	var _arg1 *C.JSCContext // out
 	var _arg2 C.gpointer    // out
@@ -242,20 +276,26 @@ func NewValueObject(context *Context, instance cgo.Handle, jscClass *Class) *Val
 // NewValueString: create a new CValue from string. If you need to create a
 // CValue from a string containing null characters, use
 // jsc_value_new_string_from_bytes() instead.
-func NewValueString(context *Context, _string string) *Value {
+//
+// The function takes the following parameters:
+//
+//    - context: CContext.
+//    - str: null-terminated string.
+//
+func NewValueString(context *Context, str string) *Value {
 	var _arg1 *C.JSCContext // out
 	var _arg2 *C.char       // out
 	var _cret *C.JSCValue   // in
 
 	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
-	if _string != "" {
-		_arg2 = (*C.char)(unsafe.Pointer(C.CString(_string)))
+	if str != "" {
+		_arg2 = (*C.char)(unsafe.Pointer(C.CString(str)))
 		defer C.free(unsafe.Pointer(_arg2))
 	}
 
 	_cret = C.jsc_value_new_string(_arg1, _arg2)
 	runtime.KeepAlive(context)
-	runtime.KeepAlive(_string)
+	runtime.KeepAlive(str)
 
 	var _value *Value // out
 
@@ -265,6 +305,12 @@ func NewValueString(context *Context, _string string) *Value {
 }
 
 // NewValueStringFromBytes: create a new CValue from bytes.
+//
+// The function takes the following parameters:
+//
+//    - context: CContext.
+//    - bytes: #GBytes.
+//
 func NewValueStringFromBytes(context *Context, bytes *glib.Bytes) *Value {
 	var _arg1 *C.JSCContext // out
 	var _arg2 *C.GBytes     // out
@@ -288,6 +334,11 @@ func NewValueStringFromBytes(context *Context, bytes *glib.Bytes) *Value {
 
 // NewValueUndefined: create a new CValue referencing
 // <function>undefined</function> in context.
+//
+// The function takes the following parameters:
+//
+//    - context: CContext.
+//
 func NewValueUndefined(context *Context) *Value {
 	var _arg1 *C.JSCContext // out
 	var _cret *C.JSCValue   // in
@@ -307,6 +358,11 @@ func NewValueUndefined(context *Context) *Value {
 // ConstructorCall: invoke <function>new</function> with constructor referenced
 // by value. If n_parameters is 0 no parameters will be passed to the
 // constructor.
+//
+// The function takes the following parameters:
+//
+//    - parameters -->s to pass as parameters to the constructor, or NULL.
+//
 func (value *Value) ConstructorCall(parameters []*Value) *Value {
 	var _arg0 *C.JSCValue  // out
 	var _arg2 **C.JSCValue // out
@@ -342,7 +398,12 @@ func (value *Value) ConstructorCall(parameters []*Value) *Value {
 // function.
 //
 // This function always returns a CValue, in case of void functions a CValue
-// referencing <function>undefined</function> is returned
+// referencing <function>undefined</function> is returned.
+//
+// The function takes the following parameters:
+//
+//    - parameters -->s to pass as parameters to the function, or NULL.
+//
 func (value *Value) FunctionCall(parameters []*Value) *Value {
 	var _arg0 *C.JSCValue  // out
 	var _arg2 **C.JSCValue // out
@@ -447,7 +508,7 @@ func (value *Value) IsConstructor() bool {
 	return _ok
 }
 
-// IsFunction: get whether the value referenced by value is a function
+// IsFunction: get whether the value referenced by value is a function.
 func (value *Value) IsFunction() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -524,7 +585,7 @@ func (value *Value) IsObject() bool {
 	return _ok
 }
 
-// IsString: get whether the value referenced by value is a string
+// IsString: get whether the value referenced by value is a string.
 func (value *Value) IsString() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -567,6 +628,13 @@ func (value *Value) IsUndefined() bool {
 // object referenced by value. This is equivalent to JavaScript
 // <function>Object.defineProperty()</function> when used with a data
 // descriptor.
+//
+// The function takes the following parameters:
+//
+//    - propertyName: name of the property to define.
+//    - flags: CValuePropertyFlags.
+//    - propertyValue: default property value.
+//
 func (value *Value) ObjectDefinePropertyData(propertyName string, flags ValuePropertyFlags, propertyValue *Value) {
 	var _arg0 *C.JSCValue             // out
 	var _arg1 *C.char                 // out
@@ -591,6 +659,11 @@ func (value *Value) ObjectDefinePropertyData(propertyName string, flags ValuePro
 // ObjectDeleteProperty: try to delete property with name from value. This
 // function will return FALSE if the property was defined without
 // JSC_VALUE_PROPERTY_CONFIGURABLE flag.
+//
+// The function takes the following parameters:
+//
+//    - name: property name.
+//
 func (value *Value) ObjectDeleteProperty(name string) bool {
 	var _arg0 *C.JSCValue // out
 	var _arg1 *C.char     // out
@@ -648,6 +721,11 @@ func (value *Value) ObjectEnumerateProperties() []string {
 }
 
 // ObjectGetProperty: get property with name from value.
+//
+// The function takes the following parameters:
+//
+//    - name: property name.
+//
 func (value *Value) ObjectGetProperty(name string) *Value {
 	var _arg0 *C.JSCValue // out
 	var _arg1 *C.char     // out
@@ -669,6 +747,11 @@ func (value *Value) ObjectGetProperty(name string) *Value {
 }
 
 // ObjectGetPropertyAtIndex: get property at index from value.
+//
+// The function takes the following parameters:
+//
+//    - index: property index.
+//
 func (value *Value) ObjectGetPropertyAtIndex(index uint) *Value {
 	var _arg0 *C.JSCValue // out
 	var _arg1 C.guint     // out
@@ -689,6 +772,11 @@ func (value *Value) ObjectGetPropertyAtIndex(index uint) *Value {
 }
 
 // ObjectHasProperty: get whether value has property with name.
+//
+// The function takes the following parameters:
+//
+//    - name: property name.
+//
 func (value *Value) ObjectHasProperty(name string) bool {
 	var _arg0 *C.JSCValue // out
 	var _arg1 *C.char     // out
@@ -719,6 +807,12 @@ func (value *Value) ObjectHasProperty(name string) bool {
 //
 // This function always returns a CValue, in case of void methods a CValue
 // referencing <function>undefined</function> is returned.
+//
+// The function takes the following parameters:
+//
+//    - name: method name.
+//    - parameters -->s to pass as parameters to the method, or NULL.
+//
 func (value *Value) ObjectInvokeMethod(name string, parameters []*Value) *Value {
 	var _arg0 *C.JSCValue  // out
 	var _arg1 *C.char      // out
@@ -755,6 +849,11 @@ func (value *Value) ObjectInvokeMethod(name string, parameters []*Value) *Value 
 
 // ObjectIsInstanceOf: get whether the value referenced by value is an instance
 // of class name.
+//
+// The function takes the following parameters:
+//
+//    - name class name.
+//
 func (value *Value) ObjectIsInstanceOf(name string) bool {
 	var _arg0 *C.JSCValue // out
 	var _arg1 *C.char     // out
@@ -778,6 +877,12 @@ func (value *Value) ObjectIsInstanceOf(name string) bool {
 }
 
 // ObjectSetProperty: set property with name on value.
+//
+// The function takes the following parameters:
+//
+//    - name: property name.
+//    - property to set.
+//
 func (value *Value) ObjectSetProperty(name string, property *Value) {
 	var _arg0 *C.JSCValue // out
 	var _arg1 *C.char     // out
@@ -795,6 +900,12 @@ func (value *Value) ObjectSetProperty(name string, property *Value) {
 }
 
 // ObjectSetPropertyAtIndex: set property at index on value.
+//
+// The function takes the following parameters:
+//
+//    - index: property index.
+//    - property to set.
+//
 func (value *Value) ObjectSetPropertyAtIndex(index uint, property *Value) {
 	var _arg0 *C.JSCValue // out
 	var _arg1 C.guint     // out
@@ -866,6 +977,11 @@ func (value *Value) ToInt32() int32 {
 // ToJson: create a JSON string of value serialization. If indent is 0, the
 // resulting JSON will not contain newlines. The size of the indent is clamped
 // to 10 spaces.
+//
+// The function takes the following parameters:
+//
+//    - indent: number of spaces to indent when nesting.
+//
 func (value *Value) ToJson(indent uint) string {
 	var _arg0 *C.JSCValue // out
 	var _arg1 C.guint     // out

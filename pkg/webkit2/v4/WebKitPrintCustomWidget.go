@@ -42,15 +42,19 @@ func wrapPrintCustomWidget(obj *externglib.Object) *PrintCustomWidget {
 }
 
 func marshalPrintCustomWidgetter(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapPrintCustomWidget(obj), nil
+	return wrapPrintCustomWidget(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewPrintCustomWidget: create a new KitPrintCustomWidget with given widget and
 // title. The widget ownership is taken and it is destroyed together with the
 // dialog even if this object could still be alive at that point. You typically
 // want to pass a container widget with multiple widgets in it.
+//
+// The function takes the following parameters:
+//
+//    - widget: Widget.
+//    - title widget's title.
+//
 func NewPrintCustomWidget(widget gtk.Widgetter, title string) *PrintCustomWidget {
 	var _arg1 *C.GtkWidget               // out
 	var _arg2 *C.char                    // out
@@ -120,4 +124,18 @@ func (printCustomWidget *PrintCustomWidget) Widget() gtk.Widgetter {
 	}
 
 	return _widget
+}
+
+// ConnectApply: emitted right before the printing will start. You should read
+// the information from the widget and update the content based on it if
+// necessary. The widget is not guaranteed to be valid at a later time.
+func (printCustomWidget *PrintCustomWidget) ConnectApply(f func()) externglib.SignalHandle {
+	return printCustomWidget.Connect("apply", f)
+}
+
+// ConnectUpdate: emitted after change of selected printer in the dialog. The
+// actual page setup and print settings are available and the custom widget can
+// actualize itself according to their values.
+func (printCustomWidget *PrintCustomWidget) ConnectUpdate(f func(pageSetup gtk.PageSetup, printSettings gtk.PrintSettings)) externglib.SignalHandle {
+	return printCustomWidget.Connect("update", f)
 }

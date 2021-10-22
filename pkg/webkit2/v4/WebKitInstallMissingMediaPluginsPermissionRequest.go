@@ -37,9 +37,7 @@ func wrapInstallMissingMediaPluginsPermissionRequest(obj *externglib.Object) *In
 }
 
 func marshalInstallMissingMediaPluginsPermissionRequester(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapInstallMissingMediaPluginsPermissionRequest(obj), nil
+	return wrapInstallMissingMediaPluginsPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Description gets the description about the missing plugins provided by the

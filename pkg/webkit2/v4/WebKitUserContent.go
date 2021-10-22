@@ -42,7 +42,7 @@ const (
 )
 
 func marshalUserContentInjectedFrames(p uintptr) (interface{}, error) {
-	return UserContentInjectedFrames(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return UserContentInjectedFrames(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for UserContentInjectedFrames.
@@ -71,7 +71,7 @@ const (
 )
 
 func marshalUserScriptInjectionTime(p uintptr) (interface{}, error) {
-	return UserScriptInjectionTime(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return UserScriptInjectionTime(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for UserScriptInjectionTime.
@@ -100,7 +100,7 @@ const (
 )
 
 func marshalUserStyleLevel(p uintptr) (interface{}, error) {
-	return UserStyleLevel(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return UserStyleLevel(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for UserStyleLevel.
@@ -126,8 +126,8 @@ type userContentFilter struct {
 }
 
 func marshalUserContentFilter(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &UserContentFilter{&userContentFilter{(*C.WebKitUserContentFilter)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &UserContentFilter{&userContentFilter{(*C.WebKitUserContentFilter)(b)}}, nil
 }
 
 // Identifier: obtain the identifier previously used to save the
@@ -159,8 +159,8 @@ type userScript struct {
 }
 
 func marshalUserScript(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &UserScript{&userScript{(*C.WebKitUserScript)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &UserScript{&userScript{(*C.WebKitUserScript)(b)}}, nil
 }
 
 // NewUserScript constructs a struct UserScript.
@@ -298,8 +298,8 @@ type userStyleSheet struct {
 }
 
 func marshalUserStyleSheet(p uintptr) (interface{}, error) {
-	b := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
-	return &UserStyleSheet{&userStyleSheet{(*C.WebKitUserStyleSheet)(unsafe.Pointer(b))}}, nil
+	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	return &UserStyleSheet{&userStyleSheet{(*C.WebKitUserStyleSheet)(b)}}, nil
 }
 
 // NewUserStyleSheet constructs a struct UserStyleSheet.

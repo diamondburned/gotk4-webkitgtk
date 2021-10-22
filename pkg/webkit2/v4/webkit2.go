@@ -130,7 +130,7 @@ const (
 )
 
 func marshalUserContentFilterError(p uintptr) (interface{}, error) {
-	return UserContentFilterError(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return UserContentFilterError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for UserContentFilterError.

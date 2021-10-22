@@ -32,9 +32,7 @@ func wrapNotification(obj *externglib.Object) *Notification {
 }
 
 func marshalNotificationer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapNotification(obj), nil
+	return wrapNotification(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Clicked tells WebKit the notification has been clicked. This will emit the
@@ -126,4 +124,18 @@ func (notification *Notification) Title() string {
 	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
 
 	return _utf8
+}
+
+// ConnectClicked: emitted when a notification has been clicked. See
+// webkit_notification_clicked().
+func (notification *Notification) ConnectClicked(f func()) externglib.SignalHandle {
+	return notification.Connect("clicked", f)
+}
+
+// ConnectClosed: emitted when a notification has been withdrawn.
+//
+// The default handler will close the notification using libnotify, if built
+// with support for it.
+func (notification *Notification) ConnectClosed(f func()) externglib.SignalHandle {
+	return notification.Connect("closed", f)
 }

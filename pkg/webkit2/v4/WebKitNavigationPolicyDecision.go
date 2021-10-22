@@ -35,9 +35,7 @@ func wrapNavigationPolicyDecision(obj *externglib.Object) *NavigationPolicyDecis
 }
 
 func marshalNavigationPolicyDecisioner(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapNavigationPolicyDecision(obj), nil
+	return wrapNavigationPolicyDecision(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // FrameName gets the value of the KitNavigationPolicyDecision:frame-name

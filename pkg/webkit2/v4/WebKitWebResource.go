@@ -38,15 +38,19 @@ func wrapWebResource(obj *externglib.Object) *WebResource {
 }
 
 func marshalWebResourcer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapWebResource(obj), nil
+	return wrapWebResource(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Data: asynchronously get the raw data for resource.
 //
 // When the operation is finished, callback will be called. You can then call
 // webkit_web_resource_get_data_finish() to get the result of the operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx or NULL to ignore.
+//    - callback to call when the request is satisfied.
+//
 func (resource *WebResource) Data(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebResource  // out
 	var _arg1 *C.GCancellable       // out
@@ -72,6 +76,11 @@ func (resource *WebResource) Data(ctx context.Context, callback gio.AsyncReadyCa
 
 // DataFinish: finish an asynchronous operation started with
 // webkit_web_resource_get_data().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
 func (resource *WebResource) DataFinish(result gio.AsyncResulter) ([]byte, error) {
 	var _arg0 *C.WebKitWebResource // out
 	var _arg1 *C.GAsyncResult      // out
@@ -149,4 +158,33 @@ func (resource *WebResource) URI() string {
 	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
 
 	return _utf8
+}
+
+// ConnectFailedWithTLSErrors: this signal is emitted when a TLS error occurs
+// during the resource load operation.
+func (resource *WebResource) ConnectFailedWithTLSErrors(f func(certificate gio.TLSCertificater, errors gio.TLSCertificateFlags)) externglib.SignalHandle {
+	return resource.Connect("failed-with-tls-errors", f)
+}
+
+// ConnectFinished: this signal is emitted when the resource load finishes
+// successfully or due to an error. In case of errors KitWebResource::failed
+// signal is emitted before this one.
+func (resource *WebResource) ConnectFinished(f func()) externglib.SignalHandle {
+	return resource.Connect("finished", f)
+}
+
+// ConnectReceivedData: this signal is emitted after response is received, every
+// time new data has been received. It's useful to know the progress of the
+// resource load operation.
+func (resource *WebResource) ConnectReceivedData(f func(dataLength uint64)) externglib.SignalHandle {
+	return resource.Connect("received-data", f)
+}
+
+// ConnectSentRequest: this signal is emitted when request has been sent to the
+// server. In case of a server redirection this signal is emitted again with the
+// request argument containing the new request sent to the server due to the
+// redirection and the redirected_response parameter containing the response
+// received by the server for the initial request.
+func (resource *WebResource) ConnectSentRequest(f func(request URIRequest, redirectedResponse URIResponse)) externglib.SignalHandle {
+	return resource.Connect("sent-request", f)
 }

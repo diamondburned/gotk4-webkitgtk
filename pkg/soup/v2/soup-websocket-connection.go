@@ -48,15 +48,22 @@ func wrapWebsocketConnection(obj *externglib.Object) *WebsocketConnection {
 }
 
 func marshalWebsocketConnectioner(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapWebsocketConnection(obj), nil
+	return wrapWebsocketConnection(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewWebsocketConnection creates a WebsocketConnection on stream. This should
 // be called after completing the handshake to begin using the WebSocket
 // protocol.
-func NewWebsocketConnection(stream gio.IOStreamer, uri *URI, typ WebsocketConnectionType, origin string, protocol string) *WebsocketConnection {
+//
+// The function takes the following parameters:
+//
+//    - stream connected to the WebSocket server.
+//    - uri: URI of the connection.
+//    - typ: type of connection (client/side).
+//    - origin: origin of the client.
+//    - protocol in use.
+//
+func NewWebsocketConnection(stream gio.IOStreamer, uri *URI, typ WebsocketConnectionType, origin, protocol string) *WebsocketConnection {
 	var _arg1 *C.GIOStream                  // out
 	var _arg2 *C.SoupURI                    // out
 	var _arg3 C.SoupWebsocketConnectionType // out
@@ -93,7 +100,17 @@ func NewWebsocketConnection(stream gio.IOStreamer, uri *URI, typ WebsocketConnec
 // NewWebsocketConnectionWithExtensions creates a WebsocketConnection on stream
 // with the given active extensions. This should be called after completing the
 // handshake to begin using the WebSocket protocol.
-func NewWebsocketConnectionWithExtensions(stream gio.IOStreamer, uri *URI, typ WebsocketConnectionType, origin string, protocol string, extensions []WebsocketExtensioner) *WebsocketConnection {
+//
+// The function takes the following parameters:
+//
+//    - stream connected to the WebSocket server.
+//    - uri: URI of the connection.
+//    - typ: type of connection (client/side).
+//    - origin: origin of the client.
+//    - protocol in use.
+//    - extensions of WebsocketExtension objects.
+//
+func NewWebsocketConnectionWithExtensions(stream gio.IOStreamer, uri *URI, typ WebsocketConnectionType, origin, protocol string, extensions []WebsocketExtensioner) *WebsocketConnection {
 	var _arg1 *C.GIOStream                  // out
 	var _arg2 *C.SoupURI                    // out
 	var _arg3 C.SoupWebsocketConnectionType // out
@@ -145,6 +162,12 @@ func NewWebsocketConnectionWithExtensions(stream gio.IOStreamer, uri *URI, typ W
 // The code and data are sent to the peer along with the close request. If code
 // is SOUP_WEBSOCKET_CLOSE_NO_STATUS a close message with no body (without code
 // and data) is sent. Note that the data must be UTF-8 valid.
+//
+// The function takes the following parameters:
+//
+//    - code: close code.
+//    - data: close data.
+//
 func (self *WebsocketConnection) Close(code uint16, data string) {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _arg1 C.gushort                  // out
@@ -401,6 +424,11 @@ func (self *WebsocketConnection) URI() *URI {
 // NULL.
 //
 // The message is queued to be sent and will be sent when the main loop is run.
+//
+// The function takes the following parameters:
+//
+//    - data: message contents.
+//
 func (self *WebsocketConnection) SendBinary(data []byte) {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _arg1 C.gconstpointer            // out
@@ -421,6 +449,12 @@ func (self *WebsocketConnection) SendBinary(data []byte) {
 // method, allows to send text messages containing NULL characters.
 //
 // The message is queued to be sent and will be sent when the main loop is run.
+//
+// The function takes the following parameters:
+//
+//    - typ: type of message contents.
+//    - message data as #GBytes.
+//
 func (self *WebsocketConnection) SendMessage(typ WebsocketDataType, message *glib.Bytes) {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _arg1 C.SoupWebsocketDataType    // out
@@ -441,6 +475,11 @@ func (self *WebsocketConnection) SendMessage(typ WebsocketDataType, message *gli
 // soup_websocket_connection_send_message() instead.
 //
 // The message is queued to be sent and will be sent when the main loop is run.
+//
+// The function takes the following parameters:
+//
+//    - text: message contents.
+//
 func (self *WebsocketConnection) SendText(text string) {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _arg1 *C.char                    // out
@@ -457,6 +496,11 @@ func (self *WebsocketConnection) SendText(text string) {
 // SetKeepaliveInterval sets the interval in seconds on when to send a ping
 // message which will serve as a keepalive message. If set to 0 the keepalive
 // message is disabled.
+//
+// The function takes the following parameters:
+//
+//    - interval to send a ping message or 0 to disable it.
+//
 func (self *WebsocketConnection) SetKeepaliveInterval(interval uint) {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _arg1 C.guint                    // out
@@ -471,6 +515,11 @@ func (self *WebsocketConnection) SetKeepaliveInterval(interval uint) {
 
 // SetMaxIncomingPayloadSize sets the maximum payload size allowed for incoming
 // packets. It does not limit the outgoing packet size.
+//
+// The function takes the following parameters:
+//
+//    - maxIncomingPayloadSize: maximum payload size.
+//
 func (self *WebsocketConnection) SetMaxIncomingPayloadSize(maxIncomingPayloadSize uint64) {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _arg1 C.guint64                  // out
@@ -481,4 +530,36 @@ func (self *WebsocketConnection) SetMaxIncomingPayloadSize(maxIncomingPayloadSiz
 	C.soup_websocket_connection_set_max_incoming_payload_size(_arg0, _arg1)
 	runtime.KeepAlive(self)
 	runtime.KeepAlive(maxIncomingPayloadSize)
+}
+
+// ConnectClosed: emitted when the connection has completely closed, either due
+// to an orderly close from the peer, one initiated via
+// soup_websocket_connection_close() or a fatal error condition that caused a
+// close.
+//
+// This signal will be emitted once.
+func (self *WebsocketConnection) ConnectClosed(f func()) externglib.SignalHandle {
+	return self.Connect("closed", f)
+}
+
+// ConnectClosing: this signal will be emitted during an orderly close.
+func (self *WebsocketConnection) ConnectClosing(f func()) externglib.SignalHandle {
+	return self.Connect("closing", f)
+}
+
+// ConnectMessage: emitted when we receive a message from the peer.
+//
+// As a convenience, the message data will always be NUL-terminated, but the NUL
+// byte will not be included in the length count.
+func (self *WebsocketConnection) ConnectMessage(f func(typ int, message *glib.Bytes)) externglib.SignalHandle {
+	return self.Connect("message", f)
+}
+
+// ConnectPong: emitted when we receive a Pong frame (solicited or unsolicited)
+// from the peer.
+//
+// As a convenience, the message data will always be NUL-terminated, but the NUL
+// byte will not be included in the length count.
+func (self *WebsocketConnection) ConnectPong(f func(message *glib.Bytes)) externglib.SignalHandle {
+	return self.Connect("pong", f)
 }

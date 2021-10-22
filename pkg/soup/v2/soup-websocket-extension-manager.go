@@ -36,9 +36,5 @@ func wrapWebsocketExtensionManager(obj *externglib.Object) *WebsocketExtensionMa
 }
 
 func marshalWebsocketExtensionManagerer(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapWebsocketExtensionManager(obj), nil
+	return wrapWebsocketExtensionManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
-
-func (*WebsocketExtensionManager) privateWebsocketExtensionManager() {}

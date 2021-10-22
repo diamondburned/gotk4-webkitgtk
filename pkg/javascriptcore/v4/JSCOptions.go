@@ -48,7 +48,7 @@ const (
 	OptionSize
 	// OptionDouble options type.
 	OptionDouble
-	// OptionString option type.
+	// OptionString: string option type.
 	OptionString
 	// OptionRangeString: range string option type.
 	OptionRangeString
@@ -110,6 +110,11 @@ func _gotk4_javascriptcore4_OptionsFunc(arg0 *C.char, arg1 C.JSCOptionType, arg2
 
 // OptionsForeach iterates all available options calling function for each one.
 // Iteration can stop early if function returns FALSE.
+//
+// The function takes the following parameters:
+//
+//    - function: COptionsFunc callback.
+//
 func OptionsForeach(function OptionsFunc) {
 	var _arg1 C.JSCOptionsFunc // out
 	var _arg2 C.gpointer
@@ -123,6 +128,11 @@ func OptionsForeach(function OptionsFunc) {
 }
 
 // OptionsGetBoolean: get option as a #gboolean value.
+//
+// The function takes the following parameters:
+//
+//    - option identifier.
+//
 func OptionsGetBoolean(option string) (value bool, ok bool) {
 	var _arg1 *C.char    // out
 	var _arg2 C.gboolean // in
@@ -148,6 +158,11 @@ func OptionsGetBoolean(option string) (value bool, ok bool) {
 }
 
 // OptionsGetDouble: get option as a #gdouble value.
+//
+// The function takes the following parameters:
+//
+//    - option identifier.
+//
 func OptionsGetDouble(option string) (float64, bool) {
 	var _arg1 *C.char    // out
 	var _arg2 C.gdouble  // in
@@ -171,6 +186,11 @@ func OptionsGetDouble(option string) (float64, bool) {
 }
 
 // OptionsGetInt: get option as a #gint value.
+//
+// The function takes the following parameters:
+//
+//    - option identifier.
+//
 func OptionsGetInt(option string) (int, bool) {
 	var _arg1 *C.char    // out
 	var _arg2 C.gint     // in
@@ -223,6 +243,11 @@ func OptionsGetOptionGroup() *glib.OptionGroup {
 // high are #guint values. Values between low and high (both included) will be
 // considered in the range, unless <emphasis>!</emphasis> is used to invert the
 // range.
+//
+// The function takes the following parameters:
+//
+//    - option identifier.
+//
 func OptionsGetRangeString(option string) (string, bool) {
 	var _arg1 *C.char    // out
 	var _arg2 *C.char    // in
@@ -247,6 +272,11 @@ func OptionsGetRangeString(option string) (string, bool) {
 }
 
 // OptionsGetSize: get option as a #gsize value.
+//
+// The function takes the following parameters:
+//
+//    - option identifier.
+//
 func OptionsGetSize(option string) (uint, bool) {
 	var _arg1 *C.char    // out
 	var _arg2 C.gsize    // in
@@ -270,6 +300,11 @@ func OptionsGetSize(option string) (uint, bool) {
 }
 
 // OptionsGetString: get option as a string.
+//
+// The function takes the following parameters:
+//
+//    - option identifier.
+//
 func OptionsGetString(option string) (string, bool) {
 	var _arg1 *C.char    // out
 	var _arg2 *C.char    // in
@@ -294,6 +329,11 @@ func OptionsGetString(option string) (string, bool) {
 }
 
 // OptionsGetUint: get option as a #guint value.
+//
+// The function takes the following parameters:
+//
+//    - option identifier.
+//
 func OptionsGetUint(option string) (uint, bool) {
 	var _arg1 *C.char    // out
 	var _arg2 C.guint    // in
@@ -317,6 +357,12 @@ func OptionsGetUint(option string) (uint, bool) {
 }
 
 // OptionsSetBoolean: set option as a #gboolean value.
+//
+// The function takes the following parameters:
+//
+//    - option identifier.
+//    - value to set.
+//
 func OptionsSetBoolean(option string, value bool) bool {
 	var _arg1 *C.char    // out
 	var _arg2 C.gboolean // out
@@ -342,6 +388,12 @@ func OptionsSetBoolean(option string, value bool) bool {
 }
 
 // OptionsSetDouble: set option as a #gdouble value.
+//
+// The function takes the following parameters:
+//
+//    - option identifier.
+//    - value to set.
+//
 func OptionsSetDouble(option string, value float64) bool {
 	var _arg1 *C.char    // out
 	var _arg2 C.gdouble  // out
@@ -365,6 +417,12 @@ func OptionsSetDouble(option string, value float64) bool {
 }
 
 // OptionsSetInt: set option as a #gint value.
+//
+// The function takes the following parameters:
+//
+//    - option identifier.
+//    - value to set.
+//
 func OptionsSetInt(option string, value int) bool {
 	var _arg1 *C.char    // out
 	var _arg2 C.gint     // out
@@ -392,7 +450,13 @@ func OptionsSetInt(option string, value int) bool {
 // high are #guint values. Values between low and high (both included) will be
 // considered in the range, unless <emphasis>!</emphasis> is used to invert the
 // range.
-func OptionsSetRangeString(option string, value string) bool {
+//
+// The function takes the following parameters:
+//
+//    - option identifier.
+//    - value to set.
+//
+func OptionsSetRangeString(option, value string) bool {
 	var _arg1 *C.char    // out
 	var _arg2 *C.char    // out
 	var _cret C.gboolean // in
@@ -416,6 +480,12 @@ func OptionsSetRangeString(option string, value string) bool {
 }
 
 // OptionsSetSize: set option as a #gsize value.
+//
+// The function takes the following parameters:
+//
+//    - option identifier.
+//    - value to set.
+//
 func OptionsSetSize(option string, value uint) bool {
 	var _arg1 *C.char    // out
 	var _arg2 C.gsize    // out
@@ -439,7 +509,13 @@ func OptionsSetSize(option string, value uint) bool {
 }
 
 // OptionsSetString: set option as a string.
-func OptionsSetString(option string, value string) bool {
+//
+// The function takes the following parameters:
+//
+//    - option identifier.
+//    - value to set.
+//
+func OptionsSetString(option, value string) bool {
 	var _arg1 *C.char    // out
 	var _arg2 *C.char    // out
 	var _cret C.gboolean // in
@@ -463,6 +539,12 @@ func OptionsSetString(option string, value string) bool {
 }
 
 // OptionsSetUint: set option as a #guint value.
+//
+// The function takes the following parameters:
+//
+//    - option identifier.
+//    - value to set.
+//
 func OptionsSetUint(option string, value uint) bool {
 	var _arg1 *C.char    // out
 	var _arg2 C.guint    // out

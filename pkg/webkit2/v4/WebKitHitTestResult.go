@@ -31,22 +31,22 @@ type HitTestResultContext int
 const (
 	// HitTestResultContextDocument: anywhere in the document.
 	HitTestResultContextDocument HitTestResultContext = 0b10
-	// HitTestResultContextLink element.
+	// HitTestResultContextLink: hyperlink element.
 	HitTestResultContextLink HitTestResultContext = 0b100
-	// HitTestResultContextImage element.
+	// HitTestResultContextImage: image element.
 	HitTestResultContextImage HitTestResultContext = 0b1000
 	// HitTestResultContextMedia: video or audio element.
 	HitTestResultContextMedia HitTestResultContext = 0b10000
-	// HitTestResultContextEditable element
+	// HitTestResultContextEditable: editable element.
 	HitTestResultContextEditable HitTestResultContext = 0b100000
-	// HitTestResultContextScrollbar element.
+	// HitTestResultContextScrollbar: scrollbar element.
 	HitTestResultContextScrollbar HitTestResultContext = 0b1000000
-	// HitTestResultContextSelection: selected element. Since 2.8
+	// HitTestResultContextSelection: selected element. Since 2.8.
 	HitTestResultContextSelection HitTestResultContext = 0b10000000
 )
 
 func marshalHitTestResultContext(p uintptr) (interface{}, error) {
-	return HitTestResultContext(C.g_value_get_flags((*C.GValue)(unsafe.Pointer(p)))), nil
+	return HitTestResultContext(externglib.ValueFromNative(unsafe.Pointer(p)).Flags()), nil
 }
 
 // String returns the names in string for HitTestResultContext.
@@ -103,9 +103,7 @@ func wrapHitTestResult(obj *externglib.Object) *HitTestResult {
 }
 
 func marshalHitTestResulter(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapHitTestResult(obj), nil
+	return wrapHitTestResult(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // ContextIsEditable gets whether WEBKIT_HIT_TEST_RESULT_CONTEXT_EDITABLE flag

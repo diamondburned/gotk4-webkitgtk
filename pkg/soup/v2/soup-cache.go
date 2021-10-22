@@ -27,14 +27,14 @@ func init() {
 type CacheType int
 
 const (
-	// CacheSingleUser: single-user cache
+	// CacheSingleUser: single-user cache.
 	CacheSingleUser CacheType = iota
-	// CacheShared cache
+	// CacheShared: shared cache.
 	CacheShared
 )
 
 func marshalCacheType(p uintptr) (interface{}, error) {
-	return CacheType(C.g_value_get_enum((*C.GValue)(unsafe.Pointer(p)))), nil
+	return CacheType(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for CacheType.
@@ -73,12 +73,19 @@ func wrapCache(obj *externglib.Object) *Cache {
 }
 
 func marshalCacher(p uintptr) (interface{}, error) {
-	val := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
-	obj := externglib.Take(unsafe.Pointer(val))
-	return wrapCache(obj), nil
+	return wrapCache(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewCache creates a new Cache.
+//
+// The function takes the following parameters:
+//
+//    - cacheDir: directory to store the cached data, or NULL to use the
+//    default one. Note that since the cache isn't safe to access for multiple
+//    processes at once, and the default directory isn't namespaced by process,
+//    clients are strongly discouraged from passing NULL.
+//    - cacheType of the cache.
+//
 func NewCache(cacheDir string, cacheType CacheType) *Cache {
 	var _arg1 *C.char         // out
 	var _arg2 C.SoupCacheType // out
@@ -168,6 +175,11 @@ func (cache *Cache) Load() {
 }
 
 // SetMaxSize sets the maximum size of the cache.
+//
+// The function takes the following parameters:
+//
+//    - maxSize: maximum size of the cache, in bytes.
+//
 func (cache *Cache) SetMaxSize(maxSize uint) {
 	var _arg0 *C.SoupCache // out
 	var _arg1 C.guint      // out

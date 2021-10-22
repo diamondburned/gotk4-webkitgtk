@@ -17,6 +17,11 @@ import "C"
 // which are not generally suitable to display to users. This function provides
 // protection against IDN homograph attacks, so in some cases the host part of
 // the returned URI may be in Punycode if the safety check fails.
+//
+// The function takes the following parameters:
+//
+//    - uri: URI to be converted.
+//
 func URIForDisplay(uri string) string {
 	var _arg1 *C.gchar // out
 	var _cret *C.gchar // in
