@@ -13,6 +13,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -24,7 +25,7 @@ func init() {
 }
 
 // TLDError: error codes for SOUP_TLD_ERROR.
-type TLDError int
+type TLDError C.gint
 
 const (
 	// TldErrorInvalidHostname: hostname was syntactically invalid.

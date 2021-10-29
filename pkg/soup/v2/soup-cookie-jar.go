@@ -13,6 +13,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -33,7 +34,7 @@ const COOKIE_JAR_READ_ONLY = "read-only"
 
 // CookieJarAcceptPolicy: policy for accepting or rejecting cookies returned in
 // responses.
-type CookieJarAcceptPolicy int
+type CookieJarAcceptPolicy C.gint
 
 const (
 	// CookieJarAcceptAlways: accept all cookies unconditionally.
@@ -109,6 +110,10 @@ type CookieJar struct {
 
 	SessionFeature
 }
+
+var (
+	_ externglib.Objector = (*CookieJar)(nil)
+)
 
 func wrapCookieJar(obj *externglib.Object) *CookieJar {
 	return &CookieJar{
@@ -237,7 +242,7 @@ func (jar *CookieJar) AddCookieWithFirstParty(firstParty *URI, cookie *Cookie) {
 // AllCookies constructs a List with every cookie inside the jar. The cookies in
 // the list are a copy of the original, so you have to free them when you are
 // done with them.
-func (jar *CookieJar) AllCookies() []Cookie {
+func (jar *CookieJar) AllCookies() []*Cookie {
 	var _arg0 *C.SoupCookieJar // out
 	var _cret *C.GSList        // in
 
@@ -246,15 +251,15 @@ func (jar *CookieJar) AllCookies() []Cookie {
 	_cret = C.soup_cookie_jar_all_cookies(_arg0)
 	runtime.KeepAlive(jar)
 
-	var _sList []Cookie // out
+	var _sList []*Cookie // out
 
-	_sList = make([]Cookie, 0, gextras.SListSize(unsafe.Pointer(_cret)))
+	_sList = make([]*Cookie, 0, gextras.SListSize(unsafe.Pointer(_cret)))
 	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
 		src := (*C.SoupCookie)(v)
-		var dst Cookie // out
-		dst = *(*Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
+		var dst *Cookie // out
+		dst = (*Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
 		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(&dst)),
+			gextras.StructIntern(unsafe.Pointer(dst)),
 			func(intern *struct{ C unsafe.Pointer }) {
 				C.soup_cookie_free((*C.SoupCookie)(intern.C))
 			},
@@ -316,7 +321,7 @@ func (jar *CookieJar) AcceptPolicy() CookieJarAcceptPolicy {
 //    - forHttp: whether or not the return value is being passed directly to an
 //    HTTP operation.
 //
-func (jar *CookieJar) CookieList(uri *URI, forHttp bool) []Cookie {
+func (jar *CookieJar) CookieList(uri *URI, forHttp bool) []*Cookie {
 	var _arg0 *C.SoupCookieJar // out
 	var _arg1 *C.SoupURI       // out
 	var _arg2 C.gboolean       // out
@@ -333,15 +338,15 @@ func (jar *CookieJar) CookieList(uri *URI, forHttp bool) []Cookie {
 	runtime.KeepAlive(uri)
 	runtime.KeepAlive(forHttp)
 
-	var _sList []Cookie // out
+	var _sList []*Cookie // out
 
-	_sList = make([]Cookie, 0, gextras.SListSize(unsafe.Pointer(_cret)))
+	_sList = make([]*Cookie, 0, gextras.SListSize(unsafe.Pointer(_cret)))
 	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
 		src := (*C.SoupCookie)(v)
-		var dst Cookie // out
-		dst = *(*Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
+		var dst *Cookie // out
+		dst = (*Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
 		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(&dst)),
+			gextras.StructIntern(unsafe.Pointer(dst)),
 			func(intern *struct{ C unsafe.Pointer }) {
 				C.soup_cookie_free((*C.SoupCookie)(intern.C))
 			},
@@ -370,7 +375,7 @@ func (jar *CookieJar) CookieList(uri *URI, forHttp bool) []Cookie {
 //    - isTopLevelNavigation: whether or not the HTTP request is part of top
 //    level navigation.
 //
-func (jar *CookieJar) CookieListWithSameSiteInfo(uri, topLevel, siteForCookies *URI, forHttp, isSafeMethod, isTopLevelNavigation bool) []Cookie {
+func (jar *CookieJar) CookieListWithSameSiteInfo(uri, topLevel, siteForCookies *URI, forHttp, isSafeMethod, isTopLevelNavigation bool) []*Cookie {
 	var _arg0 *C.SoupCookieJar // out
 	var _arg1 *C.SoupURI       // out
 	var _arg2 *C.SoupURI       // out
@@ -407,15 +412,15 @@ func (jar *CookieJar) CookieListWithSameSiteInfo(uri, topLevel, siteForCookies *
 	runtime.KeepAlive(isSafeMethod)
 	runtime.KeepAlive(isTopLevelNavigation)
 
-	var _sList []Cookie // out
+	var _sList []*Cookie // out
 
-	_sList = make([]Cookie, 0, gextras.SListSize(unsafe.Pointer(_cret)))
+	_sList = make([]*Cookie, 0, gextras.SListSize(unsafe.Pointer(_cret)))
 	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
 		src := (*C.SoupCookie)(v)
-		var dst Cookie // out
-		dst = *(*Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
+		var dst *Cookie // out
+		dst = (*Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
 		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(&dst)),
+			gextras.StructIntern(unsafe.Pointer(dst)),
 			func(intern *struct{ C unsafe.Pointer }) {
 				C.soup_cookie_free((*C.SoupCookie)(intern.C))
 			},
@@ -584,6 +589,6 @@ func (jar *CookieJar) SetCookieWithFirstParty(uri, firstParty *URI, cookie strin
 // If a cookie has been deleted, old_cookie will contain the to-be-deleted
 // cookie and new_cookie will be NULL. If a cookie has been changed, old_cookie
 // will contain its old value, and new_cookie its new value.
-func (jar *CookieJar) ConnectChanged(f func(oldCookie, newCookie Cookie)) externglib.SignalHandle {
+func (jar *CookieJar) ConnectChanged(f func(oldCookie, newCookie *Cookie)) externglib.SignalHandle {
 	return jar.Connect("changed", f)
 }

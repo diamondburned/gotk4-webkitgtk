@@ -13,6 +13,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -26,7 +27,7 @@ func init() {
 
 // HitTestResultContext: enum values with flags representing the context of a
 // KitHitTestResult.
-type HitTestResultContext int
+type HitTestResultContext C.guint
 
 const (
 	// HitTestResultContextDocument: anywhere in the document.
@@ -95,6 +96,10 @@ func (h HitTestResultContext) Has(other HitTestResultContext) bool {
 type HitTestResult struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*HitTestResult)(nil)
+)
 
 func wrapHitTestResult(obj *externglib.Object) *HitTestResult {
 	return &HitTestResult{

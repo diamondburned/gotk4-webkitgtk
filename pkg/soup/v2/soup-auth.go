@@ -12,6 +12,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -48,14 +49,17 @@ type Auth struct {
 	*externglib.Object
 }
 
+var (
+	_ externglib.Objector = (*Auth)(nil)
+)
+
 // Auther describes types inherited from class Auth.
+
 // To get the original type, the caller must assert this to an interface or
 // another type.
 type Auther interface {
 	externglib.Objector
-
-	// BaseAuth returns the underlying base class.
-	BaseAuth() *Auth
+	baseAuth() *Auth
 }
 
 var _ Auther = (*Auth)(nil)
@@ -481,9 +485,13 @@ func (auth *Auth) Update(msg *Message, authHeader string) bool {
 	return _ok
 }
 
-// BaseAuth returns auth.
-func (auth *Auth) BaseAuth() *Auth {
+func (auth *Auth) baseAuth() *Auth {
 	return auth
+}
+
+// BaseAuth returns the underlying base object.
+func BaseAuth(obj Auther) *Auth {
+	return obj.baseAuth()
 }
 
 // AuthNegotiateSupported indicates whether libsoup was built with GSSAPI

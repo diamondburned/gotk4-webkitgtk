@@ -11,6 +11,7 @@ import (
 
 // #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <jsc/jsc.h>
 import "C"
@@ -24,6 +25,10 @@ func init() {
 type WeakValue struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*WeakValue)(nil)
+)
 
 func wrapWeakValue(obj *externglib.Object) *WeakValue {
 	return &WeakValue{

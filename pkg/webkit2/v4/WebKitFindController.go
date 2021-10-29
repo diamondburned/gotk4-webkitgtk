@@ -13,6 +13,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -25,7 +26,7 @@ func init() {
 }
 
 // FindOptions: enum values used to specify search options.
-type FindOptions int
+type FindOptions C.guint
 
 const (
 	// FindOptionsNone: no search flags, this means a case sensitive, no wrap,
@@ -93,6 +94,10 @@ func (f FindOptions) Has(other FindOptions) bool {
 type FindController struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*FindController)(nil)
+)
 
 func wrapFindController(obj *externglib.Object) *FindController {
 	return &FindController{

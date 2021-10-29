@@ -14,6 +14,7 @@ import (
 
 // #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <jsc/jsc.h>
 // extern void callbackDelete(gpointer);
@@ -28,7 +29,7 @@ func init() {
 
 // CheckSyntaxMode: enum values to specify a mode to check for syntax errors in
 // jsc_context_check_syntax().
-type CheckSyntaxMode int
+type CheckSyntaxMode C.gint
 
 const (
 	// CheckSyntaxModeScript: mode to check syntax of a script.
@@ -51,7 +52,7 @@ func (c CheckSyntaxMode) String() string {
 
 // CheckSyntaxResult: enum values to specify the result of
 // jsc_context_check_syntax().
-type CheckSyntaxResult int
+type CheckSyntaxResult C.gint
 
 const (
 	// CheckSyntaxResultSuccess: no errors.
@@ -112,6 +113,10 @@ func _gotk4_javascriptcore4_ExceptionHandler(arg0 *C.JSCContext, arg1 *C.JSCExce
 type Context struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*Context)(nil)
+)
 
 func wrapContext(obj *externglib.Object) *Context {
 	return &Context{

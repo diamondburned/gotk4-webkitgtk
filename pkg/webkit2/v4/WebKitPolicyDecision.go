@@ -11,6 +11,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -25,14 +26,17 @@ type PolicyDecision struct {
 	*externglib.Object
 }
 
+var (
+	_ externglib.Objector = (*PolicyDecision)(nil)
+)
+
 // PolicyDecisioner describes types inherited from class PolicyDecision.
+
 // To get the original type, the caller must assert this to an interface or
 // another type.
 type PolicyDecisioner interface {
 	externglib.Objector
-
-	// BasePolicyDecision returns the underlying base class.
-	BasePolicyDecision() *PolicyDecision
+	basePolicyDecision() *PolicyDecision
 }
 
 var _ PolicyDecisioner = (*PolicyDecision)(nil)
@@ -102,7 +106,11 @@ func (decision *PolicyDecision) UseWithPolicies(policies *WebsitePolicies) {
 	runtime.KeepAlive(policies)
 }
 
-// BasePolicyDecision returns decision.
-func (decision *PolicyDecision) BasePolicyDecision() *PolicyDecision {
+func (decision *PolicyDecision) basePolicyDecision() *PolicyDecision {
 	return decision
+}
+
+// BasePolicyDecision returns the underlying base object.
+func BasePolicyDecision(obj PolicyDecisioner) *PolicyDecision {
+	return obj.basePolicyDecision()
 }

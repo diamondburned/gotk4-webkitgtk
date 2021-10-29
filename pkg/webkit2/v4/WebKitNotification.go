@@ -11,6 +11,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -24,6 +25,10 @@ func init() {
 type Notification struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*Notification)(nil)
+)
 
 func wrapNotification(obj *externglib.Object) *Notification {
 	return &Notification{

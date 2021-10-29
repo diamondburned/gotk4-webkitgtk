@@ -8,6 +8,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <libsoup/soup.h>
 import "C"
 

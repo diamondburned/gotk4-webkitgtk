@@ -18,6 +18,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 // SoupBuffer* _gotk4_soup2_ChunkAllocator(SoupMessage*, gsize, gpointer);
@@ -103,7 +104,7 @@ const MESSAGE_TLS_ERRORS = "tls-errors"
 const MESSAGE_URI = "uri"
 
 // HTTPVersion indicates the HTTP protocol version being used.
-type HTTPVersion int
+type HTTPVersion C.gint
 
 const (
 	// HTTP10: HTTP 1.0 (RFC 1945).
@@ -130,7 +131,7 @@ func (h HTTPVersion) String() string {
 
 // MessagePriority priorities that can be set on a Message to instruct the
 // message queue to process it before any other message with lower priority.
-type MessagePriority int
+type MessagePriority C.gint
 
 const (
 	// MessagePriorityVeryLow: lowest priority, the messages with this priority
@@ -174,7 +175,7 @@ func (m MessagePriority) String() string {
 
 // MessageFlags various flags that can be set on a Message to alter its
 // behavior.
-type MessageFlags int
+type MessageFlags C.guint
 
 const (
 	// MessageNoRedirect: session should not follow redirect (3xx) responses
@@ -369,6 +370,10 @@ type MessageOverrider interface {
 type Message struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*Message)(nil)
+)
 
 func wrapMessage(obj *externglib.Object) *Message {
 	return &Message{
@@ -1256,7 +1261,7 @@ func (msg *Message) ConnectGotBody(f func()) externglib.SignalHandle {
 // If you cancel or requeue msg while processing this signal, then the current
 // HTTP I/O will be stopped after this signal emission finished, and msg's
 // connection will be closed.
-func (msg *Message) ConnectGotChunk(f func(chunk Buffer)) externglib.SignalHandle {
+func (msg *Message) ConnectGotChunk(f func(chunk *Buffer)) externglib.SignalHandle {
 	return msg.Connect("got-chunk", f)
 }
 
@@ -1330,7 +1335,7 @@ func (msg *Message) ConnectWroteBody(f func()) externglib.SignalHandle {
 //
 // Unlike Message::wrote_chunk, this is emitted after every successful write()
 // call, not only after finishing a complete "chunk".
-func (msg *Message) ConnectWroteBodyData(f func(chunk Buffer)) externglib.SignalHandle {
+func (msg *Message) ConnectWroteBodyData(f func(chunk *Buffer)) externglib.SignalHandle {
 	return msg.Connect("wrote-body-data", f)
 }
 

@@ -13,6 +13,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -26,7 +27,7 @@ func init() {
 
 // AutomationBrowsingContextPresentation: enum values used for determining the
 // automation browsing context presentation.
-type AutomationBrowsingContextPresentation int
+type AutomationBrowsingContextPresentation C.gint
 
 const (
 	// AutomationBrowsingContextPresentationWindow: window.
@@ -54,6 +55,10 @@ func (a AutomationBrowsingContextPresentation) String() string {
 type AutomationSession struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*AutomationSession)(nil)
+)
 
 func wrapAutomationSession(obj *externglib.Object) *AutomationSession {
 	return &AutomationSession{

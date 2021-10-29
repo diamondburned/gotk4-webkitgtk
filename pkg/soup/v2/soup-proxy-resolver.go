@@ -16,6 +16,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 // void _gotk4_soup2_ProxyResolverCallback(SoupProxyResolver*, SoupMessage*, guint, SoupAddress*, gpointer);
@@ -79,6 +80,8 @@ type ProxyResolverOverrider interface {
 type ProxyResolver struct {
 	SessionFeature
 }
+
+var ()
 
 // ProxyResolverer describes ProxyResolver's interface methods.
 type ProxyResolverer interface {

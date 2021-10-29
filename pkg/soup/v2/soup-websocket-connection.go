@@ -14,6 +14,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -40,6 +41,10 @@ type WebsocketConnectionOverrider interface {
 type WebsocketConnection struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*WebsocketConnection)(nil)
+)
 
 func wrapWebsocketConnection(obj *externglib.Object) *WebsocketConnection {
 	return &WebsocketConnection{

@@ -12,6 +12,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -24,7 +25,7 @@ func init() {
 }
 
 // AutoplayPolicy: enum values used to specify autoplay policies.
-type AutoplayPolicy int
+type AutoplayPolicy C.gint
 
 const (
 	// AutoplayAllow: do not restrict autoplay.
@@ -57,6 +58,10 @@ func (a AutoplayPolicy) String() string {
 type WebsitePolicies struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*WebsitePolicies)(nil)
+)
 
 func wrapWebsitePolicies(obj *externglib.Object) *WebsitePolicies {
 	return &WebsitePolicies{

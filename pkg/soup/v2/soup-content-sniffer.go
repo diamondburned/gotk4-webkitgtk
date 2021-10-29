@@ -12,6 +12,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -40,6 +41,10 @@ type ContentSniffer struct {
 
 	SessionFeature
 }
+
+var (
+	_ externglib.Objector = (*ContentSniffer)(nil)
+)
 
 func wrapContentSniffer(obj *externglib.Object) *ContentSniffer {
 	return &ContentSniffer{

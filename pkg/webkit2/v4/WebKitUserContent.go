@@ -13,6 +13,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -30,7 +31,7 @@ func init() {
 
 // UserContentInjectedFrames specifies in which frames user style sheets are to
 // be inserted in.
-type UserContentInjectedFrames int
+type UserContentInjectedFrames C.gint
 
 const (
 	// UserContentInjectAllFrames: insert the user style sheet in all the frames
@@ -59,7 +60,7 @@ func (u UserContentInjectedFrames) String() string {
 
 // UserScriptInjectionTime specifies at which place of documents an user script
 // will be inserted.
-type UserScriptInjectionTime int
+type UserScriptInjectionTime C.gint
 
 const (
 	// UserScriptInjectAtDocumentStart: insert the code of the user script at
@@ -87,7 +88,7 @@ func (u UserScriptInjectionTime) String() string {
 }
 
 // UserStyleLevel specifies how to treat an user style sheet.
-type UserStyleLevel int
+type UserStyleLevel C.gint
 
 const (
 	// UserStyleLevelUser: style sheet is an user style sheet, its contents
@@ -177,7 +178,7 @@ func NewUserScript(source string, injectedFrames UserContentInjectedFrames, inje
 	_arg2 = C.WebKitUserContentInjectedFrames(injectedFrames)
 	_arg3 = C.WebKitUserScriptInjectionTime(injectionTime)
 	{
-		_arg4 = (**C.gchar)(C.malloc(C.ulong(len(allowList)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg4 = (**C.gchar)(C.malloc(C.size_t(uint((len(allowList) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg4))
 		{
 			out := unsafe.Slice(_arg4, len(allowList)+1)
@@ -190,7 +191,7 @@ func NewUserScript(source string, injectedFrames UserContentInjectedFrames, inje
 		}
 	}
 	{
-		_arg5 = (**C.gchar)(C.malloc(C.ulong(len(blockList)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg5 = (**C.gchar)(C.malloc(C.size_t(uint((len(blockList) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg5))
 		{
 			out := unsafe.Slice(_arg5, len(blockList)+1)
@@ -240,7 +241,7 @@ func NewUserScriptForWorld(source string, injectedFrames UserContentInjectedFram
 	_arg4 = (*C.gchar)(unsafe.Pointer(C.CString(worldName)))
 	defer C.free(unsafe.Pointer(_arg4))
 	{
-		_arg5 = (**C.gchar)(C.malloc(C.ulong(len(allowList)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg5 = (**C.gchar)(C.malloc(C.size_t(uint((len(allowList) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg5))
 		{
 			out := unsafe.Slice(_arg5, len(allowList)+1)
@@ -253,7 +254,7 @@ func NewUserScriptForWorld(source string, injectedFrames UserContentInjectedFram
 		}
 	}
 	{
-		_arg6 = (**C.gchar)(C.malloc(C.ulong(len(blockList)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg6 = (**C.gchar)(C.malloc(C.size_t(uint((len(blockList) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg6))
 		{
 			out := unsafe.Slice(_arg6, len(blockList)+1)
@@ -316,7 +317,7 @@ func NewUserStyleSheet(source string, injectedFrames UserContentInjectedFrames, 
 	_arg2 = C.WebKitUserContentInjectedFrames(injectedFrames)
 	_arg3 = C.WebKitUserStyleLevel(level)
 	{
-		_arg4 = (**C.gchar)(C.malloc(C.ulong(len(allowList)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg4 = (**C.gchar)(C.malloc(C.size_t(uint((len(allowList) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg4))
 		{
 			out := unsafe.Slice(_arg4, len(allowList)+1)
@@ -329,7 +330,7 @@ func NewUserStyleSheet(source string, injectedFrames UserContentInjectedFrames, 
 		}
 	}
 	{
-		_arg5 = (**C.gchar)(C.malloc(C.ulong(len(blockList)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg5 = (**C.gchar)(C.malloc(C.size_t(uint((len(blockList) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg5))
 		{
 			out := unsafe.Slice(_arg5, len(blockList)+1)
@@ -379,7 +380,7 @@ func NewUserStyleSheetForWorld(source string, injectedFrames UserContentInjected
 	_arg4 = (*C.gchar)(unsafe.Pointer(C.CString(worldName)))
 	defer C.free(unsafe.Pointer(_arg4))
 	{
-		_arg5 = (**C.gchar)(C.malloc(C.ulong(len(allowList)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg5 = (**C.gchar)(C.malloc(C.size_t(uint((len(allowList) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg5))
 		{
 			out := unsafe.Slice(_arg5, len(allowList)+1)
@@ -392,7 +393,7 @@ func NewUserStyleSheetForWorld(source string, injectedFrames UserContentInjected
 		}
 	}
 	{
-		_arg6 = (**C.gchar)(C.malloc(C.ulong(len(blockList)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg6 = (**C.gchar)(C.malloc(C.size_t(uint((len(blockList) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg6))
 		{
 			out := unsafe.Slice(_arg6, len(blockList)+1)

@@ -13,6 +13,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -26,6 +27,10 @@ func init() {
 type ColorChooserRequest struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*ColorChooserRequest)(nil)
+)
 
 func wrapColorChooserRequest(obj *externglib.Object) *ColorChooserRequest {
 	return &ColorChooserRequest{
@@ -63,7 +68,7 @@ func (request *ColorChooserRequest) Finish() {
 }
 
 // ElementRectangle gets the bounding box of the color input element.
-func (request *ColorChooserRequest) ElementRectangle() gdk.Rectangle {
+func (request *ColorChooserRequest) ElementRectangle() *gdk.Rectangle {
 	var _arg0 *C.WebKitColorChooserRequest // out
 	var _arg1 C.GdkRectangle               // in
 
@@ -72,15 +77,15 @@ func (request *ColorChooserRequest) ElementRectangle() gdk.Rectangle {
 	C.webkit_color_chooser_request_get_element_rectangle(_arg0, &_arg1)
 	runtime.KeepAlive(request)
 
-	var _rect gdk.Rectangle // out
+	var _rect *gdk.Rectangle // out
 
-	_rect = *(*gdk.Rectangle)(gextras.NewStructNative(unsafe.Pointer((&_arg1))))
+	_rect = (*gdk.Rectangle)(gextras.NewStructNative(unsafe.Pointer((&_arg1))))
 
 	return _rect
 }
 
 // RGBA gets the current RGBA color of request.
-func (request *ColorChooserRequest) RGBA() gdk.RGBA {
+func (request *ColorChooserRequest) RGBA() *gdk.RGBA {
 	var _arg0 *C.WebKitColorChooserRequest // out
 	var _arg1 C.GdkRGBA                    // in
 
@@ -89,9 +94,9 @@ func (request *ColorChooserRequest) RGBA() gdk.RGBA {
 	C.webkit_color_chooser_request_get_rgba(_arg0, &_arg1)
 	runtime.KeepAlive(request)
 
-	var _rgba gdk.RGBA // out
+	var _rgba *gdk.RGBA // out
 
-	_rgba = *(*gdk.RGBA)(gextras.NewStructNative(unsafe.Pointer((&_arg1))))
+	_rgba = (*gdk.RGBA)(gextras.NewStructNative(unsafe.Pointer((&_arg1))))
 
 	return _rgba
 }

@@ -11,6 +11,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -32,6 +33,10 @@ type DownloadOverrider interface {
 type Download struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*Download)(nil)
+)
 
 func wrapDownload(obj *externglib.Object) *Download {
 	return &Download{

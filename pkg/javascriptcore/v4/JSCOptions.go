@@ -14,6 +14,7 @@ import (
 
 // #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <jsc/jsc.h>
 // gboolean _gotk4_javascriptcore4_OptionsFunc(char*, JSCOptionType, char*, gpointer);
 import "C"
@@ -35,7 +36,7 @@ const OPTIONS_USE_JIT = "useJIT"
 const OPTIONS_USE_LLINT = "useLLInt"
 
 // OptionType: enum values for options types.
-type OptionType int
+type OptionType C.gint
 
 const (
 	// OptionBoolean option type.

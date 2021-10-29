@@ -13,6 +13,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -26,7 +27,7 @@ func init() {
 
 // EditorTypingAttributes: enum values with flags representing typing
 // attributes.
-type EditorTypingAttributes int
+type EditorTypingAttributes C.guint
 
 const (
 	// EditorTypingAttributeNone: no typing attributes.
@@ -87,6 +88,10 @@ func (e EditorTypingAttributes) Has(other EditorTypingAttributes) bool {
 type EditorState struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*EditorState)(nil)
+)
 
 func wrapEditorState(obj *externglib.Object) *EditorState {
 	return &EditorState{

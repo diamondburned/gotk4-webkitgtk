@@ -14,6 +14,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -32,7 +33,7 @@ func init() {
 // soup_websocket_connection_close() or received from
 // soup_websocket_connection_get_close_code(). (However, other codes are also
 // allowed.).
-type WebsocketCloseCode int
+type WebsocketCloseCode C.gint
 
 const (
 	// WebsocketCloseNormal: normal, non-error close.
@@ -107,7 +108,7 @@ func (w WebsocketCloseCode) String() string {
 }
 
 // WebsocketConnectionType: type of a WebsocketConnection.
-type WebsocketConnectionType int
+type WebsocketConnectionType C.gint
 
 const (
 	// WebsocketConnectionUnknown: unknown/invalid connection.
@@ -138,7 +139,7 @@ func (w WebsocketConnectionType) String() string {
 
 // WebsocketDataType: type of data contained in a WebsocketConnection::message
 // signal.
-type WebsocketDataType int
+type WebsocketDataType C.gint
 
 const (
 	// WebsocketDataText: UTF-8 text.
@@ -164,7 +165,7 @@ func (w WebsocketDataType) String() string {
 }
 
 // WebsocketError: webSocket-related errors.
-type WebsocketError int
+type WebsocketError C.gint
 
 const (
 	// WebsocketErrorFailed: generic error.
@@ -213,7 +214,7 @@ func WebsocketErrorGetQuark() glib.Quark {
 }
 
 // WebsocketState: state of the WebSocket connection.
-type WebsocketState int
+type WebsocketState C.gint
 
 const (
 	// WebsocketStateOpen: connection is ready to send messages.
@@ -271,7 +272,7 @@ func WebsocketClientPrepareHandshake(msg *Message, origin string, protocols []st
 		defer C.free(unsafe.Pointer(_arg2))
 	}
 	{
-		_arg3 = (**C.char)(C.malloc(C.ulong(len(protocols)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg3 = (**C.char)(C.malloc(C.size_t(uint((len(protocols) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg3))
 		{
 			out := unsafe.Slice(_arg3, len(protocols)+1)
@@ -362,7 +363,7 @@ func WebsocketServerCheckHandshake(msg *Message, origin string, protocols []stri
 		defer C.free(unsafe.Pointer(_arg2))
 	}
 	{
-		_arg3 = (**C.char)(C.malloc(C.ulong(len(protocols)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg3 = (**C.char)(C.malloc(C.size_t(uint((len(protocols) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg3))
 		{
 			out := unsafe.Slice(_arg3, len(protocols)+1)
@@ -424,7 +425,7 @@ func WebsocketServerProcessHandshake(msg *Message, expectedOrigin string, protoc
 		defer C.free(unsafe.Pointer(_arg2))
 	}
 	{
-		_arg3 = (**C.char)(C.malloc(C.ulong(len(protocols)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg3 = (**C.char)(C.malloc(C.size_t(uint((len(protocols) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg3))
 		{
 			out := unsafe.Slice(_arg3, len(protocols)+1)

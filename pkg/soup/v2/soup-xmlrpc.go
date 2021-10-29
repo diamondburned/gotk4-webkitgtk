@@ -15,6 +15,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -29,7 +30,7 @@ func init() {
 // url="http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php">http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php</ulink>.
 // These are an extension, not part of the XML-RPC spec; you can't assume
 // servers will use them.
-type XMLRPCFault int
+type XMLRPCFault C.gint
 
 const (
 	// XmlrpcFaultParseErrorNotWellFormed: request was not well-formed.

@@ -16,6 +16,7 @@ import (
 
 // #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <jsc/jsc.h>
 import "C"
@@ -29,7 +30,7 @@ func init() {
 // ValuePropertyFlags flags used when defining properties with
 // jsc_value_object_define_property_data() and
 // jsc_value_object_define_property_accessor().
-type ValuePropertyFlags int
+type ValuePropertyFlags C.guint
 
 const (
 	// ValuePropertyConfigurable: type of the property descriptor may be changed
@@ -83,6 +84,10 @@ type Value struct {
 	*externglib.Object
 }
 
+var (
+	_ externglib.Objector = (*Value)(nil)
+)
+
 func wrapValue(obj *externglib.Object) *Value {
 	return &Value{
 		Object: obj,
@@ -109,7 +114,7 @@ func NewValueArrayFromStrv(context *Context, strv []string) *Value {
 
 	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
 	{
-		_arg2 = (**C.char)(C.malloc(C.ulong(len(strv)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg2 = (**C.char)(C.malloc(C.size_t(uint((len(strv) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg2))
 		{
 			out := unsafe.Slice(_arg2, len(strv)+1)
@@ -372,7 +377,7 @@ func (value *Value) ConstructorCall(parameters []*Value) *Value {
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 	if parameters != nil {
 		_arg1 = (C.guint)(len(parameters))
-		_arg2 = (**C.JSCValue)(C.malloc(C.ulong(len(parameters)) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg2 = (**C.JSCValue)(C.malloc(C.size_t(uint(len(parameters)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg2))
 		{
 			out := unsafe.Slice((**C.JSCValue)(_arg2), len(parameters))
@@ -413,7 +418,7 @@ func (value *Value) FunctionCall(parameters []*Value) *Value {
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
 	if parameters != nil {
 		_arg1 = (C.guint)(len(parameters))
-		_arg2 = (**C.JSCValue)(C.malloc(C.ulong(len(parameters)) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg2 = (**C.JSCValue)(C.malloc(C.size_t(uint(len(parameters)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg2))
 		{
 			out := unsafe.Slice((**C.JSCValue)(_arg2), len(parameters))
@@ -825,7 +830,7 @@ func (value *Value) ObjectInvokeMethod(name string, parameters []*Value) *Value 
 	defer C.free(unsafe.Pointer(_arg1))
 	if parameters != nil {
 		_arg2 = (C.guint)(len(parameters))
-		_arg3 = (**C.JSCValue)(C.malloc(C.ulong(len(parameters)) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg3 = (**C.JSCValue)(C.malloc(C.size_t(uint(len(parameters)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg3))
 		{
 			out := unsafe.Slice((**C.JSCValue)(_arg3), len(parameters))

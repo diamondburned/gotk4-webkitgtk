@@ -19,6 +19,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 // void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
@@ -110,7 +111,7 @@ const SESSION_USE_NTLM = "use-ntlm"
 const SESSION_USE_THREAD_CONTEXT = "use-thread-context"
 
 // RequestError: Request error.
-type RequestError int
+type RequestError C.gint
 
 const (
 	// RequestErrorBadURI: URI could not be parsed.
@@ -271,6 +272,10 @@ type SessionOverrider interface {
 type Session struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*Session)(nil)
+)
 
 func wrapSession(obj *externglib.Object) *Session {
 	return &Session{
@@ -1357,7 +1362,7 @@ func (session *Session) WebsocketConnectAsync(ctx context.Context, msg *Message,
 		defer C.free(unsafe.Pointer(_arg2))
 	}
 	{
-		_arg3 = (**C.char)(C.malloc(C.ulong(len(protocols)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg3 = (**C.char)(C.malloc(C.size_t(uint((len(protocols) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg3))
 		{
 			out := unsafe.Slice(_arg3, len(protocols)+1)

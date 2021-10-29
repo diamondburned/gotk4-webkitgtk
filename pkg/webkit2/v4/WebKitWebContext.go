@@ -19,6 +19,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 // extern void callbackDelete(gpointer);
@@ -35,7 +36,7 @@ func init() {
 }
 
 // CacheModel: enum values used for determining the KitWebContext cache model.
-type CacheModel int
+type CacheModel C.gint
 
 const (
 	// CacheModelDocumentViewer: disable the cache completely, which
@@ -72,7 +73,7 @@ func (c CacheModel) String() string {
 
 // ProcessModel: enum values used for determining the KitWebContext process
 // model.
-type ProcessModel int
+type ProcessModel C.gint
 
 const (
 	// ProcessModelSharedSecondaryProcess: deprecated 2.26.
@@ -138,6 +139,10 @@ type WebContextOverrider interface {
 type WebContext struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*WebContext)(nil)
+)
 
 func wrapWebContext(obj *externglib.Object) *WebContext {
 	return &WebContext{
@@ -1032,7 +1037,7 @@ func (context *WebContext) SetPreferredLanguages(languages []string) {
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 	{
-		_arg1 = (**C.gchar)(C.malloc(C.ulong(len(languages)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg1 = (**C.gchar)(C.malloc(C.size_t(uint((len(languages) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg1))
 		{
 			out := unsafe.Slice(_arg1, len(languages)+1)
@@ -1150,7 +1155,7 @@ func (context *WebContext) SetSpellCheckingLanguages(languages []string) {
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 	{
-		_arg1 = (**C.gchar)(C.malloc(C.ulong(len(languages)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg1 = (**C.gchar)(C.malloc(C.size_t(uint((len(languages) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg1))
 		{
 			out := unsafe.Slice(_arg1, len(languages)+1)

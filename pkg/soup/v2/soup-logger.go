@@ -13,6 +13,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 // SoupLoggerLogLevel _gotk4_soup2_LoggerFilter(SoupLogger*, SoupMessage*, gpointer);
@@ -34,7 +35,7 @@ const LOGGER_LEVEL = "level"
 const LOGGER_MAX_BODY_SIZE = "max-body-size"
 
 // LoggerLogLevel describes the level of logging output to provide.
-type LoggerLogLevel int
+type LoggerLogLevel C.gint
 
 const (
 	// LoggerLogNone: no logging.
@@ -136,6 +137,10 @@ type Logger struct {
 
 	SessionFeature
 }
+
+var (
+	_ externglib.Objector = (*Logger)(nil)
+)
 
 func wrapLogger(obj *externglib.Object) *Logger {
 	return &Logger{

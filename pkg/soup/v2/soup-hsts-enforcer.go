@@ -12,6 +12,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -41,6 +42,10 @@ type HSTSEnforcer struct {
 
 	SessionFeature
 }
+
+var (
+	_ externglib.Objector = (*HSTSEnforcer)(nil)
+)
 
 func wrapHSTSEnforcer(obj *externglib.Object) *HSTSEnforcer {
 	return &HSTSEnforcer{
@@ -109,7 +114,7 @@ func (hstsEnforcer *HSTSEnforcer) Domains(sessionPolicies bool) []string {
 //
 //    - sessionPolicies: whether to include session policies.
 //
-func (hstsEnforcer *HSTSEnforcer) Policies(sessionPolicies bool) []HSTSPolicy {
+func (hstsEnforcer *HSTSEnforcer) Policies(sessionPolicies bool) []*HSTSPolicy {
 	var _arg0 *C.SoupHSTSEnforcer // out
 	var _arg1 C.gboolean          // out
 	var _cret *C.GList            // in
@@ -123,15 +128,15 @@ func (hstsEnforcer *HSTSEnforcer) Policies(sessionPolicies bool) []HSTSPolicy {
 	runtime.KeepAlive(hstsEnforcer)
 	runtime.KeepAlive(sessionPolicies)
 
-	var _list []HSTSPolicy // out
+	var _list []*HSTSPolicy // out
 
-	_list = make([]HSTSPolicy, 0, gextras.ListSize(unsafe.Pointer(_cret)))
+	_list = make([]*HSTSPolicy, 0, gextras.ListSize(unsafe.Pointer(_cret)))
 	gextras.MoveList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
 		src := (*C.SoupHSTSPolicy)(v)
-		var dst HSTSPolicy // out
-		dst = *(*HSTSPolicy)(gextras.NewStructNative(unsafe.Pointer(src)))
+		var dst *HSTSPolicy // out
+		dst = (*HSTSPolicy)(gextras.NewStructNative(unsafe.Pointer(src)))
 		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(&dst)),
+			gextras.StructIntern(unsafe.Pointer(dst)),
 			func(intern *struct{ C unsafe.Pointer }) {
 				C.soup_hsts_policy_free((*C.SoupHSTSPolicy)(intern.C))
 			},
@@ -247,7 +252,7 @@ func (hstsEnforcer *HSTSEnforcer) SetSessionPolicy(domain string, includeSubdoma
 // will contain its old value, and new_policy its new value.
 //
 // Note that you shouldn't modify the policies from a callback to this signal.
-func (hstsEnforcer *HSTSEnforcer) ConnectChanged(f func(oldPolicy, newPolicy HSTSPolicy)) externglib.SignalHandle {
+func (hstsEnforcer *HSTSEnforcer) ConnectChanged(f func(oldPolicy, newPolicy *HSTSPolicy)) externglib.SignalHandle {
 	return hstsEnforcer.Connect("changed", f)
 }
 

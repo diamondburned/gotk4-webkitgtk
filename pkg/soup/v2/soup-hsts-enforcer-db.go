@@ -11,6 +11,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -26,6 +27,10 @@ const HSTS_ENFORCER_DB_FILENAME = "filename"
 type HSTSEnforcerDB struct {
 	HSTSEnforcer
 }
+
+var (
+	_ externglib.Objector = (*HSTSEnforcerDB)(nil)
+)
 
 func wrapHSTSEnforcerDB(obj *externglib.Object) *HSTSEnforcerDB {
 	return &HSTSEnforcerDB{

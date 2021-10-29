@@ -18,6 +18,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 // extern void callbackDelete(gpointer);
@@ -94,7 +95,7 @@ const SERVER_TLS_CERTIFICATE = "tls-certificate"
 // with soup_server_listen_all() and soup_server_listen_local(), not plain
 // soup_server_listen() (which simply listens on whatever kind of socket you
 // give it). And you cannot specify both of them in a single call.
-type ServerListenOptions int
+type ServerListenOptions C.guint
 
 const (
 	// ServerListenHTTPS: listen for https connections rather than plain http.
@@ -244,6 +245,10 @@ type ServerOverrider interface {
 type Server struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*Server)(nil)
+)
 
 func wrapServer(obj *externglib.Object) *Server {
 	return &Server{
@@ -498,7 +503,7 @@ func (server *Server) AddWebsocketHandler(path, origin string, protocols []strin
 		defer C.free(unsafe.Pointer(_arg2))
 	}
 	{
-		_arg3 = (**C.char)(C.malloc(C.ulong(len(protocols)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg3 = (**C.char)(C.malloc(C.size_t(uint((len(protocols) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg3))
 		{
 			out := unsafe.Slice(_arg3, len(protocols)+1)
@@ -665,7 +670,7 @@ func (server *Server) Port() uint {
 // Note that if you used soup_server_listen_all(), the returned URIs will use
 // the addresses <literal>0.0.0.0</literal> and <literal>::</literal>, rather
 // than actually returning separate URIs for each interface on the system.
-func (server *Server) URIs() []URI {
+func (server *Server) URIs() []*URI {
 	var _arg0 *C.SoupServer // out
 	var _cret *C.GSList     // in
 
@@ -674,15 +679,15 @@ func (server *Server) URIs() []URI {
 	_cret = C.soup_server_get_uris(_arg0)
 	runtime.KeepAlive(server)
 
-	var _sList []URI // out
+	var _sList []*URI // out
 
-	_sList = make([]URI, 0, gextras.SListSize(unsafe.Pointer(_cret)))
+	_sList = make([]*URI, 0, gextras.SListSize(unsafe.Pointer(_cret)))
 	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
 		src := (*C.SoupURI)(v)
-		var dst URI // out
-		dst = *(*URI)(gextras.NewStructNative(unsafe.Pointer(src)))
+		var dst *URI // out
+		dst = (*URI)(gextras.NewStructNative(unsafe.Pointer(src)))
 		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(&dst)),
+			gextras.StructIntern(unsafe.Pointer(dst)),
 			func(intern *struct{ C unsafe.Pointer }) {
 				C.soup_uri_free((*C.SoupURI)(intern.C))
 			},

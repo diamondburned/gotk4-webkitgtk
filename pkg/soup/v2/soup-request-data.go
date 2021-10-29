@@ -11,6 +11,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -24,6 +25,10 @@ func init() {
 type RequestData struct {
 	Request
 }
+
+var (
+	_ externglib.Objector = (*RequestData)(nil)
+)
 
 func wrapRequestData(obj *externglib.Object) *RequestData {
 	return &RequestData{

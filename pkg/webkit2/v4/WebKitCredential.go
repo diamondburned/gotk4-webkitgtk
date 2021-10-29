@@ -13,6 +13,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -26,7 +27,7 @@ func init() {
 
 // CredentialPersistence: enum values representing the duration for which a
 // credential persists.
-type CredentialPersistence int
+type CredentialPersistence C.gint
 
 const (
 	// CredentialPersistenceNone: credential does not persist.

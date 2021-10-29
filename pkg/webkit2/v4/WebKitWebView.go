@@ -24,6 +24,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 // void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
@@ -44,7 +45,7 @@ func init() {
 
 // InsecureContentEvent: enum values used to denote the different events which
 // can trigger the detection of insecure content.
-type InsecureContentEvent int
+type InsecureContentEvent C.gint
 
 const (
 	// InsecureContentRun: insecure content has been detected by trying to
@@ -73,7 +74,7 @@ func (i InsecureContentEvent) String() string {
 
 // LoadEvent: enum values used to denote the different events that happen during
 // a KitWebView load operation.
-type LoadEvent int
+type LoadEvent C.gint
 
 const (
 	// LoadStarted: new load request has been made. No data has been received
@@ -113,7 +114,7 @@ func (l LoadEvent) String() string {
 
 // PolicyDecisionType: enum values used for determining the type of a policy
 // decision during KitWebView::decide-policy.
-type PolicyDecisionType int
+type PolicyDecisionType C.gint
 
 const (
 	// PolicyDecisionTypeNavigationAction: this type of policy decision is
@@ -164,7 +165,7 @@ func (p PolicyDecisionType) String() string {
 
 // SaveMode: enum values to specify the different ways in which a KitWebView can
 // save its current web page into a self-contained file.
-type SaveMode int
+type SaveMode C.gint
 
 const (
 	// SaveModeMhtml: save the current page using the MHTML format.
@@ -187,7 +188,7 @@ func (s SaveMode) String() string {
 
 // SnapshotRegion: enum values used to specify the region from which to get a
 // KitWebView snapshot.
-type SnapshotRegion int
+type SnapshotRegion C.gint
 
 const (
 	// SnapshotRegionVisible specifies a snapshot only for the area that is
@@ -215,7 +216,7 @@ func (s SnapshotRegion) String() string {
 
 // WebProcessTerminationReason: enum values used to specify the reason why the
 // web process terminated abnormally.
-type WebProcessTerminationReason int
+type WebProcessTerminationReason C.gint
 
 const (
 	// WebProcessCrashed: web process crashed.
@@ -242,7 +243,7 @@ func (w WebProcessTerminationReason) String() string {
 
 // SnapshotOptions: enum values used to specify options when taking a snapshot
 // from a KitWebView.
-type SnapshotOptions int
+type SnapshotOptions C.guint
 
 const (
 	// SnapshotOptionsNone: do not include any special options.
@@ -301,6 +302,7 @@ func (s SnapshotOptions) Has(other SnapshotOptions) bool {
 type WebViewOverrider interface {
 	Authenticate(request *AuthenticationRequest) bool
 	Close()
+	ContextMenu(contextMenu *ContextMenu, event *gdk.Event, hitTestResult *HitTestResult) bool
 	ContextMenuDismissed()
 	DecidePolicy(decision PolicyDecisioner, typ PolicyDecisionType) bool
 	EnterFullscreen() bool
@@ -329,6 +331,10 @@ type WebViewOverrider interface {
 type WebView struct {
 	WebViewBase
 }
+
+var (
+	_ gtk.Containerer = (*WebView)(nil)
+)
 
 func wrapWebView(obj *externglib.Object) *WebView {
 	return &WebView{
@@ -726,7 +732,7 @@ func (webView *WebView) BackForwardList() *BackForwardList {
 // BackgroundColor gets the color that is used to draw the web_view background
 // before the actual contents are rendered. For more information see also
 // webkit_web_view_set_background_color().
-func (webView *WebView) BackgroundColor() gdk.RGBA {
+func (webView *WebView) BackgroundColor() *gdk.RGBA {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 C.GdkRGBA        // in
 
@@ -735,9 +741,9 @@ func (webView *WebView) BackgroundColor() gdk.RGBA {
 	C.webkit_web_view_get_background_color(_arg0, &_arg1)
 	runtime.KeepAlive(webView)
 
-	var _rgba gdk.RGBA // out
+	var _rgba *gdk.RGBA // out
 
-	_rgba = *(*gdk.RGBA)(gextras.NewStructNative(unsafe.Pointer((&_arg1))))
+	_rgba = (*gdk.RGBA)(gextras.NewStructNative(unsafe.Pointer((&_arg1))))
 
 	return _rgba
 }
@@ -2378,6 +2384,45 @@ func (webView *WebView) ConnectClose(f func()) externglib.SignalHandle {
 	return webView.Connect("close", f)
 }
 
+// ConnectContextMenu: emitted when a context menu is about to be displayed to
+// give the application a chance to customize the proposed menu, prevent the
+// menu from being displayed, or build its own context menu. <itemizedlist>
+// <listitem><para> To customize the proposed menu you can use
+// webkit_context_menu_prepend(), webkit_context_menu_append() or
+// webkit_context_menu_insert() to add new KitContextMenuItem<!-- -->s to
+// context_menu, webkit_context_menu_move_item() to reorder existing items, or
+// webkit_context_menu_remove() to remove an existing item. The signal handler
+// should return FALSE, and the menu represented by context_menu will be shown.
+// </para></listitem> <listitem><para> To prevent the menu from being displayed
+// you can just connect to this signal and return TRUE so that the proposed menu
+// will not be shown. </para></listitem> <listitem><para> To build your own
+// menu, you can remove all items from the proposed menu with
+// webkit_context_menu_remove_all(), add your own items and return FALSE so that
+// the menu will be shown. You can also ignore the proposed KitContextMenu,
+// build your own Menu and return TRUE to prevent the proposed menu from being
+// shown. </para></listitem> <listitem><para> If you just want the default menu
+// to be shown always, simply don't connect to this signal because showing the
+// proposed context menu is the default behaviour. </para></listitem>
+// </itemizedlist>
+//
+// The event is expected to be one of the following types: <itemizedlist>
+// <listitem><para> a EventButton of type GDK_BUTTON_PRESS when the context menu
+// was triggered with mouse. </para></listitem> <listitem><para> a EventKey of
+// type GDK_KEY_PRESS if the keyboard was used to show the menu.
+// </para></listitem> <listitem><para> a generic Event of type GDK_NOTHING when
+// the Widget::popup-menu signal was used to show the context menu.
+// </para></listitem> </itemizedlist>
+//
+// If the signal handler returns FALSE the context menu represented by
+// context_menu will be shown, if it return TRUE the context menu will not be
+// shown.
+//
+// The proposed KitContextMenu passed in context_menu argument is only valid
+// during the signal emission.
+func (webView *WebView) ConnectContextMenu(f func(contextMenu ContextMenu, event *gdk.Event, hitTestResult HitTestResult) bool) externglib.SignalHandle {
+	return webView.Connect("context-menu", f)
+}
+
 // ConnectContextMenuDismissed: emitted after KitWebView::context-menu signal,
 // if the context menu is shown, to notify that the context menu is dismissed.
 func (webView *WebView) ConnectContextMenuDismissed(f func()) externglib.SignalHandle {
@@ -2665,6 +2710,16 @@ func (webView *WebView) ConnectScriptDialog(f func(dialog *ScriptDialog) bool) e
 // support for it.
 func (webView *WebView) ConnectShowNotification(f func(notification Notification) bool) externglib.SignalHandle {
 	return webView.Connect("show-notification", f)
+}
+
+// ConnectShowOptionMenu: this signal is emitted when a select element in
+// web_view needs to display a dropdown menu. This signal can be used to show a
+// custom menu, using menu to get the details of all items that should be
+// displayed. The area of the element in the KitWebView is given as rectangle
+// parameter, it can be used to position the menu. To handle this signal
+// asynchronously you should keep a ref of the menu.
+func (webView *WebView) ConnectShowOptionMenu(f func(object OptionMenu, p0 *gdk.Event, p1 *gdk.Rectangle) bool) externglib.SignalHandle {
+	return webView.Connect("show-option-menu", f)
 }
 
 // ConnectSubmitForm: this signal is emitted when a form is about to be

@@ -17,6 +17,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 // void _gotk4_soup2_SocketCallback(SoupSocket*, guint, gpointer);
@@ -81,7 +82,7 @@ const SOCKET_TRUSTED_CERTIFICATE = "trusted-certificate"
 const SOCKET_USE_THREAD_CONTEXT = "use-thread-context"
 
 // SocketIOStatus: return value from the Socket IO methods.
-type SocketIOStatus int
+type SocketIOStatus C.gint
 
 const (
 	// SocketOK: success.
@@ -150,6 +151,10 @@ type Socket struct {
 
 	gio.Initable
 }
+
+var (
+	_ externglib.Objector = (*Socket)(nil)
+)
 
 func wrapSocket(obj *externglib.Object) *Socket {
 	return &Socket{

@@ -11,6 +11,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -23,7 +24,7 @@ func init() {
 
 // ContextMenuAction: enum values used to denote the stock actions for
 // KitContextMenuItem<!-- -->s.
-type ContextMenuAction int
+type ContextMenuAction C.gint
 
 const (
 	// ContextMenuActionNoAction: no action, used by separator menu items.

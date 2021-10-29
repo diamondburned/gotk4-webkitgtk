@@ -13,6 +13,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -25,7 +26,7 @@ func init() {
 }
 
 // AuthenticationScheme: enum values representing the authentication scheme.
-type AuthenticationScheme int
+type AuthenticationScheme C.gint
 
 const (
 	// AuthenticationSchemeDefault: default authentication scheme of WebKit.
@@ -87,6 +88,10 @@ func (a AuthenticationScheme) String() string {
 type AuthenticationRequest struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*AuthenticationRequest)(nil)
+)
 
 func wrapAuthenticationRequest(obj *externglib.Object) *AuthenticationRequest {
 	return &AuthenticationRequest{

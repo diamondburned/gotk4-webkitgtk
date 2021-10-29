@@ -12,6 +12,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -54,7 +55,7 @@ func XmlrpcBuildMethodCall(methodName string, params []externglib.Value) string 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(methodName)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg3 = (C.int)(len(params))
-	_arg2 = (*C.GValue)(C.malloc(C.ulong(len(params)) * C.ulong(C.sizeof_GValue)))
+	_arg2 = (*C.GValue)(C.malloc(C.size_t(uint(len(params)) * uint(C.sizeof_GValue))))
 	defer C.free(unsafe.Pointer(_arg2))
 	{
 		out := unsafe.Slice((*C.GValue)(_arg2), len(params))

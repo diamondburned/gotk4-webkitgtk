@@ -17,6 +17,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 // void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
@@ -73,6 +74,10 @@ type Request struct {
 
 	gio.Initable
 }
+
+var (
+	_ externglib.Objector = (*Request)(nil)
+)
 
 func wrapRequest(obj *externglib.Object) *Request {
 	return &Request{

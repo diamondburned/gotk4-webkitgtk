@@ -10,6 +10,7 @@ import (
 
 // #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <jsc/jsc.h>
 import "C"
@@ -23,6 +24,10 @@ func init() {
 type VirtualMachine struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*VirtualMachine)(nil)
+)
 
 func wrapVirtualMachine(obj *externglib.Object) *VirtualMachine {
 	return &VirtualMachine{

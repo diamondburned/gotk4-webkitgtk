@@ -13,6 +13,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -25,7 +26,7 @@ func init() {
 }
 
 // NetworkProxyMode: enum values used to set the network proxy mode.
-type NetworkProxyMode int
+type NetworkProxyMode C.gint
 
 const (
 	// NetworkProxyModeDefault: use the default proxy of the system.
@@ -80,7 +81,7 @@ func NewNetworkProxySettings(defaultProxyUri string, ignoreHosts []string) *Netw
 		defer C.free(unsafe.Pointer(_arg1))
 	}
 	{
-		_arg2 = (**C.gchar)(C.malloc(C.ulong(len(ignoreHosts)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg2 = (**C.gchar)(C.malloc(C.size_t(uint((len(ignoreHosts) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg2))
 		{
 			out := unsafe.Slice(_arg2, len(ignoreHosts)+1)

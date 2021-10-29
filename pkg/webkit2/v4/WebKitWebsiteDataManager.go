@@ -19,6 +19,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 // void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
@@ -34,7 +35,7 @@ func init() {
 }
 
 // TLSErrorsPolicy: enum values used to denote the TLS errors policy.
-type TLSErrorsPolicy int
+type TLSErrorsPolicy C.gint
 
 const (
 	// TLSErrorsPolicyIgnore: ignore TLS errors.
@@ -65,6 +66,10 @@ func (t TLSErrorsPolicy) String() string {
 type WebsiteDataManager struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*WebsiteDataManager)(nil)
+)
 
 func wrapWebsiteDataManager(obj *externglib.Object) *WebsiteDataManager {
 	return &WebsiteDataManager{

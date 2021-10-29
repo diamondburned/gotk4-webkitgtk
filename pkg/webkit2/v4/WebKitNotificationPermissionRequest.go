@@ -10,6 +10,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -25,6 +26,10 @@ type NotificationPermissionRequest struct {
 
 	PermissionRequest
 }
+
+var (
+	_ externglib.Objector = (*NotificationPermissionRequest)(nil)
+)
 
 func wrapNotificationPermissionRequest(obj *externglib.Object) *NotificationPermissionRequest {
 	return &NotificationPermissionRequest{

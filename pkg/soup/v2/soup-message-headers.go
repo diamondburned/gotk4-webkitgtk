@@ -15,6 +15,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 // void _gotk4_soup2_MessageHeadersForeachFunc(char*, char*, gpointer);
@@ -30,7 +31,7 @@ func init() {
 }
 
 // Encoding: how a message body is encoded for transport.
-type Encoding int
+type Encoding C.gint
 
 const (
 	// EncodingUnrecognized: unknown / error.
@@ -76,7 +77,7 @@ func (e Encoding) String() string {
 
 // MessageHeadersType: value passed to soup_message_headers_new() to set certain
 // default behaviors.
-type MessageHeadersType int
+type MessageHeadersType C.gint
 
 const (
 	// MessageHeadersRequest: request headers.
@@ -106,7 +107,7 @@ func (m MessageHeadersType) String() string {
 }
 
 // Expectation represents the parsed value of the "Expect" header.
-type Expectation int
+type Expectation C.guint
 
 const (
 	// ExpectationUnrecognized: any unrecognized expectation.
@@ -625,8 +626,19 @@ func (hdrs *MessageHeaders) Ranges(totalLength int64) ([]Range, bool) {
 	var _ok bool        // out
 
 	defer C.free(unsafe.Pointer(_arg2))
-	_ranges = make([]Range, _arg3)
-	copy(_ranges, unsafe.Slice((*Range)(unsafe.Pointer(_arg2)), _arg3))
+	{
+		src := unsafe.Slice(_arg2, _arg3)
+		_ranges = make([]Range, _arg3)
+		for i := 0; i < int(_arg3); i++ {
+			_ranges[i] = *(*Range)(gextras.NewStructNative(unsafe.Pointer((&src[i]))))
+			runtime.SetFinalizer(
+				gextras.StructIntern(unsafe.Pointer(&_ranges[i])),
+				func(intern *struct{ C unsafe.Pointer }) {
+					C.free(intern.C)
+				},
+			)
+		}
+	}
 	if _cret != 0 {
 		_ok = true
 	}
@@ -966,7 +978,7 @@ func (iter *MessageHeadersIter) Next() (name string, value string, ok bool) {
 //
 //    - hdrs: SoupMessageHeaders.
 //
-func MessageHeadersIterInit(hdrs *MessageHeaders) MessageHeadersIter {
+func MessageHeadersIterInit(hdrs *MessageHeaders) *MessageHeadersIter {
 	var _arg1 C.SoupMessageHeadersIter // in
 	var _arg2 *C.SoupMessageHeaders    // out
 
@@ -975,9 +987,9 @@ func MessageHeadersIterInit(hdrs *MessageHeaders) MessageHeadersIter {
 	C.soup_message_headers_iter_init(&_arg1, _arg2)
 	runtime.KeepAlive(hdrs)
 
-	var _iter MessageHeadersIter // out
+	var _iter *MessageHeadersIter // out
 
-	_iter = *(*MessageHeadersIter)(gextras.NewStructNative(unsafe.Pointer((&_arg1))))
+	_iter = (*MessageHeadersIter)(gextras.NewStructNative(unsafe.Pointer((&_arg1))))
 
 	return _iter
 }

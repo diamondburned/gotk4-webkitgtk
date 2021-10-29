@@ -9,12 +9,12 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -28,7 +28,7 @@ func init() {
 
 // UserMessageError: enum values used to denote errors happening when sending
 // user messages.
-type UserMessageError int
+type UserMessageError C.gint
 
 const (
 	// UserMessageUnhandledMessage: message was not handled by the receiver.
@@ -52,6 +52,8 @@ func (u UserMessageError) String() string {
 type UserMessage struct {
 	externglib.InitiallyUnowned
 }
+
+var ()
 
 func wrapUserMessage(obj *externglib.Object) *UserMessage {
 	return &UserMessage{
@@ -92,66 +94,6 @@ func NewUserMessage(name string, parameters *glib.Variant) *UserMessage {
 	_userMessage = wrapUserMessage(externglib.Take(unsafe.Pointer(_cret)))
 
 	return _userMessage
-}
-
-// NewUserMessageWithFdList: create a new KitUserMessage including also a list
-// of UNIX file descriptors to be sent.
-//
-// The function takes the following parameters:
-//
-//    - name: message name.
-//    - parameters: message parameters as a #GVariant.
-//    - fdList: message file descriptors.
-//
-func NewUserMessageWithFdList(name string, parameters *glib.Variant, fdList *gio.UnixFDList) *UserMessage {
-	var _arg1 *C.char              // out
-	var _arg2 *C.GVariant          // out
-	var _arg3 *C.GUnixFDList       // out
-	var _cret *C.WebKitUserMessage // in
-
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
-	defer C.free(unsafe.Pointer(_arg1))
-	if parameters != nil {
-		_arg2 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(parameters)))
-	}
-	if fdList != nil {
-		_arg3 = (*C.GUnixFDList)(unsafe.Pointer(fdList.Native()))
-	}
-
-	_cret = C.webkit_user_message_new_with_fd_list(_arg1, _arg2, _arg3)
-	runtime.KeepAlive(name)
-	runtime.KeepAlive(parameters)
-	runtime.KeepAlive(fdList)
-
-	var _userMessage *UserMessage // out
-
-	_userMessage = wrapUserMessage(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _userMessage
-}
-
-// FdList: get the message list of file descritpor.
-func (message *UserMessage) FdList() *gio.UnixFDList {
-	var _arg0 *C.WebKitUserMessage // out
-	var _cret *C.GUnixFDList       // in
-
-	_arg0 = (*C.WebKitUserMessage)(unsafe.Pointer(message.Native()))
-
-	_cret = C.webkit_user_message_get_fd_list(_arg0)
-	runtime.KeepAlive(message)
-
-	var _unixFDList *gio.UnixFDList // out
-
-	if _cret != nil {
-		{
-			obj := externglib.Take(unsafe.Pointer(_cret))
-			_unixFDList = &gio.UnixFDList{
-				Object: obj,
-			}
-		}
-	}
-
-	return _unixFDList
 }
 
 // Name: get the message name.

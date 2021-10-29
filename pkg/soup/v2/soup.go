@@ -13,6 +13,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -33,7 +34,7 @@ func init() {
 	})
 }
 
-type CacheResponse int
+type CacheResponse C.gint
 
 const (
 	CacheResponseFresh CacheResponse = iota
@@ -59,7 +60,7 @@ func (c CacheResponse) String() string {
 	}
 }
 
-type ConnectionState int
+type ConnectionState C.gint
 
 const (
 	NewConnection ConnectionState = iota
@@ -94,7 +95,7 @@ func (c ConnectionState) String() string {
 	}
 }
 
-type KnownStatusCode int
+type KnownStatusCode C.gint
 
 const (
 	KnownStatusCodeNone                         KnownStatusCode = 0
@@ -306,7 +307,7 @@ func RequestErrorQuark() glib.Quark {
 	return _quark
 }
 
-type RequesterError int
+type RequesterError C.gint
 
 const (
 	RequesterErrorBadURI RequesterError = iota
@@ -329,7 +330,7 @@ func (r RequesterError) String() string {
 	}
 }
 
-type SameSitePolicy int
+type SameSitePolicy C.gint
 
 const (
 	// SameSitePolicyNone: cookie is exposed with both cross-site and same-site
@@ -372,7 +373,7 @@ func TLDErrorQuark() glib.Quark {
 	return _quark
 }
 
-type XMLRPCError int
+type XMLRPCError C.gint
 
 const (
 	XmlrpcErrorArguments XMLRPCError = iota
@@ -407,7 +408,7 @@ func XMLRPCErrorQuark() glib.Quark {
 	return _quark
 }
 
-type Cacheability int
+type Cacheability C.guint
 
 const (
 	CacheCacheable   Cacheability = 0b1
@@ -473,6 +474,10 @@ type AuthBasic struct {
 	Auth
 }
 
+var (
+	_ Auther = (*AuthBasic)(nil)
+)
+
 func wrapAuthBasic(obj *externglib.Object) *AuthBasic {
 	return &AuthBasic{
 		Auth: Auth{
@@ -488,6 +493,10 @@ func marshalAuthBasiccer(p uintptr) (interface{}, error) {
 type AuthDigest struct {
 	Auth
 }
+
+var (
+	_ Auther = (*AuthDigest)(nil)
+)
 
 func wrapAuthDigest(obj *externglib.Object) *AuthDigest {
 	return &AuthDigest{
@@ -505,6 +514,10 @@ type AuthNTLM struct {
 	Auth
 }
 
+var (
+	_ Auther = (*AuthNTLM)(nil)
+)
+
 func wrapAuthNTLM(obj *externglib.Object) *AuthNTLM {
 	return &AuthNTLM{
 		Auth: Auth{
@@ -520,6 +533,10 @@ func marshalAuthNTLMer(p uintptr) (interface{}, error) {
 type AuthNegotiate struct {
 	Auth
 }
+
+var (
+	_ Auther = (*AuthNegotiate)(nil)
+)
 
 func wrapAuthNegotiate(obj *externglib.Object) *AuthNegotiate {
 	return &AuthNegotiate{

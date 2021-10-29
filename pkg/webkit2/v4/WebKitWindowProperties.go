@@ -13,6 +13,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -26,6 +27,10 @@ func init() {
 type WindowProperties struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*WindowProperties)(nil)
+)
 
 func wrapWindowProperties(obj *externglib.Object) *WindowProperties {
 	return &WindowProperties{
@@ -58,7 +63,7 @@ func (windowProperties *WindowProperties) Fullscreen() bool {
 }
 
 // Geometry: get the geometry the window should have on the screen when shown.
-func (windowProperties *WindowProperties) Geometry() gdk.Rectangle {
+func (windowProperties *WindowProperties) Geometry() *gdk.Rectangle {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _arg1 C.GdkRectangle            // in
 
@@ -67,9 +72,9 @@ func (windowProperties *WindowProperties) Geometry() gdk.Rectangle {
 	C.webkit_window_properties_get_geometry(_arg0, &_arg1)
 	runtime.KeepAlive(windowProperties)
 
-	var _geometry gdk.Rectangle // out
+	var _geometry *gdk.Rectangle // out
 
-	_geometry = *(*gdk.Rectangle)(gextras.NewStructNative(unsafe.Pointer((&_arg1))))
+	_geometry = (*gdk.Rectangle)(gextras.NewStructNative(unsafe.Pointer((&_arg1))))
 
 	return _geometry
 }

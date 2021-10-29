@@ -12,6 +12,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -25,6 +26,10 @@ func init() {
 type FileChooserRequest struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*FileChooserRequest)(nil)
+)
 
 func wrapFileChooserRequest(obj *externglib.Object) *FileChooserRequest {
 	return &FileChooserRequest{
@@ -190,7 +195,7 @@ func (request *FileChooserRequest) SelectFiles(files []string) {
 
 	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(request.Native()))
 	{
-		_arg1 = (**C.gchar)(C.malloc(C.ulong(len(files)+1) * C.ulong(unsafe.Sizeof(uint(0)))))
+		_arg1 = (**C.gchar)(C.malloc(C.size_t(uint((len(files) + 1)) * uint(unsafe.Sizeof(uint(0))))))
 		defer C.free(unsafe.Pointer(_arg1))
 		{
 			out := unsafe.Slice(_arg1, len(files)+1)

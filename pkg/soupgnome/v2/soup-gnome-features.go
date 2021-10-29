@@ -8,6 +8,7 @@ import (
 
 // #cgo pkg-config: libsoup-gnome-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup-gnome.h>
 import "C"

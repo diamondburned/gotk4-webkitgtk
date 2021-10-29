@@ -16,6 +16,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 // void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
@@ -30,6 +31,10 @@ func init() {
 type WebResource struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*WebResource)(nil)
+)
 
 func wrapWebResource(obj *externglib.Object) *WebResource {
 	return &WebResource{

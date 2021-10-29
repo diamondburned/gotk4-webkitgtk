@@ -14,6 +14,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -33,7 +34,7 @@ func init() {
 // time, appending the offset information if available.
 //
 // This enum may be extended with more values in future releases.
-type DateFormat int
+type DateFormat C.gint
 
 const (
 	// DateHTTP: RFC 1123 format, used by the HTTP "Date" header. Eg "Sun, 06
@@ -436,7 +437,7 @@ func (date *Date) ToTimeT() int32 {
 // ToTimeval converts date to a Val.
 //
 // Deprecated: Do not use Val, as it's not Y2038-safe.
-func (date *Date) ToTimeval() glib.TimeVal {
+func (date *Date) ToTimeval() *glib.TimeVal {
 	var _arg0 *C.SoupDate // out
 	var _arg1 C.GTimeVal  // in
 
@@ -445,9 +446,9 @@ func (date *Date) ToTimeval() glib.TimeVal {
 	C.soup_date_to_timeval(_arg0, &_arg1)
 	runtime.KeepAlive(date)
 
-	var _time glib.TimeVal // out
+	var _time *glib.TimeVal // out
 
-	_time = *(*glib.TimeVal)(gextras.NewStructNative(unsafe.Pointer((&_arg1))))
+	_time = (*glib.TimeVal)(gextras.NewStructNative(unsafe.Pointer((&_arg1))))
 
 	return _time
 }

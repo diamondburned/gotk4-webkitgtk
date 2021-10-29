@@ -10,6 +10,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -23,6 +24,10 @@ func init() {
 type SessionSync struct {
 	Session
 }
+
+var (
+	_ externglib.Objector = (*SessionSync)(nil)
+)
 
 func wrapSessionSync(obj *externglib.Object) *SessionSync {
 	return &SessionSync{

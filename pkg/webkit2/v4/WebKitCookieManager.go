@@ -19,6 +19,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 // void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
@@ -34,7 +35,7 @@ func init() {
 
 // CookieAcceptPolicy: enum values used to denote the cookie acceptance
 // policies.
-type CookieAcceptPolicy int
+type CookieAcceptPolicy C.gint
 
 const (
 	// CookiePolicyAcceptAlways: accept all cookies unconditionally.
@@ -66,7 +67,7 @@ func (c CookieAcceptPolicy) String() string {
 
 // CookiePersistentStorage: enum values used to denote the cookie persistent
 // storage types.
-type CookiePersistentStorage int
+type CookiePersistentStorage C.gint
 
 const (
 	// CookiePersistentStorageText cookies are stored in a text file in the
@@ -96,6 +97,10 @@ func (c CookiePersistentStorage) String() string {
 type CookieManager struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*CookieManager)(nil)
+)
 
 func wrapCookieManager(obj *externglib.Object) *CookieManager {
 	return &CookieManager{
@@ -390,7 +395,7 @@ func (cookieManager *CookieManager) Cookies(ctx context.Context, uri string, cal
 //
 //    - result: Result.
 //
-func (cookieManager *CookieManager) CookiesFinish(result gio.AsyncResulter) ([]soup.Cookie, error) {
+func (cookieManager *CookieManager) CookiesFinish(result gio.AsyncResulter) ([]*soup.Cookie, error) {
 	var _arg0 *C.WebKitCookieManager // out
 	var _arg1 *C.GAsyncResult        // out
 	var _cret *C.GList               // in
@@ -403,16 +408,16 @@ func (cookieManager *CookieManager) CookiesFinish(result gio.AsyncResulter) ([]s
 	runtime.KeepAlive(cookieManager)
 	runtime.KeepAlive(result)
 
-	var _list []soup.Cookie // out
-	var _goerr error        // out
+	var _list []*soup.Cookie // out
+	var _goerr error         // out
 
-	_list = make([]soup.Cookie, 0, gextras.ListSize(unsafe.Pointer(_cret)))
+	_list = make([]*soup.Cookie, 0, gextras.ListSize(unsafe.Pointer(_cret)))
 	gextras.MoveList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
 		src := (*C.SoupCookie)(v)
-		var dst soup.Cookie // out
-		dst = *(*soup.Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
+		var dst *soup.Cookie // out
+		dst = (*soup.Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
 		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(&dst)),
+			gextras.StructIntern(unsafe.Pointer(dst)),
 			func(intern *struct{ C unsafe.Pointer }) {
 				C.soup_cookie_free((*C.SoupCookie)(intern.C))
 			},

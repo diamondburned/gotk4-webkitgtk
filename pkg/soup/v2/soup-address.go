@@ -18,6 +18,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 // void _gotk4_soup2_AddressCallback(SoupAddress*, guint, gpointer);
@@ -59,7 +60,7 @@ const ADDRESS_PROTOCOL = "protocol"
 const ADDRESS_SOCKADDR = "sockaddr"
 
 // AddressFamily: supported address families.
-type AddressFamily int
+type AddressFamily C.gint
 
 const (
 	// AddressFamilyInvalid: invalid SoupAddress.
@@ -113,6 +114,10 @@ type Address struct {
 
 	gio.SocketConnectable
 }
+
+var (
+	_ externglib.Objector = (*Address)(nil)
+)
 
 func wrapAddress(obj *externglib.Object) *Address {
 	return &Address{

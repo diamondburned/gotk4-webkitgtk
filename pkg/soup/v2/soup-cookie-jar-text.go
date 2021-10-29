@@ -11,6 +11,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -28,6 +29,10 @@ const COOKIE_JAR_TEXT_FILENAME = "filename"
 type CookieJarText struct {
 	CookieJar
 }
+
+var (
+	_ externglib.Objector = (*CookieJarText)(nil)
+)
 
 func wrapCookieJarText(obj *externglib.Object) *CookieJarText {
 	return &CookieJarText{

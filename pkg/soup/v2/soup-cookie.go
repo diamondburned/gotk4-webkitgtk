@@ -12,6 +12,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -48,7 +49,7 @@ const COOKIE_MAX_AGE_ONE_YEAR = 0
 //
 //    - msg containing a "Cookie" request header.
 //
-func CookiesFromRequest(msg *Message) []Cookie {
+func CookiesFromRequest(msg *Message) []*Cookie {
 	var _arg1 *C.SoupMessage // out
 	var _cret *C.GSList      // in
 
@@ -57,15 +58,15 @@ func CookiesFromRequest(msg *Message) []Cookie {
 	_cret = C.soup_cookies_from_request(_arg1)
 	runtime.KeepAlive(msg)
 
-	var _sList []Cookie // out
+	var _sList []*Cookie // out
 
-	_sList = make([]Cookie, 0, gextras.SListSize(unsafe.Pointer(_cret)))
+	_sList = make([]*Cookie, 0, gextras.SListSize(unsafe.Pointer(_cret)))
 	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
 		src := (*C.SoupCookie)(v)
-		var dst Cookie // out
-		dst = *(*Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
+		var dst *Cookie // out
+		dst = (*Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
 		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(&dst)),
+			gextras.StructIntern(unsafe.Pointer(dst)),
 			func(intern *struct{ C unsafe.Pointer }) {
 				C.soup_cookie_free((*C.SoupCookie)(intern.C))
 			},
@@ -84,7 +85,7 @@ func CookiesFromRequest(msg *Message) []Cookie {
 //
 //    - msg containing a "Set-Cookie" response header.
 //
-func CookiesFromResponse(msg *Message) []Cookie {
+func CookiesFromResponse(msg *Message) []*Cookie {
 	var _arg1 *C.SoupMessage // out
 	var _cret *C.GSList      // in
 
@@ -93,15 +94,15 @@ func CookiesFromResponse(msg *Message) []Cookie {
 	_cret = C.soup_cookies_from_response(_arg1)
 	runtime.KeepAlive(msg)
 
-	var _sList []Cookie // out
+	var _sList []*Cookie // out
 
-	_sList = make([]Cookie, 0, gextras.SListSize(unsafe.Pointer(_cret)))
+	_sList = make([]*Cookie, 0, gextras.SListSize(unsafe.Pointer(_cret)))
 	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
 		src := (*C.SoupCookie)(v)
-		var dst Cookie // out
-		dst = *(*Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
+		var dst *Cookie // out
+		dst = (*Cookie)(gextras.NewStructNative(unsafe.Pointer(src)))
 		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(&dst)),
+			gextras.StructIntern(unsafe.Pointer(dst)),
 			func(intern *struct{ C unsafe.Pointer }) {
 				C.soup_cookie_free((*C.SoupCookie)(intern.C))
 			},
@@ -119,14 +120,14 @@ func CookiesFromResponse(msg *Message) []Cookie {
 //
 //    - cookies of Cookie.
 //
-func CookiesToCookieHeader(cookies []Cookie) string {
+func CookiesToCookieHeader(cookies []*Cookie) string {
 	var _arg1 *C.GSList // out
 	var _cret *C.char   // in
 
 	for i := len(cookies) - 1; i >= 0; i-- {
 		src := cookies[i]
 		var dst *C.SoupCookie // out
-		dst = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer((&src))))
+		dst = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(src)))
 		_arg1 = C.g_slist_prepend(_arg1, C.gpointer(unsafe.Pointer(dst)))
 	}
 	defer C.g_slist_free(_arg1)
@@ -152,14 +153,14 @@ func CookiesToCookieHeader(cookies []Cookie) string {
 //    - cookies of Cookie.
 //    - msg: Message.
 //
-func CookiesToRequest(cookies []Cookie, msg *Message) {
+func CookiesToRequest(cookies []*Cookie, msg *Message) {
 	var _arg1 *C.GSList      // out
 	var _arg2 *C.SoupMessage // out
 
 	for i := len(cookies) - 1; i >= 0; i-- {
 		src := cookies[i]
 		var dst *C.SoupCookie // out
-		dst = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer((&src))))
+		dst = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(src)))
 		_arg1 = C.g_slist_prepend(_arg1, C.gpointer(unsafe.Pointer(dst)))
 	}
 	defer C.g_slist_free(_arg1)
@@ -179,14 +180,14 @@ func CookiesToRequest(cookies []Cookie, msg *Message) {
 //    - cookies of Cookie.
 //    - msg: Message.
 //
-func CookiesToResponse(cookies []Cookie, msg *Message) {
+func CookiesToResponse(cookies []*Cookie, msg *Message) {
 	var _arg1 *C.GSList      // out
 	var _arg2 *C.SoupMessage // out
 
 	for i := len(cookies) - 1; i >= 0; i-- {
 		src := cookies[i]
 		var dst *C.SoupCookie // out
-		dst = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer((&src))))
+		dst = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(src)))
 		_arg1 = C.g_slist_prepend(_arg1, C.gpointer(unsafe.Pointer(dst)))
 	}
 	defer C.g_slist_free(_arg1)

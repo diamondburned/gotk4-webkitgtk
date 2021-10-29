@@ -17,6 +17,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 // void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
@@ -32,8 +33,15 @@ type MultipartInputStream struct {
 	gio.FilterInputStream
 
 	gio.PollableInputStream
+	gio.InputStream
 	*externglib.Object
 }
+
+var (
+	_ gio.FilterInputStreamer = (*MultipartInputStream)(nil)
+	_ gio.InputStreamer       = (*MultipartInputStream)(nil)
+	_ externglib.Objector     = (*MultipartInputStream)(nil)
+)
 
 func wrapMultipartInputStream(obj *externglib.Object) *MultipartInputStream {
 	return &MultipartInputStream{
@@ -46,6 +54,9 @@ func wrapMultipartInputStream(obj *externglib.Object) *MultipartInputStream {
 			InputStream: gio.InputStream{
 				Object: obj,
 			},
+		},
+		InputStream: gio.InputStream{
+			Object: obj,
 		},
 		Object: obj,
 	}

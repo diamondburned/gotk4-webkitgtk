@@ -11,6 +11,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -49,6 +50,10 @@ type SessionFeatureOverrider interface {
 type SessionFeature struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*SessionFeature)(nil)
+)
 
 // SessionFeaturer describes SessionFeature's interface methods.
 type SessionFeaturer interface {

@@ -12,6 +12,7 @@ import (
 
 // #cgo pkg-config: libsoup-gnome-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup-gnome.h>
 import "C"
@@ -29,6 +30,10 @@ type PasswordManagerGNOME struct {
 	soup.SessionFeature
 }
 
+var (
+	_ externglib.Objector = (*PasswordManagerGNOME)(nil)
+)
+
 func wrapPasswordManagerGNOME(obj *externglib.Object) *PasswordManagerGNOME {
 	return &PasswordManagerGNOME{
 		Object: obj,
@@ -45,6 +50,10 @@ func marshalPasswordManagerGNOMEer(p uintptr) (interface{}, error) {
 type ProxyResolverGNOME struct {
 	soup.ProxyResolverDefault
 }
+
+var (
+	_ externglib.Objector = (*ProxyResolverGNOME)(nil)
+)
 
 func wrapProxyResolverGNOME(obj *externglib.Object) *ProxyResolverGNOME {
 	return &ProxyResolverGNOME{

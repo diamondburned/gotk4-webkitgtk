@@ -15,6 +15,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -28,6 +29,8 @@ func init() {
 type ContextMenuItem struct {
 	externglib.InitiallyUnowned
 }
+
+var ()
 
 func wrapContextMenuItem(obj *externglib.Object) *ContextMenuItem {
 	return &ContextMenuItem{

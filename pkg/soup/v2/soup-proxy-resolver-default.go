@@ -10,6 +10,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -25,6 +26,10 @@ type ProxyResolverDefault struct {
 
 	ProxyURIResolver
 }
+
+var (
+	_ externglib.Objector = (*ProxyResolverDefault)(nil)
+)
 
 func wrapProxyResolverDefault(obj *externglib.Object) *ProxyResolverDefault {
 	return &ProxyResolverDefault{

@@ -18,6 +18,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 // void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
@@ -32,7 +33,7 @@ func init() {
 
 // FaviconDatabaseError: enum values used to denote the various errors related
 // to the KitFaviconDatabase.
-type FaviconDatabaseError int
+type FaviconDatabaseError C.gint
 
 const (
 	// FaviconDatabaseErrorNotInitialized has not been initialized yet.
@@ -66,6 +67,10 @@ func (f FaviconDatabaseError) String() string {
 type FaviconDatabase struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*FaviconDatabase)(nil)
+)
 
 func wrapFaviconDatabase(obj *externglib.Object) *FaviconDatabase {
 	return &FaviconDatabase{

@@ -15,6 +15,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -31,7 +32,7 @@ func init() {
 //
 // See also soup_buffer_new_with_owner(), which allows to you create a buffer
 // containing data which is owned by another object.
-type MemoryUse int
+type MemoryUse C.gint
 
 const (
 	// MemoryStatic: memory is statically allocated and constant; libsoup can
@@ -100,7 +101,7 @@ func NewBuffer(data []byte) *Buffer {
 	var _cret *C.SoupBuffer // in
 
 	_arg2 = (C.gsize)(len(data))
-	_arg1 = (*C.guchar)(C.malloc(C.ulong(len(data)) * C.ulong(C.sizeof_guchar)))
+	_arg1 = (*C.guchar)(C.malloc(C.size_t(uint(len(data)) * uint(C.sizeof_guchar))))
 	copy(unsafe.Slice((*byte)(_arg1), len(data)), data)
 
 	_cret = C.soup_buffer_new_take(_arg1, _arg2)
@@ -336,7 +337,7 @@ func (body *MessageBody) Append(data []byte) {
 
 	_arg0 = (*C.SoupMessageBody)(gextras.StructNative(unsafe.Pointer(body)))
 	_arg2 = (C.gsize)(len(data))
-	_arg1 = (*C.guchar)(C.malloc(C.ulong(len(data)) * C.ulong(C.sizeof_guchar)))
+	_arg1 = (*C.guchar)(C.malloc(C.size_t(uint(len(data)) * uint(C.sizeof_guchar))))
 	copy(unsafe.Slice((*byte)(_arg1), len(data)), data)
 
 	C.soup_message_body_append_take(_arg0, _arg1, _arg2)

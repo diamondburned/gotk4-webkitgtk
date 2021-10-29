@@ -4,6 +4,7 @@ package webkit2
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <webkit2/webkit2.h>
 import "C"
 

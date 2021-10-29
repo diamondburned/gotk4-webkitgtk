@@ -12,6 +12,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 // extern void callbackDelete(gpointer);
@@ -77,6 +78,10 @@ func _gotk4_soup2_AuthDomainBasicAuthCallback(arg0 *C.SoupAuthDomain, arg1 *C.So
 type AuthDomainBasic struct {
 	AuthDomain
 }
+
+var (
+	_ AuthDomainer = (*AuthDomainBasic)(nil)
+)
 
 func wrapAuthDomainBasic(obj *externglib.Object) *AuthDomainBasic {
 	return &AuthDomainBasic{

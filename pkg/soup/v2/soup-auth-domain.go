@@ -12,6 +12,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 // extern void callbackDelete(gpointer);
@@ -174,14 +175,17 @@ type AuthDomain struct {
 	*externglib.Object
 }
 
+var (
+	_ externglib.Objector = (*AuthDomain)(nil)
+)
+
 // AuthDomainer describes types inherited from class AuthDomain.
+
 // To get the original type, the caller must assert this to an interface or
 // another type.
 type AuthDomainer interface {
 	externglib.Objector
-
-	// BaseAuthDomain returns the underlying base class.
-	BaseAuthDomain() *AuthDomain
+	baseAuthDomain() *AuthDomain
 }
 
 var _ AuthDomainer = (*AuthDomain)(nil)
@@ -489,7 +493,11 @@ func (domain *AuthDomain) TryGenericAuthCallback(msg *Message, username string) 
 	return _ok
 }
 
-// BaseAuthDomain returns domain.
-func (domain *AuthDomain) BaseAuthDomain() *AuthDomain {
+func (domain *AuthDomain) baseAuthDomain() *AuthDomain {
 	return domain
+}
+
+// BaseAuthDomain returns the underlying base object.
+func BaseAuthDomain(obj AuthDomainer) *AuthDomain {
+	return obj.baseAuthDomain()
 }

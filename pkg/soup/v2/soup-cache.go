@@ -12,6 +12,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -24,7 +25,7 @@ func init() {
 }
 
 // CacheType: type of cache; this affects what kinds of responses will be saved.
-type CacheType int
+type CacheType C.gint
 
 const (
 	// CacheSingleUser: single-user cache.
@@ -62,6 +63,10 @@ type Cache struct {
 
 	SessionFeature
 }
+
+var (
+	_ externglib.Objector = (*Cache)(nil)
+)
 
 func wrapCache(obj *externglib.Object) *Cache {
 	return &Cache{

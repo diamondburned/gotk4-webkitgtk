@@ -12,6 +12,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -118,7 +119,7 @@ func SnapshotErrorQuark() glib.Quark {
 	return _quark
 }
 
-type UserContentFilterError int
+type UserContentFilterError C.gint
 
 const (
 	// UserContentFilterErrorInvalidSource: JSON source for a content filter is

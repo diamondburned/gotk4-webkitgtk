@@ -12,6 +12,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -31,7 +32,7 @@ func init() {
 //
 // Prior to 2.44 this type was called <literal>SoupKnownStatusCode</literal>,
 // but the individual values have always had the names they have now.
-type Status int
+type Status C.gint
 
 const (
 	// StatusNone: no status available. (Eg, the message has not been sent yet).

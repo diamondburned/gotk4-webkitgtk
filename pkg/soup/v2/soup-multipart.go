@@ -12,6 +12,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -180,34 +181,6 @@ func (multipart *Multipart) Length() int {
 	_gint = int(_cret)
 
 	return _gint
-}
-
-// Part gets the indicated body part from multipart.
-func (multipart *Multipart) Part(part int) (*MessageHeaders, *Buffer, bool) {
-	var _arg0 *C.SoupMultipart      // out
-	var _arg1 C.int                 // out
-	var _arg2 *C.SoupMessageHeaders // in
-	var _arg3 *C.SoupBuffer         // in
-	var _cret C.gboolean            // in
-
-	_arg0 = (*C.SoupMultipart)(gextras.StructNative(unsafe.Pointer(multipart)))
-	_arg1 = C.int(part)
-
-	_cret = C.soup_multipart_get_part(_arg0, _arg1, &_arg2, &_arg3)
-	runtime.KeepAlive(multipart)
-	runtime.KeepAlive(part)
-
-	var _headers *MessageHeaders // out
-	var _body *Buffer            // out
-	var _ok bool                 // out
-
-	_headers = (*MessageHeaders)(gextras.NewStructNative(unsafe.Pointer(_arg2)))
-	_body = (*Buffer)(gextras.NewStructNative(unsafe.Pointer(_arg3)))
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _headers, _body, _ok
 }
 
 // ToMessage serializes multipart to dest_headers and dest_body.

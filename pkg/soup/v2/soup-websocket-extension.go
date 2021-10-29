@@ -13,6 +13,7 @@ import (
 
 // #cgo pkg-config: libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -44,14 +45,17 @@ type WebsocketExtension struct {
 	*externglib.Object
 }
 
+var (
+	_ externglib.Objector = (*WebsocketExtension)(nil)
+)
+
 // WebsocketExtensioner describes types inherited from class WebsocketExtension.
+
 // To get the original type, the caller must assert this to an interface or
 // another type.
 type WebsocketExtensioner interface {
 	externglib.Objector
-
-	// BaseWebsocketExtension returns the underlying base class.
-	BaseWebsocketExtension() *WebsocketExtension
+	baseWebsocketExtension() *WebsocketExtension
 }
 
 var _ WebsocketExtensioner = (*WebsocketExtension)(nil)
@@ -152,7 +156,11 @@ func (extension *WebsocketExtension) ResponseParams() string {
 	return _utf8
 }
 
-// BaseWebsocketExtension returns extension.
-func (extension *WebsocketExtension) BaseWebsocketExtension() *WebsocketExtension {
+func (extension *WebsocketExtension) baseWebsocketExtension() *WebsocketExtension {
 	return extension
+}
+
+// BaseWebsocketExtension returns the underlying base object.
+func BaseWebsocketExtension(obj WebsocketExtensioner) *WebsocketExtension {
+	return obj.baseWebsocketExtension()
 }

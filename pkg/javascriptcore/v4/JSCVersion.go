@@ -4,6 +4,7 @@ package javascriptcore
 
 // #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <jsc/jsc.h>
 import "C"
 

@@ -13,6 +13,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -26,7 +27,7 @@ func init() {
 
 // PrintOperationResponse: enum values representing the response of the print
 // dialog shown with webkit_print_operation_run_dialog().
-type PrintOperationResponse int
+type PrintOperationResponse C.gint
 
 const (
 	// PrintOperationResponsePrint: print button was clicked in print dialog.
@@ -54,6 +55,10 @@ func (p PrintOperationResponse) String() string {
 type PrintOperation struct {
 	*externglib.Object
 }
+
+var (
+	_ externglib.Objector = (*PrintOperation)(nil)
+)
 
 func wrapPrintOperation(obj *externglib.Object) *PrintOperation {
 	return &PrintOperation{

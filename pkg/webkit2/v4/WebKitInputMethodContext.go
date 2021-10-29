@@ -15,6 +15,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -30,7 +31,7 @@ func init() {
 
 // InputPurpose: enum values used to describe the primary purpose of the active
 // editable element.
-type InputPurpose int
+type InputPurpose C.gint
 
 const (
 	// InputPurposeFreeForm: editable element expects any characters.
@@ -77,7 +78,7 @@ func (i InputPurpose) String() string {
 
 // InputHints: enum values used to describe hints that might be taken into
 // account by input methods.
-type InputHints int
+type InputHints C.guint
 
 const (
 	// InputHintNone: no special behavior suggested.
@@ -159,7 +160,7 @@ type InputMethodContextOverrider interface {
 	// Preedit: get the current preedit string for the context, and a list of
 	// WebKitInputMethodUnderline to apply to the string. The string will be
 	// displayed inserted at cursor_offset.
-	Preedit() (string, []InputMethodUnderline, uint)
+	Preedit() (string, []*InputMethodUnderline, uint)
 	// NotifyCursorArea: notify context that cursor area changed in input
 	// associated.
 	NotifyCursorArea(x, y, width, height int)
@@ -186,14 +187,17 @@ type InputMethodContext struct {
 	*externglib.Object
 }
 
+var (
+	_ externglib.Objector = (*InputMethodContext)(nil)
+)
+
 // InputMethodContexter describes types inherited from class InputMethodContext.
+
 // To get the original type, the caller must assert this to an interface or
 // another type.
 type InputMethodContexter interface {
 	externglib.Objector
-
-	// BaseInputMethodContext returns the underlying base class.
-	BaseInputMethodContext() *InputMethodContext
+	baseInputMethodContext() *InputMethodContext
 }
 
 var _ InputMethodContexter = (*InputMethodContext)(nil)
@@ -274,7 +278,7 @@ func (context *InputMethodContext) InputPurpose() InputPurpose {
 // Preedit: get the current preedit string for the context, and a list of
 // WebKitInputMethodUnderline to apply to the string. The string will be
 // displayed inserted at cursor_offset.
-func (context *InputMethodContext) Preedit() (string, []InputMethodUnderline, uint) {
+func (context *InputMethodContext) Preedit() (string, []*InputMethodUnderline, uint) {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _arg1 *C.char                     // in
 	var _arg2 *C.GList                    // in
@@ -285,20 +289,20 @@ func (context *InputMethodContext) Preedit() (string, []InputMethodUnderline, ui
 	C.webkit_input_method_context_get_preedit(_arg0, &_arg1, &_arg2, &_arg3)
 	runtime.KeepAlive(context)
 
-	var _text string                       // out
-	var _underlines []InputMethodUnderline // out
-	var _cursorOffset uint                 // out
+	var _text string                        // out
+	var _underlines []*InputMethodUnderline // out
+	var _cursorOffset uint                  // out
 
 	if _arg1 != nil {
 		_text = C.GoString((*C.gchar)(unsafe.Pointer(_arg1)))
 		defer C.free(unsafe.Pointer(_arg1))
 	}
 	if _arg2 != nil {
-		_underlines = make([]InputMethodUnderline, 0, gextras.ListSize(unsafe.Pointer(_arg2)))
+		_underlines = make([]*InputMethodUnderline, 0, gextras.ListSize(unsafe.Pointer(_arg2)))
 		gextras.MoveList(unsafe.Pointer(_arg2), true, func(v unsafe.Pointer) {
 			src := (*C.WebKitInputMethodUnderline)(v)
-			var dst InputMethodUnderline // out
-			dst = *(*InputMethodUnderline)(gextras.NewStructNative(unsafe.Pointer(src)))
+			var dst *InputMethodUnderline // out
+			dst = (*InputMethodUnderline)(gextras.NewStructNative(unsafe.Pointer(src)))
 			_underlines = append(_underlines, dst)
 		})
 	}
@@ -458,9 +462,13 @@ func (context *InputMethodContext) SetInputPurpose(purpose InputPurpose) {
 	runtime.KeepAlive(purpose)
 }
 
-// BaseInputMethodContext returns context.
-func (context *InputMethodContext) BaseInputMethodContext() *InputMethodContext {
+func (context *InputMethodContext) baseInputMethodContext() *InputMethodContext {
 	return context
+}
+
+// BaseInputMethodContext returns the underlying base object.
+func BaseInputMethodContext(obj InputMethodContexter) *InputMethodContext {
+	return obj.baseInputMethodContext()
 }
 
 // ConnectCommitted: emitted when a complete input sequence has been entered by

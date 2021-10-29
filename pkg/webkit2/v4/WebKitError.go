@@ -11,6 +11,7 @@ import (
 
 // #cgo pkg-config: webkit2gtk-4.0
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -28,7 +29,7 @@ func init() {
 }
 
 // DownloadError: enum values used to denote the various download errors.
-type DownloadError int
+type DownloadError C.gint
 
 const (
 	// DownloadErrorNetwork: download failure due to network error.
@@ -59,7 +60,7 @@ func (d DownloadError) String() string {
 
 // JavascriptError: enum values used to denote errors happening when executing
 // JavaScript.
-type JavascriptError int
+type JavascriptError C.gint
 
 const (
 	// JavascriptErrorScriptFailed: exception was raised in JavaScript
@@ -82,7 +83,7 @@ func (j JavascriptError) String() string {
 }
 
 // NetworkError: enum values used to denote the various network errors.
-type NetworkError int
+type NetworkError C.gint
 
 const (
 	// NetworkErrorFailed: generic load failure.
@@ -121,7 +122,7 @@ func (n NetworkError) String() string {
 
 // PluginError: enum values used to denote the various plugin and multimedia
 // errors.
-type PluginError int
+type PluginError C.gint
 
 const (
 	// PluginErrorFailed: generic plugin load failure. Deprecated 2.32.
@@ -168,7 +169,7 @@ func (p PluginError) String() string {
 }
 
 // PolicyError: enum values used to denote the various policy errors.
-type PolicyError int
+type PolicyError C.gint
 
 const (
 	// PolicyErrorFailed: generic load failure due to policy error.
@@ -207,7 +208,7 @@ func (p PolicyError) String() string {
 }
 
 // PrintError: enum values used to denote the various print errors.
-type PrintError int
+type PrintError C.gint
 
 const (
 	// PrintErrorGeneral: unspecified error during a print operation.
@@ -238,7 +239,7 @@ func (p PrintError) String() string {
 
 // SnapshotError: enum values used to denote errors happening when creating
 // snapshots of KitWebView.
-type SnapshotError int
+type SnapshotError C.gint
 
 const (
 	// SnapshotErrorFailedToCreate: error occurred when creating a webpage
