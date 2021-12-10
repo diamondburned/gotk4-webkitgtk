@@ -32,15 +32,15 @@ func init() {
 type MultipartInputStream struct {
 	gio.FilterInputStream
 
-	gio.PollableInputStream
-	gio.InputStream
 	*externglib.Object
+	gio.InputStream
+	gio.PollableInputStream
 }
 
 var (
 	_ gio.FilterInputStreamer = (*MultipartInputStream)(nil)
-	_ gio.InputStreamer       = (*MultipartInputStream)(nil)
 	_ externglib.Objector     = (*MultipartInputStream)(nil)
+	_ gio.InputStreamer       = (*MultipartInputStream)(nil)
 )
 
 func wrapMultipartInputStream(obj *externglib.Object) *MultipartInputStream {
@@ -50,15 +50,15 @@ func wrapMultipartInputStream(obj *externglib.Object) *MultipartInputStream {
 				Object: obj,
 			},
 		},
+		Object: obj,
+		InputStream: gio.InputStream{
+			Object: obj,
+		},
 		PollableInputStream: gio.PollableInputStream{
 			InputStream: gio.InputStream{
 				Object: obj,
 			},
 		},
-		InputStream: gio.InputStream{
-			Object: obj,
-		},
-		Object: obj,
 	}
 }
 

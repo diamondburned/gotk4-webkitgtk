@@ -101,7 +101,7 @@ func NewBuffer(data []byte) *Buffer {
 	var _cret *C.SoupBuffer // in
 
 	_arg2 = (C.gsize)(len(data))
-	_arg1 = (*C.guchar)(C.malloc(C.size_t(uint(len(data)) * uint(C.sizeof_guchar))))
+	_arg1 = (*C.guchar)(C.calloc(C.size_t(len(data)), C.size_t(C.sizeof_guchar)))
 	copy(unsafe.Slice((*byte)(_arg1), len(data)), data)
 
 	_cret = C.soup_buffer_new_take(_arg1, _arg2)
@@ -337,7 +337,7 @@ func (body *MessageBody) Append(data []byte) {
 
 	_arg0 = (*C.SoupMessageBody)(gextras.StructNative(unsafe.Pointer(body)))
 	_arg2 = (C.gsize)(len(data))
-	_arg1 = (*C.guchar)(C.malloc(C.size_t(uint(len(data)) * uint(C.sizeof_guchar))))
+	_arg1 = (*C.guchar)(C.calloc(C.size_t(len(data)), C.size_t(C.sizeof_guchar)))
 	copy(unsafe.Slice((*byte)(_arg1), len(data)), data)
 
 	C.soup_message_body_append_take(_arg0, _arg1, _arg2)

@@ -1362,7 +1362,7 @@ func (session *Session) WebsocketConnectAsync(ctx context.Context, msg *Message,
 		defer C.free(unsafe.Pointer(_arg2))
 	}
 	{
-		_arg3 = (**C.char)(C.malloc(C.size_t(uint((len(protocols) + 1)) * uint(unsafe.Sizeof(uint(0))))))
+		_arg3 = (**C.char)(C.calloc(C.size_t((len(protocols) + 1)), C.size_t(unsafe.Sizeof(uint(0)))))
 		defer C.free(unsafe.Pointer(_arg3))
 		{
 			out := unsafe.Slice(_arg3, len(protocols)+1)

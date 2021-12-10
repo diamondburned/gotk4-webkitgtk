@@ -55,7 +55,7 @@ func XmlrpcBuildMethodCall(methodName string, params []externglib.Value) string 
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(methodName)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg3 = (C.int)(len(params))
-	_arg2 = (*C.GValue)(C.malloc(C.size_t(uint(len(params)) * uint(C.sizeof_GValue))))
+	_arg2 = (*C.GValue)(C.calloc(C.size_t(len(params)), C.size_t(C.sizeof_GValue)))
 	defer C.free(unsafe.Pointer(_arg2))
 	{
 		out := unsafe.Slice((*C.GValue)(_arg2), len(params))

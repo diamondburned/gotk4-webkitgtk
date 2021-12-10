@@ -1037,7 +1037,7 @@ func (context *WebContext) SetPreferredLanguages(languages []string) {
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 	{
-		_arg1 = (**C.gchar)(C.malloc(C.size_t(uint((len(languages) + 1)) * uint(unsafe.Sizeof(uint(0))))))
+		_arg1 = (**C.gchar)(C.calloc(C.size_t((len(languages) + 1)), C.size_t(unsafe.Sizeof(uint(0)))))
 		defer C.free(unsafe.Pointer(_arg1))
 		{
 			out := unsafe.Slice(_arg1, len(languages)+1)
@@ -1155,7 +1155,7 @@ func (context *WebContext) SetSpellCheckingLanguages(languages []string) {
 
 	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
 	{
-		_arg1 = (**C.gchar)(C.malloc(C.size_t(uint((len(languages) + 1)) * uint(unsafe.Sizeof(uint(0))))))
+		_arg1 = (**C.gchar)(C.calloc(C.size_t((len(languages) + 1)), C.size_t(unsafe.Sizeof(uint(0)))))
 		defer C.free(unsafe.Pointer(_arg1))
 		{
 			out := unsafe.Slice(_arg1, len(languages)+1)

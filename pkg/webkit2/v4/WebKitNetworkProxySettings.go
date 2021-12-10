@@ -81,7 +81,7 @@ func NewNetworkProxySettings(defaultProxyUri string, ignoreHosts []string) *Netw
 		defer C.free(unsafe.Pointer(_arg1))
 	}
 	{
-		_arg2 = (**C.gchar)(C.malloc(C.size_t(uint((len(ignoreHosts) + 1)) * uint(unsafe.Sizeof(uint(0))))))
+		_arg2 = (**C.gchar)(C.calloc(C.size_t((len(ignoreHosts) + 1)), C.size_t(unsafe.Sizeof(uint(0)))))
 		defer C.free(unsafe.Pointer(_arg2))
 		{
 			out := unsafe.Slice(_arg2, len(ignoreHosts)+1)

@@ -113,10 +113,10 @@ func (request *FileChooserRequest) MIMETypesFilter() *gtk.FileFilter {
 			InitiallyUnowned: externglib.InitiallyUnowned{
 				Object: obj,
 			},
+			Object: obj,
 			Buildable: gtk.Buildable{
 				Object: obj,
 			},
-			Object: obj,
 		}
 	}
 
@@ -195,7 +195,7 @@ func (request *FileChooserRequest) SelectFiles(files []string) {
 
 	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(request.Native()))
 	{
-		_arg1 = (**C.gchar)(C.malloc(C.size_t(uint((len(files) + 1)) * uint(unsafe.Sizeof(uint(0))))))
+		_arg1 = (**C.gchar)(C.calloc(C.size_t((len(files) + 1)), C.size_t(unsafe.Sizeof(uint(0)))))
 		defer C.free(unsafe.Pointer(_arg1))
 		{
 			out := unsafe.Slice(_arg1, len(files)+1)

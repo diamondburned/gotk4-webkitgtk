@@ -4,7 +4,6 @@ package soup
 
 import (
 	"fmt"
-	"reflect"
 	"runtime"
 	"runtime/cgo"
 	"strings"
@@ -1019,9 +1018,9 @@ func (msg *Message) SetRequest(contentType string, reqUse MemoryUse, reqBody str
 	}
 	_arg2 = C.SoupMemoryUse(reqUse)
 	_arg4 = (C.gsize)(len(reqBody))
-	if len(reqBody) > 0 {
-		_arg3 = (*C.char)(unsafe.Pointer((*reflect.StringHeader)(unsafe.Pointer(&reqBody)).Data))
-	}
+	_arg3 = (*C.char)(C.calloc(C.size_t((len(reqBody) + 1)), C.size_t(C.sizeof_char)))
+	copy(unsafe.Slice((*byte)(unsafe.Pointer(_arg3)), len(reqBody)), reqBody)
+	defer C.free(unsafe.Pointer(_arg3))
 
 	C.soup_message_set_request(_arg0, _arg1, _arg2, _arg3, _arg4)
 	runtime.KeepAlive(msg)
@@ -1053,9 +1052,9 @@ func (msg *Message) SetResponse(contentType string, respUse MemoryUse, respBody 
 	}
 	_arg2 = C.SoupMemoryUse(respUse)
 	_arg4 = (C.gsize)(len(respBody))
-	if len(respBody) > 0 {
-		_arg3 = (*C.char)(unsafe.Pointer((*reflect.StringHeader)(unsafe.Pointer(&respBody)).Data))
-	}
+	_arg3 = (*C.char)(C.calloc(C.size_t((len(respBody) + 1)), C.size_t(C.sizeof_char)))
+	copy(unsafe.Slice((*byte)(unsafe.Pointer(_arg3)), len(respBody)), respBody)
+	defer C.free(unsafe.Pointer(_arg3))
 
 	C.soup_message_set_response(_arg0, _arg1, _arg2, _arg3, _arg4)
 	runtime.KeepAlive(msg)
