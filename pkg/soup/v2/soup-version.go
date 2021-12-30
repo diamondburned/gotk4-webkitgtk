@@ -6,8 +6,6 @@ import (
 	"runtime"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -50,6 +48,11 @@ const VERSION_MIN_REQUIRED = 2
 //    - minor version to check.
 //    - micro version to check.
 //
+// The function returns the following values:
+//
+//    - ok: TRUE if the version of the libsoup currently loaded is the same as or
+//      newer than the passed-in version.
+//
 func CheckVersion(major, minor, micro uint) bool {
 	var _arg1 C.guint    // out
 	var _arg2 C.guint    // out
@@ -81,6 +84,11 @@ func CheckVersion(major, minor, micro uint) bool {
 // code is running against. Contrast with the UP_MAJOR_VERSION macro, which
 // represents the major version of the libsoup headers you have included when
 // compiling your code.
+//
+// The function returns the following values:
+//
+//    - guint: major version number of the libsoup library.
+//
 func GetMajorVersion() uint {
 	var _cret C.guint // in
 
@@ -100,6 +108,11 @@ func GetMajorVersion() uint {
 // code is running against. Contrast with the UP_MICRO_VERSION macro, which
 // represents the micro version of the libsoup headers you have included when
 // compiling your code.
+//
+// The function returns the following values:
+//
+//    - guint: micro version number of the libsoup library.
+//
 func GetMicroVersion() uint {
 	var _cret C.guint // in
 
@@ -119,6 +132,11 @@ func GetMicroVersion() uint {
 // code is running against. Contrast with the UP_MINOR_VERSION macro, which
 // represents the minor version of the libsoup headers you have included when
 // compiling your code.
+//
+// The function returns the following values:
+//
+//    - guint: minor version number of the libsoup library.
+//
 func GetMinorVersion() uint {
 	var _cret C.guint // in
 

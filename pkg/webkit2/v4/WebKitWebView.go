@@ -22,8 +22,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v3"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -300,35 +298,130 @@ func (s SnapshotOptions) Has(other SnapshotOptions) bool {
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type WebViewOverrider interface {
+	// The function takes the following parameters:
+	//
+	// The function returns the following values:
+	//
 	Authenticate(request *AuthenticationRequest) bool
 	Close()
+	// The function takes the following parameters:
+	//
+	//    - contextMenu
+	//    - event
+	//    - hitTestResult
+	//
+	// The function returns the following values:
+	//
 	ContextMenu(contextMenu *ContextMenu, event *gdk.Event, hitTestResult *HitTestResult) bool
 	ContextMenuDismissed()
+	// The function takes the following parameters:
+	//
+	//    - decision
+	//    - typ
+	//
+	// The function returns the following values:
+	//
 	DecidePolicy(decision PolicyDecisioner, typ PolicyDecisionType) bool
+	// The function returns the following values:
+	//
 	EnterFullscreen() bool
+	// The function takes the following parameters:
+	//
 	InsecureContentDetected(event InsecureContentEvent)
+	// The function returns the following values:
+	//
 	LeaveFullscreen() bool
+	// The function takes the following parameters:
+	//
 	LoadChanged(loadEvent LoadEvent)
+	// The function takes the following parameters:
+	//
+	//    - loadEvent
+	//    - failingUri
+	//    - err
+	//
+	// The function returns the following values:
+	//
 	LoadFailed(loadEvent LoadEvent, failingUri string, err error) bool
+	// The function takes the following parameters:
+	//
+	//    - failingUri
+	//    - certificate
+	//    - errors
+	//
+	// The function returns the following values:
+	//
 	LoadFailedWithTLSErrors(failingUri string, certificate gio.TLSCertificater, errors gio.TLSCertificateFlags) bool
+	// The function takes the following parameters:
+	//
+	//    - hitTestResult
+	//    - modifiers
+	//
 	MouseTargetChanged(hitTestResult *HitTestResult, modifiers uint)
+	// The function takes the following parameters:
+	//
+	// The function returns the following values:
+	//
 	PermissionRequest(permissionRequest PermissionRequester) bool
+	// The function takes the following parameters:
+	//
+	// The function returns the following values:
+	//
 	Print(printOperation *PrintOperation) bool
 	ReadyToShow()
+	// The function takes the following parameters:
+	//
+	//    - resource
+	//    - request
+	//
 	ResourceLoadStarted(resource *WebResource, request *URIRequest)
 	RunAsModal()
+	// The function takes the following parameters:
+	//
+	// The function returns the following values:
+	//
 	RunColorChooser(request *ColorChooserRequest) bool
+	// The function takes the following parameters:
+	//
+	// The function returns the following values:
+	//
 	RunFileChooser(request *FileChooserRequest) bool
+	// The function takes the following parameters:
+	//
+	// The function returns the following values:
+	//
 	ScriptDialog(dialog *ScriptDialog) bool
+	// The function takes the following parameters:
+	//
+	// The function returns the following values:
+	//
 	ShowNotification(notification *Notification) bool
+	// The function takes the following parameters:
+	//
+	//    - rectangle
+	//    - menu
+	//
+	// The function returns the following values:
+	//
 	ShowOptionMenu(rectangle *gdk.Rectangle, menu *OptionMenu) bool
+	// The function takes the following parameters:
+	//
 	SubmitForm(request *FormSubmissionRequest)
+	// The function takes the following parameters:
+	//
+	// The function returns the following values:
+	//
 	UserMessageReceived(message *UserMessage) bool
+	// The function returns the following values:
+	//
 	WebProcessCrashed() bool
+	// The function takes the following parameters:
+	//
 	WebProcessTerminated(reason WebProcessTerminationReason)
 }
 
 type WebView struct {
+	_ [0]func() // equal guard
 	WebViewBase
 }
 
@@ -359,2005 +452,6 @@ func wrapWebView(obj *externglib.Object) *WebView {
 
 func marshalWebViewer(p uintptr) (interface{}, error) {
 	return wrapWebView(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewWebView creates a new KitWebView with the default KitWebContext and no
-// KitUserContentManager associated with it. See also
-// webkit_web_view_new_with_context(),
-// webkit_web_view_new_with_user_content_manager(), and
-// webkit_web_view_new_with_settings().
-func NewWebView() *WebView {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.webkit_web_view_new()
-
-	var _webView *WebView // out
-
-	_webView = wrapWebView(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _webView
-}
-
-// NewWebViewWithContext creates a new KitWebView with the given KitWebContext
-// and no KitUserContentManager associated with it. See also
-// webkit_web_view_new_with_user_content_manager() and
-// webkit_web_view_new_with_settings().
-//
-// The function takes the following parameters:
-//
-//    - context to be used by the KitWebView.
-//
-func NewWebViewWithContext(context *WebContext) *WebView {
-	var _arg1 *C.WebKitWebContext // out
-	var _cret *C.GtkWidget        // in
-
-	_arg1 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
-
-	_cret = C.webkit_web_view_new_with_context(_arg1)
-	runtime.KeepAlive(context)
-
-	var _webView *WebView // out
-
-	_webView = wrapWebView(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _webView
-}
-
-// NewWebViewWithRelatedView creates a new KitWebView sharing the same web
-// process with web_view. This method doesn't have any effect when
-// WEBKIT_PROCESS_MODEL_SHARED_SECONDARY_PROCESS process model is used, because
-// a single web process is shared for all the web views in the same
-// KitWebContext. When using WEBKIT_PROCESS_MODEL_MULTIPLE_SECONDARY_PROCESSES
-// process model, this method should always be used when creating the KitWebView
-// in the KitWebView::create signal. You can also use this method to implement
-// other process models based on
-// WEBKIT_PROCESS_MODEL_MULTIPLE_SECONDARY_PROCESSES, like for example, sharing
-// the same web process for all the views in the same security domain.
-//
-// The newly created KitWebView will also have the same KitUserContentManager,
-// KitSettings, and KitWebsitePolicies as web_view.
-//
-// The function takes the following parameters:
-//
-//    - webView: related KitWebView.
-//
-func NewWebViewWithRelatedView(webView *WebView) *WebView {
-	var _arg1 *C.WebKitWebView // out
-	var _cret *C.GtkWidget     // in
-
-	_arg1 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_new_with_related_view(_arg1)
-	runtime.KeepAlive(webView)
-
-	var _webView *WebView // out
-
-	_webView = wrapWebView(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _webView
-}
-
-// NewWebViewWithSettings creates a new KitWebView with the given KitSettings.
-// See also webkit_web_view_new_with_context(), and
-// webkit_web_view_new_with_user_content_manager().
-//
-// The function takes the following parameters:
-//
-//    - settings: KitSettings.
-//
-func NewWebViewWithSettings(settings *Settings) *WebView {
-	var _arg1 *C.WebKitSettings // out
-	var _cret *C.GtkWidget      // in
-
-	_arg1 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
-
-	_cret = C.webkit_web_view_new_with_settings(_arg1)
-	runtime.KeepAlive(settings)
-
-	var _webView *WebView // out
-
-	_webView = wrapWebView(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _webView
-}
-
-// NewWebViewWithUserContentManager creates a new KitWebView with the given
-// KitUserContentManager. The content loaded in the view may be affected by the
-// content injected in the view by the user content manager.
-//
-// The function takes the following parameters:
-//
-//    - userContentManager: KitUserContentManager.
-//
-func NewWebViewWithUserContentManager(userContentManager *UserContentManager) *WebView {
-	var _arg1 *C.WebKitUserContentManager // out
-	var _cret *C.GtkWidget                // in
-
-	_arg1 = (*C.WebKitUserContentManager)(unsafe.Pointer(userContentManager.Native()))
-
-	_cret = C.webkit_web_view_new_with_user_content_manager(_arg1)
-	runtime.KeepAlive(userContentManager)
-
-	var _webView *WebView // out
-
-	_webView = wrapWebView(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _webView
-}
-
-// CanExecuteEditingCommand: asynchronously check if it is possible to execute
-// the given editing command.
-//
-// When the operation is finished, callback will be called. You can then call
-// webkit_web_view_can_execute_editing_command_finish() to get the result of the
-// operation.
-//
-// The function takes the following parameters:
-//
-//    - ctx or NULL to ignore.
-//    - command to check.
-//    - callback to call when the request is satisfied.
-//
-func (webView *WebView) CanExecuteEditingCommand(ctx context.Context, command string, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.WebKitWebView      // out
-	var _arg2 *C.GCancellable       // out
-	var _arg1 *C.gchar              // out
-	var _arg3 C.GAsyncReadyCallback // out
-	var _arg4 C.gpointer
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(command)))
-	defer C.free(unsafe.Pointer(_arg1))
-	if callback != nil {
-		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg4 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.webkit_web_view_can_execute_editing_command(_arg0, _arg1, _arg2, _arg3, _arg4)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(command)
-	runtime.KeepAlive(callback)
-}
-
-// CanExecuteEditingCommandFinish: finish an asynchronous operation started with
-// webkit_web_view_can_execute_editing_command().
-//
-// The function takes the following parameters:
-//
-//    - result: Result.
-//
-func (webView *WebView) CanExecuteEditingCommandFinish(result gio.AsyncResulter) error {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 *C.GAsyncResult  // out
-	var _cerr *C.GError        // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
-
-	C.webkit_web_view_can_execute_editing_command_finish(_arg0, _arg1, &_cerr)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(result)
-
-	var _goerr error // out
-
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _goerr
-}
-
-// CanGoBack determines whether web_view has a previous history item.
-func (webView *WebView) CanGoBack() bool {
-	var _arg0 *C.WebKitWebView // out
-	var _cret C.gboolean       // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_can_go_back(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// CanGoForward determines whether web_view has a next history item.
-func (webView *WebView) CanGoForward() bool {
-	var _arg0 *C.WebKitWebView // out
-	var _cret C.gboolean       // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_can_go_forward(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// CanShowMIMEType: whether or not a MIME type can be displayed in web_view.
-//
-// The function takes the following parameters:
-//
-//    - mimeType: MIME type.
-//
-func (webView *WebView) CanShowMIMEType(mimeType string) bool {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 *C.gchar         // out
-	var _cret C.gboolean       // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(mimeType)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	_cret = C.webkit_web_view_can_show_mime_type(_arg0, _arg1)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(mimeType)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// DownloadURI requests downloading of the specified URI string for web_view.
-//
-// The function takes the following parameters:
-//
-//    - uri: URI to download.
-//
-func (webView *WebView) DownloadURI(uri string) *Download {
-	var _arg0 *C.WebKitWebView  // out
-	var _arg1 *C.char           // out
-	var _cret *C.WebKitDownload // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(uri)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	_cret = C.webkit_web_view_download_uri(_arg0, _arg1)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(uri)
-
-	var _download *Download // out
-
-	_download = wrapDownload(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _download
-}
-
-// ExecuteEditingCommand: request to execute the given command for web_view. You
-// can use webkit_web_view_can_execute_editing_command() to check whether it's
-// possible to execute the command.
-//
-// The function takes the following parameters:
-//
-//    - command to execute.
-//
-func (webView *WebView) ExecuteEditingCommand(command string) {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 *C.gchar         // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(command)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.webkit_web_view_execute_editing_command(_arg0, _arg1)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(command)
-}
-
-// ExecuteEditingCommandWithArgument: request to execute the given command with
-// argument for web_view. You can use
-// webkit_web_view_can_execute_editing_command() to check whether it's possible
-// to execute the command.
-//
-// The function takes the following parameters:
-//
-//    - command to execute.
-//    - argument: command argument.
-//
-func (webView *WebView) ExecuteEditingCommandWithArgument(command, argument string) {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 *C.char          // out
-	var _arg2 *C.char          // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(command)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.char)(unsafe.Pointer(C.CString(argument)))
-	defer C.free(unsafe.Pointer(_arg2))
-
-	C.webkit_web_view_execute_editing_command_with_argument(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(command)
-	runtime.KeepAlive(argument)
-}
-
-// AutomationPresentationType: get the presentation type of KitWebView when
-// created for automation.
-func (webView *WebView) AutomationPresentationType() AutomationBrowsingContextPresentation {
-	var _arg0 *C.WebKitWebView                              // out
-	var _cret C.WebKitAutomationBrowsingContextPresentation // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_automation_presentation_type(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _automationBrowsingContextPresentation AutomationBrowsingContextPresentation // out
-
-	_automationBrowsingContextPresentation = AutomationBrowsingContextPresentation(_cret)
-
-	return _automationBrowsingContextPresentation
-}
-
-// BackForwardList obtains the KitBackForwardList associated with the given
-// KitWebView. The KitBackForwardList is owned by the KitWebView.
-func (webView *WebView) BackForwardList() *BackForwardList {
-	var _arg0 *C.WebKitWebView         // out
-	var _cret *C.WebKitBackForwardList // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_back_forward_list(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _backForwardList *BackForwardList // out
-
-	_backForwardList = wrapBackForwardList(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _backForwardList
-}
-
-// BackgroundColor gets the color that is used to draw the web_view background
-// before the actual contents are rendered. For more information see also
-// webkit_web_view_set_background_color().
-func (webView *WebView) BackgroundColor() *gdk.RGBA {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 C.GdkRGBA        // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	C.webkit_web_view_get_background_color(_arg0, &_arg1)
-	runtime.KeepAlive(webView)
-
-	var _rgba *gdk.RGBA // out
-
-	_rgba = (*gdk.RGBA)(gextras.NewStructNative(unsafe.Pointer((&_arg1))))
-
-	return _rgba
-}
-
-// Context gets the web context of web_view.
-func (webView *WebView) Context() *WebContext {
-	var _arg0 *C.WebKitWebView    // out
-	var _cret *C.WebKitWebContext // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_context(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _webContext *WebContext // out
-
-	_webContext = wrapWebContext(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _webContext
-}
-
-// CustomCharset returns the current custom character encoding name of web_view.
-func (webView *WebView) CustomCharset() string {
-	var _arg0 *C.WebKitWebView // out
-	var _cret *C.gchar         // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_custom_charset(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _utf8 string // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-
-	return _utf8
-}
-
-// EditorState gets the web editor state of web_view.
-func (webView *WebView) EditorState() *EditorState {
-	var _arg0 *C.WebKitWebView     // out
-	var _cret *C.WebKitEditorState // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_editor_state(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _editorState *EditorState // out
-
-	_editorState = wrapEditorState(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _editorState
-}
-
-// EstimatedLoadProgress gets the value of the
-// KitWebView:estimated-load-progress property. You can monitor the estimated
-// progress of a load operation by connecting to the
-// notify::estimated-load-progress signal of web_view.
-func (webView *WebView) EstimatedLoadProgress() float64 {
-	var _arg0 *C.WebKitWebView // out
-	var _cret C.gdouble        // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_estimated_load_progress(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _gdouble float64 // out
-
-	_gdouble = float64(_cret)
-
-	return _gdouble
-}
-
-// Favicon returns favicon currently associated to web_view, if any. You can
-// connect to notify::favicon signal of web_view to be notified when the favicon
-// is available.
-func (webView *WebView) Favicon() *cairo.Surface {
-	var _arg0 *C.WebKitWebView   // out
-	var _cret *C.cairo_surface_t // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_favicon(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _surface *cairo.Surface // out
-
-	_surface = cairo.WrapSurface(uintptr(unsafe.Pointer(_cret)))
-	C.cairo_surface_reference(_cret)
-	runtime.SetFinalizer(_surface, func(v *cairo.Surface) {
-		C.cairo_surface_destroy((*C.cairo_surface_t)(unsafe.Pointer(v.Native())))
-	})
-
-	return _surface
-}
-
-// FindController gets the KitFindController that will allow the caller to query
-// the KitWebView for the text to look for.
-func (webView *WebView) FindController() *FindController {
-	var _arg0 *C.WebKitWebView        // out
-	var _cret *C.WebKitFindController // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_find_controller(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _findController *FindController // out
-
-	_findController = wrapFindController(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _findController
-}
-
-// InputMethodContext: get the KitInputMethodContext currently in use by
-// web_view, or NULL if no input method is being used.
-func (webView *WebView) InputMethodContext() InputMethodContexter {
-	var _arg0 *C.WebKitWebView            // out
-	var _cret *C.WebKitInputMethodContext // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_input_method_context(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _inputMethodContext InputMethodContexter // out
-
-	if _cret != nil {
-		{
-			objptr := unsafe.Pointer(_cret)
-
-			object := externglib.Take(objptr)
-			rv, ok := (externglib.CastObject(object)).(InputMethodContexter)
-			if !ok {
-				panic("object of type " + object.TypeFromInstance().String() + " is not webkit2.InputMethodContexter")
-			}
-			_inputMethodContext = rv
-		}
-	}
-
-	return _inputMethodContext
-}
-
-// Inspector: get the KitWebInspector associated to web_view.
-func (webView *WebView) Inspector() *WebInspector {
-	var _arg0 *C.WebKitWebView      // out
-	var _cret *C.WebKitWebInspector // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_inspector(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _webInspector *WebInspector // out
-
-	_webInspector = wrapWebInspector(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _webInspector
-}
-
-// IsMuted gets the mute state of web_view.
-func (webView *WebView) IsMuted() bool {
-	var _arg0 *C.WebKitWebView // out
-	var _cret C.gboolean       // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_is_muted(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// MainResource: return the main resource of web_view.
-func (webView *WebView) MainResource() *WebResource {
-	var _arg0 *C.WebKitWebView     // out
-	var _cret *C.WebKitWebResource // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_main_resource(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _webResource *WebResource // out
-
-	_webResource = wrapWebResource(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _webResource
-}
-
-// PageID: get the identifier of the KitWebPage corresponding to the KitWebView.
-func (webView *WebView) PageID() uint64 {
-	var _arg0 *C.WebKitWebView // out
-	var _cret C.guint64        // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_page_id(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _guint64 uint64 // out
-
-	_guint64 = uint64(_cret)
-
-	return _guint64
-}
-
-// SessionState gets the current session state of web_view.
-func (webView *WebView) SessionState() *WebViewSessionState {
-	var _arg0 *C.WebKitWebView             // out
-	var _cret *C.WebKitWebViewSessionState // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_session_state(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _webViewSessionState *WebViewSessionState // out
-
-	_webViewSessionState = (*WebViewSessionState)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_webViewSessionState)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.webkit_web_view_session_state_unref((*C.WebKitWebViewSessionState)(intern.C))
-		},
-	)
-
-	return _webViewSessionState
-}
-
-// Settings gets the KitSettings currently applied to web_view. If no other
-// KitSettings have been explicitly applied to web_view with
-// webkit_web_view_set_settings(), the default KitSettings will be returned.
-// This method always returns a valid KitSettings object. To modify any of the
-// web_view settings, you can either create a new KitSettings object with
-// webkit_settings_new(), setting the desired preferences, and then replace the
-// existing web_view settings with webkit_web_view_set_settings() or get the
-// existing web_view settings and update it directly. KitSettings objects can be
-// shared by multiple KitWebView<!-- -->s, so modifying the settings of a
-// KitWebView would affect other KitWebView<!-- -->s using the same KitSettings.
-func (webView *WebView) Settings() *Settings {
-	var _arg0 *C.WebKitWebView  // out
-	var _cret *C.WebKitSettings // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_settings(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _settings *Settings // out
-
-	_settings = wrapSettings(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _settings
-}
-
-// Snapshot: asynchronously retrieves a snapshot of web_view for region. options
-// specifies how the snapshot should be rendered.
-//
-// When the operation is finished, callback will be called. You must call
-// webkit_web_view_get_snapshot_finish() to get the result of the operation.
-//
-// The function takes the following parameters:
-//
-//    - ctx: #GCancellable.
-//    - region for this snapshot.
-//    - options for the snapshot.
-//    - callback: ReadyCallback.
-//
-func (webView *WebView) Snapshot(ctx context.Context, region SnapshotRegion, options SnapshotOptions, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.WebKitWebView        // out
-	var _arg3 *C.GCancellable         // out
-	var _arg1 C.WebKitSnapshotRegion  // out
-	var _arg2 C.WebKitSnapshotOptions // out
-	var _arg4 C.GAsyncReadyCallback   // out
-	var _arg5 C.gpointer
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = C.WebKitSnapshotRegion(region)
-	_arg2 = C.WebKitSnapshotOptions(options)
-	if callback != nil {
-		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg5 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.webkit_web_view_get_snapshot(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(region)
-	runtime.KeepAlive(options)
-	runtime.KeepAlive(callback)
-}
-
-// SnapshotFinish finishes an asynchronous operation started with
-// webkit_web_view_get_snapshot().
-//
-// The function takes the following parameters:
-//
-//    - result: Result.
-//
-func (webView *WebView) SnapshotFinish(result gio.AsyncResulter) (*cairo.Surface, error) {
-	var _arg0 *C.WebKitWebView   // out
-	var _arg1 *C.GAsyncResult    // out
-	var _cret *C.cairo_surface_t // in
-	var _cerr *C.GError          // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
-
-	_cret = C.webkit_web_view_get_snapshot_finish(_arg0, _arg1, &_cerr)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(result)
-
-	var _surface *cairo.Surface // out
-	var _goerr error            // out
-
-	_surface = cairo.WrapSurface(uintptr(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(_surface, func(v *cairo.Surface) {
-		C.cairo_surface_destroy((*C.cairo_surface_t)(unsafe.Pointer(v.Native())))
-	})
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _surface, _goerr
-}
-
-// Title gets the value of the KitWebView:title property. You can connect to
-// notify::title signal of web_view to be notified when the title has been
-// received.
-func (webView *WebView) Title() string {
-	var _arg0 *C.WebKitWebView // out
-	var _cret *C.gchar         // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_title(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _utf8 string // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-
-	return _utf8
-}
-
-// TLSInfo retrieves the Certificate associated with the main resource of
-// web_view, and the CertificateFlags showing what problems, if any, have been
-// found with that certificate. If the connection is not HTTPS, this function
-// returns FALSE. This function should be called after a response has been
-// received from the server, so you can connect to KitWebView::load-changed and
-// call this function when it's emitted with WEBKIT_LOAD_COMMITTED event.
-//
-// Note that this function provides no information about the security of the web
-// page if the current KitTLSErrorsPolicy is WEBKIT_TLS_ERRORS_POLICY_IGNORE, as
-// subresources of the page may be controlled by an attacker. This function may
-// safely be used to determine the security status of the current page only if
-// the current KitTLSErrorsPolicy is WEBKIT_TLS_ERRORS_POLICY_FAIL, in which
-// case subresources that fail certificate verification will be blocked.
-func (webView *WebView) TLSInfo() (gio.TLSCertificater, gio.TLSCertificateFlags, bool) {
-	var _arg0 *C.WebKitWebView       // out
-	var _arg1 *C.GTlsCertificate     // in
-	var _arg2 C.GTlsCertificateFlags // in
-	var _cret C.gboolean             // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_tls_info(_arg0, &_arg1, &_arg2)
-	runtime.KeepAlive(webView)
-
-	var _certificate gio.TLSCertificater // out
-	var _errors gio.TLSCertificateFlags  // out
-	var _ok bool                         // out
-
-	{
-		objptr := unsafe.Pointer(_arg1)
-		if objptr == nil {
-			panic("object of type gio.TLSCertificater is nil")
-		}
-
-		object := externglib.Take(objptr)
-		rv, ok := (externglib.CastObject(object)).(gio.TLSCertificater)
-		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not gio.TLSCertificater")
-		}
-		_certificate = rv
-	}
-	_errors = gio.TLSCertificateFlags(_arg2)
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _certificate, _errors, _ok
-}
-
-// URI returns the current active URI of web_view. The active URI might change
-// during a load operation:
-//
-// <orderedlist> <listitem><para> When nothing has been loaded yet on web_view
-// the active URI is NULL. </para></listitem> <listitem><para> When a new load
-// operation starts the active URI is the requested URI: <itemizedlist>
-// <listitem><para> If the load operation was started by
-// webkit_web_view_load_uri(), the requested URI is the given one.
-// </para></listitem> <listitem><para> If the load operation was started by
-// webkit_web_view_load_html(), the requested URI is "about:blank".
-// </para></listitem> <listitem><para> If the load operation was started by
-// webkit_web_view_load_alternate_html(), the requested URI is content URI
-// provided. </para></listitem> <listitem><para> If the load operation was
-// started by webkit_web_view_go_back() or webkit_web_view_go_forward(), the
-// requested URI is the original URI of the previous/next item in the
-// KitBackForwardList of web_view. </para></listitem> <listitem><para> If the
-// load operation was started by webkit_web_view_go_to_back_forward_list_item(),
-// the requested URI is the opriginal URI of the given KitBackForwardListItem.
-// </para></listitem> </itemizedlist> </para></listitem> <listitem><para> If
-// there is a server redirection during the load operation, the active URI is
-// the redirected URI. When the signal KitWebView::load-changed is emitted with
-// WEBKIT_LOAD_REDIRECTED event, the active URI is already updated to the
-// redirected URI. </para></listitem> <listitem><para> When the signal
-// KitWebView::load-changed is emitted with WEBKIT_LOAD_COMMITTED event, the
-// active URI is the final one and it will not change unless a new load
-// operation is started or a navigation action within the same page is
-// performed. </para></listitem> </orderedlist>
-//
-// You can monitor the active URI by connecting to the notify::uri signal of
-// web_view.
-func (webView *WebView) URI() string {
-	var _arg0 *C.WebKitWebView // out
-	var _cret *C.gchar         // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_uri(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _utf8 string // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-
-	return _utf8
-}
-
-// UserContentManager gets the user content manager associated to web_view.
-func (webView *WebView) UserContentManager() *UserContentManager {
-	var _arg0 *C.WebKitWebView            // out
-	var _cret *C.WebKitUserContentManager // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_user_content_manager(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _userContentManager *UserContentManager // out
-
-	_userContentManager = wrapUserContentManager(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _userContentManager
-}
-
-// WebsiteDataManager: get the KitWebsiteDataManager associated to web_view. If
-// web_view is not ephemeral, the returned KitWebsiteDataManager will be the
-// same as the KitWebsiteDataManager of web_view's KitWebContext.
-func (webView *WebView) WebsiteDataManager() *WebsiteDataManager {
-	var _arg0 *C.WebKitWebView            // out
-	var _cret *C.WebKitWebsiteDataManager // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_website_data_manager(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _websiteDataManager *WebsiteDataManager // out
-
-	_websiteDataManager = wrapWebsiteDataManager(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _websiteDataManager
-}
-
-// WebsitePolicies gets the default website policies set on construction in the
-// web_view. These can be overridden on a per-origin basis via the
-// KitWebView::decide-policy signal handler.
-//
-// See also webkit_policy_decision_use_with_policies().
-func (webView *WebView) WebsitePolicies() *WebsitePolicies {
-	var _arg0 *C.WebKitWebView         // out
-	var _cret *C.WebKitWebsitePolicies // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_website_policies(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _websitePolicies *WebsitePolicies // out
-
-	_websitePolicies = wrapWebsitePolicies(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _websitePolicies
-}
-
-// WindowProperties: get the KitWindowProperties object containing the
-// properties that the window containing web_view should have.
-func (webView *WebView) WindowProperties() *WindowProperties {
-	var _arg0 *C.WebKitWebView          // out
-	var _cret *C.WebKitWindowProperties // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_window_properties(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _windowProperties *WindowProperties // out
-
-	_windowProperties = wrapWindowProperties(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _windowProperties
-}
-
-// ZoomLevel: get the zoom level of web_view, i.e. the factor by which the view
-// contents are scaled with respect to their original size.
-func (webView *WebView) ZoomLevel() float64 {
-	var _arg0 *C.WebKitWebView // out
-	var _cret C.gdouble        // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_get_zoom_level(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _gdouble float64 // out
-
-	_gdouble = float64(_cret)
-
-	return _gdouble
-}
-
-// GoBack loads the previous history item. You can monitor the load operation by
-// connecting to KitWebView::load-changed signal.
-func (webView *WebView) GoBack() {
-	var _arg0 *C.WebKitWebView // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	C.webkit_web_view_go_back(_arg0)
-	runtime.KeepAlive(webView)
-}
-
-// GoForward loads the next history item. You can monitor the load operation by
-// connecting to KitWebView::load-changed signal.
-func (webView *WebView) GoForward() {
-	var _arg0 *C.WebKitWebView // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	C.webkit_web_view_go_forward(_arg0)
-	runtime.KeepAlive(webView)
-}
-
-// GoToBackForwardListItem loads the specific history item list_item. You can
-// monitor the load operation by connecting to KitWebView::load-changed signal.
-//
-// The function takes the following parameters:
-//
-//    - listItem: KitBackForwardListItem.
-//
-func (webView *WebView) GoToBackForwardListItem(listItem *BackForwardListItem) {
-	var _arg0 *C.WebKitWebView             // out
-	var _arg1 *C.WebKitBackForwardListItem // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.WebKitBackForwardListItem)(unsafe.Pointer(listItem.Native()))
-
-	C.webkit_web_view_go_to_back_forward_list_item(_arg0, _arg1)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(listItem)
-}
-
-// IsControlledByAutomation: get whether a KitWebView was created with
-// KitWebView:is-controlled-by-automation property enabled. Only KitWebView<!--
-// -->s controlled by automation can be used in an automation session.
-func (webView *WebView) IsControlledByAutomation() bool {
-	var _arg0 *C.WebKitWebView // out
-	var _cret C.gboolean       // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_is_controlled_by_automation(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-func (webView *WebView) IsEditable() bool {
-	var _arg0 *C.WebKitWebView // out
-	var _cret C.gboolean       // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_is_editable(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// IsEphemeral: get whether a KitWebView is ephemeral. To create an ephemeral
-// KitWebView you need to use g_object_new() and pass is-ephemeral property with
-// TRUE value. See KitWebView:is-ephemeral for more details. If web_view was
-// created with a ephemeral KitWebView:related-view or an ephemeral
-// KitWebView:web-context it will also be ephemeral.
-func (webView *WebView) IsEphemeral() bool {
-	var _arg0 *C.WebKitWebView // out
-	var _cret C.gboolean       // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_is_ephemeral(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// IsLoading gets the value of the KitWebView:is-loading property. You can
-// monitor when a KitWebView is loading a page by connecting to
-// notify::is-loading signal of web_view. This is useful when you are
-// interesting in knowing when the view is loading something but not in the
-// details about the status of the load operation, for example to start a
-// spinner when the view is loading a page and stop it when it finishes.
-func (webView *WebView) IsLoading() bool {
-	var _arg0 *C.WebKitWebView // out
-	var _cret C.gboolean       // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_is_loading(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// IsPlayingAudio gets the value of the KitWebView:is-playing-audio property.
-// You can monitor when a page in a KitWebView is playing audio by connecting to
-// the notify::is-playing-audio signal of web_view. This is useful when the
-// application wants to provide visual feedback when a page is producing sound.
-func (webView *WebView) IsPlayingAudio() bool {
-	var _arg0 *C.WebKitWebView // out
-	var _cret C.gboolean       // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	_cret = C.webkit_web_view_is_playing_audio(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// LoadAlternateHtml: load the given content string for the URI content_uri.
-// This allows clients to display page-loading errors in the KitWebView itself.
-// When this method is called from KitWebView::load-failed signal to show an
-// error page, then the back-forward list is maintained appropriately. For
-// everything else this method works the same way as
-// webkit_web_view_load_html().
-//
-// The function takes the following parameters:
-//
-//    - content: new content to display as the main page of the web_view.
-//    - contentUri: URI for the alternate page content.
-//    - baseUri: base URI for relative locations or NULL.
-//
-func (webView *WebView) LoadAlternateHtml(content, contentUri, baseUri string) {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 *C.gchar         // out
-	var _arg2 *C.gchar         // out
-	var _arg3 *C.gchar         // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(content)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(contentUri)))
-	defer C.free(unsafe.Pointer(_arg2))
-	if baseUri != "" {
-		_arg3 = (*C.gchar)(unsafe.Pointer(C.CString(baseUri)))
-		defer C.free(unsafe.Pointer(_arg3))
-	}
-
-	C.webkit_web_view_load_alternate_html(_arg0, _arg1, _arg2, _arg3)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(content)
-	runtime.KeepAlive(contentUri)
-	runtime.KeepAlive(baseUri)
-}
-
-// LoadBytes: load the specified bytes into web_view using the given mime_type
-// and encoding. When mime_type is NULL, it defaults to "text/html". When
-// encoding is NULL, it defaults to "UTF-8". When base_uri is NULL, it defaults
-// to "about:blank". You can monitor the load operation by connecting to
-// KitWebView::load-changed signal.
-//
-// The function takes the following parameters:
-//
-//    - bytes: input data to load.
-//    - mimeType: MIME type of bytes, or NULL.
-//    - encoding: character encoding of bytes, or NULL.
-//    - baseUri: base URI for relative locations or NULL.
-//
-func (webView *WebView) LoadBytes(bytes *glib.Bytes, mimeType, encoding, baseUri string) {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 *C.GBytes        // out
-	var _arg2 *C.gchar         // out
-	var _arg3 *C.gchar         // out
-	var _arg4 *C.gchar         // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GBytes)(gextras.StructNative(unsafe.Pointer(bytes)))
-	if mimeType != "" {
-		_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(mimeType)))
-		defer C.free(unsafe.Pointer(_arg2))
-	}
-	if encoding != "" {
-		_arg3 = (*C.gchar)(unsafe.Pointer(C.CString(encoding)))
-		defer C.free(unsafe.Pointer(_arg3))
-	}
-	if baseUri != "" {
-		_arg4 = (*C.gchar)(unsafe.Pointer(C.CString(baseUri)))
-		defer C.free(unsafe.Pointer(_arg4))
-	}
-
-	C.webkit_web_view_load_bytes(_arg0, _arg1, _arg2, _arg3, _arg4)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(bytes)
-	runtime.KeepAlive(mimeType)
-	runtime.KeepAlive(encoding)
-	runtime.KeepAlive(baseUri)
-}
-
-// LoadHtml: load the given content string with the specified base_uri. If
-// base_uri is not NULL, relative URLs in the content will be resolved against
-// base_uri and absolute local paths must be children of the base_uri. For
-// security reasons absolute local paths that are not children of base_uri will
-// cause the web process to terminate. If you need to include URLs in content
-// that are local paths in a different directory than base_uri you can build a
-// data URI for them. When base_uri is NULL, it defaults to "about:blank". The
-// mime type of the document will be "text/html". You can monitor the load
-// operation by connecting to KitWebView::load-changed signal.
-//
-// The function takes the following parameters:
-//
-//    - content: HTML string to load.
-//    - baseUri: base URI for relative locations or NULL.
-//
-func (webView *WebView) LoadHtml(content, baseUri string) {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 *C.gchar         // out
-	var _arg2 *C.gchar         // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(content)))
-	defer C.free(unsafe.Pointer(_arg1))
-	if baseUri != "" {
-		_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(baseUri)))
-		defer C.free(unsafe.Pointer(_arg2))
-	}
-
-	C.webkit_web_view_load_html(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(content)
-	runtime.KeepAlive(baseUri)
-}
-
-// LoadPlainText: load the specified plain_text string into web_view. The mime
-// type of document will be "text/plain". You can monitor the load operation by
-// connecting to KitWebView::load-changed signal.
-//
-// The function takes the following parameters:
-//
-//    - plainText: plain text to load.
-//
-func (webView *WebView) LoadPlainText(plainText string) {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 *C.gchar         // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(plainText)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.webkit_web_view_load_plain_text(_arg0, _arg1)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(plainText)
-}
-
-// LoadRequest requests loading of the specified KitURIRequest. You can monitor
-// the load operation by connecting to KitWebView::load-changed signal.
-//
-// The function takes the following parameters:
-//
-//    - request to load.
-//
-func (webView *WebView) LoadRequest(request *URIRequest) {
-	var _arg0 *C.WebKitWebView    // out
-	var _arg1 *C.WebKitURIRequest // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.WebKitURIRequest)(unsafe.Pointer(request.Native()))
-
-	C.webkit_web_view_load_request(_arg0, _arg1)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(request)
-}
-
-// LoadURI requests loading of the specified URI string. You can monitor the
-// load operation by connecting to KitWebView::load-changed signal.
-//
-// The function takes the following parameters:
-//
-//    - uri: URI string.
-//
-func (webView *WebView) LoadURI(uri string) {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 *C.gchar         // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(uri)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.webkit_web_view_load_uri(_arg0, _arg1)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(uri)
-}
-
-// Reload reloads the current contents of web_view. See also
-// webkit_web_view_reload_bypass_cache().
-func (webView *WebView) Reload() {
-	var _arg0 *C.WebKitWebView // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	C.webkit_web_view_reload(_arg0)
-	runtime.KeepAlive(webView)
-}
-
-// ReloadBypassCache reloads the current contents of web_view without using any
-// cached data.
-func (webView *WebView) ReloadBypassCache() {
-	var _arg0 *C.WebKitWebView // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	C.webkit_web_view_reload_bypass_cache(_arg0)
-	runtime.KeepAlive(webView)
-}
-
-// RestoreSessionState: restore the web_view session state from state.
-//
-// The function takes the following parameters:
-//
-//    - state: KitWebViewSessionState.
-//
-func (webView *WebView) RestoreSessionState(state *WebViewSessionState) {
-	var _arg0 *C.WebKitWebView             // out
-	var _arg1 *C.WebKitWebViewSessionState // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.WebKitWebViewSessionState)(gextras.StructNative(unsafe.Pointer(state)))
-
-	C.webkit_web_view_restore_session_state(_arg0, _arg1)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(state)
-}
-
-// RunJavascript: asynchronously run script in the context of the current page
-// in web_view. If WebKitSettings:enable-javascript is FALSE, this method will
-// do nothing.
-//
-// When the operation is finished, callback will be called. You can then call
-// webkit_web_view_run_javascript_finish() to get the result of the operation.
-//
-// The function takes the following parameters:
-//
-//    - ctx or NULL to ignore.
-//    - script to run.
-//    - callback to call when the script finished.
-//
-func (webView *WebView) RunJavascript(ctx context.Context, script string, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.WebKitWebView      // out
-	var _arg2 *C.GCancellable       // out
-	var _arg1 *C.gchar              // out
-	var _arg3 C.GAsyncReadyCallback // out
-	var _arg4 C.gpointer
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(script)))
-	defer C.free(unsafe.Pointer(_arg1))
-	if callback != nil {
-		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg4 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.webkit_web_view_run_javascript(_arg0, _arg1, _arg2, _arg3, _arg4)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(script)
-	runtime.KeepAlive(callback)
-}
-
-// RunJavascriptFinish: finish an asynchronous operation started with
-// webkit_web_view_run_javascript().
-//
-// This is an example of using webkit_web_view_run_javascript() with a script
-// returning a string:
-//
-// <informalexample><programlisting> static void web_view_javascript_finished
-// (GObject *object, GAsyncResult *result, gpointer user_data) {
-// WebKitJavascriptResult *js_result; JSCValue *value; GError *error = NULL;
-//
-//    js_result = webkit_web_view_run_javascript_finish (WEBKIT_WEB_VIEW (object), result, &error);
-//    if (!js_result) {
-//        g_warning ("Error running javascript: s", error->message);
-//        g_error_free (error);
-//        return;
-//    }
-//
-//    value = webkit_javascript_result_get_js_value (js_result);
-//    if (jsc_value_is_string (value)) {
-//        JSCException *exception;
-//        gchar        *str_value;
-//
-//        str_value = jsc_value_to_string (value);
-//        exception = jsc_context_get_exception (jsc_value_get_context (value));
-//        if (exception)
-//            g_warning ("Error running javascript: s", jsc_exception_get_message (exception));
-//        else
-//            g_print ("Script result: s\n", str_value);
-//        g_free (str_value);
-//    } else {
-//        g_warning ("Error running javascript: unexpected return value");
-//    }
-//    webkit_javascript_result_unref (js_result);
-//
-// }
-//
-// static void web_view_get_link_url (WebKitWebView *web_view, const gchar
-// *link_id) { gchar *script;
-//
-//    script = g_strdup_printf ("window.document.getElementById('s').href;", link_id);
-//    webkit_web_view_run_javascript (web_view, script, NULL, web_view_javascript_finished, NULL);
-//    g_free (script);
-//
-// } </programlisting></informalexample>.
-//
-// The function takes the following parameters:
-//
-//    - result: Result.
-//
-func (webView *WebView) RunJavascriptFinish(result gio.AsyncResulter) (*JavascriptResult, error) {
-	var _arg0 *C.WebKitWebView          // out
-	var _arg1 *C.GAsyncResult           // out
-	var _cret *C.WebKitJavascriptResult // in
-	var _cerr *C.GError                 // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
-
-	_cret = C.webkit_web_view_run_javascript_finish(_arg0, _arg1, &_cerr)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(result)
-
-	var _javascriptResult *JavascriptResult // out
-	var _goerr error                        // out
-
-	_javascriptResult = (*JavascriptResult)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_javascriptResult)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.webkit_javascript_result_unref((*C.WebKitJavascriptResult)(intern.C))
-		},
-	)
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _javascriptResult, _goerr
-}
-
-// RunJavascriptFromGresource: asynchronously run the script from resource in
-// the context of the current page in web_view.
-//
-// When the operation is finished, callback will be called. You can then call
-// webkit_web_view_run_javascript_from_gresource_finish() to get the result of
-// the operation.
-//
-// The function takes the following parameters:
-//
-//    - ctx or NULL to ignore.
-//    - resource: location of the resource to load.
-//    - callback to call when the script finished.
-//
-func (webView *WebView) RunJavascriptFromGresource(ctx context.Context, resource string, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.WebKitWebView      // out
-	var _arg2 *C.GCancellable       // out
-	var _arg1 *C.gchar              // out
-	var _arg3 C.GAsyncReadyCallback // out
-	var _arg4 C.gpointer
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(resource)))
-	defer C.free(unsafe.Pointer(_arg1))
-	if callback != nil {
-		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg4 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.webkit_web_view_run_javascript_from_gresource(_arg0, _arg1, _arg2, _arg3, _arg4)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(resource)
-	runtime.KeepAlive(callback)
-}
-
-// RunJavascriptFromGresourceFinish: finish an asynchronous operation started
-// with webkit_web_view_run_javascript_from_gresource().
-//
-// Check webkit_web_view_run_javascript_finish() for a usage example.
-//
-// The function takes the following parameters:
-//
-//    - result: Result.
-//
-func (webView *WebView) RunJavascriptFromGresourceFinish(result gio.AsyncResulter) (*JavascriptResult, error) {
-	var _arg0 *C.WebKitWebView          // out
-	var _arg1 *C.GAsyncResult           // out
-	var _cret *C.WebKitJavascriptResult // in
-	var _cerr *C.GError                 // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
-
-	_cret = C.webkit_web_view_run_javascript_from_gresource_finish(_arg0, _arg1, &_cerr)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(result)
-
-	var _javascriptResult *JavascriptResult // out
-	var _goerr error                        // out
-
-	_javascriptResult = (*JavascriptResult)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_javascriptResult)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.webkit_javascript_result_unref((*C.WebKitJavascriptResult)(intern.C))
-		},
-	)
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _javascriptResult, _goerr
-}
-
-// RunJavascriptInWorld: asynchronously run script in the script world with name
-// world_name of the current page context in web_view. If
-// WebKitSettings:enable-javascript is FALSE, this method will do nothing.
-//
-// When the operation is finished, callback will be called. You can then call
-// webkit_web_view_run_javascript_in_world_finish() to get the result of the
-// operation.
-//
-// The function takes the following parameters:
-//
-//    - ctx or NULL to ignore.
-//    - script to run.
-//    - worldName: name of a KitScriptWorld.
-//    - callback to call when the script finished.
-//
-func (webView *WebView) RunJavascriptInWorld(ctx context.Context, script, worldName string, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.WebKitWebView      // out
-	var _arg3 *C.GCancellable       // out
-	var _arg1 *C.gchar              // out
-	var _arg2 *C.gchar              // out
-	var _arg4 C.GAsyncReadyCallback // out
-	var _arg5 C.gpointer
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(script)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(worldName)))
-	defer C.free(unsafe.Pointer(_arg2))
-	if callback != nil {
-		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg5 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.webkit_web_view_run_javascript_in_world(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(script)
-	runtime.KeepAlive(worldName)
-	runtime.KeepAlive(callback)
-}
-
-// RunJavascriptInWorldFinish: finish an asynchronous operation started with
-// webkit_web_view_run_javascript_in_world().
-//
-// The function takes the following parameters:
-//
-//    - result: Result.
-//
-func (webView *WebView) RunJavascriptInWorldFinish(result gio.AsyncResulter) (*JavascriptResult, error) {
-	var _arg0 *C.WebKitWebView          // out
-	var _arg1 *C.GAsyncResult           // out
-	var _cret *C.WebKitJavascriptResult // in
-	var _cerr *C.GError                 // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
-
-	_cret = C.webkit_web_view_run_javascript_in_world_finish(_arg0, _arg1, &_cerr)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(result)
-
-	var _javascriptResult *JavascriptResult // out
-	var _goerr error                        // out
-
-	_javascriptResult = (*JavascriptResult)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_javascriptResult)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.webkit_javascript_result_unref((*C.WebKitJavascriptResult)(intern.C))
-		},
-	)
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _javascriptResult, _goerr
-}
-
-// Save: asynchronously save the current web page associated to the KitWebView
-// into a self-contained format using the mode specified in save_mode.
-//
-// When the operation is finished, callback will be called. You can then call
-// webkit_web_view_save_finish() to get the result of the operation.
-//
-// The function takes the following parameters:
-//
-//    - ctx or NULL to ignore.
-//    - saveMode specifying how the web page should be saved.
-//    - callback to call when the request is satisfied.
-//
-func (webView *WebView) Save(ctx context.Context, saveMode SaveMode, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.WebKitWebView      // out
-	var _arg2 *C.GCancellable       // out
-	var _arg1 C.WebKitSaveMode      // out
-	var _arg3 C.GAsyncReadyCallback // out
-	var _arg4 C.gpointer
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = C.WebKitSaveMode(saveMode)
-	if callback != nil {
-		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg4 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.webkit_web_view_save(_arg0, _arg1, _arg2, _arg3, _arg4)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(saveMode)
-	runtime.KeepAlive(callback)
-}
-
-// SaveFinish: finish an asynchronous operation started with
-// webkit_web_view_save().
-//
-// The function takes the following parameters:
-//
-//    - result: Result.
-//
-func (webView *WebView) SaveFinish(result gio.AsyncResulter) (gio.InputStreamer, error) {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 *C.GAsyncResult  // out
-	var _cret *C.GInputStream  // in
-	var _cerr *C.GError        // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
-
-	_cret = C.webkit_web_view_save_finish(_arg0, _arg1, &_cerr)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(result)
-
-	var _inputStream gio.InputStreamer // out
-	var _goerr error                   // out
-
-	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gio.InputStreamer is nil")
-		}
-
-		object := externglib.AssumeOwnership(objptr)
-		rv, ok := (externglib.CastObject(object)).(gio.InputStreamer)
-		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not gio.InputStreamer")
-		}
-		_inputStream = rv
-	}
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _inputStream, _goerr
-}
-
-// SaveToFile: asynchronously save the current web page associated to the
-// KitWebView into a self-contained format using the mode specified in save_mode
-// and writing it to file.
-//
-// When the operation is finished, callback will be called. You can then call
-// webkit_web_view_save_to_file_finish() to get the result of the operation.
-//
-// The function takes the following parameters:
-//
-//    - ctx or NULL to ignore.
-//    - file where the current web page should be saved to.
-//    - saveMode specifying how the web page should be saved.
-//    - callback to call when the request is satisfied.
-//
-func (webView *WebView) SaveToFile(ctx context.Context, file gio.Filer, saveMode SaveMode, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.WebKitWebView      // out
-	var _arg3 *C.GCancellable       // out
-	var _arg1 *C.GFile              // out
-	var _arg2 C.WebKitSaveMode      // out
-	var _arg4 C.GAsyncReadyCallback // out
-	var _arg5 C.gpointer
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.GFile)(unsafe.Pointer(file.Native()))
-	_arg2 = C.WebKitSaveMode(saveMode)
-	if callback != nil {
-		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg5 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.webkit_web_view_save_to_file(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(file)
-	runtime.KeepAlive(saveMode)
-	runtime.KeepAlive(callback)
-}
-
-// SaveToFileFinish: finish an asynchronous operation started with
-// webkit_web_view_save_to_file().
-//
-// The function takes the following parameters:
-//
-//    - result: Result.
-//
-func (webView *WebView) SaveToFileFinish(result gio.AsyncResulter) error {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 *C.GAsyncResult  // out
-	var _cerr *C.GError        // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
-
-	C.webkit_web_view_save_to_file_finish(_arg0, _arg1, &_cerr)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(result)
-
-	var _goerr error // out
-
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _goerr
-}
-
-// SendMessageToPage: send message to the KitWebPage corresponding to web_view.
-// If message is floating, it's consumed.
-//
-// If you don't expect any reply, or you simply want to ignore it, you can pass
-// NULL as callback. When the operation is finished, callback will be called.
-// You can then call webkit_web_view_send_message_to_page_finish() to get the
-// message reply.
-//
-// The function takes the following parameters:
-//
-//    - ctx or NULL to ignore.
-//    - message: KitUserMessage.
-//    - callback: (nullable): A ReadyCallback to call when the request is
-//    satisfied or NULL.
-//
-func (webView *WebView) SendMessageToPage(ctx context.Context, message *UserMessage, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.WebKitWebView      // out
-	var _arg2 *C.GCancellable       // out
-	var _arg1 *C.WebKitUserMessage  // out
-	var _arg3 C.GAsyncReadyCallback // out
-	var _arg4 C.gpointer
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.WebKitUserMessage)(unsafe.Pointer(message.Native()))
-	if callback != nil {
-		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg4 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.webkit_web_view_send_message_to_page(_arg0, _arg1, _arg2, _arg3, _arg4)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(message)
-	runtime.KeepAlive(callback)
-}
-
-// SendMessageToPageFinish: finish an asynchronous operation started with
-// webkit_web_view_send_message_to_page().
-//
-// The function takes the following parameters:
-//
-//    - result: Result.
-//
-func (webView *WebView) SendMessageToPageFinish(result gio.AsyncResulter) (*UserMessage, error) {
-	var _arg0 *C.WebKitWebView     // out
-	var _arg1 *C.GAsyncResult      // out
-	var _cret *C.WebKitUserMessage // in
-	var _cerr *C.GError            // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
-
-	_cret = C.webkit_web_view_send_message_to_page_finish(_arg0, _arg1, &_cerr)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(result)
-
-	var _userMessage *UserMessage // out
-	var _goerr error              // out
-
-	_userMessage = wrapUserMessage(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _userMessage, _goerr
-}
-
-// SetBackgroundColor sets the color that will be used to draw the web_view
-// background before the actual contents are rendered. Note that if the web page
-// loaded in web_view specifies a background color, it will take precedence over
-// the rgba color. By default the web_view background color is opaque white.
-// Note that the parent window must have a RGBA visual and Widget:app-paintable
-// property set to TRUE for backgrounds colors to work.
-//
-// <informalexample><programlisting> static void
-// browser_window_set_background_color (BrowserWindow *window, const GdkRGBA
-// *rgba) { WebKitWebView *web_view; GdkScreen *screen = gtk_window_get_screen
-// (GTK_WINDOW (window)); GdkVisual *rgba_visual = gdk_screen_get_rgba_visual
-// (screen);
-//
-//    if (!rgba_visual)
-//         return;
-//
-//    gtk_widget_set_visual (GTK_WIDGET (window), rgba_visual);
-//    gtk_widget_set_app_paintable (GTK_WIDGET (window), TRUE);
-//
-//    web_view = browser_window_get_web_view (window);
-//    webkit_web_view_set_background_color (web_view, rgba);
-//
-// } </programlisting></informalexample>.
-//
-// The function takes the following parameters:
-//
-//    - rgba: RGBA.
-//
-func (webView *WebView) SetBackgroundColor(rgba *gdk.RGBA) {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 *C.GdkRGBA       // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.GdkRGBA)(gextras.StructNative(unsafe.Pointer(rgba)))
-
-	C.webkit_web_view_set_background_color(_arg0, _arg1)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(rgba)
-}
-
-// SetCustomCharset sets the current custom character encoding override of
-// web_view. The custom character encoding will override any text encoding
-// detected via HTTP headers or META tags. Calling this method will stop any
-// current load operation and reload the current page. Setting the custom
-// character encoding to NULL removes the character encoding override.
-//
-// The function takes the following parameters:
-//
-//    - charset: character encoding name or NULL.
-//
-func (webView *WebView) SetCustomCharset(charset string) {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 *C.gchar         // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	if charset != "" {
-		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(charset)))
-		defer C.free(unsafe.Pointer(_arg1))
-	}
-
-	C.webkit_web_view_set_custom_charset(_arg0, _arg1)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(charset)
-}
-
-// SetEditable sets whether the user is allowed to edit the HTML document.
-//
-// If editable is TRUE, web_view allows the user to edit the HTML document. If
-// editable is FALSE, an element in web_view's document can only be edited if
-// the CONTENTEDITABLE attribute has been set on the element or one of its
-// parent elements. By default a KitWebView is not editable.
-//
-// Normally, a HTML document is not editable unless the elements within the
-// document are editable. This function provides a way to make the contents of a
-// KitWebView editable without altering the document or DOM structure.
-//
-// The function takes the following parameters:
-//
-//    - editable indicating the editable state.
-//
-func (webView *WebView) SetEditable(editable bool) {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 C.gboolean       // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	if editable {
-		_arg1 = C.TRUE
-	}
-
-	C.webkit_web_view_set_editable(_arg0, _arg1)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(editable)
-}
-
-// SetInputMethodContext: set the KitInputMethodContext to be used by web_view,
-// or NULL to not use any input method. Note that the same KitInputMethodContext
-// can't be set on more than one KitWebView at the same time.
-//
-// The function takes the following parameters:
-//
-//    - context to set, or NULL.
-//
-func (webView *WebView) SetInputMethodContext(context InputMethodContexter) {
-	var _arg0 *C.WebKitWebView            // out
-	var _arg1 *C.WebKitInputMethodContext // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	if context != nil {
-		_arg1 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
-	}
-
-	C.webkit_web_view_set_input_method_context(_arg0, _arg1)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(context)
-}
-
-// SetIsMuted sets the mute state of web_view.
-//
-// The function takes the following parameters:
-//
-//    - muted: mute flag.
-//
-func (webView *WebView) SetIsMuted(muted bool) {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 C.gboolean       // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	if muted {
-		_arg1 = C.TRUE
-	}
-
-	C.webkit_web_view_set_is_muted(_arg0, _arg1)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(muted)
-}
-
-// SetSettings sets the KitSettings to be applied to web_view. The existing
-// KitSettings of web_view will be replaced by settings. New settings are
-// applied immediately on web_view. The same KitSettings object can be shared by
-// multiple KitWebView<!-- -->s.
-//
-// The function takes the following parameters:
-//
-//    - settings: KitSettings.
-//
-func (webView *WebView) SetSettings(settings *Settings) {
-	var _arg0 *C.WebKitWebView  // out
-	var _arg1 *C.WebKitSettings // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
-
-	C.webkit_web_view_set_settings(_arg0, _arg1)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(settings)
-}
-
-// SetZoomLevel: set the zoom level of web_view, i.e. the factor by which the
-// view contents are scaled with respect to their original size.
-//
-// The function takes the following parameters:
-//
-//    - zoomLevel: zoom level.
-//
-func (webView *WebView) SetZoomLevel(zoomLevel float64) {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 C.gdouble        // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-	_arg1 = C.gdouble(zoomLevel)
-
-	C.webkit_web_view_set_zoom_level(_arg0, _arg1)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(zoomLevel)
-}
-
-// StopLoading stops any ongoing loading operation in web_view. This method does
-// nothing if no content is being loaded. If there is a loading operation in
-// progress, it will be cancelled and KitWebView::load-failed signal will be
-// emitted with WEBKIT_NETWORK_ERROR_CANCELLED error.
-func (webView *WebView) StopLoading() {
-	var _arg0 *C.WebKitWebView // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	C.webkit_web_view_stop_loading(_arg0)
-	runtime.KeepAlive(webView)
-}
-
-// TryClose tries to close the web_view. This will fire the onbeforeunload event
-// to ask the user for confirmation to close the page. If there isn't an
-// onbeforeunload event handler or the user confirms to close the page, the
-// KitWebView::close signal is emitted, otherwise nothing happens.
-func (webView *WebView) TryClose() {
-	var _arg0 *C.WebKitWebView // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
-
-	C.webkit_web_view_try_close(_arg0)
-	runtime.KeepAlive(webView)
 }
 
 // ConnectAuthenticate: this signal is emitted when the user is challenged with
@@ -2760,4 +854,2234 @@ func (webView *WebView) ConnectWebProcessCrashed(f func() bool) externglib.Signa
 // terminates abnormally due to reason.
 func (webView *WebView) ConnectWebProcessTerminated(f func(reason WebProcessTerminationReason)) externglib.SignalHandle {
 	return webView.Connect("web-process-terminated", f)
+}
+
+// NewWebView creates a new KitWebView with the default KitWebContext and no
+// KitUserContentManager associated with it. See also
+// webkit_web_view_new_with_context(),
+// webkit_web_view_new_with_user_content_manager(), and
+// webkit_web_view_new_with_settings().
+//
+// The function returns the following values:
+//
+//    - webView: newly created KitWebView widget.
+//
+func NewWebView() *WebView {
+	var _cret *C.GtkWidget // in
+
+	_cret = C.webkit_web_view_new()
+
+	var _webView *WebView // out
+
+	_webView = wrapWebView(externglib.Take(unsafe.Pointer(_cret)))
+
+	return _webView
+}
+
+// NewWebViewWithContext creates a new KitWebView with the given KitWebContext
+// and no KitUserContentManager associated with it. See also
+// webkit_web_view_new_with_user_content_manager() and
+// webkit_web_view_new_with_settings().
+//
+// The function takes the following parameters:
+//
+//    - context to be used by the KitWebView.
+//
+// The function returns the following values:
+//
+//    - webView: newly created KitWebView widget.
+//
+func NewWebViewWithContext(context *WebContext) *WebView {
+	var _arg1 *C.WebKitWebContext // out
+	var _cret *C.GtkWidget        // in
+
+	_arg1 = (*C.WebKitWebContext)(unsafe.Pointer(context.Native()))
+
+	_cret = C.webkit_web_view_new_with_context(_arg1)
+	runtime.KeepAlive(context)
+
+	var _webView *WebView // out
+
+	_webView = wrapWebView(externglib.Take(unsafe.Pointer(_cret)))
+
+	return _webView
+}
+
+// NewWebViewWithRelatedView creates a new KitWebView sharing the same web
+// process with web_view. This method doesn't have any effect when
+// WEBKIT_PROCESS_MODEL_SHARED_SECONDARY_PROCESS process model is used, because
+// a single web process is shared for all the web views in the same
+// KitWebContext. When using WEBKIT_PROCESS_MODEL_MULTIPLE_SECONDARY_PROCESSES
+// process model, this method should always be used when creating the KitWebView
+// in the KitWebView::create signal. You can also use this method to implement
+// other process models based on
+// WEBKIT_PROCESS_MODEL_MULTIPLE_SECONDARY_PROCESSES, like for example, sharing
+// the same web process for all the views in the same security domain.
+//
+// The newly created KitWebView will also have the same KitUserContentManager,
+// KitSettings, and KitWebsitePolicies as web_view.
+//
+// The function takes the following parameters:
+//
+//    - webView: related KitWebView.
+//
+// The function returns the following values:
+//
+//    - webView: newly created KitWebView widget.
+//
+func NewWebViewWithRelatedView(webView *WebView) *WebView {
+	var _arg1 *C.WebKitWebView // out
+	var _cret *C.GtkWidget     // in
+
+	_arg1 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_new_with_related_view(_arg1)
+	runtime.KeepAlive(webView)
+
+	var _webView *WebView // out
+
+	_webView = wrapWebView(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+
+	return _webView
+}
+
+// NewWebViewWithSettings creates a new KitWebView with the given KitSettings.
+// See also webkit_web_view_new_with_context(), and
+// webkit_web_view_new_with_user_content_manager().
+//
+// The function takes the following parameters:
+//
+//    - settings: KitSettings.
+//
+// The function returns the following values:
+//
+//    - webView: newly created KitWebView widget.
+//
+func NewWebViewWithSettings(settings *Settings) *WebView {
+	var _arg1 *C.WebKitSettings // out
+	var _cret *C.GtkWidget      // in
+
+	_arg1 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+
+	_cret = C.webkit_web_view_new_with_settings(_arg1)
+	runtime.KeepAlive(settings)
+
+	var _webView *WebView // out
+
+	_webView = wrapWebView(externglib.Take(unsafe.Pointer(_cret)))
+
+	return _webView
+}
+
+// NewWebViewWithUserContentManager creates a new KitWebView with the given
+// KitUserContentManager. The content loaded in the view may be affected by the
+// content injected in the view by the user content manager.
+//
+// The function takes the following parameters:
+//
+//    - userContentManager: KitUserContentManager.
+//
+// The function returns the following values:
+//
+//    - webView: newly created KitWebView widget.
+//
+func NewWebViewWithUserContentManager(userContentManager *UserContentManager) *WebView {
+	var _arg1 *C.WebKitUserContentManager // out
+	var _cret *C.GtkWidget                // in
+
+	_arg1 = (*C.WebKitUserContentManager)(unsafe.Pointer(userContentManager.Native()))
+
+	_cret = C.webkit_web_view_new_with_user_content_manager(_arg1)
+	runtime.KeepAlive(userContentManager)
+
+	var _webView *WebView // out
+
+	_webView = wrapWebView(externglib.Take(unsafe.Pointer(_cret)))
+
+	return _webView
+}
+
+// CanExecuteEditingCommand: asynchronously check if it is possible to execute
+// the given editing command.
+//
+// When the operation is finished, callback will be called. You can then call
+// webkit_web_view_can_execute_editing_command_finish() to get the result of the
+// operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx (optional) or NULL to ignore.
+//    - command to check.
+//    - callback (optional) to call when the request is satisfied.
+//
+func (webView *WebView) CanExecuteEditingCommand(ctx context.Context, command string, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebView      // out
+	var _arg2 *C.GCancellable       // out
+	var _arg1 *C.gchar              // out
+	var _arg3 C.GAsyncReadyCallback // out
+	var _arg4 C.gpointer
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(command)))
+	defer C.free(unsafe.Pointer(_arg1))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_web_view_can_execute_editing_command(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(command)
+	runtime.KeepAlive(callback)
+}
+
+// CanExecuteEditingCommandFinish: finish an asynchronous operation started with
+// webkit_web_view_can_execute_editing_command().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
+func (webView *WebView) CanExecuteEditingCommandFinish(result gio.AsyncResulter) error {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 *C.GAsyncResult  // out
+	var _cerr *C.GError        // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+
+	C.webkit_web_view_can_execute_editing_command_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(result)
+
+	var _goerr error // out
+
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
+
+	return _goerr
+}
+
+// CanGoBack determines whether web_view has a previous history item.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if able to move back or FALSE otherwise.
+//
+func (webView *WebView) CanGoBack() bool {
+	var _arg0 *C.WebKitWebView // out
+	var _cret C.gboolean       // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_can_go_back(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// CanGoForward determines whether web_view has a next history item.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if able to move forward or FALSE otherwise.
+//
+func (webView *WebView) CanGoForward() bool {
+	var _arg0 *C.WebKitWebView // out
+	var _cret C.gboolean       // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_can_go_forward(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// CanShowMIMEType: whether or not a MIME type can be displayed in web_view.
+//
+// The function takes the following parameters:
+//
+//    - mimeType: MIME type.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if the MIME type mime_type can be displayed or FALSE otherwise.
+//
+func (webView *WebView) CanShowMIMEType(mimeType string) bool {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 *C.gchar         // out
+	var _cret C.gboolean       // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(mimeType)))
+	defer C.free(unsafe.Pointer(_arg1))
+
+	_cret = C.webkit_web_view_can_show_mime_type(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(mimeType)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// DownloadURI requests downloading of the specified URI string for web_view.
+//
+// The function takes the following parameters:
+//
+//    - uri: URI to download.
+//
+// The function returns the following values:
+//
+//    - download: new KitDownload representing the download operation.
+//
+func (webView *WebView) DownloadURI(uri string) *Download {
+	var _arg0 *C.WebKitWebView  // out
+	var _arg1 *C.char           // out
+	var _cret *C.WebKitDownload // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(uri)))
+	defer C.free(unsafe.Pointer(_arg1))
+
+	_cret = C.webkit_web_view_download_uri(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(uri)
+
+	var _download *Download // out
+
+	_download = wrapDownload(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+
+	return _download
+}
+
+// ExecuteEditingCommand: request to execute the given command for web_view. You
+// can use webkit_web_view_can_execute_editing_command() to check whether it's
+// possible to execute the command.
+//
+// The function takes the following parameters:
+//
+//    - command to execute.
+//
+func (webView *WebView) ExecuteEditingCommand(command string) {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 *C.gchar         // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(command)))
+	defer C.free(unsafe.Pointer(_arg1))
+
+	C.webkit_web_view_execute_editing_command(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(command)
+}
+
+// ExecuteEditingCommandWithArgument: request to execute the given command with
+// argument for web_view. You can use
+// webkit_web_view_can_execute_editing_command() to check whether it's possible
+// to execute the command.
+//
+// The function takes the following parameters:
+//
+//    - command to execute.
+//    - argument: command argument.
+//
+func (webView *WebView) ExecuteEditingCommandWithArgument(command, argument string) {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 *C.char          // out
+	var _arg2 *C.char          // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(command)))
+	defer C.free(unsafe.Pointer(_arg1))
+	_arg2 = (*C.char)(unsafe.Pointer(C.CString(argument)))
+	defer C.free(unsafe.Pointer(_arg2))
+
+	C.webkit_web_view_execute_editing_command_with_argument(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(command)
+	runtime.KeepAlive(argument)
+}
+
+// AutomationPresentationType: get the presentation type of KitWebView when
+// created for automation.
+//
+// The function returns the following values:
+//
+//    - automationBrowsingContextPresentation:
+//      KitAutomationBrowsingContextPresentation.
+//
+func (webView *WebView) AutomationPresentationType() AutomationBrowsingContextPresentation {
+	var _arg0 *C.WebKitWebView                              // out
+	var _cret C.WebKitAutomationBrowsingContextPresentation // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_automation_presentation_type(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _automationBrowsingContextPresentation AutomationBrowsingContextPresentation // out
+
+	_automationBrowsingContextPresentation = AutomationBrowsingContextPresentation(_cret)
+
+	return _automationBrowsingContextPresentation
+}
+
+// BackForwardList obtains the KitBackForwardList associated with the given
+// KitWebView. The KitBackForwardList is owned by the KitWebView.
+//
+// The function returns the following values:
+//
+//    - backForwardList: KitBackForwardList.
+//
+func (webView *WebView) BackForwardList() *BackForwardList {
+	var _arg0 *C.WebKitWebView         // out
+	var _cret *C.WebKitBackForwardList // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_back_forward_list(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _backForwardList *BackForwardList // out
+
+	_backForwardList = wrapBackForwardList(externglib.Take(unsafe.Pointer(_cret)))
+
+	return _backForwardList
+}
+
+// BackgroundColor gets the color that is used to draw the web_view background
+// before the actual contents are rendered. For more information see also
+// webkit_web_view_set_background_color().
+//
+// The function returns the following values:
+//
+//    - rgba to fill in with the background color.
+//
+func (webView *WebView) BackgroundColor() *gdk.RGBA {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 C.GdkRGBA        // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	C.webkit_web_view_get_background_color(_arg0, &_arg1)
+	runtime.KeepAlive(webView)
+
+	var _rgba *gdk.RGBA // out
+
+	_rgba = (*gdk.RGBA)(gextras.NewStructNative(unsafe.Pointer((&_arg1))))
+
+	return _rgba
+}
+
+// Context gets the web context of web_view.
+//
+// The function returns the following values:
+//
+//    - webContext of the view.
+//
+func (webView *WebView) Context() *WebContext {
+	var _arg0 *C.WebKitWebView    // out
+	var _cret *C.WebKitWebContext // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_context(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _webContext *WebContext // out
+
+	_webContext = wrapWebContext(externglib.Take(unsafe.Pointer(_cret)))
+
+	return _webContext
+}
+
+// CustomCharset returns the current custom character encoding name of web_view.
+//
+// The function returns the following values:
+//
+//    - utf8: current custom character encoding name or NULL if no custom
+//      character encoding has been set.
+//
+func (webView *WebView) CustomCharset() string {
+	var _arg0 *C.WebKitWebView // out
+	var _cret *C.gchar         // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_custom_charset(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _utf8 string // out
+
+	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+
+	return _utf8
+}
+
+// EditorState gets the web editor state of web_view.
+//
+// The function returns the following values:
+//
+//    - editorState of the view.
+//
+func (webView *WebView) EditorState() *EditorState {
+	var _arg0 *C.WebKitWebView     // out
+	var _cret *C.WebKitEditorState // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_editor_state(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _editorState *EditorState // out
+
+	_editorState = wrapEditorState(externglib.Take(unsafe.Pointer(_cret)))
+
+	return _editorState
+}
+
+// EstimatedLoadProgress gets the value of the
+// KitWebView:estimated-load-progress property. You can monitor the estimated
+// progress of a load operation by connecting to the
+// notify::estimated-load-progress signal of web_view.
+//
+// The function returns the following values:
+//
+//    - gdouble: estimate of the of the percent complete for a document load as a
+//      range from 0.0 to 1.0.
+//
+func (webView *WebView) EstimatedLoadProgress() float64 {
+	var _arg0 *C.WebKitWebView // out
+	var _cret C.gdouble        // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_estimated_load_progress(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _gdouble float64 // out
+
+	_gdouble = float64(_cret)
+
+	return _gdouble
+}
+
+// Favicon returns favicon currently associated to web_view, if any. You can
+// connect to notify::favicon signal of web_view to be notified when the favicon
+// is available.
+//
+// The function returns the following values:
+//
+//    - surface: pointer to a #cairo_surface_t with the favicon or NULL if
+//      there's no icon associated with web_view.
+//
+func (webView *WebView) Favicon() *cairo.Surface {
+	var _arg0 *C.WebKitWebView   // out
+	var _cret *C.cairo_surface_t // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_favicon(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _surface *cairo.Surface // out
+
+	_surface = cairo.WrapSurface(uintptr(unsafe.Pointer(_cret)))
+	C.cairo_surface_reference(_cret)
+	runtime.SetFinalizer(_surface, func(v *cairo.Surface) {
+		C.cairo_surface_destroy((*C.cairo_surface_t)(unsafe.Pointer(v.Native())))
+	})
+
+	return _surface
+}
+
+// FindController gets the KitFindController that will allow the caller to query
+// the KitWebView for the text to look for.
+//
+// The function returns the following values:
+//
+//    - findController associated to this particular KitWebView.
+//
+func (webView *WebView) FindController() *FindController {
+	var _arg0 *C.WebKitWebView        // out
+	var _cret *C.WebKitFindController // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_find_controller(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _findController *FindController // out
+
+	_findController = wrapFindController(externglib.Take(unsafe.Pointer(_cret)))
+
+	return _findController
+}
+
+// InputMethodContext: get the KitInputMethodContext currently in use by
+// web_view, or NULL if no input method is being used.
+//
+// The function returns the following values:
+//
+//    - inputMethodContext (optional) or NULL.
+//
+func (webView *WebView) InputMethodContext() InputMethodContexter {
+	var _arg0 *C.WebKitWebView            // out
+	var _cret *C.WebKitInputMethodContext // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_input_method_context(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _inputMethodContext InputMethodContexter // out
+
+	if _cret != nil {
+		{
+			objptr := unsafe.Pointer(_cret)
+
+			object := externglib.Take(objptr)
+			casted := object.WalkCast(func(obj externglib.Objector) bool {
+				_, ok := obj.(InputMethodContexter)
+				return ok
+			})
+			rv, ok := casted.(InputMethodContexter)
+			if !ok {
+				panic("no marshaler for " + object.TypeFromInstance().String() + " matching webkit2.InputMethodContexter")
+			}
+			_inputMethodContext = rv
+		}
+	}
+
+	return _inputMethodContext
+}
+
+// Inspector: get the KitWebInspector associated to web_view.
+//
+// The function returns the following values:
+//
+//    - webInspector of web_view.
+//
+func (webView *WebView) Inspector() *WebInspector {
+	var _arg0 *C.WebKitWebView      // out
+	var _cret *C.WebKitWebInspector // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_inspector(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _webInspector *WebInspector // out
+
+	_webInspector = wrapWebInspector(externglib.Take(unsafe.Pointer(_cret)))
+
+	return _webInspector
+}
+
+// IsMuted gets the mute state of web_view.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if web_view audio is muted or FALSE is audio is not muted.
+//
+func (webView *WebView) IsMuted() bool {
+	var _arg0 *C.WebKitWebView // out
+	var _cret C.gboolean       // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_is_muted(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// MainResource: return the main resource of web_view.
+//
+// The function returns the following values:
+//
+//    - webResource: main KitWebResource of the view or NULL if nothing has been
+//      loaded.
+//
+func (webView *WebView) MainResource() *WebResource {
+	var _arg0 *C.WebKitWebView     // out
+	var _cret *C.WebKitWebResource // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_main_resource(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _webResource *WebResource // out
+
+	_webResource = wrapWebResource(externglib.Take(unsafe.Pointer(_cret)))
+
+	return _webResource
+}
+
+// PageID: get the identifier of the KitWebPage corresponding to the KitWebView.
+//
+// The function returns the following values:
+//
+//    - guint64: page ID of web_view.
+//
+func (webView *WebView) PageID() uint64 {
+	var _arg0 *C.WebKitWebView // out
+	var _cret C.guint64        // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_page_id(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _guint64 uint64 // out
+
+	_guint64 = uint64(_cret)
+
+	return _guint64
+}
+
+// SessionState gets the current session state of web_view.
+//
+// The function returns the following values:
+//
+//    - webViewSessionState: KitWebViewSessionState.
+//
+func (webView *WebView) SessionState() *WebViewSessionState {
+	var _arg0 *C.WebKitWebView             // out
+	var _cret *C.WebKitWebViewSessionState // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_session_state(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _webViewSessionState *WebViewSessionState // out
+
+	_webViewSessionState = (*WebViewSessionState)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_webViewSessionState)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_web_view_session_state_unref((*C.WebKitWebViewSessionState)(intern.C))
+		},
+	)
+
+	return _webViewSessionState
+}
+
+// Settings gets the KitSettings currently applied to web_view. If no other
+// KitSettings have been explicitly applied to web_view with
+// webkit_web_view_set_settings(), the default KitSettings will be returned.
+// This method always returns a valid KitSettings object. To modify any of the
+// web_view settings, you can either create a new KitSettings object with
+// webkit_settings_new(), setting the desired preferences, and then replace the
+// existing web_view settings with webkit_web_view_set_settings() or get the
+// existing web_view settings and update it directly. KitSettings objects can be
+// shared by multiple KitWebView<!-- -->s, so modifying the settings of a
+// KitWebView would affect other KitWebView<!-- -->s using the same KitSettings.
+//
+// The function returns the following values:
+//
+//    - settings attached to web_view.
+//
+func (webView *WebView) Settings() *Settings {
+	var _arg0 *C.WebKitWebView  // out
+	var _cret *C.WebKitSettings // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_settings(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _settings *Settings // out
+
+	_settings = wrapSettings(externglib.Take(unsafe.Pointer(_cret)))
+
+	return _settings
+}
+
+// Snapshot: asynchronously retrieves a snapshot of web_view for region. options
+// specifies how the snapshot should be rendered.
+//
+// When the operation is finished, callback will be called. You must call
+// webkit_web_view_get_snapshot_finish() to get the result of the operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx (optional): #GCancellable.
+//    - region for this snapshot.
+//    - options for the snapshot.
+//    - callback (optional): ReadyCallback.
+//
+func (webView *WebView) Snapshot(ctx context.Context, region SnapshotRegion, options SnapshotOptions, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebView        // out
+	var _arg3 *C.GCancellable         // out
+	var _arg1 C.WebKitSnapshotRegion  // out
+	var _arg2 C.WebKitSnapshotOptions // out
+	var _arg4 C.GAsyncReadyCallback   // out
+	var _arg5 C.gpointer
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = C.WebKitSnapshotRegion(region)
+	_arg2 = C.WebKitSnapshotOptions(options)
+	if callback != nil {
+		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg5 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_web_view_get_snapshot(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(region)
+	runtime.KeepAlive(options)
+	runtime.KeepAlive(callback)
+}
+
+// SnapshotFinish finishes an asynchronous operation started with
+// webkit_web_view_get_snapshot().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
+// The function returns the following values:
+//
+//    - surface with the retrieved snapshot or NULL in error.
+//
+func (webView *WebView) SnapshotFinish(result gio.AsyncResulter) (*cairo.Surface, error) {
+	var _arg0 *C.WebKitWebView   // out
+	var _arg1 *C.GAsyncResult    // out
+	var _cret *C.cairo_surface_t // in
+	var _cerr *C.GError          // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+
+	_cret = C.webkit_web_view_get_snapshot_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(result)
+
+	var _surface *cairo.Surface // out
+	var _goerr error            // out
+
+	_surface = cairo.WrapSurface(uintptr(unsafe.Pointer(_cret)))
+	runtime.SetFinalizer(_surface, func(v *cairo.Surface) {
+		C.cairo_surface_destroy((*C.cairo_surface_t)(unsafe.Pointer(v.Native())))
+	})
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
+
+	return _surface, _goerr
+}
+
+// Title gets the value of the KitWebView:title property. You can connect to
+// notify::title signal of web_view to be notified when the title has been
+// received.
+//
+// The function returns the following values:
+//
+//    - utf8: main frame document title of web_view.
+//
+func (webView *WebView) Title() string {
+	var _arg0 *C.WebKitWebView // out
+	var _cret *C.gchar         // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_title(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _utf8 string // out
+
+	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+
+	return _utf8
+}
+
+// TLSInfo retrieves the Certificate associated with the main resource of
+// web_view, and the CertificateFlags showing what problems, if any, have been
+// found with that certificate. If the connection is not HTTPS, this function
+// returns FALSE. This function should be called after a response has been
+// received from the server, so you can connect to KitWebView::load-changed and
+// call this function when it's emitted with WEBKIT_LOAD_COMMITTED event.
+//
+// Note that this function provides no information about the security of the web
+// page if the current KitTLSErrorsPolicy is WEBKIT_TLS_ERRORS_POLICY_IGNORE, as
+// subresources of the page may be controlled by an attacker. This function may
+// safely be used to determine the security status of the current page only if
+// the current KitTLSErrorsPolicy is WEBKIT_TLS_ERRORS_POLICY_FAIL, in which
+// case subresources that fail certificate verification will be blocked.
+//
+// The function returns the following values:
+//
+//    - certificate: return location for a Certificate.
+//    - errors: return location for a CertificateFlags the verification status of
+//      certificate.
+//    - ok: TRUE if the web_view connection uses HTTPS and a response has been
+//      received from the server, or FALSE otherwise.
+//
+func (webView *WebView) TLSInfo() (gio.TLSCertificater, gio.TLSCertificateFlags, bool) {
+	var _arg0 *C.WebKitWebView       // out
+	var _arg1 *C.GTlsCertificate     // in
+	var _arg2 C.GTlsCertificateFlags // in
+	var _cret C.gboolean             // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_tls_info(_arg0, &_arg1, &_arg2)
+	runtime.KeepAlive(webView)
+
+	var _certificate gio.TLSCertificater // out
+	var _errors gio.TLSCertificateFlags  // out
+	var _ok bool                         // out
+
+	{
+		objptr := unsafe.Pointer(_arg1)
+		if objptr == nil {
+			panic("object of type gio.TLSCertificater is nil")
+		}
+
+		object := externglib.Take(objptr)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gio.TLSCertificater)
+			return ok
+		})
+		rv, ok := casted.(gio.TLSCertificater)
+		if !ok {
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.TLSCertificater")
+		}
+		_certificate = rv
+	}
+	_errors = gio.TLSCertificateFlags(_arg2)
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _certificate, _errors, _ok
+}
+
+// URI returns the current active URI of web_view. The active URI might change
+// during a load operation:
+//
+// <orderedlist> <listitem><para> When nothing has been loaded yet on web_view
+// the active URI is NULL. </para></listitem> <listitem><para> When a new load
+// operation starts the active URI is the requested URI: <itemizedlist>
+// <listitem><para> If the load operation was started by
+// webkit_web_view_load_uri(), the requested URI is the given one.
+// </para></listitem> <listitem><para> If the load operation was started by
+// webkit_web_view_load_html(), the requested URI is "about:blank".
+// </para></listitem> <listitem><para> If the load operation was started by
+// webkit_web_view_load_alternate_html(), the requested URI is content URI
+// provided. </para></listitem> <listitem><para> If the load operation was
+// started by webkit_web_view_go_back() or webkit_web_view_go_forward(), the
+// requested URI is the original URI of the previous/next item in the
+// KitBackForwardList of web_view. </para></listitem> <listitem><para> If the
+// load operation was started by webkit_web_view_go_to_back_forward_list_item(),
+// the requested URI is the opriginal URI of the given KitBackForwardListItem.
+// </para></listitem> </itemizedlist> </para></listitem> <listitem><para> If
+// there is a server redirection during the load operation, the active URI is
+// the redirected URI. When the signal KitWebView::load-changed is emitted with
+// WEBKIT_LOAD_REDIRECTED event, the active URI is already updated to the
+// redirected URI. </para></listitem> <listitem><para> When the signal
+// KitWebView::load-changed is emitted with WEBKIT_LOAD_COMMITTED event, the
+// active URI is the final one and it will not change unless a new load
+// operation is started or a navigation action within the same page is
+// performed. </para></listitem> </orderedlist>
+//
+// You can monitor the active URI by connecting to the notify::uri signal of
+// web_view.
+//
+// The function returns the following values:
+//
+//    - utf8: current active URI of web_view or NULL if nothing has been loaded
+//      yet.
+//
+func (webView *WebView) URI() string {
+	var _arg0 *C.WebKitWebView // out
+	var _cret *C.gchar         // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_uri(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _utf8 string // out
+
+	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+
+	return _utf8
+}
+
+// UserContentManager gets the user content manager associated to web_view.
+//
+// The function returns the following values:
+//
+//    - userContentManager associated with the view.
+//
+func (webView *WebView) UserContentManager() *UserContentManager {
+	var _arg0 *C.WebKitWebView            // out
+	var _cret *C.WebKitUserContentManager // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_user_content_manager(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _userContentManager *UserContentManager // out
+
+	_userContentManager = wrapUserContentManager(externglib.Take(unsafe.Pointer(_cret)))
+
+	return _userContentManager
+}
+
+// WebsiteDataManager: get the KitWebsiteDataManager associated to web_view. If
+// web_view is not ephemeral, the returned KitWebsiteDataManager will be the
+// same as the KitWebsiteDataManager of web_view's KitWebContext.
+//
+// The function returns the following values:
+//
+//    - websiteDataManager: KitWebsiteDataManager.
+//
+func (webView *WebView) WebsiteDataManager() *WebsiteDataManager {
+	var _arg0 *C.WebKitWebView            // out
+	var _cret *C.WebKitWebsiteDataManager // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_website_data_manager(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _websiteDataManager *WebsiteDataManager // out
+
+	_websiteDataManager = wrapWebsiteDataManager(externglib.Take(unsafe.Pointer(_cret)))
+
+	return _websiteDataManager
+}
+
+// WebsitePolicies gets the default website policies set on construction in the
+// web_view. These can be overridden on a per-origin basis via the
+// KitWebView::decide-policy signal handler.
+//
+// See also webkit_policy_decision_use_with_policies().
+//
+// The function returns the following values:
+//
+//    - websitePolicies: default KitWebsitePolicies associated with the view.
+//
+func (webView *WebView) WebsitePolicies() *WebsitePolicies {
+	var _arg0 *C.WebKitWebView         // out
+	var _cret *C.WebKitWebsitePolicies // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_website_policies(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _websitePolicies *WebsitePolicies // out
+
+	_websitePolicies = wrapWebsitePolicies(externglib.Take(unsafe.Pointer(_cret)))
+
+	return _websitePolicies
+}
+
+// WindowProperties: get the KitWindowProperties object containing the
+// properties that the window containing web_view should have.
+//
+// The function returns the following values:
+//
+//    - windowProperties of web_view.
+//
+func (webView *WebView) WindowProperties() *WindowProperties {
+	var _arg0 *C.WebKitWebView          // out
+	var _cret *C.WebKitWindowProperties // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_window_properties(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _windowProperties *WindowProperties // out
+
+	_windowProperties = wrapWindowProperties(externglib.Take(unsafe.Pointer(_cret)))
+
+	return _windowProperties
+}
+
+// ZoomLevel: get the zoom level of web_view, i.e. the factor by which the view
+// contents are scaled with respect to their original size.
+//
+// The function returns the following values:
+//
+//    - gdouble: current zoom level of web_view.
+//
+func (webView *WebView) ZoomLevel() float64 {
+	var _arg0 *C.WebKitWebView // out
+	var _cret C.gdouble        // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_get_zoom_level(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _gdouble float64 // out
+
+	_gdouble = float64(_cret)
+
+	return _gdouble
+}
+
+// GoBack loads the previous history item. You can monitor the load operation by
+// connecting to KitWebView::load-changed signal.
+func (webView *WebView) GoBack() {
+	var _arg0 *C.WebKitWebView // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	C.webkit_web_view_go_back(_arg0)
+	runtime.KeepAlive(webView)
+}
+
+// GoForward loads the next history item. You can monitor the load operation by
+// connecting to KitWebView::load-changed signal.
+func (webView *WebView) GoForward() {
+	var _arg0 *C.WebKitWebView // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	C.webkit_web_view_go_forward(_arg0)
+	runtime.KeepAlive(webView)
+}
+
+// GoToBackForwardListItem loads the specific history item list_item. You can
+// monitor the load operation by connecting to KitWebView::load-changed signal.
+//
+// The function takes the following parameters:
+//
+//    - listItem: KitBackForwardListItem.
+//
+func (webView *WebView) GoToBackForwardListItem(listItem *BackForwardListItem) {
+	var _arg0 *C.WebKitWebView             // out
+	var _arg1 *C.WebKitBackForwardListItem // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.WebKitBackForwardListItem)(unsafe.Pointer(listItem.Native()))
+
+	C.webkit_web_view_go_to_back_forward_list_item(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(listItem)
+}
+
+// IsControlledByAutomation: get whether a KitWebView was created with
+// KitWebView:is-controlled-by-automation property enabled. Only KitWebView<!--
+// -->s controlled by automation can be used in an automation session.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if web_view is controlled by automation, or FALSE otherwise.
+//
+func (webView *WebView) IsControlledByAutomation() bool {
+	var _arg0 *C.WebKitWebView // out
+	var _cret C.gboolean       // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_is_controlled_by_automation(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// The function returns the following values:
+//
+func (webView *WebView) IsEditable() bool {
+	var _arg0 *C.WebKitWebView // out
+	var _cret C.gboolean       // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_is_editable(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// IsEphemeral: get whether a KitWebView is ephemeral. To create an ephemeral
+// KitWebView you need to use g_object_new() and pass is-ephemeral property with
+// TRUE value. See KitWebView:is-ephemeral for more details. If web_view was
+// created with a ephemeral KitWebView:related-view or an ephemeral
+// KitWebView:web-context it will also be ephemeral.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if web_view is ephemeral or FALSE otherwise.
+//
+func (webView *WebView) IsEphemeral() bool {
+	var _arg0 *C.WebKitWebView // out
+	var _cret C.gboolean       // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_is_ephemeral(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// IsLoading gets the value of the KitWebView:is-loading property. You can
+// monitor when a KitWebView is loading a page by connecting to
+// notify::is-loading signal of web_view. This is useful when you are
+// interesting in knowing when the view is loading something but not in the
+// details about the status of the load operation, for example to start a
+// spinner when the view is loading a page and stop it when it finishes.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if web_view is loading a page or FALSE otherwise.
+//
+func (webView *WebView) IsLoading() bool {
+	var _arg0 *C.WebKitWebView // out
+	var _cret C.gboolean       // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_is_loading(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// IsPlayingAudio gets the value of the KitWebView:is-playing-audio property.
+// You can monitor when a page in a KitWebView is playing audio by connecting to
+// the notify::is-playing-audio signal of web_view. This is useful when the
+// application wants to provide visual feedback when a page is producing sound.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if a page in web_view is playing audio or FALSE otherwise.
+//
+func (webView *WebView) IsPlayingAudio() bool {
+	var _arg0 *C.WebKitWebView // out
+	var _cret C.gboolean       // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	_cret = C.webkit_web_view_is_playing_audio(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// LoadAlternateHtml: load the given content string for the URI content_uri.
+// This allows clients to display page-loading errors in the KitWebView itself.
+// When this method is called from KitWebView::load-failed signal to show an
+// error page, then the back-forward list is maintained appropriately. For
+// everything else this method works the same way as
+// webkit_web_view_load_html().
+//
+// The function takes the following parameters:
+//
+//    - content: new content to display as the main page of the web_view.
+//    - contentUri: URI for the alternate page content.
+//    - baseUri (optional): base URI for relative locations or NULL.
+//
+func (webView *WebView) LoadAlternateHtml(content, contentUri, baseUri string) {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 *C.gchar         // out
+	var _arg2 *C.gchar         // out
+	var _arg3 *C.gchar         // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(content)))
+	defer C.free(unsafe.Pointer(_arg1))
+	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(contentUri)))
+	defer C.free(unsafe.Pointer(_arg2))
+	if baseUri != "" {
+		_arg3 = (*C.gchar)(unsafe.Pointer(C.CString(baseUri)))
+		defer C.free(unsafe.Pointer(_arg3))
+	}
+
+	C.webkit_web_view_load_alternate_html(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(content)
+	runtime.KeepAlive(contentUri)
+	runtime.KeepAlive(baseUri)
+}
+
+// LoadBytes: load the specified bytes into web_view using the given mime_type
+// and encoding. When mime_type is NULL, it defaults to "text/html". When
+// encoding is NULL, it defaults to "UTF-8". When base_uri is NULL, it defaults
+// to "about:blank". You can monitor the load operation by connecting to
+// KitWebView::load-changed signal.
+//
+// The function takes the following parameters:
+//
+//    - bytes: input data to load.
+//    - mimeType (optional): MIME type of bytes, or NULL.
+//    - encoding (optional): character encoding of bytes, or NULL.
+//    - baseUri (optional): base URI for relative locations or NULL.
+//
+func (webView *WebView) LoadBytes(bytes *glib.Bytes, mimeType, encoding, baseUri string) {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 *C.GBytes        // out
+	var _arg2 *C.gchar         // out
+	var _arg3 *C.gchar         // out
+	var _arg4 *C.gchar         // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.GBytes)(gextras.StructNative(unsafe.Pointer(bytes)))
+	if mimeType != "" {
+		_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(mimeType)))
+		defer C.free(unsafe.Pointer(_arg2))
+	}
+	if encoding != "" {
+		_arg3 = (*C.gchar)(unsafe.Pointer(C.CString(encoding)))
+		defer C.free(unsafe.Pointer(_arg3))
+	}
+	if baseUri != "" {
+		_arg4 = (*C.gchar)(unsafe.Pointer(C.CString(baseUri)))
+		defer C.free(unsafe.Pointer(_arg4))
+	}
+
+	C.webkit_web_view_load_bytes(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(bytes)
+	runtime.KeepAlive(mimeType)
+	runtime.KeepAlive(encoding)
+	runtime.KeepAlive(baseUri)
+}
+
+// LoadHtml: load the given content string with the specified base_uri. If
+// base_uri is not NULL, relative URLs in the content will be resolved against
+// base_uri and absolute local paths must be children of the base_uri. For
+// security reasons absolute local paths that are not children of base_uri will
+// cause the web process to terminate. If you need to include URLs in content
+// that are local paths in a different directory than base_uri you can build a
+// data URI for them. When base_uri is NULL, it defaults to "about:blank". The
+// mime type of the document will be "text/html". You can monitor the load
+// operation by connecting to KitWebView::load-changed signal.
+//
+// The function takes the following parameters:
+//
+//    - content: HTML string to load.
+//    - baseUri (optional): base URI for relative locations or NULL.
+//
+func (webView *WebView) LoadHtml(content, baseUri string) {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 *C.gchar         // out
+	var _arg2 *C.gchar         // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(content)))
+	defer C.free(unsafe.Pointer(_arg1))
+	if baseUri != "" {
+		_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(baseUri)))
+		defer C.free(unsafe.Pointer(_arg2))
+	}
+
+	C.webkit_web_view_load_html(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(content)
+	runtime.KeepAlive(baseUri)
+}
+
+// LoadPlainText: load the specified plain_text string into web_view. The mime
+// type of document will be "text/plain". You can monitor the load operation by
+// connecting to KitWebView::load-changed signal.
+//
+// The function takes the following parameters:
+//
+//    - plainText: plain text to load.
+//
+func (webView *WebView) LoadPlainText(plainText string) {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 *C.gchar         // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(plainText)))
+	defer C.free(unsafe.Pointer(_arg1))
+
+	C.webkit_web_view_load_plain_text(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(plainText)
+}
+
+// LoadRequest requests loading of the specified KitURIRequest. You can monitor
+// the load operation by connecting to KitWebView::load-changed signal.
+//
+// The function takes the following parameters:
+//
+//    - request to load.
+//
+func (webView *WebView) LoadRequest(request *URIRequest) {
+	var _arg0 *C.WebKitWebView    // out
+	var _arg1 *C.WebKitURIRequest // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.WebKitURIRequest)(unsafe.Pointer(request.Native()))
+
+	C.webkit_web_view_load_request(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(request)
+}
+
+// LoadURI requests loading of the specified URI string. You can monitor the
+// load operation by connecting to KitWebView::load-changed signal.
+//
+// The function takes the following parameters:
+//
+//    - uri: URI string.
+//
+func (webView *WebView) LoadURI(uri string) {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 *C.gchar         // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(uri)))
+	defer C.free(unsafe.Pointer(_arg1))
+
+	C.webkit_web_view_load_uri(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(uri)
+}
+
+// Reload reloads the current contents of web_view. See also
+// webkit_web_view_reload_bypass_cache().
+func (webView *WebView) Reload() {
+	var _arg0 *C.WebKitWebView // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	C.webkit_web_view_reload(_arg0)
+	runtime.KeepAlive(webView)
+}
+
+// ReloadBypassCache reloads the current contents of web_view without using any
+// cached data.
+func (webView *WebView) ReloadBypassCache() {
+	var _arg0 *C.WebKitWebView // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	C.webkit_web_view_reload_bypass_cache(_arg0)
+	runtime.KeepAlive(webView)
+}
+
+// RestoreSessionState: restore the web_view session state from state.
+//
+// The function takes the following parameters:
+//
+//    - state: KitWebViewSessionState.
+//
+func (webView *WebView) RestoreSessionState(state *WebViewSessionState) {
+	var _arg0 *C.WebKitWebView             // out
+	var _arg1 *C.WebKitWebViewSessionState // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.WebKitWebViewSessionState)(gextras.StructNative(unsafe.Pointer(state)))
+
+	C.webkit_web_view_restore_session_state(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(state)
+}
+
+// RunJavascript: asynchronously run script in the context of the current page
+// in web_view. If WebKitSettings:enable-javascript is FALSE, this method will
+// do nothing.
+//
+// When the operation is finished, callback will be called. You can then call
+// webkit_web_view_run_javascript_finish() to get the result of the operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx (optional) or NULL to ignore.
+//    - script to run.
+//    - callback (optional) to call when the script finished.
+//
+func (webView *WebView) RunJavascript(ctx context.Context, script string, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebView      // out
+	var _arg2 *C.GCancellable       // out
+	var _arg1 *C.gchar              // out
+	var _arg3 C.GAsyncReadyCallback // out
+	var _arg4 C.gpointer
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(script)))
+	defer C.free(unsafe.Pointer(_arg1))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_web_view_run_javascript(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(script)
+	runtime.KeepAlive(callback)
+}
+
+// RunJavascriptFinish: finish an asynchronous operation started with
+// webkit_web_view_run_javascript().
+//
+// This is an example of using webkit_web_view_run_javascript() with a script
+// returning a string:
+//
+// <informalexample><programlisting> static void web_view_javascript_finished
+// (GObject *object, GAsyncResult *result, gpointer user_data) {
+// WebKitJavascriptResult *js_result; JSCValue *value; GError *error = NULL;
+//
+//    js_result = webkit_web_view_run_javascript_finish (WEBKIT_WEB_VIEW (object), result, &error);
+//    if (!js_result) {
+//        g_warning ("Error running javascript: s", error->message);
+//        g_error_free (error);
+//        return;
+//    }
+//
+//    value = webkit_javascript_result_get_js_value (js_result);
+//    if (jsc_value_is_string (value)) {
+//        JSCException *exception;
+//        gchar        *str_value;
+//
+//        str_value = jsc_value_to_string (value);
+//        exception = jsc_context_get_exception (jsc_value_get_context (value));
+//        if (exception)
+//            g_warning ("Error running javascript: s", jsc_exception_get_message (exception));
+//        else
+//            g_print ("Script result: s\n", str_value);
+//        g_free (str_value);
+//    } else {
+//        g_warning ("Error running javascript: unexpected return value");
+//    }
+//    webkit_javascript_result_unref (js_result);
+//
+// }
+//
+// static void web_view_get_link_url (WebKitWebView *web_view, const gchar
+// *link_id) { gchar *script;
+//
+//    script = g_strdup_printf ("window.document.getElementById('s').href;", link_id);
+//    webkit_web_view_run_javascript (web_view, script, NULL, web_view_javascript_finished, NULL);
+//    g_free (script);
+//
+// } </programlisting></informalexample>.
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
+// The function returns the following values:
+//
+//    - javascriptResult with the result of the last executed statement in script
+//      or NULL in case of error.
+//
+func (webView *WebView) RunJavascriptFinish(result gio.AsyncResulter) (*JavascriptResult, error) {
+	var _arg0 *C.WebKitWebView          // out
+	var _arg1 *C.GAsyncResult           // out
+	var _cret *C.WebKitJavascriptResult // in
+	var _cerr *C.GError                 // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+
+	_cret = C.webkit_web_view_run_javascript_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(result)
+
+	var _javascriptResult *JavascriptResult // out
+	var _goerr error                        // out
+
+	_javascriptResult = (*JavascriptResult)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_javascriptResult)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_javascript_result_unref((*C.WebKitJavascriptResult)(intern.C))
+		},
+	)
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
+
+	return _javascriptResult, _goerr
+}
+
+// RunJavascriptFromGresource: asynchronously run the script from resource in
+// the context of the current page in web_view.
+//
+// When the operation is finished, callback will be called. You can then call
+// webkit_web_view_run_javascript_from_gresource_finish() to get the result of
+// the operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx (optional) or NULL to ignore.
+//    - resource: location of the resource to load.
+//    - callback (optional) to call when the script finished.
+//
+func (webView *WebView) RunJavascriptFromGresource(ctx context.Context, resource string, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebView      // out
+	var _arg2 *C.GCancellable       // out
+	var _arg1 *C.gchar              // out
+	var _arg3 C.GAsyncReadyCallback // out
+	var _arg4 C.gpointer
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(resource)))
+	defer C.free(unsafe.Pointer(_arg1))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_web_view_run_javascript_from_gresource(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(resource)
+	runtime.KeepAlive(callback)
+}
+
+// RunJavascriptFromGresourceFinish: finish an asynchronous operation started
+// with webkit_web_view_run_javascript_from_gresource().
+//
+// Check webkit_web_view_run_javascript_finish() for a usage example.
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
+// The function returns the following values:
+//
+//    - javascriptResult with the result of the last executed statement in script
+//      or NULL in case of error.
+//
+func (webView *WebView) RunJavascriptFromGresourceFinish(result gio.AsyncResulter) (*JavascriptResult, error) {
+	var _arg0 *C.WebKitWebView          // out
+	var _arg1 *C.GAsyncResult           // out
+	var _cret *C.WebKitJavascriptResult // in
+	var _cerr *C.GError                 // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+
+	_cret = C.webkit_web_view_run_javascript_from_gresource_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(result)
+
+	var _javascriptResult *JavascriptResult // out
+	var _goerr error                        // out
+
+	_javascriptResult = (*JavascriptResult)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_javascriptResult)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_javascript_result_unref((*C.WebKitJavascriptResult)(intern.C))
+		},
+	)
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
+
+	return _javascriptResult, _goerr
+}
+
+// RunJavascriptInWorld: asynchronously run script in the script world with name
+// world_name of the current page context in web_view. If
+// WebKitSettings:enable-javascript is FALSE, this method will do nothing.
+//
+// When the operation is finished, callback will be called. You can then call
+// webkit_web_view_run_javascript_in_world_finish() to get the result of the
+// operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx (optional) or NULL to ignore.
+//    - script to run.
+//    - worldName: name of a KitScriptWorld.
+//    - callback (optional) to call when the script finished.
+//
+func (webView *WebView) RunJavascriptInWorld(ctx context.Context, script, worldName string, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebView      // out
+	var _arg3 *C.GCancellable       // out
+	var _arg1 *C.gchar              // out
+	var _arg2 *C.gchar              // out
+	var _arg4 C.GAsyncReadyCallback // out
+	var _arg5 C.gpointer
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(script)))
+	defer C.free(unsafe.Pointer(_arg1))
+	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(worldName)))
+	defer C.free(unsafe.Pointer(_arg2))
+	if callback != nil {
+		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg5 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_web_view_run_javascript_in_world(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(script)
+	runtime.KeepAlive(worldName)
+	runtime.KeepAlive(callback)
+}
+
+// RunJavascriptInWorldFinish: finish an asynchronous operation started with
+// webkit_web_view_run_javascript_in_world().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
+// The function returns the following values:
+//
+//    - javascriptResult with the result of the last executed statement in script
+//      or NULL in case of error.
+//
+func (webView *WebView) RunJavascriptInWorldFinish(result gio.AsyncResulter) (*JavascriptResult, error) {
+	var _arg0 *C.WebKitWebView          // out
+	var _arg1 *C.GAsyncResult           // out
+	var _cret *C.WebKitJavascriptResult // in
+	var _cerr *C.GError                 // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+
+	_cret = C.webkit_web_view_run_javascript_in_world_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(result)
+
+	var _javascriptResult *JavascriptResult // out
+	var _goerr error                        // out
+
+	_javascriptResult = (*JavascriptResult)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_javascriptResult)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_javascript_result_unref((*C.WebKitJavascriptResult)(intern.C))
+		},
+	)
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
+
+	return _javascriptResult, _goerr
+}
+
+// Save: asynchronously save the current web page associated to the KitWebView
+// into a self-contained format using the mode specified in save_mode.
+//
+// When the operation is finished, callback will be called. You can then call
+// webkit_web_view_save_finish() to get the result of the operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx (optional) or NULL to ignore.
+//    - saveMode specifying how the web page should be saved.
+//    - callback (optional) to call when the request is satisfied.
+//
+func (webView *WebView) Save(ctx context.Context, saveMode SaveMode, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebView      // out
+	var _arg2 *C.GCancellable       // out
+	var _arg1 C.WebKitSaveMode      // out
+	var _arg3 C.GAsyncReadyCallback // out
+	var _arg4 C.gpointer
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = C.WebKitSaveMode(saveMode)
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_web_view_save(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(saveMode)
+	runtime.KeepAlive(callback)
+}
+
+// SaveFinish: finish an asynchronous operation started with
+// webkit_web_view_save().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
+// The function returns the following values:
+//
+//    - inputStream with the result of saving the current web page or NULL in
+//      case of error.
+//
+func (webView *WebView) SaveFinish(result gio.AsyncResulter) (gio.InputStreamer, error) {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 *C.GAsyncResult  // out
+	var _cret *C.GInputStream  // in
+	var _cerr *C.GError        // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+
+	_cret = C.webkit_web_view_save_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(result)
+
+	var _inputStream gio.InputStreamer // out
+	var _goerr error                   // out
+
+	{
+		objptr := unsafe.Pointer(_cret)
+		if objptr == nil {
+			panic("object of type gio.InputStreamer is nil")
+		}
+
+		object := externglib.AssumeOwnership(objptr)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gio.InputStreamer)
+			return ok
+		})
+		rv, ok := casted.(gio.InputStreamer)
+		if !ok {
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.InputStreamer")
+		}
+		_inputStream = rv
+	}
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
+
+	return _inputStream, _goerr
+}
+
+// SaveToFile: asynchronously save the current web page associated to the
+// KitWebView into a self-contained format using the mode specified in save_mode
+// and writing it to file.
+//
+// When the operation is finished, callback will be called. You can then call
+// webkit_web_view_save_to_file_finish() to get the result of the operation.
+//
+// The function takes the following parameters:
+//
+//    - ctx (optional) or NULL to ignore.
+//    - file where the current web page should be saved to.
+//    - saveMode specifying how the web page should be saved.
+//    - callback (optional) to call when the request is satisfied.
+//
+func (webView *WebView) SaveToFile(ctx context.Context, file gio.Filer, saveMode SaveMode, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebView      // out
+	var _arg3 *C.GCancellable       // out
+	var _arg1 *C.GFile              // out
+	var _arg2 C.WebKitSaveMode      // out
+	var _arg4 C.GAsyncReadyCallback // out
+	var _arg5 C.gpointer
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = (*C.GFile)(unsafe.Pointer(file.Native()))
+	_arg2 = C.WebKitSaveMode(saveMode)
+	if callback != nil {
+		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg5 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_web_view_save_to_file(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(file)
+	runtime.KeepAlive(saveMode)
+	runtime.KeepAlive(callback)
+}
+
+// SaveToFileFinish: finish an asynchronous operation started with
+// webkit_web_view_save_to_file().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
+func (webView *WebView) SaveToFileFinish(result gio.AsyncResulter) error {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 *C.GAsyncResult  // out
+	var _cerr *C.GError        // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+
+	C.webkit_web_view_save_to_file_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(result)
+
+	var _goerr error // out
+
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
+
+	return _goerr
+}
+
+// SendMessageToPage: send message to the KitWebPage corresponding to web_view.
+// If message is floating, it's consumed.
+//
+// If you don't expect any reply, or you simply want to ignore it, you can pass
+// NULL as callback. When the operation is finished, callback will be called.
+// You can then call webkit_web_view_send_message_to_page_finish() to get the
+// message reply.
+//
+// The function takes the following parameters:
+//
+//    - ctx (optional) or NULL to ignore.
+//    - message: KitUserMessage.
+//    - callback (optional): (nullable): A ReadyCallback to call when the request
+//      is satisfied or NULL.
+//
+func (webView *WebView) SendMessageToPage(ctx context.Context, message *UserMessage, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebView      // out
+	var _arg2 *C.GCancellable       // out
+	var _arg1 *C.WebKitUserMessage  // out
+	var _arg3 C.GAsyncReadyCallback // out
+	var _arg4 C.gpointer
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = (*C.WebKitUserMessage)(unsafe.Pointer(message.Native()))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_web_view_send_message_to_page(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(message)
+	runtime.KeepAlive(callback)
+}
+
+// SendMessageToPageFinish: finish an asynchronous operation started with
+// webkit_web_view_send_message_to_page().
+//
+// The function takes the following parameters:
+//
+//    - result: Result.
+//
+// The function returns the following values:
+//
+//    - userMessage with the reply or NULL in case of error.
+//
+func (webView *WebView) SendMessageToPageFinish(result gio.AsyncResulter) (*UserMessage, error) {
+	var _arg0 *C.WebKitWebView     // out
+	var _arg1 *C.GAsyncResult      // out
+	var _cret *C.WebKitUserMessage // in
+	var _cerr *C.GError            // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+
+	_cret = C.webkit_web_view_send_message_to_page_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(result)
+
+	var _userMessage *UserMessage // out
+	var _goerr error              // out
+
+	_userMessage = wrapUserMessage(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
+
+	return _userMessage, _goerr
+}
+
+// SetBackgroundColor sets the color that will be used to draw the web_view
+// background before the actual contents are rendered. Note that if the web page
+// loaded in web_view specifies a background color, it will take precedence over
+// the rgba color. By default the web_view background color is opaque white.
+// Note that the parent window must have a RGBA visual and Widget:app-paintable
+// property set to TRUE for backgrounds colors to work.
+//
+// <informalexample><programlisting> static void
+// browser_window_set_background_color (BrowserWindow *window, const GdkRGBA
+// *rgba) { WebKitWebView *web_view; GdkScreen *screen = gtk_window_get_screen
+// (GTK_WINDOW (window)); GdkVisual *rgba_visual = gdk_screen_get_rgba_visual
+// (screen);
+//
+//    if (!rgba_visual)
+//         return;
+//
+//    gtk_widget_set_visual (GTK_WIDGET (window), rgba_visual);
+//    gtk_widget_set_app_paintable (GTK_WIDGET (window), TRUE);
+//
+//    web_view = browser_window_get_web_view (window);
+//    webkit_web_view_set_background_color (web_view, rgba);
+//
+// } </programlisting></informalexample>.
+//
+// The function takes the following parameters:
+//
+//    - rgba: RGBA.
+//
+func (webView *WebView) SetBackgroundColor(rgba *gdk.RGBA) {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 *C.GdkRGBA       // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.GdkRGBA)(gextras.StructNative(unsafe.Pointer(rgba)))
+
+	C.webkit_web_view_set_background_color(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(rgba)
+}
+
+// SetCustomCharset sets the current custom character encoding override of
+// web_view. The custom character encoding will override any text encoding
+// detected via HTTP headers or META tags. Calling this method will stop any
+// current load operation and reload the current page. Setting the custom
+// character encoding to NULL removes the character encoding override.
+//
+// The function takes the following parameters:
+//
+//    - charset (optional): character encoding name or NULL.
+//
+func (webView *WebView) SetCustomCharset(charset string) {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 *C.gchar         // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	if charset != "" {
+		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(charset)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
+
+	C.webkit_web_view_set_custom_charset(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(charset)
+}
+
+// SetEditable sets whether the user is allowed to edit the HTML document.
+//
+// If editable is TRUE, web_view allows the user to edit the HTML document. If
+// editable is FALSE, an element in web_view's document can only be edited if
+// the CONTENTEDITABLE attribute has been set on the element or one of its
+// parent elements. By default a KitWebView is not editable.
+//
+// Normally, a HTML document is not editable unless the elements within the
+// document are editable. This function provides a way to make the contents of a
+// KitWebView editable without altering the document or DOM structure.
+//
+// The function takes the following parameters:
+//
+//    - editable indicating the editable state.
+//
+func (webView *WebView) SetEditable(editable bool) {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 C.gboolean       // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	if editable {
+		_arg1 = C.TRUE
+	}
+
+	C.webkit_web_view_set_editable(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(editable)
+}
+
+// SetInputMethodContext: set the KitInputMethodContext to be used by web_view,
+// or NULL to not use any input method. Note that the same KitInputMethodContext
+// can't be set on more than one KitWebView at the same time.
+//
+// The function takes the following parameters:
+//
+//    - context (optional) to set, or NULL.
+//
+func (webView *WebView) SetInputMethodContext(context InputMethodContexter) {
+	var _arg0 *C.WebKitWebView            // out
+	var _arg1 *C.WebKitInputMethodContext // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	if context != nil {
+		_arg1 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
+	}
+
+	C.webkit_web_view_set_input_method_context(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(context)
+}
+
+// SetIsMuted sets the mute state of web_view.
+//
+// The function takes the following parameters:
+//
+//    - muted: mute flag.
+//
+func (webView *WebView) SetIsMuted(muted bool) {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 C.gboolean       // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	if muted {
+		_arg1 = C.TRUE
+	}
+
+	C.webkit_web_view_set_is_muted(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(muted)
+}
+
+// SetSettings sets the KitSettings to be applied to web_view. The existing
+// KitSettings of web_view will be replaced by settings. New settings are
+// applied immediately on web_view. The same KitSettings object can be shared by
+// multiple KitWebView<!-- -->s.
+//
+// The function takes the following parameters:
+//
+//    - settings: KitSettings.
+//
+func (webView *WebView) SetSettings(settings *Settings) {
+	var _arg0 *C.WebKitWebView  // out
+	var _arg1 *C.WebKitSettings // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+
+	C.webkit_web_view_set_settings(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(settings)
+}
+
+// SetZoomLevel: set the zoom level of web_view, i.e. the factor by which the
+// view contents are scaled with respect to their original size.
+//
+// The function takes the following parameters:
+//
+//    - zoomLevel: zoom level.
+//
+func (webView *WebView) SetZoomLevel(zoomLevel float64) {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 C.gdouble        // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = C.gdouble(zoomLevel)
+
+	C.webkit_web_view_set_zoom_level(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(zoomLevel)
+}
+
+// StopLoading stops any ongoing loading operation in web_view. This method does
+// nothing if no content is being loaded. If there is a loading operation in
+// progress, it will be cancelled and KitWebView::load-failed signal will be
+// emitted with WEBKIT_NETWORK_ERROR_CANCELLED error.
+func (webView *WebView) StopLoading() {
+	var _arg0 *C.WebKitWebView // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	C.webkit_web_view_stop_loading(_arg0)
+	runtime.KeepAlive(webView)
+}
+
+// TryClose tries to close the web_view. This will fire the onbeforeunload event
+// to ask the user for confirmation to close the page. If there isn't an
+// onbeforeunload event handler or the user confirms to close the page, the
+// KitWebView::close signal is emitted, otherwise nothing happens.
+func (webView *WebView) TryClose() {
+	var _arg0 *C.WebKitWebView // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+
+	C.webkit_web_view_try_close(_arg0)
+	runtime.KeepAlive(webView)
 }

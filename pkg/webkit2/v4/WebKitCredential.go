@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -103,6 +101,11 @@ func NewCredential(username string, password string, persistence CredentialPersi
 }
 
 // Copy: make a copy of the KitCredential.
+//
+// The function returns the following values:
+//
+//    - ret: copy of passed in KitCredential.
+//
 func (credential *Credential) Copy() *Credential {
 	var _arg0 *C.WebKitCredential // out
 	var _cret *C.WebKitCredential // in
@@ -126,6 +129,11 @@ func (credential *Credential) Copy() *Credential {
 }
 
 // Password: get the password currently held by this KitCredential.
+//
+// The function returns the following values:
+//
+//    - utf8: password stored in the KitCredential.
+//
 func (credential *Credential) Password() string {
 	var _arg0 *C.WebKitCredential // out
 	var _cret *C.gchar            // in
@@ -143,6 +151,11 @@ func (credential *Credential) Password() string {
 }
 
 // Persistence: get the persistence mode currently held by this KitCredential.
+//
+// The function returns the following values:
+//
+//    - credentialPersistence stored in the KitCredential.
+//
 func (credential *Credential) Persistence() CredentialPersistence {
 	var _arg0 *C.WebKitCredential           // out
 	var _cret C.WebKitCredentialPersistence // in
@@ -160,6 +173,11 @@ func (credential *Credential) Persistence() CredentialPersistence {
 }
 
 // Username: get the username currently held by this KitCredential.
+//
+// The function returns the following values:
+//
+//    - utf8: username stored in the KitCredential.
+//
 func (credential *Credential) Username() string {
 	var _arg0 *C.WebKitCredential // out
 	var _cret *C.gchar            // in
@@ -177,6 +195,11 @@ func (credential *Credential) Username() string {
 }
 
 // HasPassword: determine whether this credential has a password stored.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if the credential has a password or FALSE otherwise.
+//
 func (credential *Credential) HasPassword() bool {
 	var _arg0 *C.WebKitCredential // out
 	var _cret C.gboolean          // in

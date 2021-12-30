@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -55,10 +53,15 @@ func (c CacheType) String() string {
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type CacheOverrider interface {
+	// The function takes the following parameters:
+	//
+	// The function returns the following values:
+	//
 	Cacheability(msg *Message) Cacheability
 }
 
 type Cache struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 
 	SessionFeature
@@ -85,11 +88,15 @@ func marshalCacher(p uintptr) (interface{}, error) {
 //
 // The function takes the following parameters:
 //
-//    - cacheDir: directory to store the cached data, or NULL to use the
-//    default one. Note that since the cache isn't safe to access for multiple
-//    processes at once, and the default directory isn't namespaced by process,
-//    clients are strongly discouraged from passing NULL.
+//    - cacheDir (optional): directory to store the cached data, or NULL to use
+//      the default one. Note that since the cache isn't safe to access for
+//      multiple processes at once, and the default directory isn't namespaced by
+//      process, clients are strongly discouraged from passing NULL.
 //    - cacheType of the cache.
+//
+// The function returns the following values:
+//
+//    - cache: new Cache.
 //
 func NewCache(cacheDir string, cacheType CacheType) *Cache {
 	var _arg1 *C.char         // out
@@ -153,6 +160,11 @@ func (cache *Cache) Flush() {
 }
 
 // MaxSize gets the maximum size of the cache.
+//
+// The function returns the following values:
+//
+//    - guint: maximum size of the cache, in bytes.
+//
 func (cache *Cache) MaxSize() uint {
 	var _arg0 *C.SoupCache // out
 	var _cret C.guint      // in

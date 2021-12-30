@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -28,10 +26,17 @@ func init() {
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type AuthManagerOverrider interface {
+	// The function takes the following parameters:
+	//
+	//    - msg
+	//    - auth
+	//    - retrying
+	//
 	Authenticate(msg *Message, auth Auther, retrying bool)
 }
 
 type AuthManager struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 
 	SessionFeature
@@ -52,6 +57,15 @@ func wrapAuthManager(obj *externglib.Object) *AuthManager {
 
 func marshalAuthManagerer(p uintptr) (interface{}, error) {
 	return wrapAuthManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+// ConnectAuthenticate: emitted when the manager requires the application to
+// provide authentication credentials.
+//
+// Session connects to this signal and emits its own Session::authenticate
+// signal when it is emitted, so you shouldn't need to use this signal directly.
+func (manager *AuthManager) ConnectAuthenticate(f func(msg Message, auth Auther, retrying bool)) externglib.SignalHandle {
+	return manager.Connect("authenticate", f)
 }
 
 // ClearCachedCredentials: clear all credentials cached by manager.
@@ -91,13 +105,4 @@ func (manager *AuthManager) UseAuth(uri *URI, auth Auther) {
 	runtime.KeepAlive(manager)
 	runtime.KeepAlive(uri)
 	runtime.KeepAlive(auth)
-}
-
-// ConnectAuthenticate: emitted when the manager requires the application to
-// provide authentication credentials.
-//
-// Session connects to this signal and emits its own Session::authenticate
-// signal when it is emitted, so you shouldn't need to use this signal directly.
-func (manager *AuthManager) ConnectAuthenticate(f func(msg Message, auth Auther, retrying bool)) externglib.SignalHandle {
-	return manager.Connect("authenticate", f)
 }

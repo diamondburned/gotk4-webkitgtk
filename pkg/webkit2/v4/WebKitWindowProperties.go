@@ -11,8 +11,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdk/v3"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -25,6 +23,7 @@ func init() {
 }
 
 type WindowProperties struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -44,6 +43,11 @@ func marshalWindowPropertieser(p uintptr) (interface{}, error) {
 
 // Fullscreen: get whether the window should be shown in fullscreen state or
 // not.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if the window should be fullscreen or FALSE otherwise.
+//
 func (windowProperties *WindowProperties) Fullscreen() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
@@ -63,6 +67,11 @@ func (windowProperties *WindowProperties) Fullscreen() bool {
 }
 
 // Geometry: get the geometry the window should have on the screen when shown.
+//
+// The function returns the following values:
+//
+//    - geometry: return location for the window geometry.
+//
 func (windowProperties *WindowProperties) Geometry() *gdk.Rectangle {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _arg1 C.GdkRectangle            // in
@@ -81,6 +90,11 @@ func (windowProperties *WindowProperties) Geometry() *gdk.Rectangle {
 
 // LocationbarVisible: get whether the window should have the locationbar
 // visible or not.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if locationbar should be visible or FALSE otherwise.
+//
 func (windowProperties *WindowProperties) LocationbarVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
@@ -101,6 +115,11 @@ func (windowProperties *WindowProperties) LocationbarVisible() bool {
 
 // MenubarVisible: get whether the window should have the menubar visible or
 // not.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if menubar should be visible or FALSE otherwise.
+//
 func (windowProperties *WindowProperties) MenubarVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
@@ -120,6 +139,11 @@ func (windowProperties *WindowProperties) MenubarVisible() bool {
 }
 
 // Resizable: get whether the window should be resizable by the user or not.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if the window should be resizable or FALSE otherwise.
+//
 func (windowProperties *WindowProperties) Resizable() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
@@ -140,6 +164,11 @@ func (windowProperties *WindowProperties) Resizable() bool {
 
 // ScrollbarsVisible: get whether the window should have the scrollbars visible
 // or not.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if scrollbars should be visible or FALSE otherwise.
+//
 func (windowProperties *WindowProperties) ScrollbarsVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
@@ -160,6 +189,11 @@ func (windowProperties *WindowProperties) ScrollbarsVisible() bool {
 
 // StatusbarVisible: get whether the window should have the statusbar visible or
 // not.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if statusbar should be visible or FALSE otherwise.
+//
 func (windowProperties *WindowProperties) StatusbarVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
@@ -180,6 +214,11 @@ func (windowProperties *WindowProperties) StatusbarVisible() bool {
 
 // ToolbarVisible: get whether the window should have the toolbar visible or
 // not.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if toolbar should be visible or FALSE otherwise.
+//
 func (windowProperties *WindowProperties) ToolbarVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in

@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -49,6 +47,10 @@ const COOKIE_MAX_AGE_ONE_YEAR = 0
 //
 //    - msg containing a "Cookie" request header.
 //
+// The function returns the following values:
+//
+//    - sList Cookie<!-- -->s, which can be freed with soup_cookies_free().
+//
 func CookiesFromRequest(msg *Message) []*Cookie {
 	var _arg1 *C.SoupMessage // out
 	var _cret *C.GSList      // in
@@ -85,6 +87,10 @@ func CookiesFromRequest(msg *Message) []*Cookie {
 //
 //    - msg containing a "Set-Cookie" response header.
 //
+// The function returns the following values:
+//
+//    - sList Cookie<!-- -->s, which can be freed with soup_cookies_free().
+//
 func CookiesFromResponse(msg *Message) []*Cookie {
 	var _arg1 *C.SoupMessage // out
 	var _cret *C.GSList      // in
@@ -119,6 +125,10 @@ func CookiesFromResponse(msg *Message) []*Cookie {
 // The function takes the following parameters:
 //
 //    - cookies of Cookie.
+//
+// The function returns the following values:
+//
+//    - utf8: serialization of cookies.
 //
 func CookiesToCookieHeader(cookies []*Cookie) string {
 	var _arg1 *C.GSList // out
@@ -276,6 +286,15 @@ func NewCookie(name string, value string, domain string, path string, maxAge int
 // (At the moment, this does not check that cookie's domain matches uri, because
 // it assumes that the caller has already done that. But don't rely on that; it
 // may change in the future.).
+//
+// The function takes the following parameters:
+//
+//    - uri: URI.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if cookie should be sent to uri, FALSE if not.
+//
 func (cookie *Cookie) AppliesToURI(uri *URI) bool {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.SoupURI    // out
@@ -298,6 +317,11 @@ func (cookie *Cookie) AppliesToURI(uri *URI) bool {
 }
 
 // Copy copies cookie.
+//
+// The function returns the following values:
+//
+//    - ret: copy of cookie.
+//
 func (cookie *Cookie) Copy() *Cookie {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.SoupCookie // in
@@ -323,6 +347,15 @@ func (cookie *Cookie) Copy() *Cookie {
 // DomainMatches checks if the cookie's domain and host match in the sense that
 // cookie should be sent when making a request to host, or that cookie should be
 // accepted when receiving a response from host.
+//
+// The function takes the following parameters:
+//
+//    - host: URI.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if the domains match, FALSE otherwise.
+//
 func (cookie *Cookie) DomainMatches(host string) bool {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.char       // out
@@ -349,6 +382,15 @@ func (cookie *Cookie) DomainMatches(host string) bool {
 //
 // Note that currently, this does not check that the cookie domains match. This
 // may change in the future.
+//
+// The function takes the following parameters:
+//
+//    - cookie2: Cookie.
+//
+// The function returns the following values:
+//
+//    - ok: whether the cookies are equal.
+//
 func (cookie1 *Cookie) Equal(cookie2 *Cookie) bool {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.SoupCookie // out
@@ -371,6 +413,11 @@ func (cookie1 *Cookie) Equal(cookie2 *Cookie) bool {
 }
 
 // Domain gets cookie's domain.
+//
+// The function returns the following values:
+//
+//    - utf8 cookie's domain.
+//
 func (cookie *Cookie) Domain() string {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.char       // in
@@ -388,6 +435,12 @@ func (cookie *Cookie) Domain() string {
 }
 
 // Expires gets cookie's expiration time.
+//
+// The function returns the following values:
+//
+//    - date (optional) cookie's expiration time, which is owned by cookie and
+//      should not be modified or freed.
+//
 func (cookie *Cookie) Expires() *Date {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.SoupDate   // in
@@ -407,6 +460,11 @@ func (cookie *Cookie) Expires() *Date {
 }
 
 // HTTPOnly gets cookie's HttpOnly attribute.
+//
+// The function returns the following values:
+//
+//    - ok cookie's HttpOnly attribute.
+//
 func (cookie *Cookie) HTTPOnly() bool {
 	var _arg0 *C.SoupCookie // out
 	var _cret C.gboolean    // in
@@ -426,6 +484,11 @@ func (cookie *Cookie) HTTPOnly() bool {
 }
 
 // Name gets cookie's name.
+//
+// The function returns the following values:
+//
+//    - utf8 cookie's name.
+//
 func (cookie *Cookie) Name() string {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.char       // in
@@ -443,6 +506,11 @@ func (cookie *Cookie) Name() string {
 }
 
 // Path gets cookie's path.
+//
+// The function returns the following values:
+//
+//    - utf8 cookie's path.
+//
 func (cookie *Cookie) Path() string {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.char       // in
@@ -459,6 +527,10 @@ func (cookie *Cookie) Path() string {
 	return _utf8
 }
 
+// The function returns the following values:
+//
+//    - sameSitePolicy: SameSitePolicy.
+//
 func (cookie *Cookie) SameSitePolicy() SameSitePolicy {
 	var _arg0 *C.SoupCookie        // out
 	var _cret C.SoupSameSitePolicy // in
@@ -476,6 +548,11 @@ func (cookie *Cookie) SameSitePolicy() SameSitePolicy {
 }
 
 // Secure gets cookie's secure attribute.
+//
+// The function returns the following values:
+//
+//    - ok cookie's secure attribute.
+//
 func (cookie *Cookie) Secure() bool {
 	var _arg0 *C.SoupCookie // out
 	var _cret C.gboolean    // in
@@ -495,6 +572,11 @@ func (cookie *Cookie) Secure() bool {
 }
 
 // Value gets cookie's value.
+//
+// The function returns the following values:
+//
+//    - utf8 cookie's value.
+//
 func (cookie *Cookie) Value() string {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.char       // in
@@ -512,6 +594,11 @@ func (cookie *Cookie) Value() string {
 }
 
 // SetDomain sets cookie's domain to domain.
+//
+// The function takes the following parameters:
+//
+//    - domain: new domain.
+//
 func (cookie *Cookie) SetDomain(domain string) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.char       // out
@@ -530,6 +617,11 @@ func (cookie *Cookie) SetDomain(domain string) {
 // session.
 //
 // (This sets the same property as soup_cookie_set_max_age().).
+//
+// The function takes the following parameters:
+//
+//    - expires: new expiration time, or NULL.
+//
 func (cookie *Cookie) SetExpires(expires *Date) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.SoupDate   // out
@@ -545,6 +637,11 @@ func (cookie *Cookie) SetExpires(expires *Date) {
 // SetHTTPOnly sets cookie's HttpOnly attribute to http_only. If TRUE, cookie
 // will be marked as "http only", meaning it should not be exposed to web page
 // scripts or other untrusted code.
+//
+// The function takes the following parameters:
+//
+//    - httpOnly: new value for the HttpOnly attribute.
+//
 func (cookie *Cookie) SetHTTPOnly(httpOnly bool) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 C.gboolean    // out
@@ -568,6 +665,11 @@ func (cookie *Cookie) SetHTTPOnly(httpOnly bool) {
 // should be considered already-expired.)
 //
 // (This sets the same property as soup_cookie_set_expires().).
+//
+// The function takes the following parameters:
+//
+//    - maxAge: new max age.
+//
 func (cookie *Cookie) SetMaxAge(maxAge int) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 C.int         // out
@@ -581,6 +683,11 @@ func (cookie *Cookie) SetMaxAge(maxAge int) {
 }
 
 // SetName sets cookie's name to name.
+//
+// The function takes the following parameters:
+//
+//    - name: new name.
+//
 func (cookie *Cookie) SetName(name string) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.char       // out
@@ -595,6 +702,11 @@ func (cookie *Cookie) SetName(name string) {
 }
 
 // SetPath sets cookie's path to path.
+//
+// The function takes the following parameters:
+//
+//    - path: new path.
+//
 func (cookie *Cookie) SetPath(path string) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.char       // out
@@ -611,6 +723,11 @@ func (cookie *Cookie) SetPath(path string) {
 // SetSameSitePolicy: when used in conjunction with
 // soup_cookie_jar_get_cookie_list_with_same_site_info() this sets the policy of
 // when this cookie should be exposed.
+//
+// The function takes the following parameters:
+//
+//    - policy: SameSitePolicy.
+//
 func (cookie *Cookie) SetSameSitePolicy(policy SameSitePolicy) {
 	var _arg0 *C.SoupCookie        // out
 	var _arg1 C.SoupSameSitePolicy // out
@@ -625,6 +742,11 @@ func (cookie *Cookie) SetSameSitePolicy(policy SameSitePolicy) {
 
 // SetSecure sets cookie's secure attribute to secure. If TRUE, cookie will only
 // be transmitted from the client to the server over secure (https) connections.
+//
+// The function takes the following parameters:
+//
+//    - secure: new value for the secure attribute.
+//
 func (cookie *Cookie) SetSecure(secure bool) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 C.gboolean    // out
@@ -640,6 +762,11 @@ func (cookie *Cookie) SetSecure(secure bool) {
 }
 
 // SetValue sets cookie's value to value.
+//
+// The function takes the following parameters:
+//
+//    - value: new value.
+//
 func (cookie *Cookie) SetValue(value string) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.char       // out
@@ -655,6 +782,11 @@ func (cookie *Cookie) SetValue(value string) {
 
 // ToCookieHeader serializes cookie in the format used by the Cookie header (ie,
 // for returning a cookie from a Session to a server).
+//
+// The function returns the following values:
+//
+//    - utf8: header.
+//
 func (cookie *Cookie) ToCookieHeader() string {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.char       // in
@@ -674,6 +806,11 @@ func (cookie *Cookie) ToCookieHeader() string {
 
 // ToSetCookieHeader serializes cookie in the format used by the Set-Cookie
 // header (ie, for sending a cookie from a Server to a client).
+//
+// The function returns the following values:
+//
+//    - utf8: header.
+//
 func (cookie *Cookie) ToSetCookieHeader() string {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.char       // in
@@ -704,6 +841,12 @@ func (cookie *Cookie) ToSetCookieHeader() string {
 //
 //    - header: cookie string (eg, the value of a Set-Cookie header).
 //    - origin of the cookie, or NULL.
+//
+// The function returns the following values:
+//
+//    - cookie (optional): new Cookie, or NULL if it could not be parsed, or
+//      contained an illegal "domain" attribute for a cookie originating from
+//      origin.
 //
 func CookieParse(header string, origin *URI) *Cookie {
 	var _arg1 *C.char       // out

@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -131,6 +129,11 @@ func NewURIWithBase(base *URI, uriString string) *URI {
 }
 
 // Copy copies uri.
+//
+// The function returns the following values:
+//
+//    - urI: copy of uri, which must be freed with soup_uri_free().
+//
 func (uri *URI) Copy() *URI {
 	var _arg0 *C.SoupURI // out
 	var _cret *C.SoupURI // in
@@ -154,6 +157,11 @@ func (uri *URI) Copy() *URI {
 }
 
 // CopyHost makes a copy of uri, considering only the protocol, host, and port.
+//
+// The function returns the following values:
+//
+//    - urI: new URI.
+//
 func (uri *URI) CopyHost() *URI {
 	var _arg0 *C.SoupURI // out
 	var _cret *C.SoupURI // in
@@ -177,6 +185,15 @@ func (uri *URI) CopyHost() *URI {
 }
 
 // Equal tests whether or not uri1 and uri2 are equal in all parts.
+//
+// The function takes the following parameters:
+//
+//    - uri2: another URI.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE or FALSE.
+//
 func (uri1 *URI) Equal(uri2 *URI) bool {
 	var _arg0 *C.SoupURI // out
 	var _arg1 *C.SoupURI // out
@@ -199,6 +216,11 @@ func (uri1 *URI) Equal(uri2 *URI) bool {
 }
 
 // Fragment gets uri's fragment.
+//
+// The function returns the following values:
+//
+//    - utf8 uri's fragment.
+//
 func (uri *URI) Fragment() string {
 	var _arg0 *C.SoupURI // out
 	var _cret *C.char    // in
@@ -216,6 +238,11 @@ func (uri *URI) Fragment() string {
 }
 
 // Host gets uri's host.
+//
+// The function returns the following values:
+//
+//    - utf8 uri's host.
+//
 func (uri *URI) Host() string {
 	var _arg0 *C.SoupURI // out
 	var _cret *C.char    // in
@@ -233,6 +260,11 @@ func (uri *URI) Host() string {
 }
 
 // Password gets uri's password.
+//
+// The function returns the following values:
+//
+//    - utf8 uri's password.
+//
 func (uri *URI) Password() string {
 	var _arg0 *C.SoupURI // out
 	var _cret *C.char    // in
@@ -250,6 +282,11 @@ func (uri *URI) Password() string {
 }
 
 // Path gets uri's path.
+//
+// The function returns the following values:
+//
+//    - utf8 uri's path.
+//
 func (uri *URI) Path() string {
 	var _arg0 *C.SoupURI // out
 	var _cret *C.char    // in
@@ -267,6 +304,11 @@ func (uri *URI) Path() string {
 }
 
 // Port gets uri's port.
+//
+// The function returns the following values:
+//
+//    - guint uri's port.
+//
 func (uri *URI) Port() uint {
 	var _arg0 *C.SoupURI // out
 	var _cret C.guint    // in
@@ -284,6 +326,11 @@ func (uri *URI) Port() uint {
 }
 
 // Query gets uri's query.
+//
+// The function returns the following values:
+//
+//    - utf8 uri's query.
+//
 func (uri *URI) Query() string {
 	var _arg0 *C.SoupURI // out
 	var _cret *C.char    // in
@@ -301,6 +348,11 @@ func (uri *URI) Query() string {
 }
 
 // Scheme gets uri's scheme.
+//
+// The function returns the following values:
+//
+//    - utf8 uri's scheme.
+//
 func (uri *URI) Scheme() string {
 	var _arg0 *C.SoupURI // out
 	var _cret *C.char    // in
@@ -318,6 +370,11 @@ func (uri *URI) Scheme() string {
 }
 
 // User gets uri's user.
+//
+// The function returns the following values:
+//
+//    - utf8 uri's user.
+//
 func (uri *URI) User() string {
 	var _arg0 *C.SoupURI // out
 	var _cret *C.char    // in
@@ -335,6 +392,15 @@ func (uri *URI) User() string {
 }
 
 // HostEqual compares v1 and v2, considering only the scheme, host, and port.
+//
+// The function takes the following parameters:
+//
+//    - v2 with a non-NULL host member.
+//
+// The function returns the following values:
+//
+//    - ok: whether or not the URIs are equal in scheme, host, and port.
+//
 func (v1 *URI) HostEqual(v2 *URI) bool {
 	var _arg0 C.gconstpointer // out
 	var _arg1 C.gconstpointer // out
@@ -357,6 +423,11 @@ func (v1 *URI) HostEqual(v2 *URI) bool {
 }
 
 // HostHash hashes key, considering only the scheme, host, and port.
+//
+// The function returns the following values:
+//
+//    - guint: hash.
+//
 func (key *URI) HostHash() uint {
 	var _arg0 C.gconstpointer // out
 	var _cret C.guint         // in
@@ -374,6 +445,11 @@ func (key *URI) HostHash() uint {
 }
 
 // SetFragment sets uri's fragment to fragment.
+//
+// The function takes the following parameters:
+//
+//    - fragment (optional): fragment.
+//
 func (uri *URI) SetFragment(fragment string) {
 	var _arg0 *C.SoupURI // out
 	var _arg1 *C.char    // out
@@ -396,6 +472,11 @@ func (uri *URI) SetFragment(fragment string) {
 // string.
 //
 // http and https URIs should not have a NULL host.
+//
+// The function takes the following parameters:
+//
+//    - host (optional): hostname or IP address, or NULL.
+//
 func (uri *URI) SetHost(host string) {
 	var _arg0 *C.SoupURI // out
 	var _arg1 *C.char    // out
@@ -412,6 +493,11 @@ func (uri *URI) SetHost(host string) {
 }
 
 // SetPassword sets uri's password to password.
+//
+// The function takes the following parameters:
+//
+//    - password (optional): password, or NULL.
+//
 func (uri *URI) SetPassword(password string) {
 	var _arg0 *C.SoupURI // out
 	var _arg1 *C.char    // out
@@ -428,6 +514,11 @@ func (uri *URI) SetPassword(password string) {
 }
 
 // SetPath sets uri's path to path.
+//
+// The function takes the following parameters:
+//
+//    - path: non-NULL path.
+//
 func (uri *URI) SetPath(path string) {
 	var _arg0 *C.SoupURI // out
 	var _arg1 *C.char    // out
@@ -443,6 +534,11 @@ func (uri *URI) SetPath(path string) {
 
 // SetPort sets uri's port to port. If port is 0, uri will not have an
 // explicitly-specified port.
+//
+// The function takes the following parameters:
+//
+//    - port: port, or 0.
+//
 func (uri *URI) SetPort(port uint) {
 	var _arg0 *C.SoupURI // out
 	var _arg1 C.guint    // out
@@ -456,6 +552,11 @@ func (uri *URI) SetPort(port uint) {
 }
 
 // SetQuery sets uri's query to query.
+//
+// The function takes the following parameters:
+//
+//    - query (optional): query.
+//
 func (uri *URI) SetQuery(query string) {
 	var _arg0 *C.SoupURI // out
 	var _arg1 *C.char    // out
@@ -473,6 +574,11 @@ func (uri *URI) SetQuery(query string) {
 
 // SetQueryFromForm sets uri's query to the result of encoding form according to
 // the HTML form rules. See soup_form_encode_hash() for more information.
+//
+// The function takes the following parameters:
+//
+//    - form containing HTML form information.
+//
 func (uri *URI) SetQueryFromForm(form map[string]string) {
 	var _arg0 *C.SoupURI    // out
 	var _arg1 *C.GHashTable // out
@@ -497,6 +603,11 @@ func (uri *URI) SetQueryFromForm(form map[string]string) {
 
 // SetScheme sets uri's scheme to scheme. This will also set uri's port to the
 // default port for scheme, if known.
+//
+// The function takes the following parameters:
+//
+//    - scheme: URI scheme.
+//
 func (uri *URI) SetScheme(scheme string) {
 	var _arg0 *C.SoupURI // out
 	var _arg1 *C.char    // out
@@ -511,6 +622,11 @@ func (uri *URI) SetScheme(scheme string) {
 }
 
 // SetUser sets uri's user to user.
+//
+// The function takes the following parameters:
+//
+//    - user (optional): username, or NULL.
+//
 func (uri *URI) SetUser(user string) {
 	var _arg0 *C.SoupURI // out
 	var _arg1 *C.char    // out
@@ -533,6 +649,15 @@ func (uri *URI) SetUser(user string) {
 // Request-Line of an HTTP request for uri.
 //
 // Note that the output will never contain a password, even if uri does.
+//
+// The function takes the following parameters:
+//
+//    - justPathAndQuery: if TRUE, output just the path and query portions.
+//
+// The function returns the following values:
+//
+//    - utf8: string representing uri, which the caller must free.
+//
 func (uri *URI) String(justPathAndQuery bool) string {
 	var _arg0 *C.SoupURI // out
 	var _arg1 C.gboolean // out
@@ -558,6 +683,11 @@ func (uri *URI) String(justPathAndQuery bool) string {
 // UsesDefaultPort tests if uri uses the default port for its scheme. (Eg, 80
 // for http.) (This only works for http, https and ftp; libsoup does not know
 // the default ports of other protocols.).
+//
+// The function returns the following values:
+//
+//    - ok: TRUE or FALSE.
+//
 func (uri *URI) UsesDefaultPort() bool {
 	var _arg0 *C.SoupURI // out
 	var _cret C.gboolean // in
@@ -586,6 +716,10 @@ func (uri *URI) UsesDefaultPort() bool {
 //
 //    - part: URI part.
 //
+// The function returns the following values:
+//
+//    - utf8: decoded URI part.
+//
 func URIDecode(part string) string {
 	var _arg1 *C.char // out
 	var _cret *C.char // in
@@ -610,7 +744,12 @@ func URIDecode(part string) string {
 // The function takes the following parameters:
 //
 //    - part: URI part.
-//    - escapeExtra: additional reserved characters to escape (or NULL).
+//    - escapeExtra (optional): additional reserved characters to escape (or
+//      NULL).
+//
+// The function returns the following values:
+//
+//    - utf8: encoded URI part.
 //
 func URIEncode(part, escapeExtra string) string {
 	var _arg1 *C.char // out
@@ -655,7 +794,11 @@ func URIEncode(part, escapeExtra string) string {
 // The function takes the following parameters:
 //
 //    - part: URI part.
-//    - unescapeExtra: reserved characters to unescape (or NULL).
+//    - unescapeExtra (optional): reserved characters to unescape (or NULL).
+//
+// The function returns the following values:
+//
+//    - utf8: normalized URI part.
 //
 func URINormalize(part, unescapeExtra string) string {
 	var _arg1 *C.char // out

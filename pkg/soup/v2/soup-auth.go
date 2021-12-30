@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -46,6 +44,7 @@ const AUTH_SCHEME_NAME = "scheme-name"
 // Authentication mechanisms are implemented by its subclasses, but applications
 // never need to be aware of the specific subclasses being used.
 type Auth struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -54,7 +53,7 @@ var (
 )
 
 // Auther describes types inherited from class Auth.
-
+//
 // To get the original type, the caller must assert this to an interface or
 // another type.
 type Auther interface {
@@ -74,6 +73,15 @@ func marshalAuther(p uintptr) (interface{}, error) {
 	return wrapAuth(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+func (auth *Auth) baseAuth() *Auth {
+	return auth
+}
+
+// BaseAuth returns the underlying base object.
+func BaseAuth(obj Auther) *Auth {
+	return obj.baseAuth()
+}
+
 // NewAuth creates a new Auth of type type with the information from msg and
 // auth_header.
 //
@@ -84,6 +92,10 @@ func marshalAuther(p uintptr) (interface{}, error) {
 //    - typ: type of auth to create (a subtype of Auth).
 //    - msg the auth is being created for.
 //    - authHeader: WWW-Authenticate/Proxy-Authenticate header.
+//
+// The function returns the following values:
+//
+//    - auth (optional): new Auth, or NULL if it could not be created.
 //
 func NewAuth(typ externglib.Type, msg *Message, authHeader string) *Auth {
 	var _arg1 C.GType        // out
@@ -137,6 +149,11 @@ func (auth *Auth) Authenticate(username, password string) {
 
 // CanAuthenticate tests if auth is able to authenticate by providing
 // credentials to the soup_auth_authenticate().
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if auth is able to accept credentials.
+//
 func (auth *Auth) CanAuthenticate() bool {
 	var _arg0 *C.SoupAuth // out
 	var _cret C.gboolean  // in
@@ -162,6 +179,10 @@ func (auth *Auth) CanAuthenticate() bool {
 //
 //    - msg to be authorized.
 //
+// The function returns the following values:
+//
+//    - utf8: "Authorization" header, which must be freed.
+//
 func (auth *Auth) Authorization(msg *Message) string {
 	var _arg0 *C.SoupAuth    // out
 	var _arg1 *C.SoupMessage // out
@@ -183,6 +204,11 @@ func (auth *Auth) Authorization(msg *Message) string {
 }
 
 // Host returns the host that auth is associated with.
+//
+// The function returns the following values:
+//
+//    - utf8: hostname.
+//
 func (auth *Auth) Host() string {
 	var _arg0 *C.SoupAuth // out
 	var _cret *C.char     // in
@@ -203,6 +229,11 @@ func (auth *Auth) Host() string {
 // Auth objects from the same server with the same identifier refer to the same
 // authentication domain (eg, the URLs associated with them take the same
 // usernames and passwords).
+//
+// The function returns the following values:
+//
+//    - utf8: identifier.
+//
 func (auth *Auth) Info() string {
 	var _arg0 *C.SoupAuth // out
 	var _cret *C.char     // in
@@ -227,6 +258,11 @@ func (auth *Auth) Info() string {
 // The function takes the following parameters:
 //
 //    - sourceUri: URI of the request that auth was generated in response to.
+//
+// The function returns the following values:
+//
+//    - sList: list of paths, which can be freed with
+//      soup_auth_free_protection_space().
 //
 func (auth *Auth) ProtectionSpace(sourceUri *URI) []string {
 	var _arg0 *C.SoupAuth // out
@@ -257,6 +293,11 @@ func (auth *Auth) ProtectionSpace(sourceUri *URI) []string {
 // Realm returns auth's realm. This is an identifier that distinguishes separate
 // authentication spaces on a given server, and may be some string that is
 // meaningful to the user. (Although it is probably not localized.).
+//
+// The function returns the following values:
+//
+//    - utf8: realm name.
+//
 func (auth *Auth) Realm() string {
 	var _arg0 *C.SoupAuth // out
 	var _cret *C.char     // in
@@ -273,10 +314,9 @@ func (auth *Auth) Realm() string {
 	return _utf8
 }
 
-//
 // The function takes the following parameters:
 //
-
+// The function returns the following values:
 //
 func (auth *Auth) SavedPassword(user string) string {
 	var _arg0 *C.SoupAuth // out
@@ -298,6 +338,8 @@ func (auth *Auth) SavedPassword(user string) string {
 	return _utf8
 }
 
+// The function returns the following values:
+//
 func (auth *Auth) SavedUsers() []string {
 	var _arg0 *C.SoupAuth // out
 	var _cret *C.GSList   // in
@@ -322,6 +364,11 @@ func (auth *Auth) SavedUsers() []string {
 }
 
 // SchemeName returns auth's scheme name. (Eg, "Basic", "Digest", or "NTLM").
+//
+// The function returns the following values:
+//
+//    - utf8: scheme name.
+//
 func (auth *Auth) SchemeName() string {
 	var _arg0 *C.SoupAuth // out
 	var _cret *C.char     // in
@@ -338,10 +385,10 @@ func (auth *Auth) SchemeName() string {
 	return _utf8
 }
 
-//
 // The function takes the following parameters:
 //
-
+//    - username
+//    - password
 //
 func (auth *Auth) HasSavedPassword(username, password string) {
 	var _arg0 *C.SoupAuth // out
@@ -361,6 +408,11 @@ func (auth *Auth) HasSavedPassword(username, password string) {
 }
 
 // IsAuthenticated tests if auth has been given a username and password.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if auth has been given a username and password.
+//
 func (auth *Auth) IsAuthenticated() bool {
 	var _arg0 *C.SoupAuth // out
 	var _cret C.gboolean  // in
@@ -381,6 +433,11 @@ func (auth *Auth) IsAuthenticated() bool {
 
 // IsForProxy tests whether or not auth is associated with a proxy server rather
 // than an "origin" server.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE or FALSE.
+//
 func (auth *Auth) IsForProxy() bool {
 	var _arg0 *C.SoupAuth // out
 	var _cret C.gboolean  // in
@@ -408,6 +465,10 @@ func (auth *Auth) IsForProxy() bool {
 //
 //    - msg: Message.
 //
+// The function returns the following values:
+//
+//    - ok: TRUE if auth is ready to make a request with.
+//
 func (auth *Auth) IsReady(msg *Message) bool {
 	var _arg0 *C.SoupAuth    // out
 	var _arg1 *C.SoupMessage // out
@@ -429,10 +490,10 @@ func (auth *Auth) IsReady(msg *Message) bool {
 	return _ok
 }
 
-//
 // The function takes the following parameters:
 //
-
+//    - username
+//    - password
 //
 func (auth *Auth) SavePassword(username, password string) {
 	var _arg0 *C.SoupAuth // out
@@ -460,6 +521,12 @@ func (auth *Auth) SavePassword(username, password string) {
 //    - msg auth is being updated for.
 //    - authHeader: WWW-Authenticate/Proxy-Authenticate header.
 //
+// The function returns the following values:
+//
+//    - ok: TRUE if auth is still a valid (but potentially unauthenticated) Auth.
+//      FALSE if something about auth_params could not be parsed or incorporated
+//      into auth at all.
+//
 func (auth *Auth) Update(msg *Message, authHeader string) bool {
 	var _arg0 *C.SoupAuth    // out
 	var _arg1 *C.SoupMessage // out
@@ -485,19 +552,13 @@ func (auth *Auth) Update(msg *Message, authHeader string) bool {
 	return _ok
 }
 
-func (auth *Auth) baseAuth() *Auth {
-	return auth
-}
-
-// BaseAuth returns the underlying base object.
-func BaseAuth(obj Auther) *Auth {
-	return obj.baseAuth()
-}
-
 // AuthNegotiateSupported indicates whether libsoup was built with GSSAPI
 // support. If this is FALSE, SOUP_TYPE_AUTH_NEGOTIATE will still be defined and
 // can still be added to a Session, but libsoup will never attempt to actually
 // use this auth type.
+//
+// The function returns the following values:
+//
 func AuthNegotiateSupported() bool {
 	var _cret C.gboolean // in
 

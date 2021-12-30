@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -86,6 +84,7 @@ func (e EditorTypingAttributes) Has(other EditorTypingAttributes) bool {
 }
 
 type EditorState struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -107,6 +106,11 @@ func marshalEditorStater(p uintptr) (interface{}, error) {
 // If there is a selection, this returns the typing attributes of the selected
 // text. Note that in case of a selection, typing attributes are considered
 // active only when they are present throughout the selection.
+//
+// The function returns the following values:
+//
+//    - guint: bitmask of KitEditorTypingAttributes flags.
+//
 func (editorState *EditorState) TypingAttributes() uint {
 	var _arg0 *C.WebKitEditorState // out
 	var _cret C.guint              // in
@@ -124,6 +128,11 @@ func (editorState *EditorState) TypingAttributes() uint {
 }
 
 // IsCopyAvailable gets whether a copy command can be issued.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if copy is currently available.
+//
 func (editorState *EditorState) IsCopyAvailable() bool {
 	var _arg0 *C.WebKitEditorState // out
 	var _cret C.gboolean           // in
@@ -143,6 +152,11 @@ func (editorState *EditorState) IsCopyAvailable() bool {
 }
 
 // IsCutAvailable gets whether a cut command can be issued.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if cut is currently available.
+//
 func (editorState *EditorState) IsCutAvailable() bool {
 	var _arg0 *C.WebKitEditorState // out
 	var _cret C.gboolean           // in
@@ -162,6 +176,11 @@ func (editorState *EditorState) IsCutAvailable() bool {
 }
 
 // IsPasteAvailable gets whether a paste command can be issued.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if paste is currently available.
+//
 func (editorState *EditorState) IsPasteAvailable() bool {
 	var _arg0 *C.WebKitEditorState // out
 	var _cret C.gboolean           // in
@@ -181,6 +200,11 @@ func (editorState *EditorState) IsPasteAvailable() bool {
 }
 
 // IsRedoAvailable gets whether a redo command can be issued.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if redo is currently available.
+//
 func (editorState *EditorState) IsRedoAvailable() bool {
 	var _arg0 *C.WebKitEditorState // out
 	var _cret C.gboolean           // in
@@ -200,6 +224,11 @@ func (editorState *EditorState) IsRedoAvailable() bool {
 }
 
 // IsUndoAvailable gets whether an undo command can be issued.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if undo is currently available.
+//
 func (editorState *EditorState) IsUndoAvailable() bool {
 	var _arg0 *C.WebKitEditorState // out
 	var _cret C.gboolean           // in

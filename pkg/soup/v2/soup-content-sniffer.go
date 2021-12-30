@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -30,13 +28,32 @@ func init() {
 type ContentSnifferOverrider interface {
 	// BufferSize gets the number of bytes sniffer needs in order to properly
 	// sniff a buffer.
+	//
+	// The function returns the following values:
+	//
+	//    - gsize: number of bytes to sniff.
+	//
 	BufferSize() uint
 	// Sniff sniffs buffer to determine its Content-Type. The result may also be
 	// influenced by the Content-Type declared in msg's response headers.
+	//
+	// The function takes the following parameters:
+	//
+	//    - msg: message to sniff.
+	//    - buffer containing the start of msg's response body.
+	//
+	// The function returns the following values:
+	//
+	//    - params (optional): return location for Content-Type parameters (eg,
+	//      "charset"), or NULL.
+	//    - utf8: sniffed Content-Type of buffer; this will never be NULL, but
+	//      may be "application/octet-stream".
+	//
 	Sniff(msg *Message, buffer *Buffer) (map[string]string, string)
 }
 
 type ContentSniffer struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 
 	SessionFeature
@@ -60,6 +77,11 @@ func marshalContentSnifferer(p uintptr) (interface{}, error) {
 }
 
 // NewContentSniffer creates a new ContentSniffer.
+//
+// The function returns the following values:
+//
+//    - contentSniffer: new ContentSniffer.
+//
 func NewContentSniffer() *ContentSniffer {
 	var _cret *C.SoupContentSniffer // in
 
@@ -74,6 +96,11 @@ func NewContentSniffer() *ContentSniffer {
 
 // BufferSize gets the number of bytes sniffer needs in order to properly sniff
 // a buffer.
+//
+// The function returns the following values:
+//
+//    - gsize: number of bytes to sniff.
+//
 func (sniffer *ContentSniffer) BufferSize() uint {
 	var _arg0 *C.SoupContentSniffer // out
 	var _cret C.gsize               // in
@@ -97,6 +124,13 @@ func (sniffer *ContentSniffer) BufferSize() uint {
 //
 //    - msg: message to sniff.
 //    - buffer containing the start of msg's response body.
+//
+// The function returns the following values:
+//
+//    - params (optional): return location for Content-Type parameters (eg,
+//      "charset"), or NULL.
+//    - utf8: sniffed Content-Type of buffer; this will never be NULL, but may be
+//      "application/octet-stream".
 //
 func (sniffer *ContentSniffer) Sniff(msg *Message, buffer *Buffer) (map[string]string, string) {
 	var _arg0 *C.SoupContentSniffer // out

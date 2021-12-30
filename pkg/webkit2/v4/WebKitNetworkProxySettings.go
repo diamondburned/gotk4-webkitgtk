@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -115,6 +113,12 @@ func NewNetworkProxySettings(defaultProxyUri string, ignoreHosts []string) *Netw
 // uri_scheme will be proxied via proxy_uri. As with the default proxy URI, if
 // proxy_uri starts with "socks://", it will be treated as referring to all
 // three of the socks5, socks4a, and socks4 proxy types.
+//
+// The function takes the following parameters:
+//
+//    - scheme: URI scheme to add a proxy for.
+//    - proxyUri: proxy URI to use for uri_scheme.
+//
 func (proxySettings *NetworkProxySettings) AddProxyForScheme(scheme string, proxyUri string) {
 	var _arg0 *C.WebKitNetworkProxySettings // out
 	var _arg1 *C.gchar                      // out
@@ -133,6 +137,11 @@ func (proxySettings *NetworkProxySettings) AddProxyForScheme(scheme string, prox
 }
 
 // Copy: make a copy of the KitNetworkProxySettings.
+//
+// The function returns the following values:
+//
+//    - networkProxySettings: copy of passed in KitNetworkProxySettings.
+//
 func (proxySettings *NetworkProxySettings) Copy() *NetworkProxySettings {
 	var _arg0 *C.WebKitNetworkProxySettings // out
 	var _cret *C.WebKitNetworkProxySettings // in

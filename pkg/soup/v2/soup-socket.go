@@ -15,8 +15,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -141,12 +139,15 @@ func _gotk4_soup2_SocketCallback(arg0 *C.SoupSocket, arg1 C.guint, arg2 C.gpoint
 // yet, so the interface currently has no use.
 type SocketOverrider interface {
 	Disconnected()
+	// The function takes the following parameters:
+	//
 	NewConnection(newSock *Socket)
 	Readable()
 	Writable()
 }
 
 type Socket struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 
 	gio.Initable
@@ -169,6 +170,39 @@ func marshalSocketter(p uintptr) (interface{}, error) {
 	return wrapSocket(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+// ConnectDisconnected: emitted when the socket is disconnected, for whatever
+// reason.
+func (sock *Socket) ConnectDisconnected(f func()) externglib.SignalHandle {
+	return sock.Connect("disconnected", f)
+}
+
+// ConnectEvent: emitted when a network-related event occurs. See Client::event
+// for more details.
+func (sock *Socket) ConnectEvent(f func(event gio.SocketClientEvent, connection gio.IOStreamer)) externglib.SignalHandle {
+	return sock.Connect("event", f)
+}
+
+// ConnectNewConnection: emitted when a listening socket (set up with
+// soup_socket_listen()) receives a new connection.
+//
+// You must ref the new if you want to keep it; otherwise it will be destroyed
+// after the signal is emitted.
+func (sock *Socket) ConnectNewConnection(f func(new Socket)) externglib.SignalHandle {
+	return sock.Connect("new-connection", f)
+}
+
+// ConnectReadable: emitted when an async socket is readable. See
+// soup_socket_read(), soup_socket_read_until() and Socket:non-blocking.
+func (sock *Socket) ConnectReadable(f func()) externglib.SignalHandle {
+	return sock.Connect("readable", f)
+}
+
+// ConnectWritable: emitted when an async socket is writable. See
+// soup_socket_write() and Socket:non-blocking.
+func (sock *Socket) ConnectWritable(f func()) externglib.SignalHandle {
+	return sock.Connect("writable", f)
+}
+
 // ConnectAsync begins asynchronously connecting to sock's remote address. The
 // socket will call callback when it succeeds or fails (but not before returning
 // from this function).
@@ -178,7 +212,7 @@ func marshalSocketter(p uintptr) (interface{}, error) {
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL.
+//    - ctx (optional) or NULL.
 //    - callback to call after connecting.
 //
 func (sock *Socket) ConnectAsync(ctx context.Context, callback SocketCallback) {
@@ -209,7 +243,11 @@ func (sock *Socket) ConnectAsync(ctx context.Context, callback SocketCallback) {
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL.
+//    - ctx (optional) or NULL.
+//
+// The function returns the following values:
+//
+//    - guint success or failure code.
 //
 func (sock *Socket) ConnectSync(ctx context.Context) uint {
 	var _arg0 *C.SoupSocket   // out
@@ -248,6 +286,11 @@ func (sock *Socket) Disconnect() {
 // Fd gets sock's underlying file descriptor.
 //
 // Note that fiddling with the file descriptor may break the Socket.
+//
+// The function returns the following values:
+//
+//    - gint sock's file descriptor.
+//
 func (sock *Socket) Fd() int {
 	var _arg0 *C.SoupSocket // out
 	var _cret C.int         // in
@@ -268,6 +311,11 @@ func (sock *Socket) Fd() int {
 //
 // Calling this method on an unconnected socket is considered to be an error,
 // and produces undefined results.
+//
+// The function returns the following values:
+//
+//    - address: Address.
+//
 func (sock *Socket) LocalAddress() *Address {
 	var _arg0 *C.SoupSocket  // out
 	var _cret *C.SoupAddress // in
@@ -288,6 +336,11 @@ func (sock *Socket) LocalAddress() *Address {
 //
 // Calling this method on an unconnected socket is considered to be an error,
 // and produces undefined results.
+//
+// The function returns the following values:
+//
+//    - address: Address.
+//
 func (sock *Socket) RemoteAddress() *Address {
 	var _arg0 *C.SoupSocket  // out
 	var _cret *C.SoupAddress // in
@@ -305,6 +358,11 @@ func (sock *Socket) RemoteAddress() *Address {
 }
 
 // IsConnected tests if sock is connected to another host.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE or FALSE.
+//
 func (sock *Socket) IsConnected() bool {
 	var _arg0 *C.SoupSocket // out
 	var _cret C.gboolean    // in
@@ -324,6 +382,11 @@ func (sock *Socket) IsConnected() bool {
 }
 
 // IsSSL tests if sock is doing (or has attempted to do) SSL.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if sock has SSL credentials set.
+//
 func (sock *Socket) IsSSL() bool {
 	var _arg0 *C.SoupSocket // out
 	var _cret C.gboolean    // in
@@ -344,6 +407,11 @@ func (sock *Socket) IsSSL() bool {
 
 // Listen makes sock start listening on its local address. When connections come
 // in, sock will emit Socket::new_connection.
+//
+// The function returns the following values:
+//
+//    - ok: whether or not sock is now listening.
+//
 func (sock *Socket) Listen() bool {
 	var _arg0 *C.SoupSocket // out
 	var _cret C.gboolean    // in
@@ -375,8 +443,15 @@ func (sock *Socket) Listen() bool {
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL.
+//    - ctx (optional) or NULL.
 //    - buffer to read into.
+//
+// The function returns the following values:
+//
+//    - nread: on return, the number of bytes read into buffer.
+//    - socketIOStatus as described above (or SOUP_SOCKET_EOF if the socket is no
+//      longer connected, or SOUP_SOCKET_ERROR on any other error, in which case
+//      error will also be set).
 //
 func (sock *Socket) Read(ctx context.Context, buffer []byte) (uint, SocketIOStatus, error) {
 	var _arg0 *C.SoupSocket   // out
@@ -421,8 +496,12 @@ func (sock *Socket) Read(ctx context.Context, buffer []byte) (uint, SocketIOStat
 //
 // The function takes the following parameters:
 //
-//    - ctx: #GCancellable.
+//    - ctx (optional): #GCancellable.
 //    - sslHost: hostname of the SSL server.
+//
+// The function returns the following values:
+//
+//    - ok success or failure.
 //
 func (sock *Socket) StartProxySsl(ctx context.Context, sslHost string) bool {
 	var _arg0 *C.SoupSocket   // out
@@ -457,7 +536,11 @@ func (sock *Socket) StartProxySsl(ctx context.Context, sslHost string) bool {
 //
 // The function takes the following parameters:
 //
-//    - ctx: #GCancellable.
+//    - ctx (optional): #GCancellable.
+//
+// The function returns the following values:
+//
+//    - ok success or failure.
 //
 func (sock *Socket) StartSSL(ctx context.Context) bool {
 	var _arg0 *C.SoupSocket   // out
@@ -498,8 +581,15 @@ func (sock *Socket) StartSSL(ctx context.Context) bool {
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL.
+//    - ctx (optional) or NULL.
 //    - buffer: data to write.
+//
+// The function returns the following values:
+//
+//    - nwrote: on return, number of bytes written.
+//    - socketIOStatus as described above (or SOUP_SOCKET_EOF or
+//      SOUP_SOCKET_ERROR. error will be set if the return value is
+//      SOUP_SOCKET_ERROR.).
 //
 func (sock *Socket) Write(ctx context.Context, buffer []byte) (uint, SocketIOStatus, error) {
 	var _arg0 *C.SoupSocket   // out
@@ -537,37 +627,4 @@ func (sock *Socket) Write(ctx context.Context, buffer []byte) (uint, SocketIOSta
 	}
 
 	return _nwrote, _socketIOStatus, _goerr
-}
-
-// ConnectDisconnected: emitted when the socket is disconnected, for whatever
-// reason.
-func (sock *Socket) ConnectDisconnected(f func()) externglib.SignalHandle {
-	return sock.Connect("disconnected", f)
-}
-
-// ConnectEvent: emitted when a network-related event occurs. See Client::event
-// for more details.
-func (sock *Socket) ConnectEvent(f func(event gio.SocketClientEvent, connection gio.IOStreamer)) externglib.SignalHandle {
-	return sock.Connect("event", f)
-}
-
-// ConnectNewConnection: emitted when a listening socket (set up with
-// soup_socket_listen()) receives a new connection.
-//
-// You must ref the new if you want to keep it; otherwise it will be destroyed
-// after the signal is emitted.
-func (sock *Socket) ConnectNewConnection(f func(new Socket)) externglib.SignalHandle {
-	return sock.Connect("new-connection", f)
-}
-
-// ConnectReadable: emitted when an async socket is readable. See
-// soup_socket_read(), soup_socket_read_until() and Socket:non-blocking.
-func (sock *Socket) ConnectReadable(f func()) externglib.SignalHandle {
-	return sock.Connect("readable", f)
-}
-
-// ConnectWritable: emitted when an async socket is writable. See
-// soup_socket_write() and Socket:non-blocking.
-func (sock *Socket) ConnectWritable(f func()) externglib.SignalHandle {
-	return sock.Connect("writable", f)
 }

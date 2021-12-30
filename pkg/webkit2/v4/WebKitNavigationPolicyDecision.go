@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -24,6 +22,7 @@ func init() {
 }
 
 type NavigationPolicyDecision struct {
+	_ [0]func() // equal guard
 	PolicyDecision
 }
 
@@ -45,6 +44,11 @@ func marshalNavigationPolicyDecisioner(p uintptr) (interface{}, error) {
 
 // FrameName gets the value of the KitNavigationPolicyDecision:frame-name
 // property.
+//
+// The function returns the following values:
+//
+//    - utf8: name of the new frame this navigation action targets or NULL.
+//
 func (decision *NavigationPolicyDecision) FrameName() string {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret *C.gchar                          // in
@@ -66,6 +70,11 @@ func (decision *NavigationPolicyDecision) FrameName() string {
 //
 // Deprecated: Use webkit_navigation_policy_decision_get_navigation_action()
 // instead.
+//
+// The function returns the following values:
+//
+//    - guint modifiers active if this decision was triggered by a mouse event.
+//
 func (decision *NavigationPolicyDecision) Modifiers() uint {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret C.guint                           // in
@@ -87,6 +96,12 @@ func (decision *NavigationPolicyDecision) Modifiers() uint {
 //
 // Deprecated: Use webkit_navigation_policy_decision_get_navigation_action()
 // instead.
+//
+// The function returns the following values:
+//
+//    - guint: mouse button used if this decision was triggered by a mouse event
+//      or 0 otherwise.
+//
 func (decision *NavigationPolicyDecision) MouseButton() uint {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret C.guint                           // in
@@ -105,6 +120,11 @@ func (decision *NavigationPolicyDecision) MouseButton() uint {
 
 // NavigationAction gets the value of the
 // KitNavigationPolicyDecision:navigation-action property.
+//
+// The function returns the following values:
+//
+//    - navigationAction triggering this policy decision.
+//
 func (decision *NavigationPolicyDecision) NavigationAction() *NavigationAction {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret *C.WebKitNavigationAction         // in
@@ -126,6 +146,11 @@ func (decision *NavigationPolicyDecision) NavigationAction() *NavigationAction {
 //
 // Deprecated: Use webkit_navigation_policy_decision_get_navigation_action()
 // instead.
+//
+// The function returns the following values:
+//
+//    - navigationType: type of navigation triggering this policy decision.
+//
 func (decision *NavigationPolicyDecision) NavigationType() NavigationType {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret C.WebKitNavigationType            // in
@@ -146,6 +171,11 @@ func (decision *NavigationPolicyDecision) NavigationType() NavigationType {
 //
 // Deprecated: Use webkit_navigation_policy_decision_get_navigation_action()
 // instead.
+//
+// The function returns the following values:
+//
+//    - uriRequest: URI request that is associated with this navigation.
+//
 func (decision *NavigationPolicyDecision) Request() *URIRequest {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret *C.WebKitURIRequest               // in

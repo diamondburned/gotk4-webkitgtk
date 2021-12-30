@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -74,6 +72,10 @@ func (t TLDError) String() string {
 //
 //    - domain name.
 //
+// The function returns the following values:
+//
+//    - ok: TRUE if it is a public domain, FALSE otherwise.
+//
 func TldDomainIsPublicSuffix(domain string) bool {
 	var _arg1 *C.char    // out
 	var _cret C.gboolean // in
@@ -109,6 +111,11 @@ func TldDomainIsPublicSuffix(domain string) bool {
 // The function takes the following parameters:
 //
 //    - hostname: hostname.
+//
+// The function returns the following values:
+//
+//    - utf8: pointer to the start of the base domain in hostname. If an error
+//      occurs, NULL will be returned and error set.
 //
 func TldGetBaseDomain(hostname string) (string, error) {
 	var _arg1 *C.char   // out

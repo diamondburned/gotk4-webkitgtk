@@ -11,8 +11,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -25,6 +23,7 @@ func init() {
 }
 
 type URISchemeRequest struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -49,7 +48,7 @@ func marshalURISchemeRequester(p uintptr) (interface{}, error) {
 //
 //    - stream to read the contents of the request.
 //    - streamLength: length of the stream or -1 if not known.
-//    - contentType: content type of the stream or NULL if not known.
+//    - contentType (optional): content type of the stream or NULL if not known.
 //
 func (request *URISchemeRequest) Finish(stream gio.InputStreamer, streamLength int64, contentType string) {
 	var _arg0 *C.WebKitURISchemeRequest // out
@@ -91,6 +90,11 @@ func (request *URISchemeRequest) FinishError(err error) {
 }
 
 // Path: get the URI path of request.
+//
+// The function returns the following values:
+//
+//    - utf8: URI path of request.
+//
 func (request *URISchemeRequest) Path() string {
 	var _arg0 *C.WebKitURISchemeRequest // out
 	var _cret *C.gchar                  // in
@@ -108,6 +112,11 @@ func (request *URISchemeRequest) Path() string {
 }
 
 // Scheme: get the URI scheme of request.
+//
+// The function returns the following values:
+//
+//    - utf8: URI scheme of request.
+//
 func (request *URISchemeRequest) Scheme() string {
 	var _arg0 *C.WebKitURISchemeRequest // out
 	var _cret *C.gchar                  // in
@@ -125,6 +134,11 @@ func (request *URISchemeRequest) Scheme() string {
 }
 
 // URI: get the URI of request.
+//
+// The function returns the following values:
+//
+//    - utf8: full URI of request.
+//
 func (request *URISchemeRequest) URI() string {
 	var _arg0 *C.WebKitURISchemeRequest // out
 	var _cret *C.gchar                  // in
@@ -142,6 +156,11 @@ func (request *URISchemeRequest) URI() string {
 }
 
 // WebView: get the KitWebView that initiated the request.
+//
+// The function returns the following values:
+//
+//    - webView that initiated request.
+//
 func (request *URISchemeRequest) WebView() *WebView {
 	var _arg0 *C.WebKitURISchemeRequest // out
 	var _cret *C.WebKitWebView          // in

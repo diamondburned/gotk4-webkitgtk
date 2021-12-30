@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -39,6 +37,11 @@ func marshalOptionMenuItem(p uintptr) (interface{}, error) {
 }
 
 // Copy: make a copy of the KitOptionMenuItem.
+//
+// The function returns the following values:
+//
+//    - optionMenuItem: copy of passed in KitOptionMenuItem.
+//
 func (item *OptionMenuItem) Copy() *OptionMenuItem {
 	var _arg0 *C.WebKitOptionMenuItem // out
 	var _cret *C.WebKitOptionMenuItem // in
@@ -62,6 +65,11 @@ func (item *OptionMenuItem) Copy() *OptionMenuItem {
 }
 
 // Label: get the label of a KitOptionMenuItem.
+//
+// The function returns the following values:
+//
+//    - utf8: label of item.
+//
 func (item *OptionMenuItem) Label() string {
 	var _arg0 *C.WebKitOptionMenuItem // out
 	var _cret *C.gchar                // in
@@ -79,6 +87,11 @@ func (item *OptionMenuItem) Label() string {
 }
 
 // Tooltip: get the tooltip of a KitOptionMenuItem.
+//
+// The function returns the following values:
+//
+//    - utf8: tooltip of item, or NULL.
+//
 func (item *OptionMenuItem) Tooltip() string {
 	var _arg0 *C.WebKitOptionMenuItem // out
 	var _cret *C.gchar                // in
@@ -96,6 +109,11 @@ func (item *OptionMenuItem) Tooltip() string {
 }
 
 // IsEnabled: whether a KitOptionMenuItem is enabled.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if the item is enabled or FALSE otherwise.
+//
 func (item *OptionMenuItem) IsEnabled() bool {
 	var _arg0 *C.WebKitOptionMenuItem // out
 	var _cret C.gboolean              // in
@@ -115,6 +133,11 @@ func (item *OptionMenuItem) IsEnabled() bool {
 }
 
 // IsGroupChild: whether a KitOptionMenuItem is a group child.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if the item is a group child or FALSE otherwise.
+//
 func (item *OptionMenuItem) IsGroupChild() bool {
 	var _arg0 *C.WebKitOptionMenuItem // out
 	var _cret C.gboolean              // in
@@ -134,6 +157,11 @@ func (item *OptionMenuItem) IsGroupChild() bool {
 }
 
 // IsGroupLabel: whether a KitOptionMenuItem is a group label.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if the item is a group label or FALSE otherwise.
+//
 func (item *OptionMenuItem) IsGroupLabel() bool {
 	var _arg0 *C.WebKitOptionMenuItem // out
 	var _cret C.gboolean              // in
@@ -153,6 +181,11 @@ func (item *OptionMenuItem) IsGroupLabel() bool {
 }
 
 // IsSelected: whether a KitOptionMenuItem is the currently selected one.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if the item is selected or FALSE otherwise.
+//
 func (item *OptionMenuItem) IsSelected() bool {
 	var _arg0 *C.WebKitOptionMenuItem // out
 	var _cret C.gboolean              // in

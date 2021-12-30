@@ -13,8 +13,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v3"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -27,6 +25,7 @@ func init() {
 }
 
 type ContextMenuItem struct {
+	_ [0]func() // equal guard
 	externglib.InitiallyUnowned
 }
 
@@ -52,6 +51,10 @@ func marshalContextMenuItemmer(p uintptr) (interface{}, error) {
 //
 //    - action: Action.
 //
+// The function returns the following values:
+//
+//    - contextMenuItem: newly created KitContextMenuItem object.
+//
 func NewContextMenuItem(action *gtk.Action) *ContextMenuItem {
 	var _arg1 *C.GtkAction             // out
 	var _cret *C.WebKitContextMenuItem // in
@@ -76,7 +79,11 @@ func NewContextMenuItem(action *gtk.Action) *ContextMenuItem {
 //
 //    - action: #GAction.
 //    - label: menu item label text.
-//    - target to use as the action target.
+//    - target (optional) to use as the action target.
+//
+// The function returns the following values:
+//
+//    - contextMenuItem: newly created KitContextMenuItem object.
 //
 func NewContextMenuItemFromGaction(action gio.Actioner, label string, target *glib.Variant) *ContextMenuItem {
 	var _arg1 *C.GAction               // out
@@ -117,6 +124,10 @@ func NewContextMenuItemFromGaction(action gio.Actioner, label string, target *gl
 //
 //    - action stock action.
 //
+// The function returns the following values:
+//
+//    - contextMenuItem: newly created KitContextMenuItem object.
+//
 func NewContextMenuItemFromStockAction(action ContextMenuAction) *ContextMenuItem {
 	var _arg1 C.WebKitContextMenuAction // out
 	var _cret *C.WebKitContextMenuItem  // in
@@ -143,6 +154,10 @@ func NewContextMenuItemFromStockAction(action ContextMenuAction) *ContextMenuIte
 //    - action stock action.
 //    - label: custom label text to use instead of the predefined one.
 //
+// The function returns the following values:
+//
+//    - contextMenuItem: newly created KitContextMenuItem object.
+//
 func NewContextMenuItemFromStockActionWithLabel(action ContextMenuAction, label string) *ContextMenuItem {
 	var _arg1 C.WebKitContextMenuAction // out
 	var _arg2 *C.gchar                  // out
@@ -165,6 +180,11 @@ func NewContextMenuItemFromStockActionWithLabel(action ContextMenuAction, label 
 
 // NewContextMenuItemSeparator creates a new KitContextMenuItem representing a
 // separator.
+//
+// The function returns the following values:
+//
+//    - contextMenuItem: newly created KitContextMenuItem object.
+//
 func NewContextMenuItemSeparator() *ContextMenuItem {
 	var _cret *C.WebKitContextMenuItem // in
 
@@ -184,6 +204,10 @@ func NewContextMenuItemSeparator() *ContextMenuItem {
 //
 //    - label: menu item label text.
 //    - submenu to set.
+//
+// The function returns the following values:
+//
+//    - contextMenuItem: newly created KitContextMenuItem object.
 //
 func NewContextMenuItemWithSubmenu(label string, submenu *ContextMenu) *ContextMenuItem {
 	var _arg1 *C.gchar                 // out
@@ -208,6 +232,12 @@ func NewContextMenuItemWithSubmenu(label string, submenu *ContextMenu) *ContextM
 // Action gets the action associated to item as a Action.
 //
 // Deprecated: Use webkit_context_menu_item_get_gaction() instead.
+//
+// The function returns the following values:
+//
+//    - action associated to the KitContextMenuItem, or NULL if item is a
+//      separator.
+//
 func (item *ContextMenuItem) Action() *gtk.Action {
 	var _arg0 *C.WebKitContextMenuItem // out
 	var _cret *C.GtkAction             // in
@@ -233,6 +263,12 @@ func (item *ContextMenuItem) Action() *gtk.Action {
 }
 
 // Gaction gets the action associated to item as a #GAction.
+//
+// The function returns the following values:
+//
+//    - action associated to the KitContextMenuItem, or NULL if item is a
+//      separator.
+//
 func (item *ContextMenuItem) Gaction() gio.Actioner {
 	var _arg0 *C.WebKitContextMenuItem // out
 	var _cret *C.GAction               // in
@@ -251,9 +287,13 @@ func (item *ContextMenuItem) Gaction() gio.Actioner {
 		}
 
 		object := externglib.Take(objptr)
-		rv, ok := (externglib.CastObject(object)).(gio.Actioner)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gio.Actioner)
+			return ok
+		})
+		rv, ok := casted.(gio.Actioner)
 		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not gio.Actioner")
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.Actioner")
 		}
 		_action = rv
 	}
@@ -265,6 +305,11 @@ func (item *ContextMenuItem) Gaction() gio.Actioner {
 // was not created for a stock action WEBKIT_CONTEXT_MENU_ACTION_CUSTOM will be
 // returned. If the KitContextMenuItem is a separator
 // WEBKIT_CONTEXT_MENU_ACTION_NO_ACTION will be returned.
+//
+// The function returns the following values:
+//
+//    - contextMenuAction of item.
+//
 func (item *ContextMenuItem) StockAction() ContextMenuAction {
 	var _arg0 *C.WebKitContextMenuItem  // out
 	var _cret C.WebKitContextMenuAction // in
@@ -282,6 +327,12 @@ func (item *ContextMenuItem) StockAction() ContextMenuAction {
 }
 
 // Submenu gets the submenu of item.
+//
+// The function returns the following values:
+//
+//    - contextMenu representing the submenu of item or NULL if item doesn't have
+//      a submenu.
+//
 func (item *ContextMenuItem) Submenu() *ContextMenu {
 	var _arg0 *C.WebKitContextMenuItem // out
 	var _cret *C.WebKitContextMenu     // in
@@ -299,6 +350,11 @@ func (item *ContextMenuItem) Submenu() *ContextMenu {
 }
 
 // IsSeparator checks whether item is a separator.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE is item is a separator or FALSE otherwise.
+//
 func (item *ContextMenuItem) IsSeparator() bool {
 	var _arg0 *C.WebKitContextMenuItem // out
 	var _cret C.gboolean               // in
@@ -322,7 +378,7 @@ func (item *ContextMenuItem) IsSeparator() bool {
 //
 // The function takes the following parameters:
 //
-//    - submenu: KitContextMenu.
+//    - submenu (optional): KitContextMenu.
 //
 func (item *ContextMenuItem) SetSubmenu(submenu *ContextMenu) {
 	var _arg0 *C.WebKitContextMenuItem // out

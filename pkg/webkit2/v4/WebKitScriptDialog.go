@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -100,6 +98,11 @@ func (dialog *ScriptDialog) Close() {
 // signal sets TRUE when the OK or Stay buttons are clicked and FALSE otherwise.
 // It's an error to use this method with a KitScriptDialog that is not of type
 // WEBKIT_SCRIPT_DIALOG_CONFIRM or WEBKIT_SCRIPT_DIALOG_BEFORE_UNLOAD_CONFIRM.
+//
+// The function takes the following parameters:
+//
+//    - confirmed: whether user confirmed the dialog.
+//
 func (dialog *ScriptDialog) ConfirmSetConfirmed(confirmed bool) {
 	var _arg0 *C.WebKitScriptDialog // out
 	var _arg1 C.gboolean            // out
@@ -115,6 +118,11 @@ func (dialog *ScriptDialog) ConfirmSetConfirmed(confirmed bool) {
 }
 
 // DialogType: get the dialog type of a KitScriptDialog.
+//
+// The function returns the following values:
+//
+//    - scriptDialogType of dialog.
+//
 func (dialog *ScriptDialog) DialogType() ScriptDialogType {
 	var _arg0 *C.WebKitScriptDialog    // out
 	var _cret C.WebKitScriptDialogType // in
@@ -132,6 +140,11 @@ func (dialog *ScriptDialog) DialogType() ScriptDialogType {
 }
 
 // Message: get the message of a KitScriptDialog.
+//
+// The function returns the following values:
+//
+//    - utf8: message of dialog.
+//
 func (dialog *ScriptDialog) Message() string {
 	var _arg0 *C.WebKitScriptDialog // out
 	var _cret *C.gchar              // in
@@ -151,6 +164,11 @@ func (dialog *ScriptDialog) Message() string {
 // PromptGetDefaultText: get the default text of a KitScriptDialog of type
 // WEBKIT_SCRIPT_DIALOG_PROMPT. It's an error to use this method with a
 // KitScriptDialog that is not of type WEBKIT_SCRIPT_DIALOG_PROMPT.
+//
+// The function returns the following values:
+//
+//    - utf8: default text of dialog.
+//
 func (dialog *ScriptDialog) PromptGetDefaultText() string {
 	var _arg0 *C.WebKitScriptDialog // out
 	var _cret *C.gchar              // in
@@ -173,6 +191,11 @@ func (dialog *ScriptDialog) PromptGetDefaultText() string {
 // the text of the entry form when OK button is clicked, otherwise NULL is set.
 // It's an error to use this method with a KitScriptDialog that is not of type
 // WEBKIT_SCRIPT_DIALOG_PROMPT.
+//
+// The function takes the following parameters:
+//
+//    - text to set.
+//
 func (dialog *ScriptDialog) PromptSetText(text string) {
 	var _arg0 *C.WebKitScriptDialog // out
 	var _arg1 *C.gchar              // out

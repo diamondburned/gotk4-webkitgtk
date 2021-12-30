@@ -9,8 +9,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -23,6 +21,10 @@ import "C"
 //
 //    - header: HTTP header suitable for parsing with soup_header_parse_list().
 //    - token: token.
+//
+// The function returns the following values:
+//
+//    - ok: whether or not header contains token.
 //
 func HeaderContains(header, token string) bool {
 	var _arg1 *C.char    // out
@@ -52,7 +54,7 @@ func HeaderContains(header, token string) bool {
 // The function takes the following parameters:
 //
 //    - paramList returned from soup_header_parse_param_list() or
-//    soup_header_parse_semi_param_list().
+//      soup_header_parse_semi_param_list().
 //
 func HeaderFreeParamList(paramList map[string]string) {
 	var _arg1 *C.GHashTable // out
@@ -80,6 +82,10 @@ func HeaderFreeParamList(paramList map[string]string) {
 // The function takes the following parameters:
 //
 //    - header value.
+//
+// The function returns the following values:
+//
+//    - sList of list elements, as allocated strings.
 //
 func HeaderParseList(header string) []string {
 	var _arg1 *C.char   // out
@@ -118,6 +124,11 @@ func HeaderParseList(header string) []string {
 //
 //    - header value.
 //
+// The function returns the following values:
+//
+//    - hashTable: a Table of list elements, which can be freed with
+//      soup_header_free_param_list().
+//
 func HeaderParseParamList(header string) map[string]string {
 	var _arg1 *C.char       // out
 	var _cret *C.GHashTable // in
@@ -155,6 +166,11 @@ func HeaderParseParamList(header string) map[string]string {
 // The function takes the following parameters:
 //
 //    - header value.
+//
+// The function returns the following values:
+//
+//    - hashTable (optional): a Table of list elements, which can be freed with
+//      soup_header_free_param_list() or NULL if there are duplicate elements.
 //
 func HeaderParseParamListStrict(header string) map[string]string {
 	var _arg1 *C.char       // out
@@ -196,6 +212,12 @@ func HeaderParseParamListStrict(header string) map[string]string {
 // The function takes the following parameters:
 //
 //    - header value.
+//
+// The function returns the following values:
+//
+//    - unacceptable (optional): on return, will contain a list of unacceptable
+//      values.
+//    - sList of acceptable values (as allocated strings), highest-qvalue first.
 //
 func HeaderParseQualityList(header string) (unacceptable []string, sList []string) {
 	var _arg1 *C.char   // out
@@ -246,6 +268,11 @@ func HeaderParseQualityList(header string) (unacceptable []string, sList []strin
 //
 //    - header value.
 //
+// The function returns the following values:
+//
+//    - hashTable: a Table of list elements, which can be freed with
+//      soup_header_free_param_list().
+//
 func HeaderParseSemiParamList(header string) map[string]string {
 	var _arg1 *C.char       // out
 	var _cret *C.GHashTable // in
@@ -284,6 +311,11 @@ func HeaderParseSemiParamList(header string) map[string]string {
 // The function takes the following parameters:
 //
 //    - header value.
+//
+// The function returns the following values:
+//
+//    - hashTable (optional): a Table of list elements, which can be freed with
+//      soup_header_free_param_list() or NULL if there are duplicate elements.
 //
 func HeaderParseSemiParamListStrict(header string) map[string]string {
 	var _arg1 *C.char       // out
@@ -324,9 +356,13 @@ func HeaderParseSemiParamListStrict(header string) map[string]string {
 // The function takes the following parameters:
 //
 //    - str: header string (including the Request-Line or Status-Line, but not
-//    the trailing blank line).
+//      the trailing blank line).
 //    - len: length of str.
 //    - dest to store the header values in.
+//
+// The function returns the following values:
+//
+//    - ok success or failure.
 //
 func HeadersParse(str string, len int, dest *MessageHeaders) bool {
 	var _arg1 *C.char               // out
@@ -363,6 +399,15 @@ func HeadersParse(str string, len int, dest *MessageHeaders) bool {
 //    - str headers (up to, but not including, the trailing blank line).
 //    - len: length of str.
 //    - reqHeaders to store the header values in.
+//
+// The function returns the following values:
+//
+//    - reqMethod (optional): if non-NULL, will be filled in with the request
+//      method.
+//    - reqPath (optional): if non-NULL, will be filled in with the request path.
+//    - ver (optional): if non-NULL, will be filled in with the HTTP version.
+//    - guint: SOUP_STATUS_OK if the headers could be parsed, or an HTTP error to
+//      be returned to the client if they could not be.
 //
 func HeadersParseRequest(str string, len int, reqHeaders *MessageHeaders) (reqMethod string, reqPath string, ver HTTPVersion, guint uint) {
 	var _arg1 *C.char               // out
@@ -413,6 +458,15 @@ func HeadersParseRequest(str string, len int, reqHeaders *MessageHeaders) (reqMe
 //    - len: length of str.
 //    - headers to store the header values in.
 //
+// The function returns the following values:
+//
+//    - ver (optional): if non-NULL, will be filled in with the HTTP version.
+//    - statusCode (optional): if non-NULL, will be filled in with the status
+//      code.
+//    - reasonPhrase (optional): if non-NULL, will be filled in with the reason
+//      phrase.
+//    - ok success or failure.
+//
 func HeadersParseResponse(str string, len int, headers *MessageHeaders) (HTTPVersion, uint, string, bool) {
 	var _arg1 *C.char               // out
 	var _arg2 C.int                 // out
@@ -457,6 +511,15 @@ func HeadersParseResponse(str string, len int, headers *MessageHeaders) (HTTPVer
 // The function takes the following parameters:
 //
 //    - statusLine: HTTP Status-Line.
+//
+// The function returns the following values:
+//
+//    - ver (optional): if non-NULL, will be filled in with the HTTP version.
+//    - statusCode (optional): if non-NULL, will be filled in with the status
+//      code.
+//    - reasonPhrase (optional): if non-NULL, will be filled in with the reason
+//      phrase.
+//    - ok: TRUE if status_line was parsed successfully.
 //
 func HeadersParseStatusLine(statusLine string) (HTTPVersion, uint, string, bool) {
 	var _arg1 *C.char           // out

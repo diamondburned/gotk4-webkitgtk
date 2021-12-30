@@ -17,8 +17,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -190,9 +188,13 @@ func _gotk4_soup2_SessionConnectProgressCallback(arg0 *C.SoupSession, arg1 C.GSo
 		}
 
 		object := externglib.Take(objptr)
-		rv, ok := (externglib.CastObject(object)).(gio.IOStreamer)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gio.IOStreamer)
+			return ok
+		})
+		rv, ok := casted.(gio.IOStreamer)
 		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not gio.IOStreamer")
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.IOStreamer")
 		}
 		connection = rv
 	}
@@ -206,7 +208,19 @@ func _gotk4_soup2_SessionConnectProgressCallback(arg0 *C.SoupSession, arg1 C.GSo
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type SessionOverrider interface {
+	// The function takes the following parameters:
+	//
+	//    - msg
+	//    - auth
+	//    - retrying
+	//
 	AuthRequired(msg *Message, auth Auther, retrying bool)
+	// The function takes the following parameters:
+	//
+	//    - msg
+	//    - auth
+	//    - retrying
+	//
 	Authenticate(msg *Message, auth Auther, retrying bool)
 	// CancelMessage causes session to immediately finish processing msg
 	// (regardless of its current state) with a final status_code of
@@ -228,6 +242,13 @@ type SessionOverrider interface {
 	// soup_session_cancel_message() returns. The plain Session does not have
 	// this behavior; cancelling an asynchronous message will merely queue its
 	// callback to be run after returning to the main loop.
+	//
+	// The function takes the following parameters:
+	//
+	//    - msg: message to cancel.
+	//    - statusCode status code to set on msg (generally
+	//      SOUP_STATUS_CANCELLED).
+	//
 	CancelMessage(msg *Message, statusCode uint)
 	FlushQueue()
 	Kick()
@@ -249,10 +270,27 @@ type SessionOverrider interface {
 	// Contrast this method with soup_session_send_async(), which also
 	// asynchronously sends a message, but returns before reading the response
 	// body, and allows you to read the response via a Stream.
+	//
+	// The function takes the following parameters:
+	//
+	//    - msg: message to queue.
+	//    - callback (optional) which will be called after the message completes
+	//      or when an unrecoverable error occurs.
+	//
 	QueueMessage(msg *Message, callback SessionCallback)
+	// The function takes the following parameters:
+	//
+	//    - msg
+	//    - socket
+	//
 	RequestStarted(msg *Message, socket *Socket)
 	// RequeueMessage: this causes msg to be placed back on the queue to be
 	// attempted again.
+	//
+	// The function takes the following parameters:
+	//
+	//    - msg: message to requeue.
+	//
 	RequeueMessage(msg *Message)
 	// SendMessage: synchronously send msg. This call will not return until the
 	// transfer is finished successfully or there is an unrecoverable error.
@@ -266,10 +304,20 @@ type SessionOverrider interface {
 	// Contrast this method with soup_session_send(), which also synchronously
 	// sends a message, but returns before reading the response body, and allows
 	// you to read the response via a Stream.
+	//
+	// The function takes the following parameters:
+	//
+	//    - msg: message to send.
+	//
+	// The function returns the following values:
+	//
+	//    - guint: HTTP status code of the response.
+	//
 	SendMessage(msg *Message) uint
 }
 
 type Session struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -287,7 +335,88 @@ func marshalSessioner(p uintptr) (interface{}, error) {
 	return wrapSession(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+// ConnectAuthenticate: emitted when the session requires authentication. If
+// credentials are available call soup_auth_authenticate() on auth. If these
+// credentials fail, the signal will be emitted again, with retrying set to
+// TRUE, which will continue until you return without calling
+// soup_auth_authenticate() on auth.
+//
+// Note that this may be emitted before msg's body has been fully read.
+//
+// If you call soup_session_pause_message() on msg before returning, then you
+// can authenticate auth asynchronously (as long as you g_object_ref() it to
+// make sure it doesn't get destroyed), and then unpause msg when you are ready
+// for it to continue.
+func (session *Session) ConnectAuthenticate(f func(msg Message, auth Auther, retrying bool)) externglib.SignalHandle {
+	return session.Connect("authenticate", f)
+}
+
+// ConnectConnectionCreated: emitted when a new connection is created. This is
+// an internal signal intended only to be used for debugging purposes, and may
+// go away in the future.
+func (session *Session) ConnectConnectionCreated(f func(connection *externglib.Object)) externglib.SignalHandle {
+	return session.Connect("connection-created", f)
+}
+
+// ConnectRequestQueued: emitted when a request is queued on session. (Note that
+// "queued" doesn't just mean soup_session_queue_message();
+// soup_session_send_message() implicitly queues the message as well.)
+//
+// When sending a request, first Session::request_queued is emitted, indicating
+// that the session has become aware of the request.
+//
+// Once a connection is available to send the request on, the session emits
+// Session::request_started. Then, various Message signals are emitted as the
+// message is processed. If the message is requeued, it will emit
+// Message::restarted, which will then be followed by another
+// Session::request_started and another set of Message signals when the message
+// is re-sent.
+//
+// Eventually, the message will emit Message::finished. Normally, this signals
+// the completion of message processing. However, it is possible that the
+// application will requeue the message from the "finished" handler (or
+// equivalently, from the soup_session_queue_message() callback). In that case,
+// the process will loop back to Session::request_started.
+//
+// Eventually, a message will reach "finished" and not be requeued. At that
+// point, the session will emit Session::request_unqueued to indicate that it is
+// done with the message.
+//
+// To sum up: Session::request_queued and Session::request_unqueued are
+// guaranteed to be emitted exactly once, but Session::request_started and
+// Message::finished (and all of the other Message signals) may be invoked
+// multiple times for a given message.
+func (session *Session) ConnectRequestQueued(f func(msg Message)) externglib.SignalHandle {
+	return session.Connect("request-queued", f)
+}
+
+// ConnectRequestStarted: emitted just before a request is sent. See
+// Session::request_queued for a detailed description of the message lifecycle
+// within a session.
+func (session *Session) ConnectRequestStarted(f func(msg Message, socket Socket)) externglib.SignalHandle {
+	return session.Connect("request-started", f)
+}
+
+// ConnectRequestUnqueued: emitted when a request is removed from session's
+// queue, indicating that session is done with it. See Session::request_queued
+// for a detailed description of the message lifecycle within a session.
+func (session *Session) ConnectRequestUnqueued(f func(msg Message)) externglib.SignalHandle {
+	return session.Connect("request-unqueued", f)
+}
+
+// ConnectTunneling: emitted when an SSL tunnel is being created on a proxy
+// connection. This is an internal signal intended only to be used for debugging
+// purposes, and may go away in the future.
+func (session *Session) ConnectTunneling(f func(connection *externglib.Object)) externglib.SignalHandle {
+	return session.Connect("tunneling", f)
+}
+
 // NewSession creates a Session with the default options.
+//
+// The function returns the following values:
+//
+//    - session: new session.
+//
 func NewSession() *Session {
 	var _cret *C.SoupSession // in
 
@@ -419,11 +548,11 @@ func (session *Session) CancelMessage(msg *Message, statusCode uint) {
 //
 // The function takes the following parameters:
 //
-//    - ctx: #GCancellable.
+//    - ctx (optional): #GCancellable.
 //    - uri to connect to.
-//    - progressCallback which will be called for every network event that
-//    occurs during the connection.
-//    - callback to invoke when the operation finishes.
+//    - progressCallback (optional) which will be called for every network event
+//      that occurs during the connection.
+//    - callback (optional) to invoke when the operation finishes.
 //
 func (session *Session) ConnectAsync(ctx context.Context, uri *URI, progressCallback SessionConnectProgressCallback, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.SoupSession                       // out
@@ -462,6 +591,10 @@ func (session *Session) ConnectAsync(ctx context.Context, uri *URI, progressCall
 //
 //    - result passed to your callback.
 //
+// The function returns the following values:
+//
+//    - ioStream: new OStream, or NULL on error.
+//
 func (session *Session) ConnectFinish(result gio.AsyncResulter) (gio.IOStreamer, error) {
 	var _arg0 *C.SoupSession  // out
 	var _arg1 *C.GAsyncResult // out
@@ -485,9 +618,13 @@ func (session *Session) ConnectFinish(result gio.AsyncResulter) (gio.IOStreamer,
 		}
 
 		object := externglib.AssumeOwnership(objptr)
-		rv, ok := (externglib.CastObject(object)).(gio.IOStreamer)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gio.IOStreamer)
+			return ok
+		})
+		rv, ok := casted.(gio.IOStreamer)
 		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not gio.IOStreamer")
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.IOStreamer")
 		}
 		_ioStream = rv
 	}
@@ -504,6 +641,11 @@ func (session *Session) ConnectFinish(result gio.AsyncResulter) (gio.IOStreamer,
 //
 // For a modern Session, this will always just return the thread-default
 // Context, and so is not especially useful.
+//
+// The function returns the following values:
+//
+//    - mainContext (optional) session's Context, which may be NULL.
+//
 func (session *Session) AsyncContext() *glib.MainContext {
 	var _arg0 *C.SoupSession  // out
 	var _cret *C.GMainContext // in
@@ -537,6 +679,10 @@ func (session *Session) AsyncContext() *glib.MainContext {
 //
 //    - featureType of the feature to get.
 //
+// The function returns the following values:
+//
+//    - sessionFeature (optional) or NULL. The feature is owned by session.
+//
 func (session *Session) Feature(featureType externglib.Type) SessionFeaturer {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 C.GType               // out
@@ -556,9 +702,13 @@ func (session *Session) Feature(featureType externglib.Type) SessionFeaturer {
 			objptr := unsafe.Pointer(_cret)
 
 			object := externglib.Take(objptr)
-			rv, ok := (externglib.CastObject(object)).(SessionFeaturer)
+			casted := object.WalkCast(func(obj externglib.Objector) bool {
+				_, ok := obj.(SessionFeaturer)
+				return ok
+			})
+			rv, ok := casted.(SessionFeaturer)
 			if !ok {
-				panic("object of type " + object.TypeFromInstance().String() + " is not soup.SessionFeaturer")
+				panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.SessionFeaturer")
 			}
 			_sessionFeature = rv
 		}
@@ -578,6 +728,10 @@ func (session *Session) Feature(featureType externglib.Type) SessionFeaturer {
 //
 //    - featureType of the feature to get.
 //    - msg: Message.
+//
+// The function returns the following values:
+//
+//    - sessionFeature (optional) or NULL. The feature is owned by session.
 //
 func (session *Session) FeatureForMessage(featureType externglib.Type, msg *Message) SessionFeaturer {
 	var _arg0 *C.SoupSession        // out
@@ -601,9 +755,13 @@ func (session *Session) FeatureForMessage(featureType externglib.Type, msg *Mess
 			objptr := unsafe.Pointer(_cret)
 
 			object := externglib.Take(objptr)
-			rv, ok := (externglib.CastObject(object)).(SessionFeaturer)
+			casted := object.WalkCast(func(obj externglib.Objector) bool {
+				_, ok := obj.(SessionFeaturer)
+				return ok
+			})
+			rv, ok := casted.(SessionFeaturer)
 			if !ok {
-				panic("object of type " + object.TypeFromInstance().String() + " is not soup.SessionFeaturer")
+				panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.SessionFeaturer")
 			}
 			_sessionFeature = rv
 		}
@@ -619,6 +777,10 @@ func (session *Session) FeatureForMessage(featureType externglib.Type, msg *Mess
 // The function takes the following parameters:
 //
 //    - featureType of the class of features to get.
+//
+// The function returns the following values:
+//
+//    - sList: a list of features. You must free the list, but not its contents.
 //
 func (session *Session) Features(featureType externglib.Type) []SessionFeaturer {
 	var _arg0 *C.SoupSession // out
@@ -645,9 +807,13 @@ func (session *Session) Features(featureType externglib.Type) []SessionFeaturer 
 			}
 
 			object := externglib.Take(objptr)
-			rv, ok := (externglib.CastObject(object)).(SessionFeaturer)
+			casted := object.WalkCast(func(obj externglib.Objector) bool {
+				_, ok := obj.(SessionFeaturer)
+				return ok
+			})
+			rv, ok := casted.(SessionFeaturer)
 			if !ok {
-				panic("object of type " + object.TypeFromInstance().String() + " is not soup.SessionFeaturer")
+				panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.SessionFeaturer")
 			}
 			dst = rv
 		}
@@ -664,6 +830,10 @@ func (session *Session) Features(featureType externglib.Type) []SessionFeaturer 
 // The function takes the following parameters:
 //
 //    - featureType of the class of features to check for.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE or FALSE.
 //
 func (session *Session) HasFeature(featureType externglib.Type) bool {
 	var _arg0 *C.SoupSession // out
@@ -718,9 +888,9 @@ func (session *Session) PauseMessage(msg *Message) {
 //
 // The function takes the following parameters:
 //
-//    - ctx object, or NULL.
+//    - ctx (optional) object, or NULL.
 //    - hostname to be resolved.
-//    - callback to call with the result, or NULL.
+//    - callback (optional) to call with the result, or NULL.
 //
 func (session *Session) PrefetchDns(ctx context.Context, hostname string, callback AddressCallback) {
 	var _arg0 *C.SoupSession        // out
@@ -794,8 +964,8 @@ func (session *Session) PrepareForURI(uri *URI) {
 // The function takes the following parameters:
 //
 //    - msg: message to queue.
-//    - callback which will be called after the message completes or when an
-//    unrecoverable error occurs.
+//    - callback (optional) which will be called after the message completes or
+//      when an unrecoverable error occurs.
 //
 func (session *Session) QueueMessage(msg *Message, callback SessionCallback) {
 	var _arg0 *C.SoupSession        // out
@@ -832,6 +1002,11 @@ func (session *Session) QueueMessage(msg *Message, callback SessionCallback) {
 // The function takes the following parameters:
 //
 //    - msg that has received a 3xx response.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if a redirection was applied, FALSE if not (eg, because there
+//      was no Location header, or it could not be parsed).
 //
 func (session *Session) RedirectMessage(msg *Message) bool {
 	var _arg0 *C.SoupSession // out
@@ -899,6 +1074,10 @@ func (session *Session) RemoveFeatureByType(featureType externglib.Type) {
 //
 //    - uriString: URI, in string form.
 //
+// The function returns the following values:
+//
+//    - request: new Request, or NULL on error.
+//
 func (session *Session) Request(uriString string) (*Request, error) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.char        // out
@@ -932,6 +1111,10 @@ func (session *Session) Request(uriString string) (*Request, error) {
 //
 //    - method: HTTP method.
 //    - uriString: URI, in string form.
+//
+// The function returns the following values:
+//
+//    - requestHTTP: new RequestHTTP, or NULL on error.
 //
 func (session *Session) RequestHTTP(method, uriString string) (*RequestHTTP, error) {
 	var _arg0 *C.SoupSession     // out
@@ -971,6 +1154,10 @@ func (session *Session) RequestHTTP(method, uriString string) (*RequestHTTP, err
 //    - method: HTTP method.
 //    - uri representing the URI to retrieve.
 //
+// The function returns the following values:
+//
+//    - requestHTTP: new RequestHTTP, or NULL on error.
+//
 func (session *Session) RequestHTTPUri(method string, uri *URI) (*RequestHTTP, error) {
 	var _arg0 *C.SoupSession     // out
 	var _arg1 *C.char            // out
@@ -1004,6 +1191,10 @@ func (session *Session) RequestHTTPUri(method string, uri *URI) (*RequestHTTP, e
 // The function takes the following parameters:
 //
 //    - uri representing the URI to retrieve.
+//
+// The function returns the following values:
+//
+//    - request: new Request, or NULL on error.
 //
 func (session *Session) RequestURI(uri *URI) (*Request, error) {
 	var _arg0 *C.SoupSession // out
@@ -1074,8 +1265,12 @@ func (session *Session) RequeueMessage(msg *Message) {
 //
 // The function takes the following parameters:
 //
-//    - ctx: #GCancellable.
+//    - ctx (optional): #GCancellable.
 //    - msg: Message.
+//
+// The function returns the following values:
+//
+//    - inputStream for reading the response body, or NULL on error.
 //
 func (session *Session) Send(ctx context.Context, msg *Message) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupSession  // out
@@ -1107,9 +1302,13 @@ func (session *Session) Send(ctx context.Context, msg *Message) (gio.InputStream
 		}
 
 		object := externglib.AssumeOwnership(objptr)
-		rv, ok := (externglib.CastObject(object)).(gio.InputStreamer)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gio.InputStreamer)
+			return ok
+		})
+		rv, ok := casted.(gio.InputStreamer)
 		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not gio.InputStreamer")
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.InputStreamer")
 		}
 		_inputStream = rv
 	}
@@ -1137,9 +1336,9 @@ func (session *Session) Send(ctx context.Context, msg *Message) (gio.InputStream
 //
 // The function takes the following parameters:
 //
-//    - ctx: #GCancellable.
+//    - ctx (optional): #GCancellable.
 //    - msg: Message.
-//    - callback to invoke.
+//    - callback (optional) to invoke.
 //
 func (session *Session) SendAsync(ctx context.Context, msg *Message, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.SoupSession        // out
@@ -1174,6 +1373,10 @@ func (session *Session) SendAsync(ctx context.Context, msg *Message, callback gi
 //
 //    - result passed to your callback.
 //
+// The function returns the following values:
+//
+//    - inputStream for reading the response body, or NULL on error.
+//
 func (session *Session) SendFinish(result gio.AsyncResulter) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupSession  // out
 	var _arg1 *C.GAsyncResult // out
@@ -1197,9 +1400,13 @@ func (session *Session) SendFinish(result gio.AsyncResulter) (gio.InputStreamer,
 		}
 
 		object := externglib.AssumeOwnership(objptr)
-		rv, ok := (externglib.CastObject(object)).(gio.InputStreamer)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gio.InputStreamer)
+			return ok
+		})
+		rv, ok := casted.(gio.InputStreamer)
 		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not gio.InputStreamer")
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.InputStreamer")
 		}
 		_inputStream = rv
 	}
@@ -1226,6 +1433,10 @@ func (session *Session) SendFinish(result gio.AsyncResulter) (gio.InputStreamer,
 // The function takes the following parameters:
 //
 //    - msg: message to send.
+//
+// The function returns the following values:
+//
+//    - guint: HTTP status code of the response.
 //
 func (session *Session) SendMessage(msg *Message) uint {
 	var _arg0 *C.SoupSession // out
@@ -1259,6 +1470,12 @@ func (session *Session) SendMessage(msg *Message) uint {
 //
 //    - msg: message whose connection is to be stolen.
 //
+// The function returns the following values:
+//
+//    - ioStream formerly associated with msg (or NULL if msg was no longer
+//      associated with a connection). No guarantees are made about what kind of
+//      OStream is returned.
+//
 func (session *Session) StealConnection(msg *Message) gio.IOStreamer {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
@@ -1280,9 +1497,13 @@ func (session *Session) StealConnection(msg *Message) gio.IOStreamer {
 		}
 
 		object := externglib.AssumeOwnership(objptr)
-		rv, ok := (externglib.CastObject(object)).(gio.IOStreamer)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gio.IOStreamer)
+			return ok
+		})
+		rv, ok := casted.(gio.IOStreamer)
 		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not gio.IOStreamer")
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.IOStreamer")
 		}
 		_ioStream = rv
 	}
@@ -1335,11 +1556,11 @@ func (session *Session) UnpauseMessage(msg *Message) {
 //
 // The function takes the following parameters:
 //
-//    - ctx: #GCancellable.
+//    - ctx (optional): #GCancellable.
 //    - msg indicating the WebSocket server to connect to.
-//    - origin of the connection.
-//    - protocols: a NULL-terminated array of protocols supported.
-//    - callback to invoke.
+//    - origin (optional) of the connection.
+//    - protocols (optional): a NULL-terminated array of protocols supported.
+//    - callback (optional) to invoke.
 //
 func (session *Session) WebsocketConnectAsync(ctx context.Context, msg *Message, origin string, protocols []string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.SoupSession        // out
@@ -1396,6 +1617,10 @@ func (session *Session) WebsocketConnectAsync(ctx context.Context, msg *Message,
 //
 //    - result passed to your callback.
 //
+// The function returns the following values:
+//
+//    - websocketConnection: new WebsocketConnection, or NULL on error.
+//
 func (session *Session) WebsocketConnectFinish(result gio.AsyncResulter) (*WebsocketConnection, error) {
 	var _arg0 *C.SoupSession             // out
 	var _arg1 *C.GAsyncResult            // out
@@ -1428,6 +1653,10 @@ func (session *Session) WebsocketConnectFinish(result gio.AsyncResulter) (*Webso
 //
 //    - msg that has response headers.
 //
+// The function returns the following values:
+//
+//    - ok: whether msg would be redirected.
+//
 func (session *Session) WouldRedirect(msg *Message) bool {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
@@ -1447,80 +1676,4 @@ func (session *Session) WouldRedirect(msg *Message) bool {
 	}
 
 	return _ok
-}
-
-// ConnectAuthenticate: emitted when the session requires authentication. If
-// credentials are available call soup_auth_authenticate() on auth. If these
-// credentials fail, the signal will be emitted again, with retrying set to
-// TRUE, which will continue until you return without calling
-// soup_auth_authenticate() on auth.
-//
-// Note that this may be emitted before msg's body has been fully read.
-//
-// If you call soup_session_pause_message() on msg before returning, then you
-// can authenticate auth asynchronously (as long as you g_object_ref() it to
-// make sure it doesn't get destroyed), and then unpause msg when you are ready
-// for it to continue.
-func (session *Session) ConnectAuthenticate(f func(msg Message, auth Auther, retrying bool)) externglib.SignalHandle {
-	return session.Connect("authenticate", f)
-}
-
-// ConnectConnectionCreated: emitted when a new connection is created. This is
-// an internal signal intended only to be used for debugging purposes, and may
-// go away in the future.
-func (session *Session) ConnectConnectionCreated(f func(connection *externglib.Object)) externglib.SignalHandle {
-	return session.Connect("connection-created", f)
-}
-
-// ConnectRequestQueued: emitted when a request is queued on session. (Note that
-// "queued" doesn't just mean soup_session_queue_message();
-// soup_session_send_message() implicitly queues the message as well.)
-//
-// When sending a request, first Session::request_queued is emitted, indicating
-// that the session has become aware of the request.
-//
-// Once a connection is available to send the request on, the session emits
-// Session::request_started. Then, various Message signals are emitted as the
-// message is processed. If the message is requeued, it will emit
-// Message::restarted, which will then be followed by another
-// Session::request_started and another set of Message signals when the message
-// is re-sent.
-//
-// Eventually, the message will emit Message::finished. Normally, this signals
-// the completion of message processing. However, it is possible that the
-// application will requeue the message from the "finished" handler (or
-// equivalently, from the soup_session_queue_message() callback). In that case,
-// the process will loop back to Session::request_started.
-//
-// Eventually, a message will reach "finished" and not be requeued. At that
-// point, the session will emit Session::request_unqueued to indicate that it is
-// done with the message.
-//
-// To sum up: Session::request_queued and Session::request_unqueued are
-// guaranteed to be emitted exactly once, but Session::request_started and
-// Message::finished (and all of the other Message signals) may be invoked
-// multiple times for a given message.
-func (session *Session) ConnectRequestQueued(f func(msg Message)) externglib.SignalHandle {
-	return session.Connect("request-queued", f)
-}
-
-// ConnectRequestStarted: emitted just before a request is sent. See
-// Session::request_queued for a detailed description of the message lifecycle
-// within a session.
-func (session *Session) ConnectRequestStarted(f func(msg Message, socket Socket)) externglib.SignalHandle {
-	return session.Connect("request-started", f)
-}
-
-// ConnectRequestUnqueued: emitted when a request is removed from session's
-// queue, indicating that session is done with it. See Session::request_queued
-// for a detailed description of the message lifecycle within a session.
-func (session *Session) ConnectRequestUnqueued(f func(msg Message)) externglib.SignalHandle {
-	return session.Connect("request-unqueued", f)
-}
-
-// ConnectTunneling: emitted when an SSL tunnel is being created on a proxy
-// connection. This is an internal signal intended only to be used for debugging
-// purposes, and may go away in the future.
-func (session *Session) ConnectTunneling(f func(connection *externglib.Object)) externglib.SignalHandle {
-	return session.Connect("tunneling", f)
 }

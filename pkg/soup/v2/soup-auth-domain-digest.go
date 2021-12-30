@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -65,6 +63,7 @@ func _gotk4_soup2_AuthDomainDigestAuthCallback(arg0 *C.SoupAuthDomain, arg1 *C.S
 }
 
 type AuthDomainDigest struct {
+	_ [0]func() // equal guard
 	AuthDomain
 }
 
@@ -130,6 +129,10 @@ func (domain *AuthDomainDigest) SetAuthCallback(callback AuthDomainDigestAuthCal
 //    - username: username.
 //    - realm: auth realm name.
 //    - password for username in realm.
+//
+// The function returns the following values:
+//
+//    - utf8: encoded password.
 //
 func AuthDomainDigestEncodePassword(username, realm, password string) string {
 	var _arg1 *C.char // out

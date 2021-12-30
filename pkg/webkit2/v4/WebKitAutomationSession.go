@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -53,6 +51,7 @@ func (a AutomationBrowsingContextPresentation) String() string {
 }
 
 type AutomationSession struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -70,8 +69,29 @@ func marshalAutomationSessioner(p uintptr) (interface{}, error) {
 	return wrapAutomationSession(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+// ConnectCreateWebView: this signal is emitted when the automation client
+// requests a new browsing context to interact with it. The callback handler
+// should return a KitWebView created with
+// KitWebView:is-controlled-by-automation construct property enabled and
+// KitWebView:automation-presentation-type construct property set if needed.
+//
+// If the signal is emitted with "tab" detail, the returned KitWebView should be
+// a new web view added to a new tab of the current browsing context window. If
+// the signal is emitted with "window" detail, the returned KitWebView should be
+// a new web view added to a new window. When creating a new web view and
+// there's an active browsing context, the new window or tab shouldn't be
+// focused.
+func (session *AutomationSession) ConnectCreateWebView(f func() WebView) externglib.SignalHandle {
+	return session.Connect("create-web-view", f)
+}
+
 // ApplicationInfo: get the KitAutomationSession previously set with
 // webkit_automation_session_set_application_info().
+//
+// The function returns the following values:
+//
+//    - applicationInfo of session, or NULL if no one has been set.
+//
 func (session *AutomationSession) ApplicationInfo() *ApplicationInfo {
 	var _arg0 *C.WebKitAutomationSession // out
 	var _cret *C.WebKitApplicationInfo   // in
@@ -96,6 +116,11 @@ func (session *AutomationSession) ApplicationInfo() *ApplicationInfo {
 }
 
 // ID: get the unique identifier of a KitAutomationSession.
+//
+// The function returns the following values:
+//
+//    - utf8: unique identifier of session.
+//
 func (session *AutomationSession) ID() string {
 	var _arg0 *C.WebKitAutomationSession // out
 	var _cret *C.char                    // in
@@ -135,20 +160,4 @@ func (session *AutomationSession) SetApplicationInfo(info *ApplicationInfo) {
 	C.webkit_automation_session_set_application_info(_arg0, _arg1)
 	runtime.KeepAlive(session)
 	runtime.KeepAlive(info)
-}
-
-// ConnectCreateWebView: this signal is emitted when the automation client
-// requests a new browsing context to interact with it. The callback handler
-// should return a KitWebView created with
-// KitWebView:is-controlled-by-automation construct property enabled and
-// KitWebView:automation-presentation-type construct property set if needed.
-//
-// If the signal is emitted with "tab" detail, the returned KitWebView should be
-// a new web view added to a new tab of the current browsing context window. If
-// the signal is emitted with "window" detail, the returned KitWebView should be
-// a new web view added to a new window. When creating a new web view and
-// there's an active browsing context, the new window or tab shouldn't be
-// focused.
-func (session *AutomationSession) ConnectCreateWebView(f func() WebView) externglib.SignalHandle {
-	return session.Connect("create-web-view", f)
 }

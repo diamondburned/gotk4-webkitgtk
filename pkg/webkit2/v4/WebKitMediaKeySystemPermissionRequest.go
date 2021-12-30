@@ -9,8 +9,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -29,6 +27,10 @@ func init() {
 //
 //    - request: KitMediaKeySystemPermissionRequest.
 //
+// The function returns the following values:
+//
+//    - utf8: key system name for request.
+//
 func MediaKeySystemPermissionGetName(request *MediaKeySystemPermissionRequest) string {
 	var _arg1 *C.WebKitMediaKeySystemPermissionRequest // out
 	var _cret *C.gchar                                 // in
@@ -46,6 +48,7 @@ func MediaKeySystemPermissionGetName(request *MediaKeySystemPermissionRequest) s
 }
 
 type MediaKeySystemPermissionRequest struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 
 	PermissionRequest

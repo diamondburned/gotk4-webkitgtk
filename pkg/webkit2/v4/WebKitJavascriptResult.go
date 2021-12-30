@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -40,6 +38,11 @@ func marshalJavascriptResult(p uintptr) (interface{}, error) {
 }
 
 // JsValue: get the CValue of js_result.
+//
+// The function returns the following values:
+//
+//    - value of the KitJavascriptResult.
+//
 func (jsResult *JavascriptResult) JsValue() *javascriptcore.Value {
 	var _arg0 *C.WebKitJavascriptResult // out
 	var _cret *C.JSCValue               // in

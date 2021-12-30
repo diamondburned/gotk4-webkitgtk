@@ -9,8 +9,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -23,6 +21,7 @@ func init() {
 }
 
 type PolicyDecision struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -31,7 +30,7 @@ var (
 )
 
 // PolicyDecisioner describes types inherited from class PolicyDecision.
-
+//
 // To get the original type, the caller must assert this to an interface or
 // another type.
 type PolicyDecisioner interface {
@@ -49,6 +48,15 @@ func wrapPolicyDecision(obj *externglib.Object) *PolicyDecision {
 
 func marshalPolicyDecisioner(p uintptr) (interface{}, error) {
 	return wrapPolicyDecision(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+func (decision *PolicyDecision) basePolicyDecision() *PolicyDecision {
+	return decision
+}
+
+// BasePolicyDecision returns the underlying base object.
+func BasePolicyDecision(obj PolicyDecisioner) *PolicyDecision {
+	return obj.basePolicyDecision()
 }
 
 // Download: spawn a download from this decision.
@@ -104,13 +112,4 @@ func (decision *PolicyDecision) UseWithPolicies(policies *WebsitePolicies) {
 	C.webkit_policy_decision_use_with_policies(_arg0, _arg1)
 	runtime.KeepAlive(decision)
 	runtime.KeepAlive(policies)
-}
-
-func (decision *PolicyDecision) basePolicyDecision() *PolicyDecision {
-	return decision
-}
-
-// BasePolicyDecision returns the underlying base object.
-func BasePolicyDecision(obj PolicyDecisioner) *PolicyDecision {
-	return obj.basePolicyDecision()
 }

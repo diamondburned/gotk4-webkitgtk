@@ -13,8 +13,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdk/v3"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -151,18 +149,51 @@ func (i InputHints) Has(other InputHints) bool {
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type InputMethodContextOverrider interface {
+	// The function takes the following parameters:
+	//
 	Committed(text string)
+	// The function takes the following parameters:
+	//
+	//    - offset
+	//    - nChars
+	//
 	DeleteSurrounding(offset int, nChars uint)
 	// FilterKeyEvent: allow key_event to be handled by the input method. If
 	// TRUE is returned, then no further processing should be done for the key
 	// event.
+	//
+	// The function takes the following parameters:
+	//
+	//    - keyEvent: key event to filter.
+	//
+	// The function returns the following values:
+	//
+	//    - ok: TRUE if the key event was handled, or FALSE otherwise.
+	//
 	FilterKeyEvent(keyEvent *gdk.EventKey) bool
 	// Preedit: get the current preedit string for the context, and a list of
 	// WebKitInputMethodUnderline to apply to the string. The string will be
 	// displayed inserted at cursor_offset.
+	//
+	// The function returns the following values:
+	//
+	//    - text (optional): location to store the preedit string.
+	//    - underlines (optional): location to store the underlines as a #GList
+	//      of KitInputMethodUnderline.
+	//    - cursorOffset (optional): location to store the position of cursor in
+	//      preedit string.
+	//
 	Preedit() (string, []*InputMethodUnderline, uint)
 	// NotifyCursorArea: notify context that cursor area changed in input
 	// associated.
+	//
+	// The function takes the following parameters:
+	//
+	//    - x coordinate of cursor location.
+	//    - y coordinate of cursor location.
+	//    - width of cursor area.
+	//    - height of cursor area.
+	//
 	NotifyCursorArea(x, y, width, height int)
 	// NotifyFocusIn: notify context that input associated has gained focus.
 	NotifyFocusIn()
@@ -171,6 +202,14 @@ type InputMethodContextOverrider interface {
 	// NotifySurrounding: notify context that the context surrounding the cursor
 	// has changed. If there's no selection selection_index is the same as
 	// cursor_index.
+	//
+	// The function takes the following parameters:
+	//
+	//    - text surrounding the insertion point.
+	//    - length of text, or -1 if text is nul-terminated.
+	//    - cursorIndex: byte index of the insertion cursor within text.
+	//    - selectionIndex: byte index of the selection cursor within text.
+	//
 	NotifySurrounding(text string, length, cursorIndex, selectionIndex uint)
 	PreeditChanged()
 	PreeditFinished()
@@ -180,10 +219,16 @@ type InputMethodContextOverrider interface {
 	Reset()
 	// SetEnablePreedit: set whether context should enable preedit to display
 	// feedback.
+	//
+	// The function takes the following parameters:
+	//
+	//    - enabled: whether to enable preedit.
+	//
 	SetEnablePreedit(enabled bool)
 }
 
 type InputMethodContext struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -192,7 +237,7 @@ var (
 )
 
 // InputMethodContexter describes types inherited from class InputMethodContext.
-
+//
 // To get the original type, the caller must assert this to an interface or
 // another type.
 type InputMethodContexter interface {
@@ -212,12 +257,58 @@ func marshalInputMethodContexter(p uintptr) (interface{}, error) {
 	return wrapInputMethodContext(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+func (context *InputMethodContext) baseInputMethodContext() *InputMethodContext {
+	return context
+}
+
+// BaseInputMethodContext returns the underlying base object.
+func BaseInputMethodContext(obj InputMethodContexter) *InputMethodContext {
+	return obj.baseInputMethodContext()
+}
+
+// ConnectCommitted: emitted when a complete input sequence has been entered by
+// the user. This can be a single character immediately after a key press or the
+// final result of preediting.
+func (context *InputMethodContext) ConnectCommitted(f func(text string)) externglib.SignalHandle {
+	return context.Connect("committed", f)
+}
+
+// ConnectDeleteSurrounding: emitted when the input method wants to delete the
+// context surrounding the cursor. If offset is a negative value, it means a
+// position before the cursor.
+func (context *InputMethodContext) ConnectDeleteSurrounding(f func(offset int, nChars uint)) externglib.SignalHandle {
+	return context.Connect("delete-surrounding", f)
+}
+
+// ConnectPreeditChanged: emitted whenever the preedit sequence currently being
+// entered has changed. It is also emitted at the end of a preedit sequence, in
+// which case webkit_input_method_context_get_preedit() returns the empty
+// string.
+func (context *InputMethodContext) ConnectPreeditChanged(f func()) externglib.SignalHandle {
+	return context.Connect("preedit-changed", f)
+}
+
+// ConnectPreeditFinished: emitted when a preediting sequence has been completed
+// or canceled.
+func (context *InputMethodContext) ConnectPreeditFinished(f func()) externglib.SignalHandle {
+	return context.Connect("preedit-finished", f)
+}
+
+// ConnectPreeditStarted: emitted when a new preediting sequence starts.
+func (context *InputMethodContext) ConnectPreeditStarted(f func()) externglib.SignalHandle {
+	return context.Connect("preedit-started", f)
+}
+
 // FilterKeyEvent: allow key_event to be handled by the input method. If TRUE is
 // returned, then no further processing should be done for the key event.
 //
 // The function takes the following parameters:
 //
 //    - keyEvent: key event to filter.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if the key event was handled, or FALSE otherwise.
 //
 func (context *InputMethodContext) FilterKeyEvent(keyEvent *gdk.EventKey) bool {
 	var _arg0 *C.WebKitInputMethodContext // out
@@ -241,6 +332,11 @@ func (context *InputMethodContext) FilterKeyEvent(keyEvent *gdk.EventKey) bool {
 }
 
 // InputHints: get the value of the KitInputMethodContext:input-hints property.
+//
+// The function returns the following values:
+//
+//    - inputHints of the input associated with context.
+//
 func (context *InputMethodContext) InputHints() InputHints {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _cret C.WebKitInputHints          // in
@@ -259,6 +355,11 @@ func (context *InputMethodContext) InputHints() InputHints {
 
 // InputPurpose: get the value of the KitInputMethodContext:input-purpose
 // property.
+//
+// The function returns the following values:
+//
+//    - inputPurpose of the input associated with context.
+//
 func (context *InputMethodContext) InputPurpose() InputPurpose {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _cret C.WebKitInputPurpose        // in
@@ -278,6 +379,15 @@ func (context *InputMethodContext) InputPurpose() InputPurpose {
 // Preedit: get the current preedit string for the context, and a list of
 // WebKitInputMethodUnderline to apply to the string. The string will be
 // displayed inserted at cursor_offset.
+//
+// The function returns the following values:
+//
+//    - text (optional): location to store the preedit string.
+//    - underlines (optional): location to store the underlines as a #GList of
+//      KitInputMethodUnderline.
+//    - cursorOffset (optional): location to store the position of cursor in
+//      preedit string.
+//
 func (context *InputMethodContext) Preedit() (string, []*InputMethodUnderline, uint) {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _arg1 *C.char                     // in
@@ -426,10 +536,7 @@ func (context *InputMethodContext) SetEnablePreedit(enabled bool) {
 	runtime.KeepAlive(enabled)
 }
 
-//
 // The function takes the following parameters:
-//
-
 //
 func (context *InputMethodContext) SetInputHints(hints InputHints) {
 	var _arg0 *C.WebKitInputMethodContext // out
@@ -460,48 +567,6 @@ func (context *InputMethodContext) SetInputPurpose(purpose InputPurpose) {
 	C.webkit_input_method_context_set_input_purpose(_arg0, _arg1)
 	runtime.KeepAlive(context)
 	runtime.KeepAlive(purpose)
-}
-
-func (context *InputMethodContext) baseInputMethodContext() *InputMethodContext {
-	return context
-}
-
-// BaseInputMethodContext returns the underlying base object.
-func BaseInputMethodContext(obj InputMethodContexter) *InputMethodContext {
-	return obj.baseInputMethodContext()
-}
-
-// ConnectCommitted: emitted when a complete input sequence has been entered by
-// the user. This can be a single character immediately after a key press or the
-// final result of preediting.
-func (context *InputMethodContext) ConnectCommitted(f func(text string)) externglib.SignalHandle {
-	return context.Connect("committed", f)
-}
-
-// ConnectDeleteSurrounding: emitted when the input method wants to delete the
-// context surrounding the cursor. If offset is a negative value, it means a
-// position before the cursor.
-func (context *InputMethodContext) ConnectDeleteSurrounding(f func(offset int, nChars uint)) externglib.SignalHandle {
-	return context.Connect("delete-surrounding", f)
-}
-
-// ConnectPreeditChanged: emitted whenever the preedit sequence currently being
-// entered has changed. It is also emitted at the end of a preedit sequence, in
-// which case webkit_input_method_context_get_preedit() returns the empty
-// string.
-func (context *InputMethodContext) ConnectPreeditChanged(f func()) externglib.SignalHandle {
-	return context.Connect("preedit-changed", f)
-}
-
-// ConnectPreeditFinished: emitted when a preediting sequence has been completed
-// or canceled.
-func (context *InputMethodContext) ConnectPreeditFinished(f func()) externglib.SignalHandle {
-	return context.Connect("preedit-finished", f)
-}
-
-// ConnectPreeditStarted: emitted when a new preediting sequence starts.
-func (context *InputMethodContext) ConnectPreeditStarted(f func()) externglib.SignalHandle {
-	return context.Connect("preedit-started", f)
 }
 
 // InputMethodUnderline: instance of this type is always passed by reference.
@@ -546,6 +611,11 @@ func NewInputMethodUnderline(startOffset uint, endOffset uint) *InputMethodUnder
 }
 
 // Copy: make a copy of the KitInputMethodUnderline.
+//
+// The function returns the following values:
+//
+//    - inputMethodUnderline: copy of passed in KitInputMethodUnderline.
+//
 func (underline *InputMethodUnderline) Copy() *InputMethodUnderline {
 	var _arg0 *C.WebKitInputMethodUnderline // out
 	var _cret *C.WebKitInputMethodUnderline // in
@@ -570,6 +640,11 @@ func (underline *InputMethodUnderline) Copy() *InputMethodUnderline {
 
 // SetColor: set the color of the underline. If rgba is NULL the foreground text
 // color will be used for the underline too.
+//
+// The function takes the following parameters:
+//
+//    - rgba (optional) or NULL.
+//
 func (underline *InputMethodUnderline) SetColor(rgba *gdk.RGBA) {
 	var _arg0 *C.WebKitInputMethodUnderline // out
 	var _arg1 *C.GdkRGBA                    // out

@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -56,6 +54,7 @@ func (a AutoplayPolicy) String() string {
 }
 
 type WebsitePolicies struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -74,6 +73,11 @@ func marshalWebsitePolicieser(p uintptr) (interface{}, error) {
 }
 
 // NewWebsitePolicies: create a new KitWebsitePolicies.
+//
+// The function returns the following values:
+//
+//    - websitePolicies: newly created KitWebsitePolicies.
+//
 func NewWebsitePolicies() *WebsitePolicies {
 	var _cret *C.WebKitWebsitePolicies // in
 
@@ -87,6 +91,11 @@ func NewWebsitePolicies() *WebsitePolicies {
 }
 
 // AutoplayPolicy: get the KitWebsitePolicies:autoplay property.
+//
+// The function returns the following values:
+//
+//    - autoplayPolicy: KitAutoplayPolicy.
+//
 func (policies *WebsitePolicies) AutoplayPolicy() AutoplayPolicy {
 	var _arg0 *C.WebKitWebsitePolicies // out
 	var _cret C.WebKitAutoplayPolicy   // in

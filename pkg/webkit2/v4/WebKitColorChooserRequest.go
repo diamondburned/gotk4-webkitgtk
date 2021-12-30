@@ -11,8 +11,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdk/v3"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -25,6 +23,7 @@ func init() {
 }
 
 type ColorChooserRequest struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -40,6 +39,15 @@ func wrapColorChooserRequest(obj *externglib.Object) *ColorChooserRequest {
 
 func marshalColorChooserRequester(p uintptr) (interface{}, error) {
 	return wrapColorChooserRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+// ConnectFinished: emitted when the request finishes. This signal can be
+// emitted because the user completed the request calling
+// webkit_color_chooser_request_finish(), or cancelled it with
+// webkit_color_chooser_request_cancel() or because the color input element is
+// removed from the DOM.
+func (request *ColorChooserRequest) ConnectFinished(f func()) externglib.SignalHandle {
+	return request.Connect("finished", f)
 }
 
 // Cancel cancels request and the input element changes to use the initial color
@@ -68,6 +76,11 @@ func (request *ColorChooserRequest) Finish() {
 }
 
 // ElementRectangle gets the bounding box of the color input element.
+//
+// The function returns the following values:
+//
+//    - rect to fill in with the element area.
+//
 func (request *ColorChooserRequest) ElementRectangle() *gdk.Rectangle {
 	var _arg0 *C.WebKitColorChooserRequest // out
 	var _arg1 C.GdkRectangle               // in
@@ -85,6 +98,11 @@ func (request *ColorChooserRequest) ElementRectangle() *gdk.Rectangle {
 }
 
 // RGBA gets the current RGBA color of request.
+//
+// The function returns the following values:
+//
+//    - rgba to fill in with the current color.
+//
 func (request *ColorChooserRequest) RGBA() *gdk.RGBA {
 	var _arg0 *C.WebKitColorChooserRequest // out
 	var _arg1 C.GdkRGBA                    // in
@@ -117,13 +135,4 @@ func (request *ColorChooserRequest) SetRGBA(rgba *gdk.RGBA) {
 	C.webkit_color_chooser_request_set_rgba(_arg0, _arg1)
 	runtime.KeepAlive(request)
 	runtime.KeepAlive(rgba)
-}
-
-// ConnectFinished: emitted when the request finishes. This signal can be
-// emitted because the user completed the request calling
-// webkit_color_chooser_request_finish(), or cancelled it with
-// webkit_color_chooser_request_cancel() or because the color input element is
-// removed from the DOM.
-func (request *ColorChooserRequest) ConnectFinished(f func()) externglib.SignalHandle {
-	return request.Connect("finished", f)
 }

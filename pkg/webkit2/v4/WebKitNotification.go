@@ -9,8 +9,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -23,6 +21,7 @@ func init() {
 }
 
 type Notification struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -38,6 +37,20 @@ func wrapNotification(obj *externglib.Object) *Notification {
 
 func marshalNotificationer(p uintptr) (interface{}, error) {
 	return wrapNotification(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+// ConnectClicked: emitted when a notification has been clicked. See
+// webkit_notification_clicked().
+func (notification *Notification) ConnectClicked(f func()) externglib.SignalHandle {
+	return notification.Connect("clicked", f)
+}
+
+// ConnectClosed: emitted when a notification has been withdrawn.
+//
+// The default handler will close the notification using libnotify, if built
+// with support for it.
+func (notification *Notification) ConnectClosed(f func()) externglib.SignalHandle {
+	return notification.Connect("closed", f)
 }
 
 // Clicked tells WebKit the notification has been clicked. This will emit the
@@ -62,6 +75,11 @@ func (notification *Notification) Close() {
 }
 
 // Body obtains the body for the notification.
+//
+// The function returns the following values:
+//
+//    - utf8: body for the notification.
+//
 func (notification *Notification) Body() string {
 	var _arg0 *C.WebKitNotification // out
 	var _cret *C.gchar              // in
@@ -79,6 +97,11 @@ func (notification *Notification) Body() string {
 }
 
 // ID obtains the unique id for the notification.
+//
+// The function returns the following values:
+//
+//    - guint64: unique id for the notification.
+//
 func (notification *Notification) ID() uint64 {
 	var _arg0 *C.WebKitNotification // out
 	var _cret C.guint64             // in
@@ -96,6 +119,11 @@ func (notification *Notification) ID() uint64 {
 }
 
 // Tag obtains the tag identifier for the notification.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): tag for the notification.
+//
 func (notification *Notification) Tag() string {
 	var _arg0 *C.WebKitNotification // out
 	var _cret *C.gchar              // in
@@ -115,6 +143,11 @@ func (notification *Notification) Tag() string {
 }
 
 // Title obtains the title for the notification.
+//
+// The function returns the following values:
+//
+//    - utf8: title for the notification.
+//
 func (notification *Notification) Title() string {
 	var _arg0 *C.WebKitNotification // out
 	var _cret *C.gchar              // in
@@ -129,18 +162,4 @@ func (notification *Notification) Title() string {
 	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
 
 	return _utf8
-}
-
-// ConnectClicked: emitted when a notification has been clicked. See
-// webkit_notification_clicked().
-func (notification *Notification) ConnectClicked(f func()) externglib.SignalHandle {
-	return notification.Connect("clicked", f)
-}
-
-// ConnectClosed: emitted when a notification has been withdrawn.
-//
-// The default handler will close the notification using libnotify, if built
-// with support for it.
-func (notification *Notification) ConnectClosed(f func()) externglib.SignalHandle {
-	return notification.Connect("closed", f)
 }

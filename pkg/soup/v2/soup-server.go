@@ -16,8 +16,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -236,13 +234,34 @@ func _gotk4_soup2_ServerWebsocketCallback(arg0 *C.SoupServer, arg1 *C.SoupWebsoc
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type ServerOverrider interface {
+	// The function takes the following parameters:
+	//
+	//    - msg
+	//    - client
+	//
 	RequestAborted(msg *Message, client *ClientContext)
+	// The function takes the following parameters:
+	//
+	//    - msg
+	//    - client
+	//
 	RequestFinished(msg *Message, client *ClientContext)
+	// The function takes the following parameters:
+	//
+	//    - msg
+	//    - client
+	//
 	RequestRead(msg *Message, client *ClientContext)
+	// The function takes the following parameters:
+	//
+	//    - msg
+	//    - client
+	//
 	RequestStarted(msg *Message, client *ClientContext)
 }
 
 type Server struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -260,13 +279,55 @@ func marshalServerer(p uintptr) (interface{}, error) {
 	return wrapServer(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+// ConnectRequestAborted: emitted when processing has failed for a message; this
+// could mean either that it could not be read (if Server::request_read has not
+// been emitted for it yet), or that the response could not be written back (if
+// Server::request_read has been emitted but Server::request_finished has not
+// been).
+//
+// message is in an undefined state when this signal is emitted; the signal
+// exists primarily to allow the server to free any state that it may have
+// allocated in Server::request_started.
+func (server *Server) ConnectRequestAborted(f func(message Message, client *ClientContext)) externglib.SignalHandle {
+	return server.Connect("request-aborted", f)
+}
+
+// ConnectRequestFinished: emitted when the server has finished writing a
+// response to a request.
+func (server *Server) ConnectRequestFinished(f func(message Message, client *ClientContext)) externglib.SignalHandle {
+	return server.Connect("request-finished", f)
+}
+
+// ConnectRequestRead: emitted when the server has successfully read a request.
+// message will have all of its request-side information filled in, and if the
+// message was authenticated, client will have information about that. This
+// signal is emitted before any (non-early) handlers are called for the message,
+// and if it sets the message's #status_code, then normal handler processing
+// will be skipped.
+func (server *Server) ConnectRequestRead(f func(message Message, client *ClientContext)) externglib.SignalHandle {
+	return server.Connect("request-read", f)
+}
+
+// ConnectRequestStarted: emitted when the server has started reading a new
+// request. message will be completely blank; not even the Request-Line will
+// have been read yet. About the only thing you can usefully do with it is
+// connect to its signals.
+//
+// If the request is read successfully, this will eventually be followed by a
+// Server::request_read signal. If a response is then sent, the request
+// processing will end with a Server::request_finished signal. If a network
+// error occurs, the processing will instead end with Server::request_aborted.
+func (server *Server) ConnectRequestStarted(f func(message Message, client *ClientContext)) externglib.SignalHandle {
+	return server.Connect("request-started", f)
+}
+
 // AcceptIostream: add a new client stream to the server.
 //
 // The function takes the following parameters:
 //
 //    - stream: OStream.
-//    - localAddr: local Address associated with the stream.
-//    - remoteAddr: remote Address associated with the stream.
+//    - localAddr (optional): local Address associated with the stream.
+//    - remoteAddr (optional): remote Address associated with the stream.
 //
 func (server *Server) AcceptIostream(stream gio.IOStreamer, localAddr, remoteAddr gio.SocketAddresser) error {
 	var _arg0 *C.SoupServer     // out
@@ -351,7 +412,7 @@ func (server *Server) AddAuthDomain(authDomain AuthDomainer) {
 //
 // The function takes the following parameters:
 //
-//    - path: toplevel path for the handler.
+//    - path (optional): toplevel path for the handler.
 //    - callback to invoke for requests under path.
 //
 func (server *Server) AddEarlyHandler(path string, callback ServerCallback) {
@@ -409,7 +470,7 @@ func (server *Server) AddEarlyHandler(path string, callback ServerCallback) {
 //
 // The function takes the following parameters:
 //
-//    - path: toplevel path for the handler.
+//    - path (optional): toplevel path for the handler.
 //    - callback to invoke for requests under path.
 //
 func (server *Server) AddHandler(path string, callback ServerCallback) {
@@ -479,9 +540,9 @@ func (server *Server) AddWebsocketExtension(extensionType externglib.Type) {
 //
 // The function takes the following parameters:
 //
-//    - path: toplevel path for the handler.
-//    - origin of the connection.
-//    - protocols: protocols supported by this handler.
+//    - path (optional): toplevel path for the handler.
+//    - origin (optional) of the connection.
+//    - protocols (optional): protocols supported by this handler.
 //    - callback to invoke for successful WebSocket requests under path.
 //
 func (server *Server) AddWebsocketHandler(path, origin string, protocols []string, callback ServerWebsocketCallback) {
@@ -553,6 +614,11 @@ func (server *Server) Disconnect() {
 //
 // Deprecated: If you are using soup_server_listen(), etc, then the server
 // listens on the thread-default Context, and this property is ignored.
+//
+// The function returns the following values:
+//
+//    - mainContext (optional) server's Context, which may be NULL.
+//
 func (server *Server) AsyncContext() *glib.MainContext {
 	var _arg0 *C.SoupServer   // out
 	var _cret *C.GMainContext // in
@@ -586,6 +652,11 @@ func (server *Server) AsyncContext() *glib.MainContext {
 // Deprecated: If you are using soup_server_listen(), etc, then use
 // soup_server_get_listeners() to get a list of all listening sockets, but note
 // that that function returns #GSockets, not Sockets.
+//
+// The function returns the following values:
+//
+//    - socket: listening socket.
+//
 func (server *Server) Listener() *Socket {
 	var _arg0 *C.SoupServer // out
 	var _cret *C.SoupSocket // in
@@ -609,6 +680,11 @@ func (server *Server) Listener() *Socket {
 //
 // (Beware that in contrast to the old soup_server_get_listener(), this function
 // returns #GSockets, not Sockets.).
+//
+// The function returns the following values:
+//
+//    - sList: a list of listening sockets.
+//
 func (server *Server) Listeners() []gio.Socket {
 	var _arg0 *C.SoupServer // out
 	var _cret *C.GSList     // in
@@ -647,6 +723,11 @@ func (server *Server) Listeners() []gio.Socket {
 //
 // Deprecated: If you are using soup_server_listen(), etc, then use
 // soup_server_get_uris() to get a list of all listening addresses.
+//
+// The function returns the following values:
+//
+//    - guint: port server is listening on.
+//
 func (server *Server) Port() uint {
 	var _arg0 *C.SoupServer // out
 	var _cret C.guint       // in
@@ -670,6 +751,11 @@ func (server *Server) Port() uint {
 // Note that if you used soup_server_listen_all(), the returned URIs will use
 // the addresses <literal>0.0.0.0</literal> and <literal>::</literal>, rather
 // than actually returning separate URIs for each interface on the system.
+//
+// The function returns the following values:
+//
+//    - sList: list of URIs, which you must free when you are done with it.
+//
 func (server *Server) URIs() []*URI {
 	var _arg0 *C.SoupServer // out
 	var _cret *C.GSList     // in
@@ -710,6 +796,11 @@ func (server *Server) URIs() []*URI {
 // server is <emphasis>able</emphasis> to do https, regardless of whether it
 // actually currently is or not. Use soup_server_get_uris() to see if it
 // currently has any https listeners.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if server is configured to serve https.
+//
 func (server *Server) IsHTTPS() bool {
 	var _arg0 *C.SoupServer // out
 	var _cret C.gboolean    // in
@@ -1072,8 +1163,7 @@ func (server *Server) RunAsync() {
 //
 // The function takes the following parameters:
 //
-//    - sslCertFile: path to a file containing a PEM-encoded SSL/TLS
-//    certificate.
+//    - sslCertFile: path to a file containing a PEM-encoded SSL/TLS certificate.
 //    - sslKeyFile: path to a file containing a PEM-encoded private key.
 //
 func (server *Server) SetSSLCertFile(sslCertFile, sslKeyFile string) error {
@@ -1128,48 +1218,6 @@ func (server *Server) UnpauseMessage(msg *Message) {
 	runtime.KeepAlive(msg)
 }
 
-// ConnectRequestAborted: emitted when processing has failed for a message; this
-// could mean either that it could not be read (if Server::request_read has not
-// been emitted for it yet), or that the response could not be written back (if
-// Server::request_read has been emitted but Server::request_finished has not
-// been).
-//
-// message is in an undefined state when this signal is emitted; the signal
-// exists primarily to allow the server to free any state that it may have
-// allocated in Server::request_started.
-func (server *Server) ConnectRequestAborted(f func(message Message, client *ClientContext)) externglib.SignalHandle {
-	return server.Connect("request-aborted", f)
-}
-
-// ConnectRequestFinished: emitted when the server has finished writing a
-// response to a request.
-func (server *Server) ConnectRequestFinished(f func(message Message, client *ClientContext)) externglib.SignalHandle {
-	return server.Connect("request-finished", f)
-}
-
-// ConnectRequestRead: emitted when the server has successfully read a request.
-// message will have all of its request-side information filled in, and if the
-// message was authenticated, client will have information about that. This
-// signal is emitted before any (non-early) handlers are called for the message,
-// and if it sets the message's #status_code, then normal handler processing
-// will be skipped.
-func (server *Server) ConnectRequestRead(f func(message Message, client *ClientContext)) externglib.SignalHandle {
-	return server.Connect("request-read", f)
-}
-
-// ConnectRequestStarted: emitted when the server has started reading a new
-// request. message will be completely blank; not even the Request-Line will
-// have been read yet. About the only thing you can usefully do with it is
-// connect to its signals.
-//
-// If the request is read successfully, this will eventually be followed by a
-// Server::request_read signal. If a response is then sent, the request
-// processing will end with a Server::request_finished signal. If a network
-// error occurs, the processing will instead end with Server::request_aborted.
-func (server *Server) ConnectRequestStarted(f func(message Message, client *ClientContext)) externglib.SignalHandle {
-	return server.Connect("request-started", f)
-}
-
 // ClientContext provides additional information about the client making a
 // particular request. In particular, you can use
 // soup_client_context_get_auth_domain() and soup_client_context_get_auth_user()
@@ -1200,6 +1248,12 @@ func marshalClientContext(p uintptr) (interface{}, error) {
 //
 // Deprecated: Use soup_client_context_get_remote_address(), which returns a
 // Address.
+//
+// The function returns the following values:
+//
+//    - address (optional) with the remote end of a connection, it may be NULL if
+//      you used soup_server_accept_iostream().
+//
 func (client *ClientContext) Address() *Address {
 	var _arg0 *C.SoupClientContext // out
 	var _cret *C.SoupAddress       // in
@@ -1220,6 +1274,11 @@ func (client *ClientContext) Address() *Address {
 
 // AuthDomain checks whether the request associated with client has been
 // authenticated, and if so returns the AuthDomain that authenticated it.
+//
+// The function returns the following values:
+//
+//    - authDomain (optional) or NULL if the request was not authenticated.
+//
 func (client *ClientContext) AuthDomain() AuthDomainer {
 	var _arg0 *C.SoupClientContext // out
 	var _cret *C.SoupAuthDomain    // in
@@ -1236,9 +1295,13 @@ func (client *ClientContext) AuthDomain() AuthDomainer {
 			objptr := unsafe.Pointer(_cret)
 
 			object := externglib.Take(objptr)
-			rv, ok := (externglib.CastObject(object)).(AuthDomainer)
+			casted := object.WalkCast(func(obj externglib.Objector) bool {
+				_, ok := obj.(AuthDomainer)
+				return ok
+			})
+			rv, ok := casted.(AuthDomainer)
 			if !ok {
-				panic("object of type " + object.TypeFromInstance().String() + " is not soup.AuthDomainer")
+				panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.AuthDomainer")
 			}
 			_authDomain = rv
 		}
@@ -1250,6 +1313,12 @@ func (client *ClientContext) AuthDomain() AuthDomainer {
 // AuthUser checks whether the request associated with client has been
 // authenticated, and if so returns the username that the client authenticated
 // as.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional) authenticated-as user, or NULL if the request was not
+//      authenticated.
+//
 func (client *ClientContext) AuthUser() string {
 	var _arg0 *C.SoupClientContext // out
 	var _cret *C.char              // in
@@ -1275,6 +1344,12 @@ func (client *ClientContext) AuthUser() string {
 // you will need to pay attention to socket destruction as well (eg, by using
 // weak references), so that you do not get fooled when the allocator reuses the
 // memory address of a previously-destroyed socket to represent a new socket.
+//
+// The function returns the following values:
+//
+//    - socket (optional) that client is associated with, NULL if you used
+//      soup_server_accept_iostream().
+//
 func (client *ClientContext) Gsocket() *gio.Socket {
 	var _arg0 *C.SoupClientContext // out
 	var _cret *C.GSocket           // in
@@ -1305,6 +1380,12 @@ func (client *ClientContext) Gsocket() *gio.Socket {
 }
 
 // Host retrieves the IP address associated with the remote end of a connection.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): IP address associated with the remote end of a
+//      connection, it may be NULL if you used soup_server_accept_iostream().
+//
 func (client *ClientContext) Host() string {
 	var _arg0 *C.SoupClientContext // out
 	var _cret *C.char              // in
@@ -1325,6 +1406,12 @@ func (client *ClientContext) Host() string {
 
 // LocalAddress retrieves the Address associated with the local end of a
 // connection.
+//
+// The function returns the following values:
+//
+//    - socketAddress (optional) with the local end of a connection, it may be
+//      NULL if you used soup_server_accept_iostream().
+//
 func (client *ClientContext) LocalAddress() gio.SocketAddresser {
 	var _arg0 *C.SoupClientContext // out
 	var _cret *C.GSocketAddress    // in
@@ -1341,9 +1428,13 @@ func (client *ClientContext) LocalAddress() gio.SocketAddresser {
 			objptr := unsafe.Pointer(_cret)
 
 			object := externglib.Take(objptr)
-			rv, ok := (externglib.CastObject(object)).(gio.SocketAddresser)
+			casted := object.WalkCast(func(obj externglib.Objector) bool {
+				_, ok := obj.(gio.SocketAddresser)
+				return ok
+			})
+			rv, ok := casted.(gio.SocketAddresser)
 			if !ok {
-				panic("object of type " + object.TypeFromInstance().String() + " is not gio.SocketAddresser")
+				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.SocketAddresser")
 			}
 			_socketAddress = rv
 		}
@@ -1354,6 +1445,12 @@ func (client *ClientContext) LocalAddress() gio.SocketAddresser {
 
 // RemoteAddress retrieves the Address associated with the remote end of a
 // connection.
+//
+// The function returns the following values:
+//
+//    - socketAddress (optional) with the remote end of a connection, it may be
+//      NULL if you used soup_server_accept_iostream().
+//
 func (client *ClientContext) RemoteAddress() gio.SocketAddresser {
 	var _arg0 *C.SoupClientContext // out
 	var _cret *C.GSocketAddress    // in
@@ -1370,9 +1467,13 @@ func (client *ClientContext) RemoteAddress() gio.SocketAddresser {
 			objptr := unsafe.Pointer(_cret)
 
 			object := externglib.Take(objptr)
-			rv, ok := (externglib.CastObject(object)).(gio.SocketAddresser)
+			casted := object.WalkCast(func(obj externglib.Objector) bool {
+				_, ok := obj.(gio.SocketAddresser)
+				return ok
+			})
+			rv, ok := casted.(gio.SocketAddresser)
 			if !ok {
-				panic("object of type " + object.TypeFromInstance().String() + " is not gio.SocketAddresser")
+				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.SocketAddresser")
 			}
 			_socketAddress = rv
 		}
@@ -1391,6 +1492,11 @@ func (client *ClientContext) RemoteAddress() gio.SocketAddresser {
 // previously-destroyed socket to represent a new socket.
 //
 // Deprecated: use soup_client_context_get_gsocket(), which returns a #GSocket.
+//
+// The function returns the following values:
+//
+//    - socket that client is associated with.
+//
 func (client *ClientContext) Socket() *Socket {
 	var _arg0 *C.SoupClientContext // out
 	var _cret *C.SoupSocket        // in
@@ -1416,6 +1522,13 @@ func (client *ClientContext) Socket() *Socket {
 //
 // Note that when calling this function from C, client will most likely be freed
 // as a side effect.
+//
+// The function returns the following values:
+//
+//    - ioStream formerly associated with client (or NULL if client was no longer
+//      associated with a connection). No guarantees are made about what kind of
+//      OStream is returned.
+//
 func (client *ClientContext) StealConnection() gio.IOStreamer {
 	var _arg0 *C.SoupClientContext // out
 	var _cret *C.GIOStream         // in
@@ -1434,9 +1547,13 @@ func (client *ClientContext) StealConnection() gio.IOStreamer {
 		}
 
 		object := externglib.AssumeOwnership(objptr)
-		rv, ok := (externglib.CastObject(object)).(gio.IOStreamer)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gio.IOStreamer)
+			return ok
+		})
+		rv, ok := casted.(gio.IOStreamer)
 		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not gio.IOStreamer")
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.IOStreamer")
 		}
 		_ioStream = rv
 	}

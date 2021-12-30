@@ -10,8 +10,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -24,6 +22,7 @@ func init() {
 }
 
 type RequestHTTP struct {
+	_ [0]func() // equal guard
 	Request
 }
 
@@ -47,6 +46,11 @@ func marshalRequestHTTPer(p uintptr) (interface{}, error) {
 }
 
 // Message gets a new reference to the Message associated to this SoupRequest.
+//
+// The function returns the following values:
+//
+//    - message: new reference to the Message.
+//
 func (http *RequestHTTP) Message() *Message {
 	var _arg0 *C.SoupRequestHTTP // out
 	var _cret *C.SoupMessage     // in

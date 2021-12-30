@@ -4,6 +4,7 @@ package soup
 
 import (
 	"fmt"
+	_ "runtime/cgo"
 	"strings"
 	"unsafe"
 
@@ -295,6 +296,8 @@ func (k KnownStatusCode) String() string {
 	}
 }
 
+// The function returns the following values:
+//
 func RequestErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -361,6 +364,8 @@ func (s SameSitePolicy) String() string {
 	}
 }
 
+// The function returns the following values:
+//
 func TLDErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -396,6 +401,8 @@ func (x XMLRPCError) String() string {
 	}
 }
 
+// The function returns the following values:
+//
 func XMLRPCErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -458,6 +465,8 @@ func (c Cacheability) Has(other Cacheability) bool {
 	return (c & other) == other
 }
 
+// The function returns the following values:
+//
 func HTTPErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -471,6 +480,7 @@ func HTTPErrorQuark() glib.Quark {
 }
 
 type AuthBasic struct {
+	_ [0]func() // equal guard
 	Auth
 }
 
@@ -491,6 +501,7 @@ func marshalAuthBasiccer(p uintptr) (interface{}, error) {
 }
 
 type AuthDigest struct {
+	_ [0]func() // equal guard
 	Auth
 }
 
@@ -511,6 +522,7 @@ func marshalAuthDigester(p uintptr) (interface{}, error) {
 }
 
 type AuthNTLM struct {
+	_ [0]func() // equal guard
 	Auth
 }
 
@@ -531,6 +543,7 @@ func marshalAuthNTLMer(p uintptr) (interface{}, error) {
 }
 
 type AuthNegotiate struct {
+	_ [0]func() // equal guard
 	Auth
 }
 

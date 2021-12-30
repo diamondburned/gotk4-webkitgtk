@@ -9,8 +9,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -27,10 +25,15 @@ func init() {
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type DownloadOverrider interface {
+	// The function takes the following parameters:
+	//
+	// The function returns the following values:
+	//
 	DecideDestination(suggestedFilename string) bool
 }
 
 type Download struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -48,6 +51,35 @@ func marshalDownloader(p uintptr) (interface{}, error) {
 	return wrapDownload(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+// ConnectCreatedDestination: this signal is emitted after
+// KitDownload::decide-destination and before KitDownload::received-data to
+// notify that destination file has been created successfully at destination.
+func (download *Download) ConnectCreatedDestination(f func(destination string)) externglib.SignalHandle {
+	return download.Connect("created-destination", f)
+}
+
+// ConnectDecideDestination: this signal is emitted after response is received
+// to decide a destination URI for the download. If this signal is not handled
+// the file will be downloaded to G_USER_DIRECTORY_DOWNLOAD directory using
+// suggested_filename.
+func (download *Download) ConnectDecideDestination(f func(suggestedFilename string) bool) externglib.SignalHandle {
+	return download.Connect("decide-destination", f)
+}
+
+// ConnectFinished: this signal is emitted when download finishes successfully
+// or due to an error. In case of errors KitDownload::failed signal is emitted
+// before this one.
+func (download *Download) ConnectFinished(f func()) externglib.SignalHandle {
+	return download.Connect("finished", f)
+}
+
+// ConnectReceivedData: this signal is emitted after response is received, every
+// time new data has been written to the destination. It's useful to know the
+// progress of the download operation.
+func (download *Download) ConnectReceivedData(f func(dataLength uint64)) externglib.SignalHandle {
+	return download.Connect("received-data", f)
+}
+
 // Cancel cancels the download. When the ongoing download operation is
 // effectively cancelled the signal KitDownload::failed is emitted with
 // WEBKIT_DOWNLOAD_ERROR_CANCELLED_BY_USER error.
@@ -63,6 +95,11 @@ func (download *Download) Cancel() {
 // AllowOverwrite returns the current value of the KitDownload:allow-overwrite
 // property, which determines whether the download will overwrite an existing
 // file on disk, or if it will fail if the destination already exists.
+//
+// The function returns the following values:
+//
+//    - ok: current value of the KitDownload:allow-overwrite property.
+//
 func (download *Download) AllowOverwrite() bool {
 	var _arg0 *C.WebKitDownload // out
 	var _cret C.gboolean        // in
@@ -84,6 +121,11 @@ func (download *Download) AllowOverwrite() bool {
 // Destination obtains the URI to which the downloaded file will be written. You
 // can connect to KitDownload::created-destination to make sure this method
 // returns a valid destination.
+//
+// The function returns the following values:
+//
+//    - utf8: destination URI or NULL.
+//
 func (download *Download) Destination() string {
 	var _arg0 *C.WebKitDownload // out
 	var _cret *C.gchar          // in
@@ -103,6 +145,11 @@ func (download *Download) Destination() string {
 // ElapsedTime gets the elapsed time in seconds, including any fractional part.
 // If the download finished, had an error or was cancelled this is the time
 // between its start and the event.
+//
+// The function returns the following values:
+//
+//    - gdouble seconds since the download was started.
+//
 func (download *Download) ElapsedTime() float64 {
 	var _arg0 *C.WebKitDownload // out
 	var _cret C.gdouble         // in
@@ -122,6 +169,12 @@ func (download *Download) ElapsedTime() float64 {
 // EstimatedProgress gets the value of the KitDownload:estimated-progress
 // property. You can monitor the estimated progress of the download operation by
 // connecting to the notify::estimated-progress signal of download.
+//
+// The function returns the following values:
+//
+//    - gdouble: estimate of the of the percent complete for a download as a
+//      range from 0.0 to 1.0.
+//
 func (download *Download) EstimatedProgress() float64 {
 	var _arg0 *C.WebKitDownload // out
 	var _cret C.gdouble         // in
@@ -140,6 +193,11 @@ func (download *Download) EstimatedProgress() float64 {
 
 // ReceivedDataLength gets the length of the data already downloaded for
 // download in bytes.
+//
+// The function returns the following values:
+//
+//    - guint64: amount of bytes already downloaded.
+//
 func (download *Download) ReceivedDataLength() uint64 {
 	var _arg0 *C.WebKitDownload // out
 	var _cret C.guint64         // in
@@ -157,6 +215,11 @@ func (download *Download) ReceivedDataLength() uint64 {
 }
 
 // Request retrieves the KitURIRequest object that backs the download process.
+//
+// The function returns the following values:
+//
+//    - uriRequest of download.
+//
 func (download *Download) Request() *URIRequest {
 	var _arg0 *C.WebKitDownload   // out
 	var _cret *C.WebKitURIRequest // in
@@ -177,6 +240,11 @@ func (download *Download) Request() *URIRequest {
 // This method returns NULL if called before the response is received from the
 // server. You can connect to notify::response signal to be notified when the
 // response is received.
+//
+// The function returns the following values:
+//
+//    - uriResponse or NULL if the response hasn't been received yet.
+//
 func (download *Download) Response() *URIResponse {
 	var _arg0 *C.WebKitDownload    // out
 	var _cret *C.WebKitURIResponse // in
@@ -194,6 +262,12 @@ func (download *Download) Response() *URIResponse {
 }
 
 // WebView: get the KitWebView that initiated the download.
+//
+// The function returns the following values:
+//
+//    - webView that initiated download, or NULL if download was not initiated by
+//      a KitWebView.
+//
 func (download *Download) WebView() *WebView {
 	var _arg0 *C.WebKitDownload // out
 	var _cret *C.WebKitWebView  // in
@@ -259,33 +333,4 @@ func (download *Download) SetDestination(uri string) {
 	C.webkit_download_set_destination(_arg0, _arg1)
 	runtime.KeepAlive(download)
 	runtime.KeepAlive(uri)
-}
-
-// ConnectCreatedDestination: this signal is emitted after
-// KitDownload::decide-destination and before KitDownload::received-data to
-// notify that destination file has been created successfully at destination.
-func (download *Download) ConnectCreatedDestination(f func(destination string)) externglib.SignalHandle {
-	return download.Connect("created-destination", f)
-}
-
-// ConnectDecideDestination: this signal is emitted after response is received
-// to decide a destination URI for the download. If this signal is not handled
-// the file will be downloaded to G_USER_DIRECTORY_DOWNLOAD directory using
-// suggested_filename.
-func (download *Download) ConnectDecideDestination(f func(suggestedFilename string) bool) externglib.SignalHandle {
-	return download.Connect("decide-destination", f)
-}
-
-// ConnectFinished: this signal is emitted when download finishes successfully
-// or due to an error. In case of errors KitDownload::failed signal is emitted
-// before this one.
-func (download *Download) ConnectFinished(f func()) externglib.SignalHandle {
-	return download.Connect("finished", f)
-}
-
-// ConnectReceivedData: this signal is emitted after response is received, every
-// time new data has been written to the destination. It's useful to know the
-// progress of the download operation.
-func (download *Download) ConnectReceivedData(f func(dataLength uint64)) externglib.SignalHandle {
-	return download.Connect("received-data", f)
 }

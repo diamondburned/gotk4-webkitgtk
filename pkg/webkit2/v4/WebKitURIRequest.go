@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -25,6 +23,7 @@ func init() {
 }
 
 type URIRequest struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -48,6 +47,10 @@ func marshalURIRequester(p uintptr) (interface{}, error) {
 //
 //    - uri: URI.
 //
+// The function returns the following values:
+//
+//    - uriRequest: new KitURIRequest.
+//
 func NewURIRequest(uri string) *URIRequest {
 	var _arg1 *C.gchar            // out
 	var _cret *C.WebKitURIRequest // in
@@ -66,6 +69,12 @@ func NewURIRequest(uri string) *URIRequest {
 }
 
 // HTTPHeaders: get the HTTP headers of a KitURIRequest as a MessageHeaders.
+//
+// The function returns the following values:
+//
+//    - messageHeaders with the HTTP headers of request or NULL if request is not
+//      an HTTP request.
+//
 func (request *URIRequest) HTTPHeaders() *soup.MessageHeaders {
 	var _arg0 *C.WebKitURIRequest   // out
 	var _cret *C.SoupMessageHeaders // in
@@ -83,6 +92,12 @@ func (request *URIRequest) HTTPHeaders() *soup.MessageHeaders {
 }
 
 // HTTPMethod: get the HTTP method of the KitURIRequest.
+//
+// The function returns the following values:
+//
+//    - utf8: HTTP method of the KitURIRequest or NULL if request is not an HTTP
+//      request.
+//
 func (request *URIRequest) HTTPMethod() string {
 	var _arg0 *C.WebKitURIRequest // out
 	var _cret *C.gchar            // in
@@ -99,6 +114,10 @@ func (request *URIRequest) HTTPMethod() string {
 	return _utf8
 }
 
+// The function returns the following values:
+//
+//    - utf8: uri of the KitURIRequest.
+//
 func (request *URIRequest) URI() string {
 	var _arg0 *C.WebKitURIRequest // out
 	var _cret *C.gchar            // in

@@ -9,8 +9,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -23,6 +21,7 @@ func init() {
 }
 
 type ResponsePolicyDecision struct {
+	_ [0]func() // equal guard
 	PolicyDecision
 }
 
@@ -48,6 +47,11 @@ func marshalResponsePolicyDecisioner(p uintptr) (interface{}, error) {
 // aid in evaluating whether a response decision should be taken or not. To
 // modify requests before they are sent over the network the
 // KitPage::send-request signal can be used instead.
+//
+// The function returns the following values:
+//
+//    - uriRequest: URI request that is associated with this policy decision.
+//
 func (decision *ResponsePolicyDecision) Request() *URIRequest {
 	var _arg0 *C.WebKitResponsePolicyDecision // out
 	var _cret *C.WebKitURIRequest             // in
@@ -65,6 +69,11 @@ func (decision *ResponsePolicyDecision) Request() *URIRequest {
 }
 
 // Response gets the value of the KitResponsePolicyDecision:response property.
+//
+// The function returns the following values:
+//
+//    - uriResponse: URI response that is associated with this policy decision.
+//
 func (decision *ResponsePolicyDecision) Response() *URIResponse {
 	var _arg0 *C.WebKitResponsePolicyDecision // out
 	var _cret *C.WebKitURIResponse            // in
@@ -84,6 +93,12 @@ func (decision *ResponsePolicyDecision) Response() *URIResponse {
 // IsMIMETypeSupported gets whether the MIME type of the response can be
 // displayed in the KitWebView that triggered this policy decision request. See
 // also webkit_web_view_can_show_mime_type().
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if the MIME type of the response is supported or FALSE
+//      otherwise.
+//
 func (decision *ResponsePolicyDecision) IsMIMETypeSupported() bool {
 	var _arg0 *C.WebKitResponsePolicyDecision // out
 	var _cret C.gboolean                      // in

@@ -9,8 +9,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <jsc/jsc.h>
@@ -23,6 +21,7 @@ func init() {
 }
 
 type Class struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -41,6 +40,11 @@ func marshalClasser(p uintptr) (interface{}, error) {
 }
 
 // Name: get the class name of jsc_class.
+//
+// The function returns the following values:
+//
+//    - utf8: name of jsc_class.
+//
 func (jscClass *Class) Name() string {
 	var _arg0 *C.JSCClass // out
 	var _cret *C.char     // in
@@ -58,6 +62,11 @@ func (jscClass *Class) Name() string {
 }
 
 // Parent: get the parent class of jsc_class.
+//
+// The function returns the following values:
+//
+//    - class: parent class of jsc_class.
+//
 func (jscClass *Class) Parent() *Class {
 	var _arg0 *C.JSCClass // out
 	var _cret *C.JSCClass // in

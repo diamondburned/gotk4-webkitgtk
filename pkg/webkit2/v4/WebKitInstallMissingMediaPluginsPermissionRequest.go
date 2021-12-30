@@ -9,8 +9,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -23,6 +21,7 @@ func init() {
 }
 
 type InstallMissingMediaPluginsPermissionRequest struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 
 	PermissionRequest
@@ -47,6 +46,11 @@ func marshalInstallMissingMediaPluginsPermissionRequester(p uintptr) (interface{
 
 // Description gets the description about the missing plugins provided by the
 // media backend when a media couldn't be played.
+//
+// The function returns the following values:
+//
+//    - utf8: string with the description provided by the media backend.
+//
 func (request *InstallMissingMediaPluginsPermissionRequest) Description() string {
 	var _arg0 *C.WebKitInstallMissingMediaPluginsPermissionRequest // out
 	var _cret *C.gchar                                             // in

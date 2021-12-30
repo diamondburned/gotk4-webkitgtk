@@ -17,8 +17,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -64,6 +62,7 @@ func (t TLSErrorsPolicy) String() string {
 }
 
 type WebsiteDataManager struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -83,6 +82,11 @@ func marshalWebsiteDataManagerer(p uintptr) (interface{}, error) {
 
 // NewWebsiteDataManagerEphemeral creates an ephemeral KitWebsiteDataManager.
 // See KitWebsiteDataManager:is-ephemeral for more details.
+//
+// The function returns the following values:
+//
+//    - websiteDataManager: new ephemeral KitWebsiteDataManager.
+//
 func NewWebsiteDataManagerEphemeral() *WebsiteDataManager {
 	var _cret *C.WebKitWebsiteDataManager // in
 
@@ -108,10 +112,10 @@ func NewWebsiteDataManagerEphemeral() *WebsiteDataManager {
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL to ignore.
+//    - ctx (optional) or NULL to ignore.
 //    - types: KitWebsiteDataTypes.
 //    - timespan: Span.
-//    - callback to call when the request is satisfied.
+//    - callback (optional) to call when the request is satisfied.
 //
 func (manager *WebsiteDataManager) Clear(ctx context.Context, types WebsiteDataTypes, timespan glib.TimeSpan, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
@@ -178,9 +182,9 @@ func (manager *WebsiteDataManager) ClearFinish(result gio.AsyncResulter) error {
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL to ignore.
+//    - ctx (optional) or NULL to ignore.
 //    - types: KitWebsiteDataTypes.
-//    - callback to call when the request is satisfied.
+//    - callback (optional) to call when the request is satisfied.
 //
 func (manager *WebsiteDataManager) Fetch(ctx context.Context, types WebsiteDataTypes, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
@@ -214,6 +218,12 @@ func (manager *WebsiteDataManager) Fetch(ctx context.Context, types WebsiteDataT
 // The function takes the following parameters:
 //
 //    - result: Result.
+//
+// The function returns the following values:
+//
+//    - list of KitWebsiteData. You must free the #GList with g_list_free() and
+//      unref the KitWebsiteData<!-- -->s with webkit_website_data_unref() when
+//      you're done with them.
 //
 func (manager *WebsiteDataManager) FetchFinish(result gio.AsyncResulter) ([]*WebsiteData, error) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
@@ -253,6 +263,13 @@ func (manager *WebsiteDataManager) FetchFinish(result gio.AsyncResulter) ([]*Web
 
 // BaseCacheDirectory: get the KitWebsiteDataManager:base-cache-directory
 // property.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): base directory for Website cache, or NULL if
+//      KitWebsiteDataManager:base-cache-directory was not provided or manager is
+//      ephemeral.
+//
 func (manager *WebsiteDataManager) BaseCacheDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
@@ -273,6 +290,13 @@ func (manager *WebsiteDataManager) BaseCacheDirectory() string {
 
 // BaseDataDirectory: get the KitWebsiteDataManager:base-data-directory
 // property.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): base directory for Website data, or NULL if
+//      KitWebsiteDataManager:base-data-directory was not provided or manager is
+//      ephemeral.
+//
 func (manager *WebsiteDataManager) BaseDataDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
@@ -292,6 +316,11 @@ func (manager *WebsiteDataManager) BaseDataDirectory() string {
 }
 
 // CookieManager: get the KitCookieManager of manager.
+//
+// The function returns the following values:
+//
+//    - cookieManager: KitCookieManager.
+//
 func (manager *WebsiteDataManager) CookieManager() *CookieManager {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.WebKitCookieManager      // in
@@ -310,6 +339,12 @@ func (manager *WebsiteDataManager) CookieManager() *CookieManager {
 
 // DiskCacheDirectory: get the KitWebsiteDataManager:disk-cache-directory
 // property.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): directory where HTTP disk cache is stored or NULL if
+//      manager is ephemeral.
+//
 func (manager *WebsiteDataManager) DiskCacheDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
@@ -330,6 +365,12 @@ func (manager *WebsiteDataManager) DiskCacheDirectory() string {
 
 // DomCacheDirectory: get the KitWebsiteDataManager:dom-cache-directory
 // property.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): directory where DOM cache is stored or NULL if manager
+//      is ephemeral.
+//
 func (manager *WebsiteDataManager) DomCacheDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
@@ -350,6 +391,12 @@ func (manager *WebsiteDataManager) DomCacheDirectory() string {
 
 // HstsCacheDirectory: get the KitWebsiteDataManager:hsts-cache-directory
 // property.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): directory where the HSTS cache is stored or NULL if
+//      manager is ephemeral.
+//
 func (manager *WebsiteDataManager) HstsCacheDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
@@ -370,6 +417,12 @@ func (manager *WebsiteDataManager) HstsCacheDirectory() string {
 
 // IndexeddbDirectory: get the KitWebsiteDataManager:indexeddb-directory
 // property.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): directory where IndexedDB databases are stored or NULL
+//      if manager is ephemeral.
+//
 func (manager *WebsiteDataManager) IndexeddbDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
@@ -389,6 +442,12 @@ func (manager *WebsiteDataManager) IndexeddbDirectory() string {
 }
 
 // ITPDirectory: get the KitWebsiteDataManager:itp-directory property.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): directory where Intelligent Tracking Prevention data is
+//      stored or NULL if manager is ephemeral.
+//
 func (manager *WebsiteDataManager) ITPDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
@@ -409,6 +468,11 @@ func (manager *WebsiteDataManager) ITPDirectory() string {
 
 // ITPEnabled: get whether Intelligent Tracking Prevention (ITP) is enabled or
 // not.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if ITP is enabled, or FALSE otherwise.
+//
 func (manager *WebsiteDataManager) ITPEnabled() bool {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret C.gboolean                  // in
@@ -437,8 +501,8 @@ func (manager *WebsiteDataManager) ITPEnabled() bool {
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL to ignore.
-//    - callback to call when the request is satisfied.
+//    - ctx (optional) or NULL to ignore.
+//    - callback (optional) to call when the request is satisfied.
 //
 func (manager *WebsiteDataManager) ITPSummary(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
@@ -469,6 +533,12 @@ func (manager *WebsiteDataManager) ITPSummary(ctx context.Context, callback gio.
 // The function takes the following parameters:
 //
 //    - result: Result.
+//
+// The function returns the following values:
+//
+//    - list of KitITPThirdParty. You must free the #GList with g_list_free() and
+//      unref the KitITPThirdParty<!-- -->s with webkit_itp_third_party_unref()
+//      when you're done with them.
 //
 func (manager *WebsiteDataManager) ITPSummaryFinish(result gio.AsyncResulter) ([]*ITPThirdParty, error) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
@@ -508,6 +578,12 @@ func (manager *WebsiteDataManager) ITPSummaryFinish(result gio.AsyncResulter) ([
 
 // LocalStorageDirectory: get the KitWebsiteDataManager:local-storage-directory
 // property.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): directory where local storage data is stored or NULL if
+//      manager is ephemeral.
+//
 func (manager *WebsiteDataManager) LocalStorageDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
@@ -528,6 +604,12 @@ func (manager *WebsiteDataManager) LocalStorageDirectory() string {
 
 // OfflineApplicationCacheDirectory: get the
 // KitWebsiteDataManager:offline-application-cache-directory property.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): directory where offline web application cache is stored
+//      or NULL if manager is ephemeral.
+//
 func (manager *WebsiteDataManager) OfflineApplicationCacheDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
@@ -549,6 +631,11 @@ func (manager *WebsiteDataManager) OfflineApplicationCacheDirectory() string {
 // PersistentCredentialStorageEnabled: get whether persistent credential storage
 // is enabled or not. See also
 // webkit_website_data_manager_set_persistent_credential_storage_enabled().
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if persistent credential storage is enabled, or FALSE otherwise.
+//
 func (manager *WebsiteDataManager) PersistentCredentialStorageEnabled() bool {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret C.gboolean                  // in
@@ -569,6 +656,12 @@ func (manager *WebsiteDataManager) PersistentCredentialStorageEnabled() bool {
 
 // ServiceWorkerRegistrationsDirectory: get the
 // KitWebsiteDataManager:service-worker-registrations-directory property.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): directory where service worker registrations are stored
+//      or NULL if manager is ephemeral.
+//
 func (manager *WebsiteDataManager) ServiceWorkerRegistrationsDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
@@ -588,6 +681,11 @@ func (manager *WebsiteDataManager) ServiceWorkerRegistrationsDirectory() string 
 }
 
 // TLSErrorsPolicy: get the TLS errors policy of manager.
+//
+// The function returns the following values:
+//
+//    - tlsErrorsPolicy: KitTLSErrorsPolicy.
+//
 func (manager *WebsiteDataManager) TLSErrorsPolicy() TLSErrorsPolicy {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret C.WebKitTLSErrorsPolicy     // in
@@ -607,6 +705,12 @@ func (manager *WebsiteDataManager) TLSErrorsPolicy() TLSErrorsPolicy {
 // WebsqlDirectory: get the KitWebsiteDataManager:websql-directory property.
 //
 // Deprecated: WebSQL is no longer supported. Use IndexedDB instead.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): directory where WebSQL databases are stored or NULL if
+//      manager is ephemeral.
+//
 func (manager *WebsiteDataManager) WebsqlDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
@@ -627,6 +731,11 @@ func (manager *WebsiteDataManager) WebsqlDirectory() string {
 
 // IsEphemeral: get whether a KitWebsiteDataManager is ephemeral. See
 // KitWebsiteDataManager:is-ephemeral for more details.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if manager is ephemeral or FALSE otherwise.
+//
 func (manager *WebsiteDataManager) IsEphemeral() bool {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret C.gboolean                  // in
@@ -656,10 +765,10 @@ func (manager *WebsiteDataManager) IsEphemeral() bool {
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL to ignore.
+//    - ctx (optional) or NULL to ignore.
 //    - types: KitWebsiteDataTypes.
 //    - websiteData of KitWebsiteData.
-//    - callback to call when the request is satisfied.
+//    - callback (optional) to call when the request is satisfied.
 //
 func (manager *WebsiteDataManager) Remove(ctx context.Context, types WebsiteDataTypes, websiteData []*WebsiteData, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
@@ -763,7 +872,7 @@ func (manager *WebsiteDataManager) SetITPEnabled(enabled bool) {
 // The function takes the following parameters:
 //
 //    - proxyMode: KitNetworkProxyMode.
-//    - proxySettings or NULL.
+//    - proxySettings (optional) or NULL.
 //
 func (manager *WebsiteDataManager) SetNetworkProxySettings(proxyMode NetworkProxyMode, proxySettings *NetworkProxySettings) {
 	var _arg0 *C.WebKitWebsiteDataManager   // out
@@ -839,6 +948,11 @@ func marshalITPFirstParty(p uintptr) (interface{}, error) {
 }
 
 // Domain: get the domain name of itp_first_party.
+//
+// The function returns the following values:
+//
+//    - utf8: domain name.
+//
 func (itpFirstParty *ITPFirstParty) Domain() string {
 	var _arg0 *C.WebKitITPFirstParty // out
 	var _cret *C.char                // in
@@ -859,6 +973,11 @@ func (itpFirstParty *ITPFirstParty) Domain() string {
 // itp_first_party. Each WebKitITPFirstParty is created by
 // webkit_itp_third_party_get_first_parties() and therefore corresponds to
 // exactly one KitITPThirdParty.
+//
+// The function returns the following values:
+//
+//    - dateTime: last update time as a Time.
+//
 func (itpFirstParty *ITPFirstParty) LastUpdateTime() *glib.DateTime {
 	var _arg0 *C.WebKitITPFirstParty // out
 	var _cret *C.GDateTime           // in
@@ -886,6 +1005,11 @@ func (itpFirstParty *ITPFirstParty) LastUpdateTime() *glib.DateTime {
 // data access to its KitITPThirdParty. Each WebKitITPFirstParty is created by
 // webkit_itp_third_party_get_first_parties() and therefore corresponds to
 // exactly one KitITPThirdParty.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if website data access has been granted, or FALSE otherwise.
+//
 func (itpFirstParty *ITPFirstParty) WebsiteDataAccessAllowed() bool {
 	var _arg0 *C.WebKitITPFirstParty // out
 	var _cret C.gboolean             // in
@@ -920,6 +1044,11 @@ func marshalITPThirdParty(p uintptr) (interface{}, error) {
 }
 
 // Domain: get the domain name of itp_third_party.
+//
+// The function returns the following values:
+//
+//    - utf8: domain name.
+//
 func (itpThirdParty *ITPThirdParty) Domain() string {
 	var _arg0 *C.WebKitITPThirdParty // out
 	var _cret *C.char                // in
@@ -938,6 +1067,11 @@ func (itpThirdParty *ITPThirdParty) Domain() string {
 
 // FirstParties: get the list of KitITPFirstParty under which itp_third_party
 // has been seen.
+//
+// The function returns the following values:
+//
+//    - list of KitITPFirstParty.
+//
 func (itpThirdParty *ITPThirdParty) FirstParties() []*ITPFirstParty {
 	var _arg0 *C.WebKitITPThirdParty // out
 	var _cret *C.GList               // in

@@ -9,8 +9,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -27,6 +25,7 @@ func init() {
 const COOKIE_JAR_TEXT_FILENAME = "filename"
 
 type CookieJarText struct {
+	_ [0]func() // equal guard
 	CookieJar
 }
 
@@ -61,6 +60,10 @@ func marshalCookieJarTexter(p uintptr) (interface{}, error) {
 //
 //    - filename to read to/write from.
 //    - readOnly: TRUE if filename is read-only.
+//
+// The function returns the following values:
+//
+//    - cookieJarText: new CookieJar.
 //
 func NewCookieJarText(filename string, readOnly bool) *CookieJarText {
 	var _arg1 *C.char          // out

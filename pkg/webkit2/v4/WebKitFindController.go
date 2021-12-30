@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -92,6 +90,7 @@ func (f FindOptions) Has(other FindOptions) bool {
 }
 
 type FindController struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -107,6 +106,30 @@ func wrapFindController(obj *externglib.Object) *FindController {
 
 func marshalFindControllerer(p uintptr) (interface{}, error) {
 	return wrapFindController(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+// ConnectCountedMatches: this signal is emitted when the KitFindController has
+// counted the number of matches for a given text after a call to
+// webkit_find_controller_count_matches().
+func (findController *FindController) ConnectCountedMatches(f func(matchCount uint)) externglib.SignalHandle {
+	return findController.Connect("counted-matches", f)
+}
+
+// ConnectFailedToFindText: this signal is emitted when a search operation does
+// not find any result for the given text. It will be issued if the text is not
+// found asynchronously after a call to webkit_find_controller_search(),
+// webkit_find_controller_search_next() or
+// webkit_find_controller_search_previous().
+func (findController *FindController) ConnectFailedToFindText(f func()) externglib.SignalHandle {
+	return findController.Connect("failed-to-find-text", f)
+}
+
+// ConnectFoundText: this signal is emitted when a given text is found in the
+// web page text. It will be issued if the text is found asynchronously after a
+// call to webkit_find_controller_search(), webkit_find_controller_search_next()
+// or webkit_find_controller_search_previous().
+func (findController *FindController) ConnectFoundText(f func(matchCount uint)) externglib.SignalHandle {
+	return findController.Connect("found-text", f)
 }
 
 // CountMatches counts the number of matches for search_text found in the
@@ -141,6 +164,11 @@ func (findController *FindController) CountMatches(searchText string, findOption
 // MaxMatchCount gets the maximum number of matches to report during a text
 // lookup. This number is passed as the last argument of
 // webkit_find_controller_search() or webkit_find_controller_count_matches().
+//
+// The function returns the following values:
+//
+//    - guint: maximum number of matches to report.
+//
 func (findController *FindController) MaxMatchCount() uint {
 	var _arg0 *C.WebKitFindController // out
 	var _cret C.guint                 // in
@@ -159,6 +187,12 @@ func (findController *FindController) MaxMatchCount() uint {
 
 // Options gets a bitmask containing the KitFindOptions associated with the
 // current search.
+//
+// The function returns the following values:
+//
+//    - guint32: bitmask containing the KitFindOptions associated with the
+//      current search.
+//
 func (findController *FindController) Options() uint32 {
 	var _arg0 *C.WebKitFindController // out
 	var _cret C.guint32               // in
@@ -178,6 +212,11 @@ func (findController *FindController) Options() uint32 {
 // SearchText gets the text that find_controller is currently searching for.
 // This text is passed to either webkit_find_controller_search() or
 // webkit_find_controller_count_matches().
+//
+// The function returns the following values:
+//
+//    - utf8: text to look for in the KitWebView.
+//
 func (findController *FindController) SearchText() string {
 	var _arg0 *C.WebKitFindController // out
 	var _cret *C.gchar                // in
@@ -196,6 +235,11 @@ func (findController *FindController) SearchText() string {
 
 // WebView gets the KitWebView this find controller is associated to. Do not
 // dereference the returned instance as it belongs to the KitFindController.
+//
+// The function returns the following values:
+//
+//    - webView: KitWebView.
+//
 func (findController *FindController) WebView() *WebView {
 	var _arg0 *C.WebKitFindController // out
 	var _cret *C.WebKitWebView        // in
@@ -295,28 +339,4 @@ func (findController *FindController) SearchPrevious() {
 
 	C.webkit_find_controller_search_previous(_arg0)
 	runtime.KeepAlive(findController)
-}
-
-// ConnectCountedMatches: this signal is emitted when the KitFindController has
-// counted the number of matches for a given text after a call to
-// webkit_find_controller_count_matches().
-func (findController *FindController) ConnectCountedMatches(f func(matchCount uint)) externglib.SignalHandle {
-	return findController.Connect("counted-matches", f)
-}
-
-// ConnectFailedToFindText: this signal is emitted when a search operation does
-// not find any result for the given text. It will be issued if the text is not
-// found asynchronously after a call to webkit_find_controller_search(),
-// webkit_find_controller_search_next() or
-// webkit_find_controller_search_previous().
-func (findController *FindController) ConnectFailedToFindText(f func()) externglib.SignalHandle {
-	return findController.Connect("failed-to-find-text", f)
-}
-
-// ConnectFoundText: this signal is emitted when a given text is found in the
-// web page text. It will be issued if the text is found asynchronously after a
-// call to webkit_find_controller_search(), webkit_find_controller_search_next()
-// or webkit_find_controller_search_previous().
-func (findController *FindController) ConnectFoundText(f func(matchCount uint)) externglib.SignalHandle {
-	return findController.Connect("found-text", f)
 }

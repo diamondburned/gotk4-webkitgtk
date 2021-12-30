@@ -9,8 +9,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <jsc/jsc.h>
@@ -23,6 +21,7 @@ func init() {
 }
 
 type WeakValue struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -40,12 +39,22 @@ func marshalWeakValueer(p uintptr) (interface{}, error) {
 	return wrapWeakValue(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+// ConnectCleared: this signal is emitted when the JavaScript value is
+// destroyed.
+func (weakValue *WeakValue) ConnectCleared(f func()) externglib.SignalHandle {
+	return weakValue.Connect("cleared", f)
+}
+
 // NewWeakValue: create a new CWeakValue for the JavaScript value referenced by
 // value.
 //
 // The function takes the following parameters:
 //
 //    - value: CValue.
+//
+// The function returns the following values:
+//
+//    - weakValue: new CWeakValue.
 //
 func NewWeakValue(value *Value) *WeakValue {
 	var _arg1 *C.JSCValue     // out
@@ -64,6 +73,11 @@ func NewWeakValue(value *Value) *WeakValue {
 }
 
 // Value: get a CValue referencing the JavaScript value of weak_value.
+//
+// The function returns the following values:
+//
+//    - value: new CValue or NULL if weak_value was cleared.
+//
 func (weakValue *WeakValue) Value() *Value {
 	var _arg0 *C.JSCWeakValue // out
 	var _cret *C.JSCValue     // in
@@ -78,10 +92,4 @@ func (weakValue *WeakValue) Value() *Value {
 	_value = wrapValue(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _value
-}
-
-// ConnectCleared: this signal is emitted when the JavaScript value is
-// destroyed.
-func (weakValue *WeakValue) ConnectCleared(f func()) externglib.SignalHandle {
-	return weakValue.Connect("cleared", f)
 }

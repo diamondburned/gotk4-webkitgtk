@@ -9,8 +9,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -23,6 +21,7 @@ func init() {
 }
 
 type BackForwardListItem struct {
+	_ [0]func() // equal guard
 	externglib.InitiallyUnowned
 }
 
@@ -41,6 +40,11 @@ func marshalBackForwardListItemmer(p uintptr) (interface{}, error) {
 }
 
 // OriginalURI: see also webkit_back_forward_list_item_get_uri().
+//
+// The function returns the following values:
+//
+//    - utf8: original URI of list_item or NULL when the original URI is empty.
+//
 func (listItem *BackForwardListItem) OriginalURI() string {
 	var _arg0 *C.WebKitBackForwardListItem // out
 	var _cret *C.gchar                     // in
@@ -57,6 +61,10 @@ func (listItem *BackForwardListItem) OriginalURI() string {
 	return _utf8
 }
 
+// The function returns the following values:
+//
+//    - utf8: page title of list_item or NULL when the title is empty.
+//
 func (listItem *BackForwardListItem) Title() string {
 	var _arg0 *C.WebKitBackForwardListItem // out
 	var _cret *C.gchar                     // in
@@ -76,6 +84,11 @@ func (listItem *BackForwardListItem) Title() string {
 // URI: this URI may differ from the original URI if the page was, for example,
 // redirected to a new location. See also
 // webkit_back_forward_list_item_get_original_uri().
+//
+// The function returns the following values:
+//
+//    - utf8: URI of list_item or NULL when the URI is empty.
+//
 func (listItem *BackForwardListItem) URI() string {
 	var _arg0 *C.WebKitBackForwardListItem // out
 	var _cret *C.gchar                     // in

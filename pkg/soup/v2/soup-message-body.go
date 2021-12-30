@@ -13,8 +13,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -132,6 +130,11 @@ func (b *Buffer) Length() uint {
 // buffer and return it. However, if buffer was created with UP_MEMORY_TEMPORARY
 // memory, then soup_buffer_copy() will actually return a copy of it, so that
 // the data in the copy will remain valid after the temporary buffer is freed.
+//
+// The function returns the following values:
+//
+//    - ret: new (or newly-reffed) buffer.
+//
 func (buffer *Buffer) Copy() *Buffer {
 	var _arg0 *C.SoupBuffer // out
 	var _cret *C.SoupBuffer // in
@@ -157,6 +160,11 @@ func (buffer *Buffer) Copy() *Buffer {
 // AsBytes creates a #GBytes pointing to the same memory as buffer. The #GBytes
 // will hold a reference on buffer to ensure that it is not freed while the
 // #GBytes is still valid.
+//
+// The function returns the following values:
+//
+//    - bytes: new #GBytes which has the same content as the Buffer.
+//
 func (buffer *Buffer) AsBytes() *glib.Bytes {
 	var _arg0 *C.SoupBuffer // out
 	var _cret *C.GBytes     // in
@@ -182,6 +190,11 @@ func (buffer *Buffer) AsBytes() *glib.Bytes {
 // Data: this function exists for use by language bindings, because it's not
 // currently possible to get the right effect by annotating the fields of
 // Buffer.
+//
+// The function returns the following values:
+//
+//    - data: pointer to the buffer data is stored here.
+//
 func (buffer *Buffer) Data() []byte {
 	var _arg0 *C.SoupBuffer // out
 	var _arg1 *C.guint8     // in
@@ -202,6 +215,11 @@ func (buffer *Buffer) Data() []byte {
 
 // Owner gets the "owner" object for a buffer created with
 // soup_buffer_new_with_owner().
+//
+// The function returns the following values:
+//
+//    - gpointer (optional): owner pointer.
+//
 func (buffer *Buffer) Owner() cgo.Handle {
 	var _arg0 *C.SoupBuffer // out
 	var _cret C.gpointer    // in
@@ -221,6 +239,16 @@ func (buffer *Buffer) Owner() cgo.Handle {
 // NewSubbuffer creates a new Buffer containing length bytes "copied" from
 // parent starting at offset. (Normally this will not actually copy any data,
 // but will instead simply reference the same data as parent does.).
+//
+// The function takes the following parameters:
+//
+//    - offset within parent to start at.
+//    - length: number of bytes to copy from parent.
+//
+// The function returns the following values:
+//
+//    - buffer: new Buffer.
+//
 func (parent *Buffer) NewSubbuffer(offset uint, length uint) *Buffer {
 	var _arg0 *C.SoupBuffer // out
 	var _arg1 C.gsize       // out
@@ -313,6 +341,11 @@ func (m *MessageBody) Length() int64 {
 // AppendBuffer appends the data from buffer to body. (MessageBody uses Buffers
 // internally, so this is normally a constant-time operation that doesn't
 // actually require copying the data in buffer.).
+//
+// The function takes the following parameters:
+//
+//    - buffer: Buffer.
+//
 func (body *MessageBody) AppendBuffer(buffer *Buffer) {
 	var _arg0 *C.SoupMessageBody // out
 	var _arg1 *C.SoupBuffer      // out
@@ -330,6 +363,11 @@ func (body *MessageBody) AppendBuffer(buffer *Buffer) {
 // This function is exactly equivalent to soup_message_body_append() with
 // SOUP_MEMORY_TAKE as second argument; it exists mainly for convenience and
 // simplifying language bindings.
+//
+// The function takes the following parameters:
+//
+//    - data to append.
+//
 func (body *MessageBody) Append(data []byte) {
 	var _arg0 *C.SoupMessageBody // out
 	var _arg1 *C.guchar          // out
@@ -358,6 +396,12 @@ func (body *MessageBody) Complete() {
 
 // Flatten fills in body's data field with a buffer containing all of the data
 // in body (plus an additional '\0' byte not counted by body's length field).
+//
+// The function returns the following values:
+//
+//    - buffer containing the same data as body. (You must free this buffer if
+//      you do not want it.).
+//
 func (body *MessageBody) Flatten() *Buffer {
 	var _arg0 *C.SoupMessageBody // out
 	var _cret *C.SoupBuffer      // in
@@ -382,6 +426,11 @@ func (body *MessageBody) Flatten() *Buffer {
 
 // Accumulate gets the accumulate flag on body; see
 // soup_message_body_set_accumulate() for details.
+//
+// The function returns the following values:
+//
+//    - ok: accumulate flag for body.
+//
 func (body *MessageBody) Accumulate() bool {
 	var _arg0 *C.SoupMessageBody // out
 	var _cret C.gboolean         // in
@@ -412,6 +461,15 @@ func (body *MessageBody) Accumulate() bool {
 // 0-length chunk (indicating the end of body). If it has not, then
 // soup_message_body_get_chunk() will return NULL (indicating that body may
 // still potentially have more data, but that data is not currently available).
+//
+// The function takes the following parameters:
+//
+//    - offset: offset.
+//
+// The function returns the following values:
+//
+//    - buffer (optional) or NULL.
+//
 func (body *MessageBody) Chunk(offset int64) *Buffer {
 	var _arg0 *C.SoupMessageBody // out
 	var _arg1 C.goffset          // out
@@ -445,6 +503,11 @@ func (body *MessageBody) Chunk(offset int64) *Buffer {
 // to FALSE, then that will not happen.
 //
 // This is a low-level method which you should not normally need to use.
+//
+// The function takes the following parameters:
+//
+//    - chunk received from the network.
+//
 func (body *MessageBody) GotChunk(chunk *Buffer) {
 	var _arg0 *C.SoupMessageBody // out
 	var _arg1 *C.SoupBuffer      // out
@@ -482,6 +545,11 @@ func (body *MessageBody) GotChunk(chunk *Buffer) {
 // SOUP_MESSAGE_CAN_REBUILD flag on the message, then the chunks will be
 // discarded, and you will be responsible for recreating the request body after
 // the Message::restarted signal is emitted.
+//
+// The function takes the following parameters:
+//
+//    - accumulate: whether or not to accumulate body chunks in body.
+//
 func (body *MessageBody) SetAccumulate(accumulate bool) {
 	var _arg0 *C.SoupMessageBody // out
 	var _arg1 C.gboolean         // out
@@ -512,6 +580,11 @@ func (body *MessageBody) Truncate() {
 //
 // This is a low-level method which you should not need to use, and there are
 // further restrictions on its proper use which are not documented here.
+//
+// The function takes the following parameters:
+//
+//    - chunk returned from soup_message_body_get_chunk().
+//
 func (body *MessageBody) WroteChunk(chunk *Buffer) {
 	var _arg0 *C.SoupMessageBody // out
 	var _arg1 *C.SoupBuffer      // out

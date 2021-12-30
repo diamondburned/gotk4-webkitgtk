@@ -12,8 +12,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -145,6 +143,11 @@ func marshalWebsiteData(p uintptr) (interface{}, error) {
 // Name gets the name of KitWebsiteData. This is the website name, normally
 // represented by a domain or host name. All local documents are grouped in the
 // same KitWebsiteData using the name "Local files".
+//
+// The function returns the following values:
+//
+//    - utf8: website name of website_data.
+//
 func (websiteData *WebsiteData) Name() string {
 	var _arg0 *C.WebKitWebsiteData // out
 	var _cret *C.char              // in
@@ -164,6 +167,15 @@ func (websiteData *WebsiteData) Name() string {
 // Size gets the size of the data of types types in a KitWebsiteData. Note that
 // currently the data size is only known for WEBKIT_WEBSITE_DATA_DISK_CACHE data
 // type so for all other types 0 will be returned.
+//
+// The function takes the following parameters:
+//
+//    - types: bitmask of KitWebsiteDataTypes.
+//
+// The function returns the following values:
+//
+//    - guint64: size of website_data for the given types.
+//
 func (websiteData *WebsiteData) Size(types WebsiteDataTypes) uint64 {
 	var _arg0 *C.WebKitWebsiteData     // out
 	var _arg1 C.WebKitWebsiteDataTypes // out
@@ -186,6 +198,11 @@ func (websiteData *WebsiteData) Size(types WebsiteDataTypes) uint64 {
 // Types gets the types of data stored in the client for a KitWebsiteData. These
 // are the types actually present, not the types queried with
 // webkit_website_data_manager_fetch().
+//
+// The function returns the following values:
+//
+//    - websiteDataTypes: bitmask of KitWebsiteDataTypes in website_data.
+//
 func (websiteData *WebsiteData) Types() WebsiteDataTypes {
 	var _arg0 *C.WebKitWebsiteData     // out
 	var _cret C.WebKitWebsiteDataTypes // in

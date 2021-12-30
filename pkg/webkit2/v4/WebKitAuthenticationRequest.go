@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -86,6 +84,7 @@ func (a AuthenticationScheme) String() string {
 }
 
 type AuthenticationRequest struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -103,12 +102,26 @@ func marshalAuthenticationRequester(p uintptr) (interface{}, error) {
 	return wrapAuthenticationRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+// ConnectAuthenticated: this signal is emitted when the user authentication
+// request succeeded. Applications handling their own credential storage should
+// connect to this signal to save the credentials.
+func (request *AuthenticationRequest) ConnectAuthenticated(f func(credential *Credential)) externglib.SignalHandle {
+	return request.Connect("authenticated", f)
+}
+
+// ConnectCancelled: this signal is emitted when the user authentication request
+// is cancelled. It allows the application to dismiss its authentication dialog
+// in case of page load failure for example.
+func (request *AuthenticationRequest) ConnectCancelled(f func()) externglib.SignalHandle {
+	return request.Connect("cancelled", f)
+}
+
 // Authenticate the KitAuthenticationRequest using the KitCredential supplied.
 // To continue without credentials, pass NULL as credential.
 //
 // The function takes the following parameters:
 //
-//    - credential or NULL.
+//    - credential (optional) or NULL.
 //
 func (request *AuthenticationRequest) Authenticate(credential *Credential) {
 	var _arg0 *C.WebKitAuthenticationRequest // out
@@ -131,6 +144,11 @@ func (request *AuthenticationRequest) Authenticate(credential *Credential) {
 // disabled in KitWebsiteDataManager, unless credentials saving has been
 // explicitly enabled with
 // webkit_authentication_request_set_can_save_credentials().
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if WebKit can store credentials or FALSE otherwise.
+//
 func (request *AuthenticationRequest) CanSaveCredentials() bool {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.gboolean                     // in
@@ -162,6 +180,11 @@ func (request *AuthenticationRequest) Cancel() {
 }
 
 // Host: get the host that this authentication challenge is applicable to.
+//
+// The function returns the following values:
+//
+//    - utf8: host of request.
+//
 func (request *AuthenticationRequest) Host() string {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret *C.gchar                       // in
@@ -179,6 +202,11 @@ func (request *AuthenticationRequest) Host() string {
 }
 
 // Port: get the port that this authentication challenge is applicable to.
+//
+// The function returns the following values:
+//
+//    - guint: port of request.
+//
 func (request *AuthenticationRequest) Port() uint {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.guint                        // in
@@ -198,6 +226,12 @@ func (request *AuthenticationRequest) Port() uint {
 // ProposedCredential: get the KitCredential of the proposed authentication
 // challenge that was stored from a previous session. The client can use this
 // directly for authentication or construct their own KitCredential.
+//
+// The function returns the following values:
+//
+//    - credential encapsulating credential details or NULL if there is no stored
+//      credential.
+//
 func (request *AuthenticationRequest) ProposedCredential() *Credential {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret *C.WebKitCredential            // in
@@ -221,6 +255,11 @@ func (request *AuthenticationRequest) ProposedCredential() *Credential {
 }
 
 // Realm: get the realm that this authentication challenge is applicable to.
+//
+// The function returns the following values:
+//
+//    - utf8: realm of request.
+//
 func (request *AuthenticationRequest) Realm() string {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret *C.gchar                       // in
@@ -238,6 +277,11 @@ func (request *AuthenticationRequest) Realm() string {
 }
 
 // Scheme: get the authentication scheme of the authentication challenge.
+//
+// The function returns the following values:
+//
+//    - authenticationScheme of request.
+//
 func (request *AuthenticationRequest) Scheme() AuthenticationScheme {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.WebKitAuthenticationScheme   // in
@@ -256,6 +300,11 @@ func (request *AuthenticationRequest) Scheme() AuthenticationScheme {
 
 // SecurityOrigin: get the KitSecurityOrigin that this authentication challenge
 // is applicable to.
+//
+// The function returns the following values:
+//
+//    - securityOrigin: newly created KitSecurityOrigin.
+//
 func (request *AuthenticationRequest) SecurityOrigin() *SecurityOrigin {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret *C.WebKitSecurityOrigin        // in
@@ -280,6 +329,11 @@ func (request *AuthenticationRequest) SecurityOrigin() *SecurityOrigin {
 
 // IsForProxy: determine whether the authentication challenge is associated with
 // a proxy server rather than an "origin" server.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if authentication is for a proxy or FALSE otherwise.
+//
 func (request *AuthenticationRequest) IsForProxy() bool {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.gboolean                     // in
@@ -300,6 +354,11 @@ func (request *AuthenticationRequest) IsForProxy() bool {
 
 // IsRetry: determine whether this this is a first attempt or a retry for this
 // authentication challenge.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if authentication attempt is a retry or FALSE otherwise.
+//
 func (request *AuthenticationRequest) IsRetry() bool {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.gboolean                     // in
@@ -365,18 +424,4 @@ func (request *AuthenticationRequest) SetProposedCredential(credential *Credenti
 	C.webkit_authentication_request_set_proposed_credential(_arg0, _arg1)
 	runtime.KeepAlive(request)
 	runtime.KeepAlive(credential)
-}
-
-// ConnectAuthenticated: this signal is emitted when the user authentication
-// request succeeded. Applications handling their own credential storage should
-// connect to this signal to save the credentials.
-func (request *AuthenticationRequest) ConnectAuthenticated(f func(credential *Credential)) externglib.SignalHandle {
-	return request.Connect("authenticated", f)
-}
-
-// ConnectCancelled: this signal is emitted when the user authentication request
-// is cancelled. It allows the application to dismiss its authentication dialog
-// in case of page load failure for example.
-func (request *AuthenticationRequest) ConnectCancelled(f func()) externglib.SignalHandle {
-	return request.Connect("cancelled", f)
 }

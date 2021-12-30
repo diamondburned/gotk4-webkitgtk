@@ -8,8 +8,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -22,6 +20,7 @@ func init() {
 }
 
 type SessionAsync struct {
+	_ [0]func() // equal guard
 	Session
 }
 
@@ -46,6 +45,11 @@ func marshalSessionAsyncer(p uintptr) (interface{}, error) {
 // Deprecated: SessionAsync is deprecated; use a plain Session, created with
 // soup_session_new(). See the <link linkend="libsoup-session-porting">porting
 // guide</link>.
+//
+// The function returns the following values:
+//
+//    - sessionAsync: new session.
+//
 func NewSessionAsync() *SessionAsync {
 	var _cret *C.SoupSession // in
 

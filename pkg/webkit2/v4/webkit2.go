@@ -4,6 +4,7 @@ package webkit2
 
 import (
 	"fmt"
+	_ "runtime/cgo"
 	"unsafe"
 
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
@@ -23,6 +24,8 @@ func init() {
 	})
 }
 
+// The function returns the following values:
+//
 func DownloadErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -35,6 +38,8 @@ func DownloadErrorQuark() glib.Quark {
 	return _quark
 }
 
+// The function returns the following values:
+//
 func FaviconDatabaseErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -47,6 +52,8 @@ func FaviconDatabaseErrorQuark() glib.Quark {
 	return _quark
 }
 
+// The function returns the following values:
+//
 func JavascriptErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -59,6 +66,8 @@ func JavascriptErrorQuark() glib.Quark {
 	return _quark
 }
 
+// The function returns the following values:
+//
 func NetworkErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -71,6 +80,8 @@ func NetworkErrorQuark() glib.Quark {
 	return _quark
 }
 
+// The function returns the following values:
+//
 func PluginErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -83,6 +94,8 @@ func PluginErrorQuark() glib.Quark {
 	return _quark
 }
 
+// The function returns the following values:
+//
 func PolicyErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -95,6 +108,8 @@ func PolicyErrorQuark() glib.Quark {
 	return _quark
 }
 
+// The function returns the following values:
+//
 func PrintErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -107,6 +122,8 @@ func PrintErrorQuark() glib.Quark {
 	return _quark
 }
 
+// The function returns the following values:
+//
 func SnapshotErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -146,6 +163,8 @@ func (u UserContentFilterError) String() string {
 	}
 }
 
+// The function returns the following values:
+//
 func UserContentFilterErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -158,6 +177,8 @@ func UserContentFilterErrorQuark() glib.Quark {
 	return _quark
 }
 
+// The function returns the following values:
+//
 func UserMessageErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 

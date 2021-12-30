@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -133,6 +131,7 @@ func _gotk4_soup2_LoggerPrinter(arg0 *C.SoupLogger, arg1 C.SoupLoggerLogLevel, a
 }
 
 type Logger struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 
 	SessionFeature
@@ -166,6 +165,10 @@ func marshalLoggerer(p uintptr) (interface{}, error) {
 //
 //    - level: debug level.
 //    - maxBodySize: maximum body size to output, or -1.
+//
+// The function returns the following values:
+//
+//    - logger: new Logger.
 //
 func NewLogger(level LoggerLogLevel, maxBodySize int) *Logger {
 	var _arg1 C.SoupLoggerLogLevel // out

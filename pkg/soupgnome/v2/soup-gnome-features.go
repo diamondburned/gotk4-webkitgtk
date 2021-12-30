@@ -6,13 +6,13 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-gnome-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup-gnome.h>
 import "C"
 
+// The function returns the following values:
+//
 func GnomeFeatures226_GetType() externglib.Type {
 	var _cret C.GType // in
 

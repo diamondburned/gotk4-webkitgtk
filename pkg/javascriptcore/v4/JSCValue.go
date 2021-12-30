@@ -14,8 +14,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <jsc/jsc.h>
@@ -81,6 +79,7 @@ func (v ValuePropertyFlags) Has(other ValuePropertyFlags) bool {
 }
 
 type Value struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -106,6 +105,10 @@ func marshalValueer(p uintptr) (interface{}, error) {
 //
 //    - context: CContext.
 //    - strv: NULL-terminated array of strings.
+//
+// The function returns the following values:
+//
+//    - value: CValue.
 //
 func NewValueArrayFromStrv(context *Context, strv []string) *Value {
 	var _arg1 *C.JSCContext // out
@@ -145,6 +148,10 @@ func NewValueArrayFromStrv(context *Context, strv []string) *Value {
 //    - context: CContext.
 //    - value: #gboolean.
 //
+// The function returns the following values:
+//
+//    - ret: CValue.
+//
 func NewValueBoolean(context *Context, value bool) *Value {
 	var _arg1 *C.JSCContext // out
 	var _arg2 C.gboolean    // out
@@ -174,6 +181,10 @@ func NewValueBoolean(context *Context, value bool) *Value {
 //    - context: CContext.
 //    - json: JSON string to be parsed.
 //
+// The function returns the following values:
+//
+//    - value: CValue.
+//
 func NewValueFromJson(context *Context, json string) *Value {
 	var _arg1 *C.JSCContext // out
 	var _arg2 *C.char       // out
@@ -201,6 +212,10 @@ func NewValueFromJson(context *Context, json string) *Value {
 //
 //    - context: CContext.
 //
+// The function returns the following values:
+//
+//    - value: CValue.
+//
 func NewValueNull(context *Context) *Value {
 	var _arg1 *C.JSCContext // out
 	var _cret *C.JSCValue   // in
@@ -223,6 +238,10 @@ func NewValueNull(context *Context) *Value {
 //
 //    - context: CContext.
 //    - number: number.
+//
+// The function returns the following values:
+//
+//    - value: CValue.
 //
 func NewValueNumber(context *Context, number float64) *Value {
 	var _arg1 *C.JSCContext // out
@@ -251,8 +270,12 @@ func NewValueNumber(context *Context, number float64) *Value {
 // The function takes the following parameters:
 //
 //    - context: CContext.
-//    - instance: object instance or NULL.
-//    - jscClass of instance.
+//    - instance (optional): object instance or NULL.
+//    - jscClass (optional) of instance.
+//
+// The function returns the following values:
+//
+//    - value: CValue.
 //
 func NewValueObject(context *Context, instance cgo.Handle, jscClass *Class) *Value {
 	var _arg1 *C.JSCContext // out
@@ -285,7 +308,11 @@ func NewValueObject(context *Context, instance cgo.Handle, jscClass *Class) *Val
 // The function takes the following parameters:
 //
 //    - context: CContext.
-//    - str: null-terminated string.
+//    - str (optional): null-terminated string.
+//
+// The function returns the following values:
+//
+//    - value: CValue.
 //
 func NewValueString(context *Context, str string) *Value {
 	var _arg1 *C.JSCContext // out
@@ -314,7 +341,11 @@ func NewValueString(context *Context, str string) *Value {
 // The function takes the following parameters:
 //
 //    - context: CContext.
-//    - bytes: #GBytes.
+//    - bytes (optional): #GBytes.
+//
+// The function returns the following values:
+//
+//    - value: CValue.
 //
 func NewValueStringFromBytes(context *Context, bytes *glib.Bytes) *Value {
 	var _arg1 *C.JSCContext // out
@@ -344,6 +375,10 @@ func NewValueStringFromBytes(context *Context, bytes *glib.Bytes) *Value {
 //
 //    - context: CContext.
 //
+// The function returns the following values:
+//
+//    - value: CValue.
+//
 func NewValueUndefined(context *Context) *Value {
 	var _arg1 *C.JSCContext // out
 	var _cret *C.JSCValue   // in
@@ -366,7 +401,12 @@ func NewValueUndefined(context *Context) *Value {
 //
 // The function takes the following parameters:
 //
-//    - parameters -->s to pass as parameters to the constructor, or NULL.
+//    - parameters (optional) -->s to pass as parameters to the constructor, or
+//      NULL.
+//
+// The function returns the following values:
+//
+//    - ret referencing the newly created object instance.
 //
 func (value *Value) ConstructorCall(parameters []*Value) *Value {
 	var _arg0 *C.JSCValue  // out
@@ -407,7 +447,12 @@ func (value *Value) ConstructorCall(parameters []*Value) *Value {
 //
 // The function takes the following parameters:
 //
-//    - parameters -->s to pass as parameters to the function, or NULL.
+//    - parameters (optional) -->s to pass as parameters to the function, or
+//      NULL.
+//
+// The function returns the following values:
+//
+//    - ret with the return value of the function.
 //
 func (value *Value) FunctionCall(parameters []*Value) *Value {
 	var _arg0 *C.JSCValue  // out
@@ -440,6 +485,11 @@ func (value *Value) FunctionCall(parameters []*Value) *Value {
 }
 
 // Context: get the CContext in which value was created.
+//
+// The function returns the following values:
+//
+//    - context: CValue context.
+//
 func (value *Value) Context() *Context {
 	var _arg0 *C.JSCValue   // out
 	var _cret *C.JSCContext // in
@@ -457,6 +507,11 @@ func (value *Value) Context() *Context {
 }
 
 // IsArray: get whether the value referenced by value is an array.
+//
+// The function returns the following values:
+//
+//    - ok: whether the value is an array.
+//
 func (value *Value) IsArray() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -476,6 +531,11 @@ func (value *Value) IsArray() bool {
 }
 
 // IsBoolean: get whether the value referenced by value is a boolean.
+//
+// The function returns the following values:
+//
+//    - ok: whether the value is a boolean.
+//
 func (value *Value) IsBoolean() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -495,6 +555,11 @@ func (value *Value) IsBoolean() bool {
 }
 
 // IsConstructor: get whether the value referenced by value is a constructor.
+//
+// The function returns the following values:
+//
+//    - ok: whether the value is a constructor.
+//
 func (value *Value) IsConstructor() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -514,6 +579,11 @@ func (value *Value) IsConstructor() bool {
 }
 
 // IsFunction: get whether the value referenced by value is a function.
+//
+// The function returns the following values:
+//
+//    - ok: whether the value is a function.
+//
 func (value *Value) IsFunction() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -534,6 +604,11 @@ func (value *Value) IsFunction() bool {
 
 // IsNull: get whether the value referenced by value is
 // <function>null</function>.
+//
+// The function returns the following values:
+//
+//    - ok: whether the value is null.
+//
 func (value *Value) IsNull() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -553,6 +628,11 @@ func (value *Value) IsNull() bool {
 }
 
 // IsNumber: get whether the value referenced by value is a number.
+//
+// The function returns the following values:
+//
+//    - ok: whether the value is a number.
+//
 func (value *Value) IsNumber() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -572,6 +652,11 @@ func (value *Value) IsNumber() bool {
 }
 
 // IsObject: get whether the value referenced by value is an object.
+//
+// The function returns the following values:
+//
+//    - ok: whether the value is an object.
+//
 func (value *Value) IsObject() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -591,6 +676,11 @@ func (value *Value) IsObject() bool {
 }
 
 // IsString: get whether the value referenced by value is a string.
+//
+// The function returns the following values:
+//
+//    - ok: whether the value is a string.
+//
 func (value *Value) IsString() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -611,6 +701,11 @@ func (value *Value) IsString() bool {
 
 // IsUndefined: get whether the value referenced by value is
 // <function>undefined</function>.
+//
+// The function returns the following values:
+//
+//    - ok: whether the value is undefined.
+//
 func (value *Value) IsUndefined() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -638,7 +733,7 @@ func (value *Value) IsUndefined() bool {
 //
 //    - propertyName: name of the property to define.
 //    - flags: CValuePropertyFlags.
-//    - propertyValue: default property value.
+//    - propertyValue (optional): default property value.
 //
 func (value *Value) ObjectDefinePropertyData(propertyName string, flags ValuePropertyFlags, propertyValue *Value) {
 	var _arg0 *C.JSCValue             // out
@@ -669,6 +764,10 @@ func (value *Value) ObjectDefinePropertyData(propertyName string, flags ValuePro
 //
 //    - name: property name.
 //
+// The function returns the following values:
+//
+//    - ok: TRUE if the property was deleted, or FALSE otherwise.
+//
 func (value *Value) ObjectDeleteProperty(name string) bool {
 	var _arg0 *C.JSCValue // out
 	var _arg1 *C.char     // out
@@ -693,6 +792,13 @@ func (value *Value) ObjectDeleteProperty(name string) bool {
 
 // ObjectEnumerateProperties: get the list of property names of value. Only
 // properties defined with JSC_VALUE_PROPERTY_ENUMERABLE flag will be collected.
+//
+// The function returns the following values:
+//
+//    - utf8s (optional): NULL-terminated array of strings containing the
+//      property names, or NULL if value doesn't have enumerable properties. Use
+//      g_strfreev() to free.
+//
 func (value *Value) ObjectEnumerateProperties() []string {
 	var _arg0 *C.JSCValue // out
 	var _cret **C.gchar   // in
@@ -731,6 +837,10 @@ func (value *Value) ObjectEnumerateProperties() []string {
 //
 //    - name: property name.
 //
+// The function returns the following values:
+//
+//    - ret: property CValue.
+//
 func (value *Value) ObjectGetProperty(name string) *Value {
 	var _arg0 *C.JSCValue // out
 	var _arg1 *C.char     // out
@@ -757,6 +867,10 @@ func (value *Value) ObjectGetProperty(name string) *Value {
 //
 //    - index: property index.
 //
+// The function returns the following values:
+//
+//    - ret: property CValue.
+//
 func (value *Value) ObjectGetPropertyAtIndex(index uint) *Value {
 	var _arg0 *C.JSCValue // out
 	var _arg1 C.guint     // out
@@ -781,6 +895,10 @@ func (value *Value) ObjectGetPropertyAtIndex(index uint) *Value {
 // The function takes the following parameters:
 //
 //    - name: property name.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if value has a property with name, or FALSE otherwise.
 //
 func (value *Value) ObjectHasProperty(name string) bool {
 	var _arg0 *C.JSCValue // out
@@ -816,7 +934,11 @@ func (value *Value) ObjectHasProperty(name string) bool {
 // The function takes the following parameters:
 //
 //    - name: method name.
-//    - parameters -->s to pass as parameters to the method, or NULL.
+//    - parameters (optional) -->s to pass as parameters to the method, or NULL.
+//
+// The function returns the following values:
+//
+//    - ret with the return value of the method.
 //
 func (value *Value) ObjectInvokeMethod(name string, parameters []*Value) *Value {
 	var _arg0 *C.JSCValue  // out
@@ -858,6 +980,10 @@ func (value *Value) ObjectInvokeMethod(name string, parameters []*Value) *Value 
 // The function takes the following parameters:
 //
 //    - name class name.
+//
+// The function returns the following values:
+//
+//    - ok: whether the value is an object instance of class name.
 //
 func (value *Value) ObjectIsInstanceOf(name string) bool {
 	var _arg0 *C.JSCValue // out
@@ -927,6 +1053,11 @@ func (value *Value) ObjectSetPropertyAtIndex(index uint, property *Value) {
 }
 
 // ToBoolean: convert value to a boolean.
+//
+// The function returns the following values:
+//
+//    - ok result of the conversion.
+//
 func (value *Value) ToBoolean() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -946,6 +1077,11 @@ func (value *Value) ToBoolean() bool {
 }
 
 // ToDouble: convert value to a double.
+//
+// The function returns the following values:
+//
+//    - gdouble result of the conversion.
+//
 func (value *Value) ToDouble() float64 {
 	var _arg0 *C.JSCValue // out
 	var _cret C.double    // in
@@ -963,6 +1099,11 @@ func (value *Value) ToDouble() float64 {
 }
 
 // ToInt32: convert value to a #gint32.
+//
+// The function returns the following values:
+//
+//    - gint32 result of the conversion.
+//
 func (value *Value) ToInt32() int32 {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gint32    // in
@@ -987,6 +1128,10 @@ func (value *Value) ToInt32() int32 {
 //
 //    - indent: number of spaces to indent when nesting.
 //
+// The function returns the following values:
+//
+//    - utf8: null-terminated JSON string with serialization of value.
+//
 func (value *Value) ToJson(indent uint) string {
 	var _arg0 *C.JSCValue // out
 	var _arg1 C.guint     // out
@@ -1009,6 +1154,11 @@ func (value *Value) ToJson(indent uint) string {
 
 // String: convert value to a string. Use jsc_value_to_string_as_bytes()
 // instead, if you need to handle strings containing null characters.
+//
+// The function returns the following values:
+//
+//    - utf8: null-terminated string result of the conversion.
+//
 func (value *Value) String() string {
 	var _arg0 *C.JSCValue // out
 	var _cret *C.char     // in
@@ -1028,6 +1178,11 @@ func (value *Value) String() string {
 
 // ToStringAsBytes: convert value to a string and return the results as #GBytes.
 // This is needed to handle strings with null characters.
+//
+// The function returns the following values:
+//
+//    - bytes with the result of the conversion.
+//
 func (value *Value) ToStringAsBytes() *glib.Bytes {
 	var _arg0 *C.JSCValue // out
 	var _cret *C.GBytes   // in

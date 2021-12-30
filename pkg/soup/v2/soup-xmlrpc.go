@@ -13,8 +13,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -91,6 +89,8 @@ func (x XMLRPCFault) String() string {
 	}
 }
 
+// The function returns the following values:
+//
 func XMLRPCFaultQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -127,6 +127,10 @@ func XMLRPCFaultQuark() glib.Quark {
 //
 //    - methodName: name of the XML-RPC method.
 //    - params: #GVariant tuple.
+//
+// The function returns the following values:
+//
+//    - utf8: text of the methodCall, or NULL on error.
 //
 func XmlrpcBuildRequest(methodName string, params *glib.Variant) (string, error) {
 	var _arg1 *C.char     // out
@@ -169,6 +173,10 @@ func XmlrpcBuildRequest(methodName string, params *glib.Variant) (string, error)
 //
 //    - value: return value.
 //
+// The function returns the following values:
+//
+//    - utf8: text of the methodResponse, or NULL on error.
+//
 func XmlrpcBuildResponse(value *glib.Variant) (string, error) {
 	var _arg1 *C.GVariant // out
 	var _cret *C.char     // in
@@ -203,6 +211,10 @@ func XmlrpcBuildResponse(value *glib.Variant) (string, error) {
 //    - uri: URI of the XML-RPC service.
 //    - methodName: name of the XML-RPC method to invoke at uri.
 //    - params: #GVariant tuple.
+//
+// The function returns the following values:
+//
+//    - message encoding the indicated XML-RPC request, or NULL on error.
 //
 func NewXmlrpcMessage(uri, methodName string, params *glib.Variant) (*Message, error) {
 	var _arg1 *C.char        // out
@@ -280,7 +292,11 @@ func XmlrpcMessageSetResponse(msg *Message, value *glib.Variant) error {
 //
 //    - methodResponse: XML-RPC methodResponse string.
 //    - length of method_response, or -1 if it is NUL-terminated.
-//    - signature: valid #GVariant type string, or NULL.
+//    - signature (optional): valid #GVariant type string, or NULL.
+//
+// The function returns the following values:
+//
+//    - variant: new (non-floating) #GVariant, or NULL.
 //
 func XmlrpcParseResponse(methodResponse string, length int, signature string) (*glib.Variant, error) {
 	var _arg1 *C.char     // out
@@ -331,6 +347,10 @@ func XmlrpcParseResponse(methodResponse string, length int, signature string) (*
 //
 //    - variant: #GVariant.
 //
+// The function returns the following values:
+//
+//    - date: new Date, or NULL on error.
+//
 func XmlrpcVariantGetDatetime(variant *glib.Variant) (*Date, error) {
 	var _arg1 *C.GVariant // out
 	var _cret *C.SoupDate // in
@@ -370,6 +390,10 @@ func XmlrpcVariantGetDatetime(variant *glib.Variant) (*Date, error) {
 // The function takes the following parameters:
 //
 //    - date: Date.
+//
+// The function returns the following values:
+//
+//    - variant: floating #GVariant.
 //
 func XmlrpcVariantNewDatetime(date *Date) *glib.Variant {
 	var _arg1 *C.SoupDate // out

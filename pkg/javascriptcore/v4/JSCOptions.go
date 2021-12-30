@@ -12,8 +12,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <jsc/jsc.h>
 // gboolean _gotk4_javascriptcore4_OptionsFunc(char*, JSCOptionType, char*, gpointer);
@@ -109,14 +107,14 @@ func _gotk4_javascriptcore4_OptionsFunc(arg0 *C.char, arg1 C.JSCOptionType, arg2
 	return cret
 }
 
-// OptionsForeach iterates all available options calling function for each one.
+// OptionsForEach iterates all available options calling function for each one.
 // Iteration can stop early if function returns FALSE.
 //
 // The function takes the following parameters:
 //
 //    - function: COptionsFunc callback.
 //
-func OptionsForeach(function OptionsFunc) {
+func OptionsForEach(function OptionsFunc) {
 	var _arg1 C.JSCOptionsFunc // out
 	var _arg2 C.gpointer
 
@@ -133,6 +131,11 @@ func OptionsForeach(function OptionsFunc) {
 // The function takes the following parameters:
 //
 //    - option identifier.
+//
+// The function returns the following values:
+//
+//    - value: return location for the option value.
+//    - ok: TRUE if value has been set or FALSE if the option doesn't exist.
 //
 func OptionsGetBoolean(option string) (value bool, ok bool) {
 	var _arg1 *C.char    // out
@@ -164,6 +167,11 @@ func OptionsGetBoolean(option string) (value bool, ok bool) {
 //
 //    - option identifier.
 //
+// The function returns the following values:
+//
+//    - value: return location for the option value.
+//    - ok: TRUE if value has been set or FALSE if the option doesn't exist.
+//
 func OptionsGetDouble(option string) (float64, bool) {
 	var _arg1 *C.char    // out
 	var _arg2 C.gdouble  // in
@@ -191,6 +199,11 @@ func OptionsGetDouble(option string) (float64, bool) {
 // The function takes the following parameters:
 //
 //    - option identifier.
+//
+// The function returns the following values:
+//
+//    - value: return location for the option value.
+//    - ok: TRUE if value has been set or FALSE if the option doesn't exist.
 //
 func OptionsGetInt(option string) (int, bool) {
 	var _arg1 *C.char    // out
@@ -221,6 +234,11 @@ func OptionsGetInt(option string) (int, bool) {
 // command line parsing. Applications only need to pass the returned group to
 // g_option_context_add_group(), and the rest will be taken care for
 // automatically.
+//
+// The function returns the following values:
+//
+//    - optionGroup for the JSCOptions.
+//
 func OptionsGetOptionGroup() *glib.OptionGroup {
 	var _cret *C.GOptionGroup // in
 
@@ -248,6 +266,11 @@ func OptionsGetOptionGroup() *glib.OptionGroup {
 // The function takes the following parameters:
 //
 //    - option identifier.
+//
+// The function returns the following values:
+//
+//    - value: return location for the option value.
+//    - ok: TRUE if value has been set or FALSE if the option doesn't exist.
 //
 func OptionsGetRangeString(option string) (string, bool) {
 	var _arg1 *C.char    // out
@@ -278,6 +301,11 @@ func OptionsGetRangeString(option string) (string, bool) {
 //
 //    - option identifier.
 //
+// The function returns the following values:
+//
+//    - value: return location for the option value.
+//    - ok: TRUE if value has been set or FALSE if the option doesn't exist.
+//
 func OptionsGetSize(option string) (uint, bool) {
 	var _arg1 *C.char    // out
 	var _arg2 C.gsize    // in
@@ -305,6 +333,11 @@ func OptionsGetSize(option string) (uint, bool) {
 // The function takes the following parameters:
 //
 //    - option identifier.
+//
+// The function returns the following values:
+//
+//    - value: return location for the option value.
+//    - ok: TRUE if value has been set or FALSE if the option doesn't exist.
 //
 func OptionsGetString(option string) (string, bool) {
 	var _arg1 *C.char    // out
@@ -335,6 +368,11 @@ func OptionsGetString(option string) (string, bool) {
 //
 //    - option identifier.
 //
+// The function returns the following values:
+//
+//    - value: return location for the option value.
+//    - ok: TRUE if value has been set or FALSE if the option doesn't exist.
+//
 func OptionsGetUint(option string) (uint, bool) {
 	var _arg1 *C.char    // out
 	var _arg2 C.guint    // in
@@ -363,6 +401,10 @@ func OptionsGetUint(option string) (uint, bool) {
 //
 //    - option identifier.
 //    - value to set.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if option was correctly set or FALSE otherwise.
 //
 func OptionsSetBoolean(option string, value bool) bool {
 	var _arg1 *C.char    // out
@@ -395,6 +437,10 @@ func OptionsSetBoolean(option string, value bool) bool {
 //    - option identifier.
 //    - value to set.
 //
+// The function returns the following values:
+//
+//    - ok: TRUE if option was correctly set or FALSE otherwise.
+//
 func OptionsSetDouble(option string, value float64) bool {
 	var _arg1 *C.char    // out
 	var _arg2 C.gdouble  // out
@@ -423,6 +469,10 @@ func OptionsSetDouble(option string, value float64) bool {
 //
 //    - option identifier.
 //    - value to set.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if option was correctly set or FALSE otherwise.
 //
 func OptionsSetInt(option string, value int) bool {
 	var _arg1 *C.char    // out
@@ -457,6 +507,10 @@ func OptionsSetInt(option string, value int) bool {
 //    - option identifier.
 //    - value to set.
 //
+// The function returns the following values:
+//
+//    - ok: TRUE if option was correctly set or FALSE otherwise.
+//
 func OptionsSetRangeString(option, value string) bool {
 	var _arg1 *C.char    // out
 	var _arg2 *C.char    // out
@@ -487,6 +541,10 @@ func OptionsSetRangeString(option, value string) bool {
 //    - option identifier.
 //    - value to set.
 //
+// The function returns the following values:
+//
+//    - ok: TRUE if option was correctly set or FALSE otherwise.
+//
 func OptionsSetSize(option string, value uint) bool {
 	var _arg1 *C.char    // out
 	var _arg2 C.gsize    // out
@@ -515,6 +573,10 @@ func OptionsSetSize(option string, value uint) bool {
 //
 //    - option identifier.
 //    - value to set.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if option was correctly set or FALSE otherwise.
 //
 func OptionsSetString(option, value string) bool {
 	var _arg1 *C.char    // out
@@ -545,6 +607,10 @@ func OptionsSetString(option, value string) bool {
 //
 //    - option identifier.
 //    - value to set.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if option was correctly set or FALSE otherwise.
 //
 func OptionsSetUint(option string, value uint) bool {
 	var _arg1 *C.char    // out

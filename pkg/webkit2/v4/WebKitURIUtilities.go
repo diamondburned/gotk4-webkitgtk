@@ -7,8 +7,6 @@ import (
 	"unsafe"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -22,6 +20,10 @@ import "C"
 // The function takes the following parameters:
 //
 //    - uri: URI to be converted.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): uri suitable for display, or NULL in case of error.
 //
 func URIForDisplay(uri string) string {
 	var _arg1 *C.gchar // out

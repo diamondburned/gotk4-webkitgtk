@@ -8,8 +8,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <jsc/jsc.h>
@@ -22,6 +20,7 @@ func init() {
 }
 
 type VirtualMachine struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -40,6 +39,11 @@ func marshalVirtualMachiner(p uintptr) (interface{}, error) {
 }
 
 // NewVirtualMachine: create a new CVirtualMachine.
+//
+// The function returns the following values:
+//
+//    - virtualMachine: newly created CVirtualMachine.
+//
 func NewVirtualMachine() *VirtualMachine {
 	var _cret *C.JSCVirtualMachine // in
 

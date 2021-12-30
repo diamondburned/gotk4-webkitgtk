@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-gnome-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup-gnome.h>
@@ -26,6 +24,7 @@ func init() {
 const COOKIE_JAR_SQLITE_FILENAME = "filename"
 
 type CookieJarSqlite struct {
+	_ [0]func() // equal guard
 	soup.CookieJarDB
 }
 
@@ -50,10 +49,12 @@ func marshalCookieJarSqliter(p uintptr) (interface{}, error) {
 	return wrapCookieJarSqlite(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-//
 // The function takes the following parameters:
 //
-
+//    - filename
+//    - readOnly
+//
+// The function returns the following values:
 //
 func NewCookieJarSqlite(filename string, readOnly bool) *CookieJarSqlite {
 	var _arg1 *C.char          // out

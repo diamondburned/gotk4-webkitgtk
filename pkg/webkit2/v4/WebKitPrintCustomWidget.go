@@ -10,8 +10,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v3"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -28,11 +26,20 @@ func init() {
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type PrintCustomWidgetOverrider interface {
+	// The function takes the following parameters:
+	//
 	Apply(widget gtk.Widgetter)
+	// The function takes the following parameters:
+	//
+	//    - widget
+	//    - pageSetup
+	//    - printSettings
+	//
 	Update(widget gtk.Widgetter, pageSetup *gtk.PageSetup, printSettings *gtk.PrintSettings)
 }
 
 type PrintCustomWidget struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -50,6 +57,20 @@ func marshalPrintCustomWidgetter(p uintptr) (interface{}, error) {
 	return wrapPrintCustomWidget(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+// ConnectApply: emitted right before the printing will start. You should read
+// the information from the widget and update the content based on it if
+// necessary. The widget is not guaranteed to be valid at a later time.
+func (printCustomWidget *PrintCustomWidget) ConnectApply(f func()) externglib.SignalHandle {
+	return printCustomWidget.Connect("apply", f)
+}
+
+// ConnectUpdate: emitted after change of selected printer in the dialog. The
+// actual page setup and print settings are available and the custom widget can
+// actualize itself according to their values.
+func (printCustomWidget *PrintCustomWidget) ConnectUpdate(f func(pageSetup gtk.PageSetup, printSettings gtk.PrintSettings)) externglib.SignalHandle {
+	return printCustomWidget.Connect("update", f)
+}
+
 // NewPrintCustomWidget: create a new KitPrintCustomWidget with given widget and
 // title. The widget ownership is taken and it is destroyed together with the
 // dialog even if this object could still be alive at that point. You typically
@@ -59,6 +80,10 @@ func marshalPrintCustomWidgetter(p uintptr) (interface{}, error) {
 //
 //    - widget: Widget.
 //    - title widget's title.
+//
+// The function returns the following values:
+//
+//    - printCustomWidget: new KitPrintOperation.
 //
 func NewPrintCustomWidget(widget gtk.Widgetter, title string) *PrintCustomWidget {
 	var _arg1 *C.GtkWidget               // out
@@ -82,6 +107,11 @@ func NewPrintCustomWidget(widget gtk.Widgetter, title string) *PrintCustomWidget
 
 // Title: return the value of KitPrintCustomWidget:title property for the given
 // print_custom_widget object.
+//
+// The function returns the following values:
+//
+//    - utf8: title of the print_custom_widget.
+//
 func (printCustomWidget *PrintCustomWidget) Title() string {
 	var _arg0 *C.WebKitPrintCustomWidget // out
 	var _cret *C.gchar                   // in
@@ -103,6 +133,11 @@ func (printCustomWidget *PrintCustomWidget) Title() string {
 // called from KitPrintCustomWidget::apply or KitPrintCustomWidget::update
 // callbacks, but it will be NULL if called after the
 // KitPrintCustomWidget::apply signal is emitted.
+//
+// The function returns the following values:
+//
+//    - widget: Widget.
+//
 func (printCustomWidget *PrintCustomWidget) Widget() gtk.Widgetter {
 	var _arg0 *C.WebKitPrintCustomWidget // out
 	var _cret *C.GtkWidget               // in
@@ -121,26 +156,16 @@ func (printCustomWidget *PrintCustomWidget) Widget() gtk.Widgetter {
 		}
 
 		object := externglib.Take(objptr)
-		rv, ok := (externglib.CastObject(object)).(gtk.Widgetter)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gtk.Widgetter)
+			return ok
+		})
+		rv, ok := casted.(gtk.Widgetter)
 		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not gtk.Widgetter")
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gtk.Widgetter")
 		}
 		_widget = rv
 	}
 
 	return _widget
-}
-
-// ConnectApply: emitted right before the printing will start. You should read
-// the information from the widget and update the content based on it if
-// necessary. The widget is not guaranteed to be valid at a later time.
-func (printCustomWidget *PrintCustomWidget) ConnectApply(f func()) externglib.SignalHandle {
-	return printCustomWidget.Connect("apply", f)
-}
-
-// ConnectUpdate: emitted after change of selected printer in the dialog. The
-// actual page setup and print settings are available and the custom widget can
-// actualize itself according to their values.
-func (printCustomWidget *PrintCustomWidget) ConnectUpdate(f func(pageSetup gtk.PageSetup, printSettings gtk.PrintSettings)) externglib.SignalHandle {
-	return printCustomWidget.Connect("update", f)
 }

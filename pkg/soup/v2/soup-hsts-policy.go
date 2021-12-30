@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -201,6 +199,11 @@ func (h *HSTSPolicy) IncludeSubdomains() bool {
 }
 
 // Copy copies policy.
+//
+// The function returns the following values:
+//
+//    - hstsPolicy: copy of policy.
+//
 func (policy *HSTSPolicy) Copy() *HSTSPolicy {
 	var _arg0 *C.SoupHSTSPolicy // out
 	var _cret *C.SoupHSTSPolicy // in
@@ -224,6 +227,15 @@ func (policy *HSTSPolicy) Copy() *HSTSPolicy {
 }
 
 // Equal tests if policy1 and policy2 are equal.
+//
+// The function takes the following parameters:
+//
+//    - policy2: HSTSPolicy.
+//
+// The function returns the following values:
+//
+//    - ok: whether the policies are equal.
+//
 func (policy1 *HSTSPolicy) Equal(policy2 *HSTSPolicy) bool {
 	var _arg0 *C.SoupHSTSPolicy // out
 	var _arg1 *C.SoupHSTSPolicy // out
@@ -246,6 +258,11 @@ func (policy1 *HSTSPolicy) Equal(policy2 *HSTSPolicy) bool {
 }
 
 // Domain gets policy's domain.
+//
+// The function returns the following values:
+//
+//    - utf8 policy's domain.
+//
 func (policy *HSTSPolicy) Domain() string {
 	var _arg0 *C.SoupHSTSPolicy // out
 	var _cret *C.char           // in
@@ -263,6 +280,11 @@ func (policy *HSTSPolicy) Domain() string {
 }
 
 // IncludesSubdomains gets whether policy include its subdomains.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if policy includes subdomains, FALSE otherwise.
+//
 func (policy *HSTSPolicy) IncludesSubdomains() bool {
 	var _arg0 *C.SoupHSTSPolicy // out
 	var _cret C.gboolean        // in
@@ -282,6 +304,11 @@ func (policy *HSTSPolicy) IncludesSubdomains() bool {
 }
 
 // IsExpired gets whether policy is expired. Permanent policies never expire.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if policy is expired, FALSE otherwise.
+//
 func (policy *HSTSPolicy) IsExpired() bool {
 	var _arg0 *C.SoupHSTSPolicy // out
 	var _cret C.gboolean        // in
@@ -302,6 +329,11 @@ func (policy *HSTSPolicy) IsExpired() bool {
 
 // IsSessionPolicy gets whether policy is a non-permanent, non-expirable session
 // policy. see soup_hsts_policy_new_session_policy() for details.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if policy is permanent, FALSE otherwise.
+//
 func (policy *HSTSPolicy) IsSessionPolicy() bool {
 	var _arg0 *C.SoupHSTSPolicy // out
 	var _cret C.gboolean        // in

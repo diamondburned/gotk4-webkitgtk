@@ -9,8 +9,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <jsc/jsc.h>
@@ -23,6 +21,7 @@ func init() {
 }
 
 type Exception struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -46,6 +45,10 @@ func marshalExceptioner(p uintptr) (interface{}, error) {
 //
 //    - context: CContext.
 //    - message: error message.
+//
+// The function returns the following values:
+//
+//    - exception: new CException.
 //
 func NewException(context *Context, message string) *Exception {
 	var _arg1 *C.JSCContext   // out
@@ -76,6 +79,10 @@ func NewException(context *Context, message string) *Exception {
 //    - name: error name.
 //    - message: error message.
 //
+// The function returns the following values:
+//
+//    - exception: new CException.
+//
 func NewExceptionWithName(context *Context, name, message string) *Exception {
 	var _arg1 *C.JSCContext   // out
 	var _arg2 *C.char         // out
@@ -101,6 +108,11 @@ func NewExceptionWithName(context *Context, name, message string) *Exception {
 }
 
 // BacktraceString: get a string with the exception backtrace.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): exception backtrace string or NULL.
+//
 func (exception *Exception) BacktraceString() string {
 	var _arg0 *C.JSCException // out
 	var _cret *C.char         // in
@@ -120,6 +132,11 @@ func (exception *Exception) BacktraceString() string {
 }
 
 // ColumnNumber: get the column number at which exception happened.
+//
+// The function returns the following values:
+//
+//    - guint: column number of exception.
+//
 func (exception *Exception) ColumnNumber() uint {
 	var _arg0 *C.JSCException // out
 	var _cret C.guint         // in
@@ -137,6 +154,11 @@ func (exception *Exception) ColumnNumber() uint {
 }
 
 // LineNumber: get the line number at which exception happened.
+//
+// The function returns the following values:
+//
+//    - guint: line number of exception.
+//
 func (exception *Exception) LineNumber() uint {
 	var _arg0 *C.JSCException // out
 	var _cret C.guint         // in
@@ -154,6 +176,11 @@ func (exception *Exception) LineNumber() uint {
 }
 
 // Message: get the error message of exception.
+//
+// The function returns the following values:
+//
+//    - utf8: exception error message.
+//
 func (exception *Exception) Message() string {
 	var _arg0 *C.JSCException // out
 	var _cret *C.char         // in
@@ -171,6 +198,11 @@ func (exception *Exception) Message() string {
 }
 
 // Name: get the error name of exception.
+//
+// The function returns the following values:
+//
+//    - utf8: exception error name.
+//
 func (exception *Exception) Name() string {
 	var _arg0 *C.JSCException // out
 	var _cret *C.char         // in
@@ -188,6 +220,11 @@ func (exception *Exception) Name() string {
 }
 
 // SourceURI: get the source URI of exception.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): the source URI of exception, or NULL.
+//
 func (exception *Exception) SourceURI() string {
 	var _arg0 *C.JSCException // out
 	var _cret *C.char         // in
@@ -209,6 +246,11 @@ func (exception *Exception) SourceURI() string {
 // Report: return a report message of exception, containing all the possible
 // details such us source URI, line, column and backtrace, and formatted to be
 // printed.
+//
+// The function returns the following values:
+//
+//    - utf8: new string with the exception report.
+//
 func (exception *Exception) Report() string {
 	var _arg0 *C.JSCException // out
 	var _cret *C.char         // in
@@ -227,6 +269,11 @@ func (exception *Exception) Report() string {
 }
 
 // String: get the string representation of exception error.
+//
+// The function returns the following values:
+//
+//    - utf8: string representation of exception.
+//
 func (exception *Exception) String() string {
 	var _arg0 *C.JSCException // out
 	var _cret *C.char         // in

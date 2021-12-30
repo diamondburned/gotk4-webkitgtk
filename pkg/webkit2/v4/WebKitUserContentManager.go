@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -24,6 +22,7 @@ func init() {
 }
 
 type UserContentManager struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -41,7 +40,21 @@ func marshalUserContentManagerer(p uintptr) (interface{}, error) {
 	return wrapUserContentManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+// ConnectScriptMessageReceived: this signal is emitted when JavaScript in a web
+// view calls
+// <code>window.webkit.messageHandlers.&lt;name&gt;.postMessage()</code>, after
+// registering <code>&lt;name&gt;</code> using
+// webkit_user_content_manager_register_script_message_handler().
+func (manager *UserContentManager) ConnectScriptMessageReceived(f func(jsResult *JavascriptResult)) externglib.SignalHandle {
+	return manager.Connect("script-message-received", f)
+}
+
 // NewUserContentManager creates a new user content manager.
+//
+// The function returns the following values:
+//
+//    - userContentManager: KitUserContentManager.
+//
 func NewUserContentManager() *UserContentManager {
 	var _cret *C.WebKitUserContentManager // in
 
@@ -138,6 +151,11 @@ func (manager *UserContentManager) AddStyleSheet(stylesheet *UserStyleSheet) {
 //
 //    - name: name of the script message channel.
 //
+// The function returns the following values:
+//
+//    - ok: TRUE if message handler was registered successfully, or FALSE
+//      otherwise.
+//
 func (manager *UserContentManager) RegisterScriptMessageHandler(name string) bool {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.gchar                    // out
@@ -172,6 +190,11 @@ func (manager *UserContentManager) RegisterScriptMessageHandler(name string) boo
 //
 //    - name: name of the script message channel.
 //    - worldName: name of a KitScriptWorld.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if message handler was registered successfully, or FALSE
+//      otherwise.
 //
 func (manager *UserContentManager) RegisterScriptMessageHandlerInWorld(name, worldName string) bool {
 	var _arg0 *C.WebKitUserContentManager // out
@@ -374,13 +397,4 @@ func (manager *UserContentManager) UnregisterScriptMessageHandlerInWorld(name, w
 	runtime.KeepAlive(manager)
 	runtime.KeepAlive(name)
 	runtime.KeepAlive(worldName)
-}
-
-// ConnectScriptMessageReceived: this signal is emitted when JavaScript in a web
-// view calls
-// <code>window.webkit.messageHandlers.&lt;name&gt;.postMessage()</code>, after
-// registering <code>&lt;name&gt;</code> using
-// webkit_user_content_manager_register_script_message_handler().
-func (manager *UserContentManager) ConnectScriptMessageReceived(f func(jsResult *JavascriptResult)) externglib.SignalHandle {
-	return manager.Connect("script-message-received", f)
 }

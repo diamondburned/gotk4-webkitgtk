@@ -14,8 +14,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -50,9 +48,13 @@ func _gotk4_soup2_ProxyResolverCallback(arg0 *C.SoupProxyResolver, arg1 *C.SoupM
 		}
 
 		object := externglib.Take(objptr)
-		rv, ok := (externglib.CastObject(object)).(ProxyResolverer)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(ProxyResolverer)
+			return ok
+		})
+		rv, ok := casted.(ProxyResolverer)
 		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not soup.ProxyResolverer")
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.ProxyResolverer")
 		}
 		proxyResolver = rv
 	}
@@ -71,13 +73,33 @@ func _gotk4_soup2_ProxyResolverCallback(arg0 *C.SoupProxyResolver, arg1 *C.SoupM
 type ProxyResolverOverrider interface {
 	// ProxyAsync: deprecated: Use SoupProxyURIResolver.get_proxy_uri_async
 	// instead.
+	//
+	// The function takes the following parameters:
+	//
+	//    - ctx (optional)
+	//    - msg
+	//    - asyncContext
+	//    - callback
+	//
 	ProxyAsync(ctx context.Context, msg *Message, asyncContext *glib.MainContext, callback ProxyResolverCallback)
 	// ProxySync: deprecated: Use SoupProxyURIResolver.get_proxy_uri_sync()
 	// instead.
+	//
+	// The function takes the following parameters:
+	//
+	//    - ctx (optional)
+	//    - msg
+	//
+	// The function returns the following values:
+	//
+	//    - addr
+	//    - guint
+	//
 	ProxySync(ctx context.Context, msg *Message) (*Address, uint)
 }
 
 type ProxyResolver struct {
+	_ [0]func() // equal guard
 	SessionFeature
 }
 
@@ -113,7 +135,10 @@ func marshalProxyResolverer(p uintptr) (interface{}, error) {
 //
 // The function takes the following parameters:
 //
-
+//    - ctx (optional)
+//    - msg
+//    - asyncContext
+//    - callback
 //
 func (proxyResolver *ProxyResolver) ProxyAsync(ctx context.Context, msg *Message, asyncContext *glib.MainContext, callback ProxyResolverCallback) {
 	var _arg0 *C.SoupProxyResolver        // out
@@ -146,7 +171,13 @@ func (proxyResolver *ProxyResolver) ProxyAsync(ctx context.Context, msg *Message
 //
 // The function takes the following parameters:
 //
-
+//    - ctx (optional)
+//    - msg
+//
+// The function returns the following values:
+//
+//    - addr
+//    - guint
 //
 func (proxyResolver *ProxyResolver) ProxySync(ctx context.Context, msg *Message) (*Address, uint) {
 	var _arg0 *C.SoupProxyResolver // out

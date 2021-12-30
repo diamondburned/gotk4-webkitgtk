@@ -25,6 +25,7 @@ func init() {
 }
 
 type PasswordManagerGNOME struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 
 	soup.SessionFeature
@@ -48,6 +49,7 @@ func marshalPasswordManagerGNOMEer(p uintptr) (interface{}, error) {
 }
 
 type ProxyResolverGNOME struct {
+	_ [0]func() // equal guard
 	soup.ProxyResolverDefault
 }
 

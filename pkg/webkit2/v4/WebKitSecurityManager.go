@@ -9,8 +9,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -23,6 +21,7 @@ func init() {
 }
 
 type SecurityManager struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -172,6 +171,10 @@ func (securityManager *SecurityManager) RegisterURISchemeAsSecure(scheme string)
 //
 //    - scheme: URI scheme.
 //
+// The function returns the following values:
+//
+//    - ok: TRUE if scheme is a CORS enabled scheme or FALSE otherwise.
+//
 func (securityManager *SecurityManager) URISchemeIsCorsEnabled(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
@@ -201,6 +204,10 @@ func (securityManager *SecurityManager) URISchemeIsCorsEnabled(scheme string) bo
 // The function takes the following parameters:
 //
 //    - scheme: URI scheme.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if scheme is a display isolated scheme or FALSE otherwise.
 //
 func (securityManager *SecurityManager) URISchemeIsDisplayIsolated(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out
@@ -232,6 +239,10 @@ func (securityManager *SecurityManager) URISchemeIsDisplayIsolated(scheme string
 //
 //    - scheme: URI scheme.
 //
+// The function returns the following values:
+//
+//    - ok: TRUE if scheme is an empty document scheme or FALSE otherwise.
+//
 func (securityManager *SecurityManager) URISchemeIsEmptyDocument(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
@@ -260,6 +271,10 @@ func (securityManager *SecurityManager) URISchemeIsEmptyDocument(scheme string) 
 // The function takes the following parameters:
 //
 //    - scheme: URI scheme.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if scheme is a local scheme or FALSE otherwise.
 //
 func (securityManager *SecurityManager) URISchemeIsLocal(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out
@@ -290,6 +305,10 @@ func (securityManager *SecurityManager) URISchemeIsLocal(scheme string) bool {
 //
 //    - scheme: URI scheme.
 //
+// The function returns the following values:
+//
+//    - ok: TRUE if scheme is a no-access scheme or FALSE otherwise.
+//
 func (securityManager *SecurityManager) URISchemeIsNoAccess(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
@@ -318,6 +337,10 @@ func (securityManager *SecurityManager) URISchemeIsNoAccess(scheme string) bool 
 // The function takes the following parameters:
 //
 //    - scheme: URI scheme.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if scheme is a secure scheme or FALSE otherwise.
 //
 func (securityManager *SecurityManager) URISchemeIsSecure(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out

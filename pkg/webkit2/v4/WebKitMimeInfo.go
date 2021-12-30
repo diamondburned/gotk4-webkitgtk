@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -39,6 +37,11 @@ func marshalMIMEInfo(p uintptr) (interface{}, error) {
 }
 
 // Description: deprecated: since version 2.32.
+//
+// The function returns the following values:
+//
+//    - utf8: description of the MIME type of info.
+//
 func (info *MIMEInfo) Description() string {
 	var _arg0 *C.WebKitMimeInfo // out
 	var _cret *C.gchar          // in
@@ -59,6 +62,11 @@ func (info *MIMEInfo) Description() string {
 // info
 //
 // Deprecated: since version 2.32.
+//
+// The function returns the following values:
+//
+//    - utf8s: a NULL-terminated array of strings.
+//
 func (info *MIMEInfo) Extensions() []string {
 	var _arg0 *C.WebKitMimeInfo // out
 	var _cret **C.gchar         // in
@@ -88,6 +96,11 @@ func (info *MIMEInfo) Extensions() []string {
 }
 
 // MIMEType: deprecated: since version 2.32.
+//
+// The function returns the following values:
+//
+//    - utf8: MIME type of info.
+//
 func (info *MIMEInfo) MIMEType() string {
 	var _arg0 *C.WebKitMimeInfo // out
 	var _cret *C.gchar          // in

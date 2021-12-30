@@ -14,8 +14,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -50,9 +48,13 @@ func _gotk4_soup2_ProxyURIResolverCallback(arg0 *C.SoupProxyURIResolver, arg1 C.
 		}
 
 		object := externglib.Take(objptr)
-		rv, ok := (externglib.CastObject(object)).(ProxyURIResolverer)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(ProxyURIResolverer)
+			return ok
+		})
+		rv, ok := casted.(ProxyURIResolverer)
 		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not soup.ProxyURIResolverer")
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.ProxyURIResolverer")
 		}
 		resolver = rv
 	}
@@ -72,10 +74,19 @@ type ProxyURIResolverOverrider interface {
 	// calls callback.
 	//
 	// Deprecated: ProxyURIResolver is deprecated in favor of Resolver.
+	//
+	// The function takes the following parameters:
+	//
+	//    - ctx (optional) or NULL.
+	//    - uri you want a proxy for.
+	//    - asyncContext (optional) to invoke callback in.
+	//    - callback to invoke with the proxy address.
+	//
 	ProxyUriAsync(ctx context.Context, uri *URI, asyncContext *glib.MainContext, callback ProxyURIResolverCallback)
 }
 
 type ProxyURIResolver struct {
+	_ [0]func() // equal guard
 	SessionFeature
 }
 
@@ -111,9 +122,9 @@ func marshalProxyURIResolverer(p uintptr) (interface{}, error) {
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL.
+//    - ctx (optional) or NULL.
 //    - uri you want a proxy for.
-//    - asyncContext to invoke callback in.
+//    - asyncContext (optional) to invoke callback in.
 //    - callback to invoke with the proxy address.
 //
 func (proxyUriResolver *ProxyURIResolver) ProxyUriAsync(ctx context.Context, uri *URI, asyncContext *glib.MainContext, callback ProxyURIResolverCallback) {

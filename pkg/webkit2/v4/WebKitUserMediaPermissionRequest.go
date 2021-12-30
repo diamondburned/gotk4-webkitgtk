@@ -9,8 +9,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -22,10 +20,13 @@ func init() {
 	})
 }
 
-//
 // The function takes the following parameters:
 //
 //    - request: KitUserMediaPermissionRequest.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if access to an audio device was requested.
 //
 func UserMediaPermissionIsForAudioDevice(request *UserMediaPermissionRequest) bool {
 	var _arg1 *C.WebKitUserMediaPermissionRequest // out
@@ -45,10 +46,13 @@ func UserMediaPermissionIsForAudioDevice(request *UserMediaPermissionRequest) bo
 	return _ok
 }
 
-//
 // The function takes the following parameters:
 //
 //    - request: KitUserMediaPermissionRequest.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if access to a video device was requested.
 //
 func UserMediaPermissionIsForVideoDevice(request *UserMediaPermissionRequest) bool {
 	var _arg1 *C.WebKitUserMediaPermissionRequest // out
@@ -69,6 +73,7 @@ func UserMediaPermissionIsForVideoDevice(request *UserMediaPermissionRequest) bo
 }
 
 type UserMediaPermissionRequest struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 
 	PermissionRequest

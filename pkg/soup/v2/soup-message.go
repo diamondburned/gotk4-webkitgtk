@@ -15,8 +15,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -321,6 +319,8 @@ func _gotk4_soup2_ChunkAllocator(arg0 *C.SoupMessage, arg1 C.gsize, arg2 C.gpoin
 type MessageOverrider interface {
 	Finished()
 	GotBody()
+	// The function takes the following parameters:
+	//
 	GotChunk(chunk *Buffer)
 	GotHeaders()
 	GotInformational()
@@ -367,6 +367,7 @@ type MessageOverrider interface {
 // at the end), call soup_message_body_set_accumulate() on response_body or
 // request_body as appropriate, passing FALSE.
 type Message struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -382,838 +383,6 @@ func wrapMessage(obj *externglib.Object) *Message {
 
 func marshalMessager(p uintptr) (interface{}, error) {
 	return wrapMessage(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewMessage creates a new empty Message, which will connect to uri.
-//
-// The function takes the following parameters:
-//
-//    - method: HTTP method for the created request.
-//    - uriString: destination endpoint (as a string).
-//
-func NewMessage(method, uriString string) *Message {
-	var _arg1 *C.char        // out
-	var _arg2 *C.char        // out
-	var _cret *C.SoupMessage // in
-
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(method)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.char)(unsafe.Pointer(C.CString(uriString)))
-	defer C.free(unsafe.Pointer(_arg2))
-
-	_cret = C.soup_message_new(_arg1, _arg2)
-	runtime.KeepAlive(method)
-	runtime.KeepAlive(uriString)
-
-	var _message *Message // out
-
-	if _cret != nil {
-		_message = wrapMessage(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	}
-
-	return _message
-}
-
-// NewMessageFromURI creates a new empty Message, which will connect to uri.
-//
-// The function takes the following parameters:
-//
-//    - method: HTTP method for the created request.
-//    - uri: destination endpoint (as a URI).
-//
-func NewMessageFromURI(method string, uri *URI) *Message {
-	var _arg1 *C.char        // out
-	var _arg2 *C.SoupURI     // out
-	var _cret *C.SoupMessage // in
-
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(method)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
-
-	_cret = C.soup_message_new_from_uri(_arg1, _arg2)
-	runtime.KeepAlive(method)
-	runtime.KeepAlive(uri)
-
-	var _message *Message // out
-
-	_message = wrapMessage(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _message
-}
-
-//
-// The function takes the following parameters:
-//
-
-//
-func (msg *Message) ContentSniffed(contentType string, params map[cgo.Handle]cgo.Handle) {
-	var _arg0 *C.SoupMessage // out
-	var _arg1 *C.char        // out
-	var _arg2 *C.GHashTable  // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(contentType)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = C.g_hash_table_new_full(nil, nil, (*[0]byte)(C.free), (*[0]byte)(C.free))
-	for ksrc, vsrc := range params {
-		var kdst *C.gpointer // out
-		var vdst *C.gpointer // out
-		kdst = (*C.gpointer)(unsafe.Pointer(ksrc))
-		vdst = (*C.gpointer)(unsafe.Pointer(vsrc))
-		C.g_hash_table_insert(_arg2, C.gpointer(unsafe.Pointer(kdst)), C.gpointer(unsafe.Pointer(vdst)))
-	}
-	defer C.g_hash_table_unref(_arg2)
-
-	C.soup_message_content_sniffed(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(contentType)
-	runtime.KeepAlive(params)
-}
-
-// DisableFeature: this disables the actions of SessionFeature<!-- -->s with the
-// given feature_type (or a subclass of that type) on msg, so that msg is
-// processed as though the feature(s) hadn't been added to the session. Eg,
-// passing UP_TYPE_CONTENT_SNIFFER for feature_type will disable Content-Type
-// sniffing on the message.
-//
-// You must call this before queueing msg on a session; calling it on a message
-// that has already been queued is undefined. In particular, you cannot call
-// this on a message that is being requeued after a redirect or authentication.
-//
-// The function takes the following parameters:
-//
-//    - featureType of a SessionFeature.
-//
-func (msg *Message) DisableFeature(featureType externglib.Type) {
-	var _arg0 *C.SoupMessage // out
-	var _arg1 C.GType        // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = C.GType(featureType)
-
-	C.soup_message_disable_feature(_arg0, _arg1)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(featureType)
-}
-
-func (msg *Message) Finished() {
-	var _arg0 *C.SoupMessage // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	C.soup_message_finished(_arg0)
-	runtime.KeepAlive(msg)
-}
-
-// Address gets the address msg's URI points to. After first setting the URI on
-// a message, this will be unresolved, although the message's session will
-// resolve it before sending the message.
-func (msg *Message) Address() *Address {
-	var _arg0 *C.SoupMessage // out
-	var _cret *C.SoupAddress // in
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	_cret = C.soup_message_get_address(_arg0)
-	runtime.KeepAlive(msg)
-
-	var _address *Address // out
-
-	_address = wrapAddress(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _address
-}
-
-// FirstParty gets msg's first-party URI.
-func (msg *Message) FirstParty() *URI {
-	var _arg0 *C.SoupMessage // out
-	var _cret *C.SoupURI     // in
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	_cret = C.soup_message_get_first_party(_arg0)
-	runtime.KeepAlive(msg)
-
-	var _urI *URI // out
-
-	_urI = (*URI)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-
-	return _urI
-}
-
-// Flags gets the flags on msg.
-func (msg *Message) Flags() MessageFlags {
-	var _arg0 *C.SoupMessage     // out
-	var _cret C.SoupMessageFlags // in
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	_cret = C.soup_message_get_flags(_arg0)
-	runtime.KeepAlive(msg)
-
-	var _messageFlags MessageFlags // out
-
-	_messageFlags = MessageFlags(_cret)
-
-	return _messageFlags
-}
-
-// HTTPVersion gets the HTTP version of msg. This is the minimum of the version
-// from the request and the version from the response.
-func (msg *Message) HTTPVersion() HTTPVersion {
-	var _arg0 *C.SoupMessage    // out
-	var _cret C.SoupHTTPVersion // in
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	_cret = C.soup_message_get_http_version(_arg0)
-	runtime.KeepAlive(msg)
-
-	var _httpVersion HTTPVersion // out
-
-	_httpVersion = HTTPVersion(_cret)
-
-	return _httpVersion
-}
-
-// HTTPSStatus: if msg is using https (or attempted to use https but got
-// SOUP_STATUS_SSL_FAILED), this retrieves the Certificate associated with its
-// connection, and the CertificateFlags showing what problems, if any, have been
-// found with that certificate.
-//
-// <note><para>This is only meaningful with messages processed by a Session and
-// is not useful for messages received by a Server</para></note>.
-func (msg *Message) HTTPSStatus() (gio.TLSCertificater, gio.TLSCertificateFlags, bool) {
-	var _arg0 *C.SoupMessage         // out
-	var _arg1 *C.GTlsCertificate     // in
-	var _arg2 C.GTlsCertificateFlags // in
-	var _cret C.gboolean             // in
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	_cret = C.soup_message_get_https_status(_arg0, &_arg1, &_arg2)
-	runtime.KeepAlive(msg)
-
-	var _certificate gio.TLSCertificater // out
-	var _errors gio.TLSCertificateFlags  // out
-	var _ok bool                         // out
-
-	{
-		objptr := unsafe.Pointer(_arg1)
-		if objptr == nil {
-			panic("object of type gio.TLSCertificater is nil")
-		}
-
-		object := externglib.Take(objptr)
-		rv, ok := (externglib.CastObject(object)).(gio.TLSCertificater)
-		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not gio.TLSCertificater")
-		}
-		_certificate = rv
-	}
-	_errors = gio.TLSCertificateFlags(_arg2)
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _certificate, _errors, _ok
-}
-
-func (msg *Message) IsTopLevelNavigation() bool {
-	var _arg0 *C.SoupMessage // out
-	var _cret C.gboolean     // in
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	_cret = C.soup_message_get_is_top_level_navigation(_arg0)
-	runtime.KeepAlive(msg)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// Priority retrieves the MessagePriority. If not set this value defaults to
-// UP_MESSAGE_PRIORITY_NORMAL.
-func (msg *Message) Priority() MessagePriority {
-	var _arg0 *C.SoupMessage        // out
-	var _cret C.SoupMessagePriority // in
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	_cret = C.soup_message_get_priority(_arg0)
-	runtime.KeepAlive(msg)
-
-	var _messagePriority MessagePriority // out
-
-	_messagePriority = MessagePriority(_cret)
-
-	return _messagePriority
-}
-
-// SiteForCookies gets msg's site for cookies URI.
-func (msg *Message) SiteForCookies() *URI {
-	var _arg0 *C.SoupMessage // out
-	var _cret *C.SoupURI     // in
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	_cret = C.soup_message_get_site_for_cookies(_arg0)
-	runtime.KeepAlive(msg)
-
-	var _urI *URI // out
-
-	_urI = (*URI)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-
-	return _urI
-}
-
-// SoupRequest: if msg is associated with a Request, this returns that request.
-// Otherwise it returns NULL.
-func (msg *Message) SoupRequest() *Request {
-	var _arg0 *C.SoupMessage // out
-	var _cret *C.SoupRequest // in
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	_cret = C.soup_message_get_soup_request(_arg0)
-	runtime.KeepAlive(msg)
-
-	var _request *Request // out
-
-	_request = wrapRequest(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _request
-}
-
-// URI gets msg's URI.
-func (msg *Message) URI() *URI {
-	var _arg0 *C.SoupMessage // out
-	var _cret *C.SoupURI     // in
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	_cret = C.soup_message_get_uri(_arg0)
-	runtime.KeepAlive(msg)
-
-	var _urI *URI // out
-
-	_urI = (*URI)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-
-	return _urI
-}
-
-func (msg *Message) GotBody() {
-	var _arg0 *C.SoupMessage // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	C.soup_message_got_body(_arg0)
-	runtime.KeepAlive(msg)
-}
-
-//
-// The function takes the following parameters:
-//
-
-//
-func (msg *Message) GotChunk(chunk *Buffer) {
-	var _arg0 *C.SoupMessage // out
-	var _arg1 *C.SoupBuffer  // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(chunk)))
-
-	C.soup_message_got_chunk(_arg0, _arg1)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(chunk)
-}
-
-func (msg *Message) GotHeaders() {
-	var _arg0 *C.SoupMessage // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	C.soup_message_got_headers(_arg0)
-	runtime.KeepAlive(msg)
-}
-
-func (msg *Message) GotInformational() {
-	var _arg0 *C.SoupMessage // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	C.soup_message_got_informational(_arg0)
-	runtime.KeepAlive(msg)
-}
-
-// IsFeatureDisabled: get whether SessionFeature<!-- -->s of the given
-// feature_type (or a subclass of that type) are disabled on msg. See
-// soup_message_disable_feature().
-//
-// The function takes the following parameters:
-//
-//    - featureType of a SessionFeature.
-//
-func (msg *Message) IsFeatureDisabled(featureType externglib.Type) bool {
-	var _arg0 *C.SoupMessage // out
-	var _arg1 C.GType        // out
-	var _cret C.gboolean     // in
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = C.GType(featureType)
-
-	_cret = C.soup_message_is_feature_disabled(_arg0, _arg1)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(featureType)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// IsKeepalive determines whether or not msg's connection can be kept alive for
-// further requests after processing msg, based on the HTTP version, Connection
-// header, etc.
-func (msg *Message) IsKeepalive() bool {
-	var _arg0 *C.SoupMessage // out
-	var _cret C.gboolean     // in
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	_cret = C.soup_message_is_keepalive(_arg0)
-	runtime.KeepAlive(msg)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-func (msg *Message) Restarted() {
-	var _arg0 *C.SoupMessage // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	C.soup_message_restarted(_arg0)
-	runtime.KeepAlive(msg)
-}
-
-// SetChunkAllocator sets an alternate chunk-allocation function to use when
-// reading msg's body when using the traditional (ie, non-Request<!-- -->-based)
-// API. Every time data is available to read, libsoup will call allocator, which
-// should return a Buffer. (See ChunkAllocator for additional details.) Libsoup
-// will then read data from the network into that buffer, and update the
-// buffer's <literal>length</literal> to indicate how much data it read.
-//
-// Generally, a custom chunk allocator would be used in conjunction with
-// soup_message_body_set_accumulate() FALSE and Message::got_chunk, as part of a
-// strategy to avoid unnecessary copying of data. However, you cannot assume
-// that every call to the allocator will be followed by a call to your
-// Message::got_chunk handler; if an I/O error occurs, then the buffer will be
-// unreffed without ever having been used. If your buffer-allocation strategy
-// requires special cleanup, use soup_buffer_new_with_owner() rather than doing
-// the cleanup from the Message::got_chunk handler.
-//
-// The other thing to remember when using non-accumulating message bodies is
-// that the buffer passed to the Message::got_chunk handler will be unreffed
-// after the handler returns, just as it would be in the non-custom-allocated
-// case. If you want to hand the chunk data off to some other part of your
-// program to use later, you'll need to ref the Buffer (or its owner, in the
-// soup_buffer_new_with_owner() case) to ensure that the data remains valid.
-//
-// Deprecated: Request provides a much simpler API that lets you read the
-// response directly into your own buffers without needing to mess with
-// callbacks, pausing/unpausing, etc.
-//
-// The function takes the following parameters:
-//
-//    - allocator: chunk allocator callback.
-//
-func (msg *Message) SetChunkAllocator(allocator ChunkAllocator) {
-	var _arg0 *C.SoupMessage       // out
-	var _arg1 C.SoupChunkAllocator // out
-	var _arg2 C.gpointer
-	var _arg3 C.GDestroyNotify
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = (*[0]byte)(C._gotk4_soup2_ChunkAllocator)
-	_arg2 = C.gpointer(gbox.Assign(allocator))
-	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
-
-	C.soup_message_set_chunk_allocator(_arg0, _arg1, _arg2, _arg3)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(allocator)
-}
-
-// SetFirstParty sets first_party as the main document URI for msg. For details
-// of when and how this is used refer to the documentation for
-// CookieJarAcceptPolicy.
-//
-// The function takes the following parameters:
-//
-//    - firstParty for the msg's first party.
-//
-func (msg *Message) SetFirstParty(firstParty *URI) {
-	var _arg0 *C.SoupMessage // out
-	var _arg1 *C.SoupURI     // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(firstParty)))
-
-	C.soup_message_set_first_party(_arg0, _arg1)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(firstParty)
-}
-
-// SetFlags sets the specified flags on msg.
-//
-// The function takes the following parameters:
-//
-//    - flags: set of MessageFlags values.
-//
-func (msg *Message) SetFlags(flags MessageFlags) {
-	var _arg0 *C.SoupMessage     // out
-	var _arg1 C.SoupMessageFlags // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = C.SoupMessageFlags(flags)
-
-	C.soup_message_set_flags(_arg0, _arg1)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(flags)
-}
-
-// SetHTTPVersion sets the HTTP version on msg. The default version is
-// SOUP_HTTP_1_1. Setting it to SOUP_HTTP_1_0 will prevent certain functionality
-// from being used.
-//
-// The function takes the following parameters:
-//
-//    - version: HTTP version.
-//
-func (msg *Message) SetHTTPVersion(version HTTPVersion) {
-	var _arg0 *C.SoupMessage    // out
-	var _arg1 C.SoupHTTPVersion // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = C.SoupHTTPVersion(version)
-
-	C.soup_message_set_http_version(_arg0, _arg1)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(version)
-}
-
-// SetIsTopLevelNavigation: see the same-site spec
-// (https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00) for more
-// information.
-//
-// The function takes the following parameters:
-//
-//    - isTopLevelNavigation: if TRUE indicate the current request is a
-//    top-level navigation.
-//
-func (msg *Message) SetIsTopLevelNavigation(isTopLevelNavigation bool) {
-	var _arg0 *C.SoupMessage // out
-	var _arg1 C.gboolean     // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	if isTopLevelNavigation {
-		_arg1 = C.TRUE
-	}
-
-	C.soup_message_set_is_top_level_navigation(_arg0, _arg1)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(isTopLevelNavigation)
-}
-
-// SetPriority sets the priority of a message. Note that this won't have any
-// effect unless used before the message is added to the session's message
-// processing queue.
-//
-// The message will be placed just before any other previously added message
-// with lower priority (messages with the same priority are processed on a FIFO
-// basis).
-//
-// Setting priorities does not currently work with SessionSync (or with
-// synchronous messages on a plain Session) because in the synchronous/blocking
-// case, priority ends up being determined semi-randomly by thread scheduling.
-//
-// The function takes the following parameters:
-//
-//    - priority: MessagePriority.
-//
-func (msg *Message) SetPriority(priority MessagePriority) {
-	var _arg0 *C.SoupMessage        // out
-	var _arg1 C.SoupMessagePriority // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = C.SoupMessagePriority(priority)
-
-	C.soup_message_set_priority(_arg0, _arg1)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(priority)
-}
-
-// SetRedirect sets msg's status_code to status_code and adds a Location header
-// pointing to redirect_uri. Use this from a Server when you want to redirect
-// the client to another URI.
-//
-// redirect_uri can be a relative URI, in which case it is interpreted relative
-// to msg's current URI. In particular, if redirect_uri is just a path, it will
-// replace the path <emphasis>and query</emphasis> of msg's URI.
-//
-// The function takes the following parameters:
-//
-//    - statusCode: 3xx status code.
-//    - redirectUri: URI to redirect msg to.
-//
-func (msg *Message) SetRedirect(statusCode uint, redirectUri string) {
-	var _arg0 *C.SoupMessage // out
-	var _arg1 C.guint        // out
-	var _arg2 *C.char        // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = C.guint(statusCode)
-	_arg2 = (*C.char)(unsafe.Pointer(C.CString(redirectUri)))
-	defer C.free(unsafe.Pointer(_arg2))
-
-	C.soup_message_set_redirect(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(statusCode)
-	runtime.KeepAlive(redirectUri)
-}
-
-// SetRequest: convenience function to set the request body of a Message. If
-// content_type is NULL, the request body must be empty as well.
-//
-// The function takes the following parameters:
-//
-//    - contentType: MIME Content-Type of the body.
-//    - reqUse describing how to handle req_body.
-//    - reqBody: a data buffer containing the body of the message request.
-//
-func (msg *Message) SetRequest(contentType string, reqUse MemoryUse, reqBody string) {
-	var _arg0 *C.SoupMessage  // out
-	var _arg1 *C.char         // out
-	var _arg2 C.SoupMemoryUse // out
-	var _arg3 *C.char         // out
-	var _arg4 C.gsize
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	if contentType != "" {
-		_arg1 = (*C.char)(unsafe.Pointer(C.CString(contentType)))
-		defer C.free(unsafe.Pointer(_arg1))
-	}
-	_arg2 = C.SoupMemoryUse(reqUse)
-	_arg4 = (C.gsize)(len(reqBody))
-	_arg3 = (*C.char)(C.calloc(C.size_t((len(reqBody) + 1)), C.size_t(C.sizeof_char)))
-	copy(unsafe.Slice((*byte)(unsafe.Pointer(_arg3)), len(reqBody)), reqBody)
-	defer C.free(unsafe.Pointer(_arg3))
-
-	C.soup_message_set_request(_arg0, _arg1, _arg2, _arg3, _arg4)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(contentType)
-	runtime.KeepAlive(reqUse)
-	runtime.KeepAlive(reqBody)
-}
-
-// SetResponse: convenience function to set the response body of a Message. If
-// content_type is NULL, the response body must be empty as well.
-//
-// The function takes the following parameters:
-//
-//    - contentType: MIME Content-Type of the body.
-//    - respUse describing how to handle resp_body.
-//    - respBody: a data buffer containing the body of the message response.
-//
-func (msg *Message) SetResponse(contentType string, respUse MemoryUse, respBody string) {
-	var _arg0 *C.SoupMessage  // out
-	var _arg1 *C.char         // out
-	var _arg2 C.SoupMemoryUse // out
-	var _arg3 *C.char         // out
-	var _arg4 C.gsize
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	if contentType != "" {
-		_arg1 = (*C.char)(unsafe.Pointer(C.CString(contentType)))
-		defer C.free(unsafe.Pointer(_arg1))
-	}
-	_arg2 = C.SoupMemoryUse(respUse)
-	_arg4 = (C.gsize)(len(respBody))
-	_arg3 = (*C.char)(C.calloc(C.size_t((len(respBody) + 1)), C.size_t(C.sizeof_char)))
-	copy(unsafe.Slice((*byte)(unsafe.Pointer(_arg3)), len(respBody)), respBody)
-	defer C.free(unsafe.Pointer(_arg3))
-
-	C.soup_message_set_response(_arg0, _arg1, _arg2, _arg3, _arg4)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(contentType)
-	runtime.KeepAlive(respUse)
-	runtime.KeepAlive(respBody)
-}
-
-// SetSiteForCookies sets site_for_cookies as the policy URL for same-site
-// cookies for msg.
-//
-// It is either the URL of the top-level document or NULL depending on whether
-// the registrable domain of this document's URL matches the registrable domain
-// of its parent's/opener's URL. For the top-level document it is set to the
-// document's URL.
-//
-// See the same-site spec
-// (https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00) for more
-// information.
-//
-// The function takes the following parameters:
-//
-//    - siteForCookies for the msg's site for cookies.
-//
-func (msg *Message) SetSiteForCookies(siteForCookies *URI) {
-	var _arg0 *C.SoupMessage // out
-	var _arg1 *C.SoupURI     // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	if siteForCookies != nil {
-		_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(siteForCookies)))
-	}
-
-	C.soup_message_set_site_for_cookies(_arg0, _arg1)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(siteForCookies)
-}
-
-// SetStatus sets msg's status code to status_code. If status_code is a known
-// value, it will also set msg's reason_phrase.
-//
-// The function takes the following parameters:
-//
-//    - statusCode: HTTP status code.
-//
-func (msg *Message) SetStatus(statusCode uint) {
-	var _arg0 *C.SoupMessage // out
-	var _arg1 C.guint        // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = C.guint(statusCode)
-
-	C.soup_message_set_status(_arg0, _arg1)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(statusCode)
-}
-
-// SetStatusFull sets msg's status code and reason phrase.
-//
-// The function takes the following parameters:
-//
-//    - statusCode: HTTP status code.
-//    - reasonPhrase: description of the status.
-//
-func (msg *Message) SetStatusFull(statusCode uint, reasonPhrase string) {
-	var _arg0 *C.SoupMessage // out
-	var _arg1 C.guint        // out
-	var _arg2 *C.char        // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = C.guint(statusCode)
-	_arg2 = (*C.char)(unsafe.Pointer(C.CString(reasonPhrase)))
-	defer C.free(unsafe.Pointer(_arg2))
-
-	C.soup_message_set_status_full(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(statusCode)
-	runtime.KeepAlive(reasonPhrase)
-}
-
-// SetURI sets msg's URI to uri. If msg has already been sent and you want to
-// re-send it with the new URI, you need to call soup_session_requeue_message().
-//
-// The function takes the following parameters:
-//
-//    - uri: new URI.
-//
-func (msg *Message) SetURI(uri *URI) {
-	var _arg0 *C.SoupMessage // out
-	var _arg1 *C.SoupURI     // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
-
-	C.soup_message_set_uri(_arg0, _arg1)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(uri)
-}
-
-func (msg *Message) Starting() {
-	var _arg0 *C.SoupMessage // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	C.soup_message_starting(_arg0)
-	runtime.KeepAlive(msg)
-}
-
-func (msg *Message) WroteBody() {
-	var _arg0 *C.SoupMessage // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	C.soup_message_wrote_body(_arg0)
-	runtime.KeepAlive(msg)
-}
-
-//
-// The function takes the following parameters:
-//
-
-//
-func (msg *Message) WroteBodyData(chunk *Buffer) {
-	var _arg0 *C.SoupMessage // out
-	var _arg1 *C.SoupBuffer  // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg1 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(chunk)))
-
-	C.soup_message_wrote_body_data(_arg0, _arg1)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(chunk)
-}
-
-func (msg *Message) WroteChunk() {
-	var _arg0 *C.SoupMessage // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	C.soup_message_wrote_chunk(_arg0)
-	runtime.KeepAlive(msg)
-}
-
-func (msg *Message) WroteHeaders() {
-	var _arg0 *C.SoupMessage // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	C.soup_message_wrote_headers(_arg0)
-	runtime.KeepAlive(msg)
-}
-
-func (msg *Message) WroteInformational() {
-	var _arg0 *C.SoupMessage // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-
-	C.soup_message_wrote_informational(_arg0)
-	runtime.KeepAlive(msg)
 }
 
 // ConnectContentSniffed: this signal is emitted after Message::got-headers, and
@@ -1361,4 +530,902 @@ func (msg *Message) ConnectWroteHeaders(f func()) externglib.SignalHandle {
 // (Informational) response for a (server-side) message.
 func (msg *Message) ConnectWroteInformational(f func()) externglib.SignalHandle {
 	return msg.Connect("wrote-informational", f)
+}
+
+// NewMessage creates a new empty Message, which will connect to uri.
+//
+// The function takes the following parameters:
+//
+//    - method: HTTP method for the created request.
+//    - uriString: destination endpoint (as a string).
+//
+// The function returns the following values:
+//
+//    - message (optional): new Message (or NULL if uri could not be parsed).
+//
+func NewMessage(method, uriString string) *Message {
+	var _arg1 *C.char        // out
+	var _arg2 *C.char        // out
+	var _cret *C.SoupMessage // in
+
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(method)))
+	defer C.free(unsafe.Pointer(_arg1))
+	_arg2 = (*C.char)(unsafe.Pointer(C.CString(uriString)))
+	defer C.free(unsafe.Pointer(_arg2))
+
+	_cret = C.soup_message_new(_arg1, _arg2)
+	runtime.KeepAlive(method)
+	runtime.KeepAlive(uriString)
+
+	var _message *Message // out
+
+	if _cret != nil {
+		_message = wrapMessage(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	}
+
+	return _message
+}
+
+// NewMessageFromURI creates a new empty Message, which will connect to uri.
+//
+// The function takes the following parameters:
+//
+//    - method: HTTP method for the created request.
+//    - uri: destination endpoint (as a URI).
+//
+// The function returns the following values:
+//
+//    - message: new Message.
+//
+func NewMessageFromURI(method string, uri *URI) *Message {
+	var _arg1 *C.char        // out
+	var _arg2 *C.SoupURI     // out
+	var _cret *C.SoupMessage // in
+
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(method)))
+	defer C.free(unsafe.Pointer(_arg1))
+	_arg2 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
+
+	_cret = C.soup_message_new_from_uri(_arg1, _arg2)
+	runtime.KeepAlive(method)
+	runtime.KeepAlive(uri)
+
+	var _message *Message // out
+
+	_message = wrapMessage(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+
+	return _message
+}
+
+// The function takes the following parameters:
+//
+//    - contentType
+//    - params
+//
+func (msg *Message) ContentSniffed(contentType string, params map[cgo.Handle]cgo.Handle) {
+	var _arg0 *C.SoupMessage // out
+	var _arg1 *C.char        // out
+	var _arg2 *C.GHashTable  // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(contentType)))
+	defer C.free(unsafe.Pointer(_arg1))
+	_arg2 = C.g_hash_table_new_full(nil, nil, (*[0]byte)(C.free), (*[0]byte)(C.free))
+	for ksrc, vsrc := range params {
+		var kdst *C.gpointer // out
+		var vdst *C.gpointer // out
+		kdst = (*C.gpointer)(unsafe.Pointer(ksrc))
+		vdst = (*C.gpointer)(unsafe.Pointer(vsrc))
+		C.g_hash_table_insert(_arg2, C.gpointer(unsafe.Pointer(kdst)), C.gpointer(unsafe.Pointer(vdst)))
+	}
+	defer C.g_hash_table_unref(_arg2)
+
+	C.soup_message_content_sniffed(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(contentType)
+	runtime.KeepAlive(params)
+}
+
+// DisableFeature: this disables the actions of SessionFeature<!-- -->s with the
+// given feature_type (or a subclass of that type) on msg, so that msg is
+// processed as though the feature(s) hadn't been added to the session. Eg,
+// passing UP_TYPE_CONTENT_SNIFFER for feature_type will disable Content-Type
+// sniffing on the message.
+//
+// You must call this before queueing msg on a session; calling it on a message
+// that has already been queued is undefined. In particular, you cannot call
+// this on a message that is being requeued after a redirect or authentication.
+//
+// The function takes the following parameters:
+//
+//    - featureType of a SessionFeature.
+//
+func (msg *Message) DisableFeature(featureType externglib.Type) {
+	var _arg0 *C.SoupMessage // out
+	var _arg1 C.GType        // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = C.GType(featureType)
+
+	C.soup_message_disable_feature(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(featureType)
+}
+
+func (msg *Message) Finished() {
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	C.soup_message_finished(_arg0)
+	runtime.KeepAlive(msg)
+}
+
+// Address gets the address msg's URI points to. After first setting the URI on
+// a message, this will be unresolved, although the message's session will
+// resolve it before sending the message.
+//
+// The function returns the following values:
+//
+//    - address msg's URI points to.
+//
+func (msg *Message) Address() *Address {
+	var _arg0 *C.SoupMessage // out
+	var _cret *C.SoupAddress // in
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	_cret = C.soup_message_get_address(_arg0)
+	runtime.KeepAlive(msg)
+
+	var _address *Address // out
+
+	_address = wrapAddress(externglib.Take(unsafe.Pointer(_cret)))
+
+	return _address
+}
+
+// FirstParty gets msg's first-party URI.
+//
+// The function returns the following values:
+//
+//    - urI msg's first party URI.
+//
+func (msg *Message) FirstParty() *URI {
+	var _arg0 *C.SoupMessage // out
+	var _cret *C.SoupURI     // in
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	_cret = C.soup_message_get_first_party(_arg0)
+	runtime.KeepAlive(msg)
+
+	var _urI *URI // out
+
+	_urI = (*URI)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+
+	return _urI
+}
+
+// Flags gets the flags on msg.
+//
+// The function returns the following values:
+//
+//    - messageFlags: flags.
+//
+func (msg *Message) Flags() MessageFlags {
+	var _arg0 *C.SoupMessage     // out
+	var _cret C.SoupMessageFlags // in
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	_cret = C.soup_message_get_flags(_arg0)
+	runtime.KeepAlive(msg)
+
+	var _messageFlags MessageFlags // out
+
+	_messageFlags = MessageFlags(_cret)
+
+	return _messageFlags
+}
+
+// HTTPVersion gets the HTTP version of msg. This is the minimum of the version
+// from the request and the version from the response.
+//
+// The function returns the following values:
+//
+//    - httpVersion: HTTP version.
+//
+func (msg *Message) HTTPVersion() HTTPVersion {
+	var _arg0 *C.SoupMessage    // out
+	var _cret C.SoupHTTPVersion // in
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	_cret = C.soup_message_get_http_version(_arg0)
+	runtime.KeepAlive(msg)
+
+	var _httpVersion HTTPVersion // out
+
+	_httpVersion = HTTPVersion(_cret)
+
+	return _httpVersion
+}
+
+// HTTPSStatus: if msg is using https (or attempted to use https but got
+// SOUP_STATUS_SSL_FAILED), this retrieves the Certificate associated with its
+// connection, and the CertificateFlags showing what problems, if any, have been
+// found with that certificate.
+//
+// <note><para>This is only meaningful with messages processed by a Session and
+// is not useful for messages received by a Server</para></note>.
+//
+// The function returns the following values:
+//
+//    - certificate msg's TLS certificate.
+//    - errors: verification status of certificate.
+//    - ok: TRUE if msg used/attempted https, FALSE if not.
+//
+func (msg *Message) HTTPSStatus() (gio.TLSCertificater, gio.TLSCertificateFlags, bool) {
+	var _arg0 *C.SoupMessage         // out
+	var _arg1 *C.GTlsCertificate     // in
+	var _arg2 C.GTlsCertificateFlags // in
+	var _cret C.gboolean             // in
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	_cret = C.soup_message_get_https_status(_arg0, &_arg1, &_arg2)
+	runtime.KeepAlive(msg)
+
+	var _certificate gio.TLSCertificater // out
+	var _errors gio.TLSCertificateFlags  // out
+	var _ok bool                         // out
+
+	{
+		objptr := unsafe.Pointer(_arg1)
+		if objptr == nil {
+			panic("object of type gio.TLSCertificater is nil")
+		}
+
+		object := externglib.Take(objptr)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gio.TLSCertificater)
+			return ok
+		})
+		rv, ok := casted.(gio.TLSCertificater)
+		if !ok {
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.TLSCertificater")
+		}
+		_certificate = rv
+	}
+	_errors = gio.TLSCertificateFlags(_arg2)
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _certificate, _errors, _ok
+}
+
+// The function returns the following values:
+//
+func (msg *Message) IsTopLevelNavigation() bool {
+	var _arg0 *C.SoupMessage // out
+	var _cret C.gboolean     // in
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	_cret = C.soup_message_get_is_top_level_navigation(_arg0)
+	runtime.KeepAlive(msg)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// Priority retrieves the MessagePriority. If not set this value defaults to
+// UP_MESSAGE_PRIORITY_NORMAL.
+//
+// The function returns the following values:
+//
+//    - messagePriority: priority of the message.
+//
+func (msg *Message) Priority() MessagePriority {
+	var _arg0 *C.SoupMessage        // out
+	var _cret C.SoupMessagePriority // in
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	_cret = C.soup_message_get_priority(_arg0)
+	runtime.KeepAlive(msg)
+
+	var _messagePriority MessagePriority // out
+
+	_messagePriority = MessagePriority(_cret)
+
+	return _messagePriority
+}
+
+// SiteForCookies gets msg's site for cookies URI.
+//
+// The function returns the following values:
+//
+//    - urI msg's site for cookies URI.
+//
+func (msg *Message) SiteForCookies() *URI {
+	var _arg0 *C.SoupMessage // out
+	var _cret *C.SoupURI     // in
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	_cret = C.soup_message_get_site_for_cookies(_arg0)
+	runtime.KeepAlive(msg)
+
+	var _urI *URI // out
+
+	_urI = (*URI)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+
+	return _urI
+}
+
+// SoupRequest: if msg is associated with a Request, this returns that request.
+// Otherwise it returns NULL.
+//
+// The function returns the following values:
+//
+//    - request msg's associated Request.
+//
+func (msg *Message) SoupRequest() *Request {
+	var _arg0 *C.SoupMessage // out
+	var _cret *C.SoupRequest // in
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	_cret = C.soup_message_get_soup_request(_arg0)
+	runtime.KeepAlive(msg)
+
+	var _request *Request // out
+
+	_request = wrapRequest(externglib.Take(unsafe.Pointer(_cret)))
+
+	return _request
+}
+
+// URI gets msg's URI.
+//
+// The function returns the following values:
+//
+//    - urI: URI msg is targeted for.
+//
+func (msg *Message) URI() *URI {
+	var _arg0 *C.SoupMessage // out
+	var _cret *C.SoupURI     // in
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	_cret = C.soup_message_get_uri(_arg0)
+	runtime.KeepAlive(msg)
+
+	var _urI *URI // out
+
+	_urI = (*URI)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+
+	return _urI
+}
+
+func (msg *Message) GotBody() {
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	C.soup_message_got_body(_arg0)
+	runtime.KeepAlive(msg)
+}
+
+// The function takes the following parameters:
+//
+func (msg *Message) GotChunk(chunk *Buffer) {
+	var _arg0 *C.SoupMessage // out
+	var _arg1 *C.SoupBuffer  // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(chunk)))
+
+	C.soup_message_got_chunk(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(chunk)
+}
+
+func (msg *Message) GotHeaders() {
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	C.soup_message_got_headers(_arg0)
+	runtime.KeepAlive(msg)
+}
+
+func (msg *Message) GotInformational() {
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	C.soup_message_got_informational(_arg0)
+	runtime.KeepAlive(msg)
+}
+
+// IsFeatureDisabled: get whether SessionFeature<!-- -->s of the given
+// feature_type (or a subclass of that type) are disabled on msg. See
+// soup_message_disable_feature().
+//
+// The function takes the following parameters:
+//
+//    - featureType of a SessionFeature.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if feature is disabled, or FALSE otherwise.
+//
+func (msg *Message) IsFeatureDisabled(featureType externglib.Type) bool {
+	var _arg0 *C.SoupMessage // out
+	var _arg1 C.GType        // out
+	var _cret C.gboolean     // in
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = C.GType(featureType)
+
+	_cret = C.soup_message_is_feature_disabled(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(featureType)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// IsKeepalive determines whether or not msg's connection can be kept alive for
+// further requests after processing msg, based on the HTTP version, Connection
+// header, etc.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE or FALSE.
+//
+func (msg *Message) IsKeepalive() bool {
+	var _arg0 *C.SoupMessage // out
+	var _cret C.gboolean     // in
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	_cret = C.soup_message_is_keepalive(_arg0)
+	runtime.KeepAlive(msg)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+func (msg *Message) Restarted() {
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	C.soup_message_restarted(_arg0)
+	runtime.KeepAlive(msg)
+}
+
+// SetChunkAllocator sets an alternate chunk-allocation function to use when
+// reading msg's body when using the traditional (ie, non-Request<!-- -->-based)
+// API. Every time data is available to read, libsoup will call allocator, which
+// should return a Buffer. (See ChunkAllocator for additional details.) Libsoup
+// will then read data from the network into that buffer, and update the
+// buffer's <literal>length</literal> to indicate how much data it read.
+//
+// Generally, a custom chunk allocator would be used in conjunction with
+// soup_message_body_set_accumulate() FALSE and Message::got_chunk, as part of a
+// strategy to avoid unnecessary copying of data. However, you cannot assume
+// that every call to the allocator will be followed by a call to your
+// Message::got_chunk handler; if an I/O error occurs, then the buffer will be
+// unreffed without ever having been used. If your buffer-allocation strategy
+// requires special cleanup, use soup_buffer_new_with_owner() rather than doing
+// the cleanup from the Message::got_chunk handler.
+//
+// The other thing to remember when using non-accumulating message bodies is
+// that the buffer passed to the Message::got_chunk handler will be unreffed
+// after the handler returns, just as it would be in the non-custom-allocated
+// case. If you want to hand the chunk data off to some other part of your
+// program to use later, you'll need to ref the Buffer (or its owner, in the
+// soup_buffer_new_with_owner() case) to ensure that the data remains valid.
+//
+// Deprecated: Request provides a much simpler API that lets you read the
+// response directly into your own buffers without needing to mess with
+// callbacks, pausing/unpausing, etc.
+//
+// The function takes the following parameters:
+//
+//    - allocator: chunk allocator callback.
+//
+func (msg *Message) SetChunkAllocator(allocator ChunkAllocator) {
+	var _arg0 *C.SoupMessage       // out
+	var _arg1 C.SoupChunkAllocator // out
+	var _arg2 C.gpointer
+	var _arg3 C.GDestroyNotify
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = (*[0]byte)(C._gotk4_soup2_ChunkAllocator)
+	_arg2 = C.gpointer(gbox.Assign(allocator))
+	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
+
+	C.soup_message_set_chunk_allocator(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(allocator)
+}
+
+// SetFirstParty sets first_party as the main document URI for msg. For details
+// of when and how this is used refer to the documentation for
+// CookieJarAcceptPolicy.
+//
+// The function takes the following parameters:
+//
+//    - firstParty for the msg's first party.
+//
+func (msg *Message) SetFirstParty(firstParty *URI) {
+	var _arg0 *C.SoupMessage // out
+	var _arg1 *C.SoupURI     // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(firstParty)))
+
+	C.soup_message_set_first_party(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(firstParty)
+}
+
+// SetFlags sets the specified flags on msg.
+//
+// The function takes the following parameters:
+//
+//    - flags: set of MessageFlags values.
+//
+func (msg *Message) SetFlags(flags MessageFlags) {
+	var _arg0 *C.SoupMessage     // out
+	var _arg1 C.SoupMessageFlags // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = C.SoupMessageFlags(flags)
+
+	C.soup_message_set_flags(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(flags)
+}
+
+// SetHTTPVersion sets the HTTP version on msg. The default version is
+// SOUP_HTTP_1_1. Setting it to SOUP_HTTP_1_0 will prevent certain functionality
+// from being used.
+//
+// The function takes the following parameters:
+//
+//    - version: HTTP version.
+//
+func (msg *Message) SetHTTPVersion(version HTTPVersion) {
+	var _arg0 *C.SoupMessage    // out
+	var _arg1 C.SoupHTTPVersion // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = C.SoupHTTPVersion(version)
+
+	C.soup_message_set_http_version(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(version)
+}
+
+// SetIsTopLevelNavigation: see the same-site spec
+// (https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00) for more
+// information.
+//
+// The function takes the following parameters:
+//
+//    - isTopLevelNavigation: if TRUE indicate the current request is a top-level
+//      navigation.
+//
+func (msg *Message) SetIsTopLevelNavigation(isTopLevelNavigation bool) {
+	var _arg0 *C.SoupMessage // out
+	var _arg1 C.gboolean     // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	if isTopLevelNavigation {
+		_arg1 = C.TRUE
+	}
+
+	C.soup_message_set_is_top_level_navigation(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(isTopLevelNavigation)
+}
+
+// SetPriority sets the priority of a message. Note that this won't have any
+// effect unless used before the message is added to the session's message
+// processing queue.
+//
+// The message will be placed just before any other previously added message
+// with lower priority (messages with the same priority are processed on a FIFO
+// basis).
+//
+// Setting priorities does not currently work with SessionSync (or with
+// synchronous messages on a plain Session) because in the synchronous/blocking
+// case, priority ends up being determined semi-randomly by thread scheduling.
+//
+// The function takes the following parameters:
+//
+//    - priority: MessagePriority.
+//
+func (msg *Message) SetPriority(priority MessagePriority) {
+	var _arg0 *C.SoupMessage        // out
+	var _arg1 C.SoupMessagePriority // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = C.SoupMessagePriority(priority)
+
+	C.soup_message_set_priority(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(priority)
+}
+
+// SetRedirect sets msg's status_code to status_code and adds a Location header
+// pointing to redirect_uri. Use this from a Server when you want to redirect
+// the client to another URI.
+//
+// redirect_uri can be a relative URI, in which case it is interpreted relative
+// to msg's current URI. In particular, if redirect_uri is just a path, it will
+// replace the path <emphasis>and query</emphasis> of msg's URI.
+//
+// The function takes the following parameters:
+//
+//    - statusCode: 3xx status code.
+//    - redirectUri: URI to redirect msg to.
+//
+func (msg *Message) SetRedirect(statusCode uint, redirectUri string) {
+	var _arg0 *C.SoupMessage // out
+	var _arg1 C.guint        // out
+	var _arg2 *C.char        // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = C.guint(statusCode)
+	_arg2 = (*C.char)(unsafe.Pointer(C.CString(redirectUri)))
+	defer C.free(unsafe.Pointer(_arg2))
+
+	C.soup_message_set_redirect(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(statusCode)
+	runtime.KeepAlive(redirectUri)
+}
+
+// SetRequest: convenience function to set the request body of a Message. If
+// content_type is NULL, the request body must be empty as well.
+//
+// The function takes the following parameters:
+//
+//    - contentType (optional): MIME Content-Type of the body.
+//    - reqUse describing how to handle req_body.
+//    - reqBody (optional): a data buffer containing the body of the message
+//      request.
+//
+func (msg *Message) SetRequest(contentType string, reqUse MemoryUse, reqBody string) {
+	var _arg0 *C.SoupMessage  // out
+	var _arg1 *C.char         // out
+	var _arg2 C.SoupMemoryUse // out
+	var _arg3 *C.char         // out
+	var _arg4 C.gsize
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	if contentType != "" {
+		_arg1 = (*C.char)(unsafe.Pointer(C.CString(contentType)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
+	_arg2 = C.SoupMemoryUse(reqUse)
+	_arg4 = (C.gsize)(len(reqBody))
+	_arg3 = (*C.char)(C.calloc(C.size_t((len(reqBody) + 1)), C.size_t(C.sizeof_char)))
+	copy(unsafe.Slice((*byte)(unsafe.Pointer(_arg3)), len(reqBody)), reqBody)
+	defer C.free(unsafe.Pointer(_arg3))
+
+	C.soup_message_set_request(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(contentType)
+	runtime.KeepAlive(reqUse)
+	runtime.KeepAlive(reqBody)
+}
+
+// SetResponse: convenience function to set the response body of a Message. If
+// content_type is NULL, the response body must be empty as well.
+//
+// The function takes the following parameters:
+//
+//    - contentType (optional): MIME Content-Type of the body.
+//    - respUse describing how to handle resp_body.
+//    - respBody (optional): a data buffer containing the body of the message
+//      response.
+//
+func (msg *Message) SetResponse(contentType string, respUse MemoryUse, respBody string) {
+	var _arg0 *C.SoupMessage  // out
+	var _arg1 *C.char         // out
+	var _arg2 C.SoupMemoryUse // out
+	var _arg3 *C.char         // out
+	var _arg4 C.gsize
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	if contentType != "" {
+		_arg1 = (*C.char)(unsafe.Pointer(C.CString(contentType)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
+	_arg2 = C.SoupMemoryUse(respUse)
+	_arg4 = (C.gsize)(len(respBody))
+	_arg3 = (*C.char)(C.calloc(C.size_t((len(respBody) + 1)), C.size_t(C.sizeof_char)))
+	copy(unsafe.Slice((*byte)(unsafe.Pointer(_arg3)), len(respBody)), respBody)
+	defer C.free(unsafe.Pointer(_arg3))
+
+	C.soup_message_set_response(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(contentType)
+	runtime.KeepAlive(respUse)
+	runtime.KeepAlive(respBody)
+}
+
+// SetSiteForCookies sets site_for_cookies as the policy URL for same-site
+// cookies for msg.
+//
+// It is either the URL of the top-level document or NULL depending on whether
+// the registrable domain of this document's URL matches the registrable domain
+// of its parent's/opener's URL. For the top-level document it is set to the
+// document's URL.
+//
+// See the same-site spec
+// (https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00) for more
+// information.
+//
+// The function takes the following parameters:
+//
+//    - siteForCookies (optional) for the msg's site for cookies.
+//
+func (msg *Message) SetSiteForCookies(siteForCookies *URI) {
+	var _arg0 *C.SoupMessage // out
+	var _arg1 *C.SoupURI     // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	if siteForCookies != nil {
+		_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(siteForCookies)))
+	}
+
+	C.soup_message_set_site_for_cookies(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(siteForCookies)
+}
+
+// SetStatus sets msg's status code to status_code. If status_code is a known
+// value, it will also set msg's reason_phrase.
+//
+// The function takes the following parameters:
+//
+//    - statusCode: HTTP status code.
+//
+func (msg *Message) SetStatus(statusCode uint) {
+	var _arg0 *C.SoupMessage // out
+	var _arg1 C.guint        // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = C.guint(statusCode)
+
+	C.soup_message_set_status(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(statusCode)
+}
+
+// SetStatusFull sets msg's status code and reason phrase.
+//
+// The function takes the following parameters:
+//
+//    - statusCode: HTTP status code.
+//    - reasonPhrase: description of the status.
+//
+func (msg *Message) SetStatusFull(statusCode uint, reasonPhrase string) {
+	var _arg0 *C.SoupMessage // out
+	var _arg1 C.guint        // out
+	var _arg2 *C.char        // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = C.guint(statusCode)
+	_arg2 = (*C.char)(unsafe.Pointer(C.CString(reasonPhrase)))
+	defer C.free(unsafe.Pointer(_arg2))
+
+	C.soup_message_set_status_full(_arg0, _arg1, _arg2)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(statusCode)
+	runtime.KeepAlive(reasonPhrase)
+}
+
+// SetURI sets msg's URI to uri. If msg has already been sent and you want to
+// re-send it with the new URI, you need to call soup_session_requeue_message().
+//
+// The function takes the following parameters:
+//
+//    - uri: new URI.
+//
+func (msg *Message) SetURI(uri *URI) {
+	var _arg0 *C.SoupMessage // out
+	var _arg1 *C.SoupURI     // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
+
+	C.soup_message_set_uri(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(uri)
+}
+
+func (msg *Message) Starting() {
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	C.soup_message_starting(_arg0)
+	runtime.KeepAlive(msg)
+}
+
+func (msg *Message) WroteBody() {
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	C.soup_message_wrote_body(_arg0)
+	runtime.KeepAlive(msg)
+}
+
+// The function takes the following parameters:
+//
+func (msg *Message) WroteBodyData(chunk *Buffer) {
+	var _arg0 *C.SoupMessage // out
+	var _arg1 *C.SoupBuffer  // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(chunk)))
+
+	C.soup_message_wrote_body_data(_arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(chunk)
+}
+
+func (msg *Message) WroteChunk() {
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	C.soup_message_wrote_chunk(_arg0)
+	runtime.KeepAlive(msg)
+}
+
+func (msg *Message) WroteHeaders() {
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	C.soup_message_wrote_headers(_arg0)
+	runtime.KeepAlive(msg)
+}
+
+func (msg *Message) WroteInformational() {
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+
+	C.soup_message_wrote_informational(_arg0)
+	runtime.KeepAlive(msg)
 }

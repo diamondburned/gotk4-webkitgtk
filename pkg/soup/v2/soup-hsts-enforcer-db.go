@@ -9,8 +9,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -25,6 +23,7 @@ func init() {
 const HSTS_ENFORCER_DB_FILENAME = "filename"
 
 type HSTSEnforcerDB struct {
+	_ [0]func() // equal guard
 	HSTSEnforcer
 }
 
@@ -58,6 +57,10 @@ func marshalHSTSEnforcerDBer(p uintptr) (interface{}, error) {
 // The function takes the following parameters:
 //
 //    - filename of the database to read/write from.
+//
+// The function returns the following values:
+//
+//    - hstsEnforcerDB: new HSTSEnforcer.
 //
 func NewHSTSEnforcerDB(filename string) *HSTSEnforcerDB {
 	var _arg1 *C.char             // out

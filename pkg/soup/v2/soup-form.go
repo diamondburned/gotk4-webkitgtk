@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <libsoup/soup.h>
 import "C"
@@ -32,6 +30,11 @@ const FORM_MIME_TYPE_URLENCODED = "application/x-www-form-urlencoded"
 // The function takes the following parameters:
 //
 //    - encodedForm: data of type "application/x-www-form-urlencoded".
+//
+// The function returns the following values:
+//
+//    - hashTable: hash table containing the name/value pairs from encoded_form,
+//      which you can free with g_hash_table_destroy().
 //
 func FormDecode(encodedForm string) map[string]string {
 	var _arg1 *C.char       // out
@@ -71,6 +74,10 @@ func FormDecode(encodedForm string) map[string]string {
 //
 //    - formDataSet: hash table containing name/value pairs (as strings).
 //
+// The function returns the following values:
+//
+//    - utf8: encoded form.
+//
 func FormEncodeHash(formDataSet map[string]string) string {
 	var _arg1 *C.GHashTable // out
 	var _cret *C.char       // in
@@ -106,6 +113,10 @@ func FormEncodeHash(formDataSet map[string]string) string {
 //    - method: HTTP method, either "GET" or "POST".
 //    - uri: URI to send the form data to.
 //    - formDataSet: data to send to uri.
+//
+// The function returns the following values:
+//
+//    - message: new SoupMessage.
 //
 func FormRequestNewFromHash(method, uri string, formDataSet map[string]string) *Message {
 	var _arg1 *C.char        // out
@@ -157,6 +168,10 @@ func FormRequestNewFromHash(method, uri string, formDataSet map[string]string) *
 //
 //    - uri: URI to send the form data to.
 //    - multipart: "multipart/form-data" Multipart.
+//
+// The function returns the following values:
+//
+//    - message: new SoupMessage.
 //
 func FormRequestNewFromMultipart(uri string, multipart *Multipart) *Message {
 	var _arg1 *C.char          // out

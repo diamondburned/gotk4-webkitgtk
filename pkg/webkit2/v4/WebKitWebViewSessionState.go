@@ -11,8 +11,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -63,6 +61,11 @@ func NewWebViewSessionState(data *glib.Bytes) *WebViewSessionState {
 }
 
 // Serialize serializes a KitWebViewSessionState.
+//
+// The function returns the following values:
+//
+//    - bytes containing the state serialized.
+//
 func (state *WebViewSessionState) Serialize() *glib.Bytes {
 	var _arg0 *C.WebKitWebViewSessionState // out
 	var _cret *C.GBytes                    // in

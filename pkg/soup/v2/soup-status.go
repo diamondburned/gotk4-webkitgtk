@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -321,6 +319,10 @@ func (s Status) String() string {
 //
 //    - statusCode: HTTP status code.
 //
+// The function returns the following values:
+//
+//    - utf8: (terse, English) description of status_code.
+//
 func StatusGetPhrase(statusCode uint) string {
 	var _arg1 C.guint // out
 	var _cret *C.char // in
@@ -345,6 +347,10 @@ func StatusGetPhrase(statusCode uint) string {
 // The function takes the following parameters:
 //
 //    - statusCode status code.
+//
+// The function returns the following values:
+//
+//    - guint: "proxified" equivalent of status_code.
 //
 func StatusProxify(statusCode uint) uint {
 	var _arg1 C.guint // out

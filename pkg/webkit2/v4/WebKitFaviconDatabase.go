@@ -16,8 +16,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -65,6 +63,7 @@ func (f FaviconDatabaseError) String() string {
 }
 
 type FaviconDatabase struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -80,6 +79,16 @@ func wrapFaviconDatabase(obj *externglib.Object) *FaviconDatabase {
 
 func marshalFaviconDatabaser(p uintptr) (interface{}, error) {
 	return wrapFaviconDatabase(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+// ConnectFaviconChanged: this signal is emitted when the favicon URI of
+// page_uri has been changed to favicon_uri in the database. You can connect to
+// this signal and call webkit_favicon_database_get_favicon() to get the
+// favicon. If you are interested in the favicon of a KitWebView it's easier to
+// use the KitWebView:favicon property. See webkit_web_view_get_favicon() for
+// more details.
+func (database *FaviconDatabase) ConnectFaviconChanged(f func(pageUri, faviconUri string)) externglib.SignalHandle {
+	return database.Connect("favicon-changed", f)
 }
 
 // Clear clears all icons from the database.
@@ -107,10 +116,10 @@ func (database *FaviconDatabase) Clear() {
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL.
+//    - ctx (optional) or NULL.
 //    - pageUri: URI of the page for which we want to retrieve the favicon.
-//    - callback to call when the request is satisfied or NULL if you don't
-//    care about the result.
+//    - callback (optional) to call when the request is satisfied or NULL if you
+//      don't care about the result.
 //
 func (database *FaviconDatabase) Favicon(ctx context.Context, pageUri string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitFaviconDatabase // out
@@ -145,7 +154,11 @@ func (database *FaviconDatabase) Favicon(ctx context.Context, pageUri string, ca
 // The function takes the following parameters:
 //
 //    - result obtained from the ReadyCallback passed to
-//    webkit_favicon_database_get_favicon().
+//      webkit_favicon_database_get_favicon().
+//
+// The function returns the following values:
+//
+//    - surface: new reference to a #cairo_surface_t, or NULL in case of error.
 //
 func (database *FaviconDatabase) FaviconFinish(result gio.AsyncResulter) (*cairo.Surface, error) {
 	var _arg0 *C.WebKitFaviconDatabase // out
@@ -180,6 +193,11 @@ func (database *FaviconDatabase) FaviconFinish(result gio.AsyncResulter) (*cairo
 //
 //    - pageUri: URI of the page containing the icon.
 //
+// The function returns the following values:
+//
+//    - utf8: newly allocated URI for the favicon, or NULL if the database
+//      doesn't have a favicon for page_uri.
+//
 func (database *FaviconDatabase) FaviconURI(pageUri string) string {
 	var _arg0 *C.WebKitFaviconDatabase // out
 	var _arg1 *C.gchar                 // out
@@ -199,14 +217,4 @@ func (database *FaviconDatabase) FaviconURI(pageUri string) string {
 	defer C.free(unsafe.Pointer(_cret))
 
 	return _utf8
-}
-
-// ConnectFaviconChanged: this signal is emitted when the favicon URI of
-// page_uri has been changed to favicon_uri in the database. You can connect to
-// this signal and call webkit_favicon_database_get_favicon() to get the
-// favicon. If you are interested in the favicon of a KitWebView it's easier to
-// use the KitWebView:favicon property. See webkit_web_view_get_favicon() for
-// more details.
-func (database *FaviconDatabase) ConnectFaviconChanged(f func(pageUri, faviconUri string)) externglib.SignalHandle {
-	return database.Connect("favicon-changed", f)
 }

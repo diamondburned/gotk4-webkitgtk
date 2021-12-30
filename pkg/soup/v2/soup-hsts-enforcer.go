@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -28,16 +26,39 @@ func init() {
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type HSTSEnforcerOverrider interface {
+	// The function takes the following parameters:
+	//
+	//    - oldPolicy
+	//    - newPolicy
+	//
 	Changed(oldPolicy, newPolicy *HSTSPolicy)
 	// HasValidPolicy gets whether hsts_enforcer has a currently valid policy
 	// for domain.
+	//
+	// The function takes the following parameters:
+	//
+	//    - domain: domain.
+	//
+	// The function returns the following values:
+	//
+	//    - ok: TRUE if access to domain should happen over HTTPS, false
+	//      otherwise.
+	//
 	HasValidPolicy(domain string) bool
+	// The function takes the following parameters:
+	//
 	HstsEnforced(message *Message)
 	// IsPersistent gets whether hsts_enforcer stores policies persistenly.
+	//
+	// The function returns the following values:
+	//
+	//    - ok: TRUE if hsts_enforcer storage is persistent or FALSE otherwise.
+	//
 	IsPersistent() bool
 }
 
 type HSTSEnforcer struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 
 	SessionFeature
@@ -60,8 +81,30 @@ func marshalHSTSEnforcerer(p uintptr) (interface{}, error) {
 	return wrapHSTSEnforcer(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+// ConnectChanged: emitted when hsts_enforcer changes. If a policy has been
+// added, new_policy will contain the newly-added policy and old_policy will be
+// NULL. If a policy has been deleted, old_policy will contain the to-be-deleted
+// policy and new_policy will be NULL. If a policy has been changed, old_policy
+// will contain its old value, and new_policy its new value.
+//
+// Note that you shouldn't modify the policies from a callback to this signal.
+func (hstsEnforcer *HSTSEnforcer) ConnectChanged(f func(oldPolicy, newPolicy *HSTSPolicy)) externglib.SignalHandle {
+	return hstsEnforcer.Connect("changed", f)
+}
+
+// ConnectHstsEnforced: emitted when hsts_enforcer has upgraded the protocol for
+// message to HTTPS as a result of matching its domain with a HSTS policy.
+func (hstsEnforcer *HSTSEnforcer) ConnectHstsEnforced(f func(message Message)) externglib.SignalHandle {
+	return hstsEnforcer.Connect("hsts-enforced", f)
+}
+
 // NewHSTSEnforcer creates a new HSTSEnforcer. The base HSTSEnforcer class does
 // not support persistent storage of HSTS policies, see HSTSEnforcerDB for that.
+//
+// The function returns the following values:
+//
+//    - hstsEnforcer: new HSTSEnforcer.
+//
 func NewHSTSEnforcer() *HSTSEnforcer {
 	var _cret *C.SoupHSTSEnforcer // in
 
@@ -79,6 +122,11 @@ func NewHSTSEnforcer() *HSTSEnforcer {
 // The function takes the following parameters:
 //
 //    - sessionPolicies: whether to include session policies.
+//
+// The function returns the following values:
+//
+//    - list: newly allocated list of domains. Use g_list_free_full() and
+//      g_free() to free the list.
 //
 func (hstsEnforcer *HSTSEnforcer) Domains(sessionPolicies bool) []string {
 	var _arg0 *C.SoupHSTSEnforcer // out
@@ -113,6 +161,11 @@ func (hstsEnforcer *HSTSEnforcer) Domains(sessionPolicies bool) []string {
 // The function takes the following parameters:
 //
 //    - sessionPolicies: whether to include session policies.
+//
+// The function returns the following values:
+//
+//    - list: newly allocated list of policies. Use g_list_free_full() and
+//      soup_hsts_policy_free() to free the list.
 //
 func (hstsEnforcer *HSTSEnforcer) Policies(sessionPolicies bool) []*HSTSPolicy {
 	var _arg0 *C.SoupHSTSEnforcer // out
@@ -154,6 +207,10 @@ func (hstsEnforcer *HSTSEnforcer) Policies(sessionPolicies bool) []*HSTSPolicy {
 //
 //    - domain: domain.
 //
+// The function returns the following values:
+//
+//    - ok: TRUE if access to domain should happen over HTTPS, false otherwise.
+//
 func (hstsEnforcer *HSTSEnforcer) HasValidPolicy(domain string) bool {
 	var _arg0 *C.SoupHSTSEnforcer // out
 	var _arg1 *C.char             // out
@@ -177,6 +234,11 @@ func (hstsEnforcer *HSTSEnforcer) HasValidPolicy(domain string) bool {
 }
 
 // IsPersistent gets whether hsts_enforcer stores policies persistenly.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if hsts_enforcer storage is persistent or FALSE otherwise.
+//
 func (hstsEnforcer *HSTSEnforcer) IsPersistent() bool {
 	var _arg0 *C.SoupHSTSEnforcer // out
 	var _cret C.gboolean          // in
@@ -243,21 +305,4 @@ func (hstsEnforcer *HSTSEnforcer) SetSessionPolicy(domain string, includeSubdoma
 	runtime.KeepAlive(hstsEnforcer)
 	runtime.KeepAlive(domain)
 	runtime.KeepAlive(includeSubdomains)
-}
-
-// ConnectChanged: emitted when hsts_enforcer changes. If a policy has been
-// added, new_policy will contain the newly-added policy and old_policy will be
-// NULL. If a policy has been deleted, old_policy will contain the to-be-deleted
-// policy and new_policy will be NULL. If a policy has been changed, old_policy
-// will contain its old value, and new_policy its new value.
-//
-// Note that you shouldn't modify the policies from a callback to this signal.
-func (hstsEnforcer *HSTSEnforcer) ConnectChanged(f func(oldPolicy, newPolicy *HSTSPolicy)) externglib.SignalHandle {
-	return hstsEnforcer.Connect("changed", f)
-}
-
-// ConnectHstsEnforced: emitted when hsts_enforcer has upgraded the protocol for
-// message to HTTPS as a result of matching its domain with a HSTS policy.
-func (hstsEnforcer *HSTSEnforcer) ConnectHstsEnforced(f func(message Message)) externglib.SignalHandle {
-	return hstsEnforcer.Connect("hsts-enforced", f)
 }

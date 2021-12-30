@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -80,9 +78,13 @@ func _gotk4_soup2_AuthDomainFilter(arg0 *C.SoupAuthDomain, arg1 *C.SoupMessage, 
 		}
 
 		object := externglib.Take(objptr)
-		rv, ok := (externglib.CastObject(object)).(AuthDomainer)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(AuthDomainer)
+			return ok
+		})
+		rv, ok := casted.(AuthDomainer)
 		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not soup.AuthDomainer")
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.AuthDomainer")
 		}
 		domain = rv
 	}
@@ -133,9 +135,13 @@ func _gotk4_soup2_AuthDomainGenericAuthCallback(arg0 *C.SoupAuthDomain, arg1 *C.
 		}
 
 		object := externglib.Take(objptr)
-		rv, ok := (externglib.CastObject(object)).(AuthDomainer)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(AuthDomainer)
+			return ok
+		})
+		rv, ok := casted.(AuthDomainer)
 		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not soup.AuthDomainer")
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.AuthDomainer")
 		}
 		domain = rv
 	}
@@ -157,6 +163,13 @@ func _gotk4_soup2_AuthDomainGenericAuthCallback(arg0 *C.SoupAuthDomain, arg1 *C.
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type AuthDomainOverrider interface {
+	// The function takes the following parameters:
+	//
+	//    - msg
+	//    - header
+	//
+	// The function returns the following values:
+	//
 	Accepts(msg *Message, header string) string
 	// Challenge adds a "WWW-Authenticate" or "Proxy-Authenticate" header to
 	// msg, requesting that the client authenticate, and sets msg's status
@@ -164,14 +177,33 @@ type AuthDomainOverrider interface {
 	//
 	// This is used by Server internally and is probably of no use to anyone
 	// else.
+	//
+	// The function takes the following parameters:
+	//
+	//    - msg: Message.
+	//
+	// The function returns the following values:
+	//
 	Challenge(msg *Message) string
 	// CheckPassword checks if msg authenticates to domain via username and
 	// password. This would normally be called from a
 	// AuthDomainGenericAuthCallback.
+	//
+	// The function takes the following parameters:
+	//
+	//    - msg: Message.
+	//    - username: username.
+	//    - password: password.
+	//
+	// The function returns the following values:
+	//
+	//    - ok: whether or not the message is authenticated.
+	//
 	CheckPassword(msg *Message, username, password string) bool
 }
 
 type AuthDomain struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -180,7 +212,7 @@ var (
 )
 
 // AuthDomainer describes types inherited from class AuthDomain.
-
+//
 // To get the original type, the caller must assert this to an interface or
 // another type.
 type AuthDomainer interface {
@@ -200,6 +232,15 @@ func marshalAuthDomainer(p uintptr) (interface{}, error) {
 	return wrapAuthDomain(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+func (domain *AuthDomain) baseAuthDomain() *AuthDomain {
+	return domain
+}
+
+// BaseAuthDomain returns the underlying base object.
+func BaseAuthDomain(obj AuthDomainer) *AuthDomain {
+	return obj.baseAuthDomain()
+}
+
 // Accepts checks if msg contains appropriate authorization for domain to accept
 // it. Mirroring soup_auth_domain_covers(), this does not check whether or not
 // domain <emphasis>cares</emphasis> if msg is authorized.
@@ -209,6 +250,11 @@ func marshalAuthDomainer(p uintptr) (interface{}, error) {
 // The function takes the following parameters:
 //
 //    - msg: Message.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): username that msg has authenticated as, if in fact it
+//      has authenticated. NULL otherwise.
 //
 func (domain *AuthDomain) Accepts(msg *Message) string {
 	var _arg0 *C.SoupAuthDomain // out
@@ -286,6 +332,10 @@ func (domain *AuthDomain) Challenge(msg *Message) {
 //    - username: username.
 //    - password: password.
 //
+// The function returns the following values:
+//
+//    - ok: whether or not the message is authenticated.
+//
 func (domain *AuthDomain) CheckPassword(msg *Message, username, password string) bool {
 	var _arg0 *C.SoupAuthDomain // out
 	var _arg1 *C.SoupMessage    // out
@@ -325,6 +375,10 @@ func (domain *AuthDomain) CheckPassword(msg *Message, username, password string)
 //
 //    - msg: Message.
 //
+// The function returns the following values:
+//
+//    - ok: TRUE if domain requires msg to be authenticated.
+//
 func (domain *AuthDomain) Covers(msg *Message) bool {
 	var _arg0 *C.SoupAuthDomain // out
 	var _arg1 *C.SoupMessage    // out
@@ -347,6 +401,11 @@ func (domain *AuthDomain) Covers(msg *Message) bool {
 }
 
 // Realm gets the realm name associated with domain.
+//
+// The function returns the following values:
+//
+//    - utf8 domain's realm.
+//
 func (domain *AuthDomain) Realm() string {
 	var _arg0 *C.SoupAuthDomain // out
 	var _cret *C.char           // in
@@ -463,10 +522,12 @@ func (domain *AuthDomain) SetGenericAuthCallback(authCallback AuthDomainGenericA
 	runtime.KeepAlive(authCallback)
 }
 
-//
 // The function takes the following parameters:
 //
-
+//    - msg
+//    - username
+//
+// The function returns the following values:
 //
 func (domain *AuthDomain) TryGenericAuthCallback(msg *Message, username string) bool {
 	var _arg0 *C.SoupAuthDomain // out
@@ -491,13 +552,4 @@ func (domain *AuthDomain) TryGenericAuthCallback(msg *Message, username string) 
 	}
 
 	return _ok
-}
-
-func (domain *AuthDomain) baseAuthDomain() *AuthDomain {
-	return domain
-}
-
-// BaseAuthDomain returns the underlying base object.
-func BaseAuthDomain(obj AuthDomainer) *AuthDomain {
-	return obj.baseAuthDomain()
 }

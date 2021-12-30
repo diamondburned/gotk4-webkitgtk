@@ -15,8 +15,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -40,10 +38,18 @@ const REQUEST_URI = "uri"
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type RequestOverrider interface {
+	// The function takes the following parameters:
+	//
 	CheckURI(uri *URI) error
 	// ContentLength gets the length of the data represented by request. For
 	// most request types, this will not be known until after you call
 	// soup_request_send() or soup_request_send_finish().
+	//
+	// The function returns the following values:
+	//
+	//    - gint64: length of the data represented by request, or -1 if not
+	//      known.
+	//
 	ContentLength() int64
 	// ContentType gets the type of the data represented by request. For most
 	// request types, this will not be known until after you call
@@ -51,25 +57,58 @@ type RequestOverrider interface {
 	//
 	// As in the HTTP Content-Type header, this may include parameters after the
 	// MIME type.
+	//
+	// The function returns the following values:
+	//
+	//    - utf8 (optional): type of the data represented by request, or NULL if
+	//      not known.
+	//
 	ContentType() string
 	// Send: synchronously requests the URI pointed to by request, and returns a
 	// Stream that can be used to read its contents.
 	//
 	// Note that you cannot use this method with Requests attached to a
 	// SessionAsync.
+	//
+	// The function takes the following parameters:
+	//
+	//    - ctx (optional) or NULL.
+	//
+	// The function returns the following values:
+	//
+	//    - inputStream that can be used to read from the URI pointed to by
+	//      request.
+	//
 	Send(ctx context.Context) (gio.InputStreamer, error)
 	// SendAsync begins an asynchronously request for the URI pointed to by
 	// request.
 	//
 	// Note that you cannot use this method with Requests attached to a
 	// SessionSync.
+	//
+	// The function takes the following parameters:
+	//
+	//    - ctx (optional) or NULL.
+	//    - callback (optional): ReadyCallback.
+	//
 	SendAsync(ctx context.Context, callback gio.AsyncReadyCallback)
 	// SendFinish gets the result of a soup_request_send_async().
+	//
+	// The function takes the following parameters:
+	//
+	//    - result: Result.
+	//
+	// The function returns the following values:
+	//
+	//    - inputStream that can be used to read from the URI pointed to by
+	//      request.
+	//
 	SendFinish(result gio.AsyncResulter) (gio.InputStreamer, error)
 }
 
 // Request: request to retrieve a particular URI.
 type Request struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 
 	gio.Initable
@@ -95,6 +134,11 @@ func marshalRequester(p uintptr) (interface{}, error) {
 // ContentLength gets the length of the data represented by request. For most
 // request types, this will not be known until after you call
 // soup_request_send() or soup_request_send_finish().
+//
+// The function returns the following values:
+//
+//    - gint64: length of the data represented by request, or -1 if not known.
+//
 func (request *Request) ContentLength() int64 {
 	var _arg0 *C.SoupRequest // out
 	var _cret C.goffset      // in
@@ -117,6 +161,12 @@ func (request *Request) ContentLength() int64 {
 //
 // As in the HTTP Content-Type header, this may include parameters after the
 // MIME type.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): type of the data represented by request, or NULL if not
+//      known.
+//
 func (request *Request) ContentType() string {
 	var _arg0 *C.SoupRequest // out
 	var _cret *C.char        // in
@@ -136,6 +186,11 @@ func (request *Request) ContentType() string {
 }
 
 // Session gets request's Session.
+//
+// The function returns the following values:
+//
+//    - session request's Session.
+//
 func (request *Request) Session() *Session {
 	var _arg0 *C.SoupRequest // out
 	var _cret *C.SoupSession // in
@@ -153,6 +208,11 @@ func (request *Request) Session() *Session {
 }
 
 // URI gets request's URI.
+//
+// The function returns the following values:
+//
+//    - urI request's URI.
+//
 func (request *Request) URI() *URI {
 	var _arg0 *C.SoupRequest // out
 	var _cret *C.SoupURI     // in
@@ -177,7 +237,11 @@ func (request *Request) URI() *URI {
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL.
+//    - ctx (optional) or NULL.
+//
+// The function returns the following values:
+//
+//    - inputStream that can be used to read from the URI pointed to by request.
 //
 func (request *Request) Send(ctx context.Context) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupRequest  // out
@@ -206,9 +270,13 @@ func (request *Request) Send(ctx context.Context) (gio.InputStreamer, error) {
 		}
 
 		object := externglib.AssumeOwnership(objptr)
-		rv, ok := (externglib.CastObject(object)).(gio.InputStreamer)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gio.InputStreamer)
+			return ok
+		})
+		rv, ok := casted.(gio.InputStreamer)
 		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not gio.InputStreamer")
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.InputStreamer")
 		}
 		_inputStream = rv
 	}
@@ -225,8 +293,8 @@ func (request *Request) Send(ctx context.Context) (gio.InputStreamer, error) {
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL.
-//    - callback: ReadyCallback.
+//    - ctx (optional) or NULL.
+//    - callback (optional): ReadyCallback.
 //
 func (request *Request) SendAsync(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.SoupRequest        // out
@@ -257,6 +325,10 @@ func (request *Request) SendAsync(ctx context.Context, callback gio.AsyncReadyCa
 //
 //    - result: Result.
 //
+// The function returns the following values:
+//
+//    - inputStream that can be used to read from the URI pointed to by request.
+//
 func (request *Request) SendFinish(result gio.AsyncResulter) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupRequest  // out
 	var _arg1 *C.GAsyncResult // out
@@ -280,9 +352,13 @@ func (request *Request) SendFinish(result gio.AsyncResulter) (gio.InputStreamer,
 		}
 
 		object := externglib.AssumeOwnership(objptr)
-		rv, ok := (externglib.CastObject(object)).(gio.InputStreamer)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gio.InputStreamer)
+			return ok
+		})
+		rv, ok := casted.(gio.InputStreamer)
 		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not gio.InputStreamer")
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.InputStreamer")
 		}
 		_inputStream = rv
 	}

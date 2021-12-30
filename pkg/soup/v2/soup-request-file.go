@@ -10,8 +10,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -24,6 +22,7 @@ func init() {
 }
 
 type RequestFile struct {
+	_ [0]func() // equal guard
 	Request
 }
 
@@ -47,6 +46,11 @@ func marshalRequestFiler(p uintptr) (interface{}, error) {
 }
 
 // File gets a #GFile corresponding to file's URI.
+//
+// The function returns the following values:
+//
+//    - ret corresponding to file.
+//
 func (file *RequestFile) File() gio.Filer {
 	var _arg0 *C.SoupRequestFile // out
 	var _cret *C.GFile           // in
@@ -65,9 +69,13 @@ func (file *RequestFile) File() gio.Filer {
 		}
 
 		object := externglib.AssumeOwnership(objptr)
-		rv, ok := (externglib.CastObject(object)).(gio.Filer)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gio.Filer)
+			return ok
+		})
+		rv, ok := casted.(gio.Filer)
 		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not gio.Filer")
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.Filer")
 		}
 		_ret = rv
 	}

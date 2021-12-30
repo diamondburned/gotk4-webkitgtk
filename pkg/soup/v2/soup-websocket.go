@@ -12,8 +12,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -201,6 +199,8 @@ func (w WebsocketError) String() string {
 	}
 }
 
+// The function returns the following values:
+//
 func WebsocketErrorGetQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -258,8 +258,8 @@ func (w WebsocketState) String() string {
 // The function takes the following parameters:
 //
 //    - msg: Message.
-//    - origin: "Origin" header to set.
-//    - protocols: list of protocols to offer.
+//    - origin (optional): "Origin" header to set.
+//    - protocols (optional): list of protocols to offer.
 //
 func WebsocketClientPrepareHandshake(msg *Message, origin string, protocols []string) {
 	var _arg1 *C.SoupMessage // out
@@ -348,8 +348,8 @@ func WebsocketClientVerifyHandshake(msg *Message) error {
 // The function takes the following parameters:
 //
 //    - msg containing the client side of a WebSocket handshake.
-//    - origin: expected Origin header.
-//    - protocols: allowed WebSocket protocols.
+//    - origin (optional): expected Origin header.
+//    - protocols (optional): allowed WebSocket protocols.
 //
 func WebsocketServerCheckHandshake(msg *Message, origin string, protocols []string) error {
 	var _arg1 *C.SoupMessage // out
@@ -410,8 +410,13 @@ func WebsocketServerCheckHandshake(msg *Message, origin string, protocols []stri
 // The function takes the following parameters:
 //
 //    - msg containing the client side of a WebSocket handshake.
-//    - expectedOrigin: expected Origin header.
-//    - protocols: allowed WebSocket protocols.
+//    - expectedOrigin (optional): expected Origin header.
+//    - protocols (optional): allowed WebSocket protocols.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if msg contained a valid WebSocket handshake request and was
+//      updated to contain a handshake response. FALSE if not.
 //
 func WebsocketServerProcessHandshake(msg *Message, expectedOrigin string, protocols []string) bool {
 	var _arg1 *C.SoupMessage // out

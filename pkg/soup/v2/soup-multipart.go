@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -104,6 +102,14 @@ func NewMultipartFromMessage(headers *MessageHeaders, body *MessageBody) *Multip
 // AppendFormFile adds a new MIME part containing body to multipart, using
 // "Content-Disposition: form-data", as per the HTML forms specification. See
 // soup_form_request_new_from_multipart() for more details.
+//
+// The function takes the following parameters:
+//
+//    - controlName: name of the control associated with this file.
+//    - filename: name of the file, or NULL if not known.
+//    - contentType: MIME type of the file, or NULL if not known.
+//    - body: file data.
+//
 func (multipart *Multipart) AppendFormFile(controlName string, filename string, contentType string, body *Buffer) {
 	var _arg0 *C.SoupMultipart // out
 	var _arg1 *C.char          // out
@@ -131,6 +137,12 @@ func (multipart *Multipart) AppendFormFile(controlName string, filename string, 
 // AppendFormString adds a new MIME part containing data to multipart, using
 // "Content-Disposition: form-data", as per the HTML forms specification. See
 // soup_form_request_new_from_multipart() for more details.
+//
+// The function takes the following parameters:
+//
+//    - controlName: name of the control associated with data.
+//    - data: body data.
+//
 func (multipart *Multipart) AppendFormString(controlName string, data string) {
 	var _arg0 *C.SoupMultipart // out
 	var _arg1 *C.char          // out
@@ -151,6 +163,12 @@ func (multipart *Multipart) AppendFormString(controlName string, data string) {
 // AppendPart adds a new MIME part to multipart with the given headers and body.
 // (The multipart will make its own copies of headers and body, so you should
 // free your copies if you are not using them for anything else.).
+//
+// The function takes the following parameters:
+//
+//    - headers: MIME part headers.
+//    - body: MIME part body.
+//
 func (multipart *Multipart) AppendPart(headers *MessageHeaders, body *Buffer) {
 	var _arg0 *C.SoupMultipart      // out
 	var _arg1 *C.SoupMessageHeaders // out
@@ -167,6 +185,11 @@ func (multipart *Multipart) AppendPart(headers *MessageHeaders, body *Buffer) {
 }
 
 // Length gets the number of body parts in multipart.
+//
+// The function returns the following values:
+//
+//    - gint: number of body parts in multipart.
+//
 func (multipart *Multipart) Length() int {
 	var _arg0 *C.SoupMultipart // out
 	var _cret C.int            // in
@@ -184,6 +207,12 @@ func (multipart *Multipart) Length() int {
 }
 
 // ToMessage serializes multipart to dest_headers and dest_body.
+//
+// The function takes the following parameters:
+//
+//    - destHeaders headers of the HTTP message to serialize multipart to.
+//    - destBody: body of the HTTP message to serialize multipart to.
+//
 func (multipart *Multipart) ToMessage(destHeaders *MessageHeaders, destBody *MessageBody) {
 	var _arg0 *C.SoupMultipart      // out
 	var _arg1 *C.SoupMessageHeaders // out

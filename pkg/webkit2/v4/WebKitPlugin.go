@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -24,6 +22,7 @@ func init() {
 }
 
 type Plugin struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -42,6 +41,11 @@ func marshalPluginner(p uintptr) (interface{}, error) {
 }
 
 // Description: deprecated: since version 2.32.
+//
+// The function returns the following values:
+//
+//    - utf8: description of the plugin.
+//
 func (plugin *Plugin) Description() string {
 	var _arg0 *C.WebKitPlugin // out
 	var _cret *C.gchar        // in
@@ -62,6 +66,11 @@ func (plugin *Plugin) Description() string {
 // list of KitMimeInfo.
 //
 // Deprecated: since version 2.32.
+//
+// The function returns the following values:
+//
+//    - list of KitMimeInfo.
+//
 func (plugin *Plugin) MIMEInfoList() []*MIMEInfo {
 	var _arg0 *C.WebKitPlugin // out
 	var _cret *C.GList        // in
@@ -92,6 +101,11 @@ func (plugin *Plugin) MIMEInfoList() []*MIMEInfo {
 }
 
 // Name: deprecated: since version 2.32.
+//
+// The function returns the following values:
+//
+//    - utf8: name of the plugin.
+//
 func (plugin *Plugin) Name() string {
 	var _arg0 *C.WebKitPlugin // out
 	var _cret *C.gchar        // in
@@ -109,6 +123,11 @@ func (plugin *Plugin) Name() string {
 }
 
 // Path: deprecated: since version 2.32.
+//
+// The function returns the following values:
+//
+//    - utf8: absolute path where the plugin is installed.
+//
 func (plugin *Plugin) Path() string {
 	var _arg0 *C.WebKitPlugin // out
 	var _cret *C.gchar        // in

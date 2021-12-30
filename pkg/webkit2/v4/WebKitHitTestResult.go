@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -94,6 +92,7 @@ func (h HitTestResultContext) Has(other HitTestResultContext) bool {
 }
 
 type HitTestResult struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -113,6 +112,12 @@ func marshalHitTestResulter(p uintptr) (interface{}, error) {
 
 // ContextIsEditable gets whether WEBKIT_HIT_TEST_RESULT_CONTEXT_EDITABLE flag
 // is present in KitHitTestResult:context.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if there's an editable element at the coordinates of the
+//      hit_test_result, or FALSE otherwise.
+//
 func (hitTestResult *HitTestResult) ContextIsEditable() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
@@ -133,6 +138,12 @@ func (hitTestResult *HitTestResult) ContextIsEditable() bool {
 
 // ContextIsImage gets whether WEBKIT_HIT_TEST_RESULT_CONTEXT_IMAGE flag is
 // present in KitHitTestResult:context.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if there's an image element in the coordinates of the Hit Test,
+//      or FALSE otherwise.
+//
 func (hitTestResult *HitTestResult) ContextIsImage() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
@@ -153,6 +164,12 @@ func (hitTestResult *HitTestResult) ContextIsImage() bool {
 
 // ContextIsLink gets whether WEBKIT_HIT_TEST_RESULT_CONTEXT_LINK flag is
 // present in KitHitTestResult:context.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if there's a link element in the coordinates of the Hit Test, or
+//      FALSE otherwise.
+//
 func (hitTestResult *HitTestResult) ContextIsLink() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
@@ -173,6 +190,12 @@ func (hitTestResult *HitTestResult) ContextIsLink() bool {
 
 // ContextIsMedia gets whether WEBKIT_HIT_TEST_RESULT_CONTEXT_MEDIA flag is
 // present in KitHitTestResult:context.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if there's a media element in the coordinates of the Hit Test,
+//      or FALSE otherwise.
+//
 func (hitTestResult *HitTestResult) ContextIsMedia() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
@@ -193,6 +216,12 @@ func (hitTestResult *HitTestResult) ContextIsMedia() bool {
 
 // ContextIsScrollbar gets whether WEBKIT_HIT_TEST_RESULT_CONTEXT_SCROLLBAR flag
 // is present in KitHitTestResult:context.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if there's a scrollbar element at the coordinates of the
+//      hit_test_result, or FALSE otherwise.
+//
 func (hitTestResult *HitTestResult) ContextIsScrollbar() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
@@ -213,6 +242,12 @@ func (hitTestResult *HitTestResult) ContextIsScrollbar() bool {
 
 // ContextIsSelection gets whether WEBKIT_HIT_TEST_RESULT_CONTEXT_SELECTION flag
 // is present in KitHitTestResult:context.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if there's a selected element at the coordinates of the
+//      hit_test_result, or FALSE otherwise.
+//
 func (hitTestResult *HitTestResult) ContextIsSelection() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
@@ -232,6 +267,11 @@ func (hitTestResult *HitTestResult) ContextIsSelection() bool {
 }
 
 // Context gets the value of the KitHitTestResult:context property.
+//
+// The function returns the following values:
+//
+//    - guint: bitmask of KitHitTestResultContext flags.
+//
 func (hitTestResult *HitTestResult) Context() uint {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.guint                // in
@@ -249,6 +289,12 @@ func (hitTestResult *HitTestResult) Context() uint {
 }
 
 // ImageURI gets the value of the KitHitTestResult:image-uri property.
+//
+// The function returns the following values:
+//
+//    - utf8: URI of the image element in the coordinates of the Hit Test, or
+//      NULL if there isn't an image element in hit_test_result context.
+//
 func (hitTestResult *HitTestResult) ImageURI() string {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret *C.gchar               // in
@@ -266,6 +312,13 @@ func (hitTestResult *HitTestResult) ImageURI() string {
 }
 
 // LinkLabel gets the value of the KitHitTestResult:link-label property.
+//
+// The function returns the following values:
+//
+//    - utf8: label of the link element in the coordinates of the Hit Test, or
+//      NULL if there isn't a link element in hit_test_result context or the link
+//      element doesn't have a label.
+//
 func (hitTestResult *HitTestResult) LinkLabel() string {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret *C.gchar               // in
@@ -283,6 +336,13 @@ func (hitTestResult *HitTestResult) LinkLabel() string {
 }
 
 // LinkTitle gets the value of the KitHitTestResult:link-title property.
+//
+// The function returns the following values:
+//
+//    - utf8: title of the link element in the coordinates of the Hit Test, or
+//      NULL if there isn't a link element in hit_test_result context or the link
+//      element doesn't have a title.
+//
 func (hitTestResult *HitTestResult) LinkTitle() string {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret *C.gchar               // in
@@ -300,6 +360,12 @@ func (hitTestResult *HitTestResult) LinkTitle() string {
 }
 
 // LinkURI gets the value of the KitHitTestResult:link-uri property.
+//
+// The function returns the following values:
+//
+//    - utf8: URI of the link element in the coordinates of the Hit Test, or NULL
+//      if there isn't a link element in hit_test_result context.
+//
 func (hitTestResult *HitTestResult) LinkURI() string {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret *C.gchar               // in
@@ -317,6 +383,12 @@ func (hitTestResult *HitTestResult) LinkURI() string {
 }
 
 // MediaURI gets the value of the KitHitTestResult:media-uri property.
+//
+// The function returns the following values:
+//
+//    - utf8: URI of the media element in the coordinates of the Hit Test, or
+//      NULL if there isn't a media element in hit_test_result context.
+//
 func (hitTestResult *HitTestResult) MediaURI() string {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret *C.gchar               // in

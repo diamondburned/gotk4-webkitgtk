@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -25,6 +23,7 @@ func init() {
 }
 
 type FormSubmissionRequest struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -48,6 +47,12 @@ func marshalFormSubmissionRequester(p uintptr) (interface{}, error) {
 // does not reliably return all text fields.
 //
 // Deprecated: Use webkit_form_submission_request_list_text_fields() instead.
+//
+// The function returns the following values:
+//
+//    - hashTable (optional) with the form text fields, or NULL if the form
+//      doesn't contain text fields.
+//
 func (request *FormSubmissionRequest) TextFields() map[cgo.Handle]cgo.Handle {
 	var _arg0 *C.WebKitFormSubmissionRequest // out
 	var _cret *C.GHashTable                  // in

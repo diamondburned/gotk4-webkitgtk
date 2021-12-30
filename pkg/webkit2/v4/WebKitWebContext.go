@@ -17,8 +17,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -129,14 +127,23 @@ func _gotk4_webkit24_URISchemeRequestCallback(arg0 *C.WebKitURISchemeRequest, ar
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type WebContextOverrider interface {
+	// The function takes the following parameters:
+	//
 	AutomationStarted(session *AutomationSession)
+	// The function takes the following parameters:
+	//
 	DownloadStarted(download *Download)
 	InitializeNotificationPermissions()
 	InitializeWebExtensions()
+	// The function takes the following parameters:
+	//
+	// The function returns the following values:
+	//
 	UserMessageReceived(message *UserMessage) bool
 }
 
 type WebContext struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -154,7 +161,56 @@ func marshalWebContexter(p uintptr) (interface{}, error) {
 	return wrapWebContext(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+// ConnectAutomationStarted: this signal is emitted when a new automation
+// request is made. Note that it will never be emitted if automation is not
+// enabled in context, see webkit_web_context_set_automation_allowed() for more
+// details.
+func (context *WebContext) ConnectAutomationStarted(f func(session AutomationSession)) externglib.SignalHandle {
+	return context.Connect("automation-started", f)
+}
+
+// ConnectDownloadStarted: this signal is emitted when a new download request is
+// made.
+func (context *WebContext) ConnectDownloadStarted(f func(download Download)) externglib.SignalHandle {
+	return context.Connect("download-started", f)
+}
+
+// ConnectInitializeNotificationPermissions: this signal is emitted when a
+// KitWebContext needs to set initial notification permissions for a web
+// process. It is emitted when a new web process is about to be launched, and
+// signals the most appropriate moment to use
+// webkit_web_context_initialize_notification_permissions(). If no notification
+// permissions have changed since the last time this signal was emitted, then
+// there is no need to call
+// webkit_web_context_initialize_notification_permissions() again.
+func (context *WebContext) ConnectInitializeNotificationPermissions(f func()) externglib.SignalHandle {
+	return context.Connect("initialize-notification-permissions", f)
+}
+
+// ConnectInitializeWebExtensions: this signal is emitted when a new web process
+// is about to be launched. It signals the most appropriate moment to use
+// webkit_web_context_set_web_extensions_initialization_user_data() and
+// webkit_web_context_set_web_extensions_directory().
+func (context *WebContext) ConnectInitializeWebExtensions(f func()) externglib.SignalHandle {
+	return context.Connect("initialize-web-extensions", f)
+}
+
+// ConnectUserMessageReceived: this signal is emitted when a KitUserMessage is
+// received from a KitWebExtension. You can reply to the message using
+// webkit_user_message_send_reply().
+//
+// You can handle the user message asynchronously by calling g_object_ref() on
+// message and returning TRUE.
+func (context *WebContext) ConnectUserMessageReceived(f func(message UserMessage) bool) externglib.SignalHandle {
+	return context.Connect("user-message-received", f)
+}
+
 // NewWebContext: create a new KitWebContext.
+//
+// The function returns the following values:
+//
+//    - webContext: newly created KitWebContext.
+//
 func NewWebContext() *WebContext {
 	var _cret *C.WebKitWebContext // in
 
@@ -173,6 +229,11 @@ func NewWebContext() *WebContext {
 // to create your own KitWebsiteDataManager. All KitWebView<!-- -->s associated
 // with this context will also be ephemeral. Websites will not store any data in
 // the client storage. This is normally used to implement private instances.
+//
+// The function returns the following values:
+//
+//    - webContext: new ephemeral KitWebContext.
+//
 func NewWebContextEphemeral() *WebContext {
 	var _cret *C.WebKitWebContext // in
 
@@ -191,6 +252,10 @@ func NewWebContextEphemeral() *WebContext {
 // The function takes the following parameters:
 //
 //    - manager: KitWebsiteDataManager.
+//
+// The function returns the following values:
+//
+//    - webContext: newly created KitWebContext.
 //
 func NewWebContextWithWebsiteDataManager(manager *WebsiteDataManager) *WebContext {
 	var _arg1 *C.WebKitWebsiteDataManager // out
@@ -284,6 +349,10 @@ func (context *WebContext) ClearCache() {
 //
 //    - uri: URI to download.
 //
+// The function returns the following values:
+//
+//    - download: new KitDownload representing the download operation.
+//
 func (context *WebContext) DownloadURI(uri string) *Download {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 *C.gchar            // out
@@ -307,6 +376,11 @@ func (context *WebContext) DownloadURI(uri string) *Download {
 // CacheModel returns the current cache model. For more information about this
 // value check the documentation of the function
 // webkit_web_context_set_cache_model().
+//
+// The function returns the following values:
+//
+//    - cacheModel: current KitCacheModel.
+//
 func (context *WebContext) CacheModel() CacheModel {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret C.WebKitCacheModel  // in
@@ -325,6 +399,11 @@ func (context *WebContext) CacheModel() CacheModel {
 
 // CookieManager: get the KitCookieManager of the context's
 // KitWebsiteDataManager.
+//
+// The function returns the following values:
+//
+//    - cookieManager of context.
+//
 func (context *WebContext) CookieManager() *CookieManager {
 	var _arg0 *C.WebKitWebContext    // out
 	var _cret *C.WebKitCookieManager // in
@@ -345,6 +424,11 @@ func (context *WebContext) CookieManager() *CookieManager {
 //
 // To initialize the database you need to call
 // webkit_web_context_set_favicon_database_directory().
+//
+// The function returns the following values:
+//
+//    - faviconDatabase of context.
+//
 func (context *WebContext) FaviconDatabase() *FaviconDatabase {
 	var _arg0 *C.WebKitWebContext      // out
 	var _cret *C.WebKitFaviconDatabase // in
@@ -367,6 +451,12 @@ func (context *WebContext) FaviconDatabase() *FaviconDatabase {
 //
 // This function will always return the same path after having called
 // webkit_web_context_set_favicon_database_directory() for the first time.
+//
+// The function returns the following values:
+//
+//    - utf8: path of the directory of the favicons database associated with
+//      context, or NULL.
+//
 func (context *WebContext) FaviconDatabaseDirectory() string {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret *C.gchar            // in
@@ -384,6 +474,11 @@ func (context *WebContext) FaviconDatabaseDirectory() string {
 }
 
 // GeolocationManager: get the KitGeolocationManager of context.
+//
+// The function returns the following values:
+//
+//    - geolocationManager of context.
+//
 func (context *WebContext) GeolocationManager() *GeolocationManager {
 	var _arg0 *C.WebKitWebContext         // out
 	var _cret *C.WebKitGeolocationManager // in
@@ -409,8 +504,8 @@ func (context *WebContext) GeolocationManager() *GeolocationManager {
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL to ignore.
-//    - callback to call when the request is satisfied.
+//    - ctx (optional) or NULL to ignore.
+//    - callback (optional) to call when the request is satisfied.
 //
 func (context *WebContext) Plugins(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebContext   // out
@@ -444,6 +539,11 @@ func (context *WebContext) Plugins(ctx context.Context, callback gio.AsyncReadyC
 //
 //    - result: Result.
 //
+// The function returns the following values:
+//
+//    - list of KitPlugin. You must free the #GList with g_list_free() and unref
+//      the KitPlugin<!-- -->s with g_object_unref() when you're done with them.
+//
 func (context *WebContext) PluginsFinish(result gio.AsyncResulter) ([]Plugin, error) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 *C.GAsyncResult     // out
@@ -476,6 +576,11 @@ func (context *WebContext) PluginsFinish(result gio.AsyncResulter) ([]Plugin, er
 
 // ProcessModel returns the current process model. For more information about
 // this value see webkit_web_context_set_process_model().
+//
+// The function returns the following values:
+//
+//    - processModel: current KitProcessModel.
+//
 func (context *WebContext) ProcessModel() ProcessModel {
 	var _arg0 *C.WebKitWebContext  // out
 	var _cret C.WebKitProcessModel // in
@@ -493,6 +598,11 @@ func (context *WebContext) ProcessModel() ProcessModel {
 }
 
 // SandboxEnabled: get whether sandboxing is currently enabled.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if sandboxing is enabled, or FALSE otherwise.
+//
 func (context *WebContext) SandboxEnabled() bool {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret C.gboolean          // in
@@ -512,6 +622,11 @@ func (context *WebContext) SandboxEnabled() bool {
 }
 
 // SecurityManager: get the KitSecurityManager of context.
+//
+// The function returns the following values:
+//
+//    - securityManager of context.
+//
 func (context *WebContext) SecurityManager() *SecurityManager {
 	var _arg0 *C.WebKitWebContext      // out
 	var _cret *C.WebKitSecurityManager // in
@@ -530,6 +645,11 @@ func (context *WebContext) SecurityManager() *SecurityManager {
 
 // SpellCheckingEnabled: get whether spell checking feature is currently
 // enabled.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE If spell checking is enabled, or FALSE otherwise.
+//
 func (context *WebContext) SpellCheckingEnabled() bool {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret C.gboolean          // in
@@ -553,6 +673,12 @@ func (context *WebContext) SpellCheckingEnabled() bool {
 //
 // See webkit_web_context_set_spell_checking_languages() for more details on the
 // format of the languages in the list.
+//
+// The function returns the following values:
+//
+//    - utf8s: NULL-terminated array of languages if available, or NULL
+//      otherwise.
+//
 func (context *WebContext) SpellCheckingLanguages() []string {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret **C.gchar           // in
@@ -584,6 +710,11 @@ func (context *WebContext) SpellCheckingLanguages() []string {
 // TLSErrorsPolicy: get the TLS errors policy of context
 //
 // Deprecated: Use webkit_website_data_manager_get_tls_errors_policy() instead.
+//
+// The function returns the following values:
+//
+//    - tlsErrorsPolicy: KitTLSErrorsPolicy.
+//
 func (context *WebContext) TLSErrorsPolicy() TLSErrorsPolicy {
 	var _arg0 *C.WebKitWebContext     // out
 	var _cret C.WebKitTLSErrorsPolicy // in
@@ -602,6 +733,12 @@ func (context *WebContext) TLSErrorsPolicy() TLSErrorsPolicy {
 
 // UseSystemAppearanceForScrollbars: get the
 // KitWebContext:use-system-appearance-for-scrollbars property.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if scrollbars are rendering using the system appearance, or
+//      FALSE otherwise.
+//
 func (context *WebContext) UseSystemAppearanceForScrollbars() bool {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret C.gboolean          // in
@@ -627,6 +764,11 @@ func (context *WebContext) UseSystemAppearanceForScrollbars() bool {
 // webkit_web_context_set_web_process_count_limit().
 //
 // Deprecated: since version 2.26.
+//
+// The function returns the following values:
+//
+//    - guint: maximum limit of web processes, or 0 if there isn't a limit.
+//
 func (context *WebContext) WebProcessCountLimit() uint {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret C.guint             // in
@@ -644,6 +786,11 @@ func (context *WebContext) WebProcessCountLimit() uint {
 }
 
 // WebsiteDataManager: get the KitWebsiteDataManager of context.
+//
+// The function returns the following values:
+//
+//    - websiteDataManager: KitWebsiteDataManager.
+//
 func (context *WebContext) WebsiteDataManager() *WebsiteDataManager {
 	var _arg0 *C.WebKitWebContext         // out
 	var _cret *C.WebKitWebsiteDataManager // in
@@ -709,6 +856,11 @@ func (context *WebContext) InitializeNotificationPermissions(allowedOrigins, dis
 
 // IsAutomationAllowed: get whether automation is allowed in context. See also
 // webkit_web_context_set_automation_allowed().
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if automation is allowed or FALSE otherwise.
+//
 func (context *WebContext) IsAutomationAllowed() bool {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret C.gboolean          // in
@@ -728,6 +880,11 @@ func (context *WebContext) IsAutomationAllowed() bool {
 }
 
 // IsEphemeral: get whether a KitWebContext is ephemeral.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if context is ephemeral or FALSE otherwise.
+//
 func (context *WebContext) IsEphemeral() bool {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret C.gboolean          // in
@@ -969,8 +1126,8 @@ func (context *WebContext) SetDiskCacheDirectory(directory string) {
 //
 // The function takes the following parameters:
 //
-//    - path: absolute path to the icon database directory or NULL to use the
-//    defaults.
+//    - path (optional): absolute path to the icon database directory or NULL to
+//      use the defaults.
 //
 func (context *WebContext) SetFaviconDatabaseDirectory(path string) {
 	var _arg0 *C.WebKitWebContext // out
@@ -1003,7 +1160,7 @@ func (context *WebContext) SetFaviconDatabaseDirectory(path string) {
 // The function takes the following parameters:
 //
 //    - proxyMode: KitNetworkProxyMode.
-//    - proxySettings or NULL.
+//    - proxySettings (optional) or NULL.
 //
 func (context *WebContext) SetNetworkProxySettings(proxyMode NetworkProxyMode, proxySettings *NetworkProxySettings) {
 	var _arg0 *C.WebKitWebContext           // out
@@ -1029,7 +1186,7 @@ func (context *WebContext) SetNetworkProxySettings(proxyMode NetworkProxyMode, p
 //
 // The function takes the following parameters:
 //
-//    - languages: NULL-terminated list of language identifiers.
+//    - languages (optional): NULL-terminated list of language identifiers.
 //
 func (context *WebContext) SetPreferredLanguages(languages []string) {
 	var _arg0 *C.WebKitWebContext // out
@@ -1284,51 +1441,12 @@ func (context *WebContext) SetWebProcessCountLimit(limit uint) {
 	runtime.KeepAlive(limit)
 }
 
-// ConnectAutomationStarted: this signal is emitted when a new automation
-// request is made. Note that it will never be emitted if automation is not
-// enabled in context, see webkit_web_context_set_automation_allowed() for more
-// details.
-func (context *WebContext) ConnectAutomationStarted(f func(session AutomationSession)) externglib.SignalHandle {
-	return context.Connect("automation-started", f)
-}
-
-// ConnectDownloadStarted: this signal is emitted when a new download request is
-// made.
-func (context *WebContext) ConnectDownloadStarted(f func(download Download)) externglib.SignalHandle {
-	return context.Connect("download-started", f)
-}
-
-// ConnectInitializeNotificationPermissions: this signal is emitted when a
-// KitWebContext needs to set initial notification permissions for a web
-// process. It is emitted when a new web process is about to be launched, and
-// signals the most appropriate moment to use
-// webkit_web_context_initialize_notification_permissions(). If no notification
-// permissions have changed since the last time this signal was emitted, then
-// there is no need to call
-// webkit_web_context_initialize_notification_permissions() again.
-func (context *WebContext) ConnectInitializeNotificationPermissions(f func()) externglib.SignalHandle {
-	return context.Connect("initialize-notification-permissions", f)
-}
-
-// ConnectInitializeWebExtensions: this signal is emitted when a new web process
-// is about to be launched. It signals the most appropriate moment to use
-// webkit_web_context_set_web_extensions_initialization_user_data() and
-// webkit_web_context_set_web_extensions_directory().
-func (context *WebContext) ConnectInitializeWebExtensions(f func()) externglib.SignalHandle {
-	return context.Connect("initialize-web-extensions", f)
-}
-
-// ConnectUserMessageReceived: this signal is emitted when a KitUserMessage is
-// received from a KitWebExtension. You can reply to the message using
-// webkit_user_message_send_reply().
-//
-// You can handle the user message asynchronously by calling g_object_ref() on
-// message and returning TRUE.
-func (context *WebContext) ConnectUserMessageReceived(f func(message UserMessage) bool) externglib.SignalHandle {
-	return context.Connect("user-message-received", f)
-}
-
 // WebContextGetDefault gets the default web context.
+//
+// The function returns the following values:
+//
+//    - webContext: KitWebContext.
+//
 func WebContextGetDefault() *WebContext {
 	var _cret *C.WebKitWebContext // in
 

@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -86,6 +84,11 @@ func marshalNavigationAction(p uintptr) (interface{}, error) {
 }
 
 // Copy: make a copy of navigation.
+//
+// The function returns the following values:
+//
+//    - navigationAction: copy of passed in KitNavigationAction.
+//
 func (navigation *NavigationAction) Copy() *NavigationAction {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret *C.WebKitNavigationAction // in
@@ -110,6 +113,11 @@ func (navigation *NavigationAction) Copy() *NavigationAction {
 
 // Modifiers: return a bitmask of ModifierType values describing the modifier
 // keys that were in effect when the navigation was requested.
+//
+// The function returns the following values:
+//
+//    - guint: modifier keys.
+//
 func (navigation *NavigationAction) Modifiers() uint {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret C.guint                   // in
@@ -128,6 +136,11 @@ func (navigation *NavigationAction) Modifiers() uint {
 
 // MouseButton: return the number of the mouse button that triggered the
 // navigation, or 0 if the navigation was not started by a mouse event.
+//
+// The function returns the following values:
+//
+//    - guint: mouse button number or 0.
+//
 func (navigation *NavigationAction) MouseButton() uint {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret C.guint                   // in
@@ -145,6 +158,11 @@ func (navigation *NavigationAction) MouseButton() uint {
 }
 
 // NavigationType: return the type of action that triggered the navigation.
+//
+// The function returns the following values:
+//
+//    - navigationType: KitNavigationType.
+//
 func (navigation *NavigationAction) NavigationType() NavigationType {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret C.WebKitNavigationType    // in
@@ -167,6 +185,11 @@ func (navigation *NavigationAction) NavigationType() NavigationType {
 // aid in evaluating whether a navigation action should be taken or not. To
 // modify requests before they are sent over the network the
 // KitPage::send-request signal can be used instead.
+//
+// The function returns the following values:
+//
+//    - uriRequest: KitURIRequest.
+//
 func (navigation *NavigationAction) Request() *URIRequest {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret *C.WebKitURIRequest       // in
@@ -184,6 +207,11 @@ func (navigation *NavigationAction) Request() *URIRequest {
 }
 
 // IsRedirect returns whether the navigation was redirected.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if the original navigation was redirected, FALSE otherwise.
+//
 func (navigation *NavigationAction) IsRedirect() bool {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret C.gboolean                // in
@@ -204,6 +232,11 @@ func (navigation *NavigationAction) IsRedirect() bool {
 
 // IsUserGesture: return whether the navigation was triggered by a user gesture
 // like a mouse click.
+//
+// The function returns the following values:
+//
+//    - ok: whether navigation action is a user gesture.
+//
 func (navigation *NavigationAction) IsUserGesture() bool {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret C.gboolean                // in

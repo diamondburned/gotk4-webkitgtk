@@ -8,8 +8,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -22,6 +20,7 @@ func init() {
 }
 
 type ContentDecoder struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 
 	SessionFeature

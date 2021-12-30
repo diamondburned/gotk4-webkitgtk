@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -59,6 +57,11 @@ func NewApplicationInfo() *ApplicationInfo {
 
 // Name: get the name of the application. If webkit_application_info_set_name()
 // hasn't been called with a valid name, this returns g_get_prgname().
+//
+// The function returns the following values:
+//
+//    - utf8: application name.
+//
 func (info *ApplicationInfo) Name() string {
 	var _arg0 *C.WebKitApplicationInfo // out
 	var _cret *C.gchar                 // in
@@ -77,6 +80,13 @@ func (info *ApplicationInfo) Name() string {
 
 // Version: get the application version previously set with
 // webkit_application_info_set_version().
+//
+// The function returns the following values:
+//
+//    - major: return location for the major version number.
+//    - minor (optional): return location for the minor version number.
+//    - micro (optional): return location for the micro version number.
+//
 func (info *ApplicationInfo) Version() (major uint64, minor uint64, micro uint64) {
 	var _arg0 *C.WebKitApplicationInfo // out
 	var _arg1 C.guint64                // in
@@ -101,6 +111,11 @@ func (info *ApplicationInfo) Version() (major uint64, minor uint64, micro uint64
 
 // SetName: set the name of the application. If not provided, or NULL is passed,
 // g_get_prgname() will be used.
+//
+// The function takes the following parameters:
+//
+//    - name: application name.
+//
 func (info *ApplicationInfo) SetName(name string) {
 	var _arg0 *C.WebKitApplicationInfo // out
 	var _arg1 *C.gchar                 // out
@@ -119,6 +134,13 @@ func (info *ApplicationInfo) SetName(name string) {
 // pass 0 as both micro and minor to use only major number. Any other format
 // must be converted to major.minor.micro so that it can be used in version
 // comparisons.
+//
+// The function takes the following parameters:
+//
+//    - major version number.
+//    - minor version number.
+//    - micro version number.
+//
 func (info *ApplicationInfo) SetVersion(major uint64, minor uint64, micro uint64) {
 	var _arg0 *C.WebKitApplicationInfo // out
 	var _arg1 C.guint64                // out

@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -25,6 +23,7 @@ func init() {
 }
 
 type GeolocationManager struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -40,6 +39,24 @@ func wrapGeolocationManager(obj *externglib.Object) *GeolocationManager {
 
 func marshalGeolocationManagerer(p uintptr) (interface{}, error) {
 	return wrapGeolocationManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+// ConnectStart: signal is emitted to notify that manager needs to start
+// receiving position updates. After this signal is emitted the user should
+// provide the updates using webkit_geolocation_manager_update_position() every
+// time the position changes, or use webkit_geolocation_manager_failed() in case
+// it isn't possible to determine the current position.
+//
+// If the signal is not handled, WebKit will try to determine the position using
+// GeoClue if available.
+func (manager *GeolocationManager) ConnectStart(f func() bool) externglib.SignalHandle {
+	return manager.Connect("start", f)
+}
+
+// ConnectStop: signal is emitted to notify that manager doesn't need to receive
+// position updates anymore.
+func (manager *GeolocationManager) ConnectStop(f func()) externglib.SignalHandle {
+	return manager.Connect("stop", f)
 }
 
 // Failed: notify manager that determining the position failed.
@@ -62,6 +79,9 @@ func (manager *GeolocationManager) Failed(errorMessage string) {
 }
 
 // EnableHighAccuracy: get whether high accuracy is enabled.
+//
+// The function returns the following values:
+//
 func (manager *GeolocationManager) EnableHighAccuracy() bool {
 	var _arg0 *C.WebKitGeolocationManager // out
 	var _cret C.gboolean                  // in
@@ -96,24 +116,6 @@ func (manager *GeolocationManager) UpdatePosition(position *GeolocationPosition)
 	C.webkit_geolocation_manager_update_position(_arg0, _arg1)
 	runtime.KeepAlive(manager)
 	runtime.KeepAlive(position)
-}
-
-// ConnectStart: signal is emitted to notify that manager needs to start
-// receiving position updates. After this signal is emitted the user should
-// provide the updates using webkit_geolocation_manager_update_position() every
-// time the position changes, or use webkit_geolocation_manager_failed() in case
-// it isn't possible to determine the current position.
-//
-// If the signal is not handled, WebKit will try to determine the position using
-// GeoClue if available.
-func (manager *GeolocationManager) ConnectStart(f func() bool) externglib.SignalHandle {
-	return manager.Connect("start", f)
-}
-
-// ConnectStop: signal is emitted to notify that manager doesn't need to receive
-// position updates anymore.
-func (manager *GeolocationManager) ConnectStop(f func()) externglib.SignalHandle {
-	return manager.Connect("stop", f)
 }
 
 // GeolocationPosition is an opaque struct used to provide position updates to a
@@ -164,6 +166,11 @@ func NewGeolocationPosition(latitude float64, longitude float64, accuracy float6
 }
 
 // Copy: make a copy of the KitGeolocationPosition.
+//
+// The function returns the following values:
+//
+//    - geolocationPosition: copy of position.
+//
 func (position *GeolocationPosition) Copy() *GeolocationPosition {
 	var _arg0 *C.WebKitGeolocationPosition // out
 	var _cret *C.WebKitGeolocationPosition // in
@@ -187,6 +194,11 @@ func (position *GeolocationPosition) Copy() *GeolocationPosition {
 }
 
 // SetAltitude: set the position altitude.
+//
+// The function takes the following parameters:
+//
+//    - altitude in meters.
+//
 func (position *GeolocationPosition) SetAltitude(altitude float64) {
 	var _arg0 *C.WebKitGeolocationPosition // out
 	var _arg1 C.double                     // out
@@ -200,6 +212,11 @@ func (position *GeolocationPosition) SetAltitude(altitude float64) {
 }
 
 // SetAltitudeAccuracy: set the accuracy of position altitude.
+//
+// The function takes the following parameters:
+//
+//    - altitudeAccuracy: accuracy of position altitude in meters.
+//
 func (position *GeolocationPosition) SetAltitudeAccuracy(altitudeAccuracy float64) {
 	var _arg0 *C.WebKitGeolocationPosition // out
 	var _arg1 C.double                     // out
@@ -214,6 +231,11 @@ func (position *GeolocationPosition) SetAltitudeAccuracy(altitudeAccuracy float6
 
 // SetHeading: set the position heading, as a positive angle between the
 // direction of movement and the North direction, in clockwise direction.
+//
+// The function takes the following parameters:
+//
+//    - heading in degrees.
+//
 func (position *GeolocationPosition) SetHeading(heading float64) {
 	var _arg0 *C.WebKitGeolocationPosition // out
 	var _arg1 C.double                     // out
@@ -227,6 +249,11 @@ func (position *GeolocationPosition) SetHeading(heading float64) {
 }
 
 // SetSpeed: set the position speed.
+//
+// The function takes the following parameters:
+//
+//    - speed in meters per second.
+//
 func (position *GeolocationPosition) SetSpeed(speed float64) {
 	var _arg0 *C.WebKitGeolocationPosition // out
 	var _arg1 C.double                     // out
@@ -241,6 +268,11 @@ func (position *GeolocationPosition) SetSpeed(speed float64) {
 
 // SetTimestamp: set the position timestamp. By default it's the time when the
 // position was created.
+//
+// The function takes the following parameters:
+//
+//    - timestamp in seconds since the epoch, or 0 to use current time.
+//
 func (position *GeolocationPosition) SetTimestamp(timestamp uint64) {
 	var _arg0 *C.WebKitGeolocationPosition // out
 	var _arg1 C.guint64                    // out

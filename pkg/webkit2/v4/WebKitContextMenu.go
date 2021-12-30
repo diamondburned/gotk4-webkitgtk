@@ -11,8 +11,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -25,6 +23,7 @@ func init() {
 }
 
 type ContextMenu struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -49,6 +48,11 @@ func marshalContextMenuer(p uintptr) (interface{}, error) {
 // webkit_context_menu_append() or webkit_context_menu_insert(). See also
 // webkit_context_menu_new_with_items() to create a KitContextMenu with a list
 // of initial items.
+//
+// The function returns the following values:
+//
+//    - contextMenu: newly created KitContextMenu object.
+//
 func NewContextMenu() *ContextMenu {
 	var _cret *C.WebKitContextMenu // in
 
@@ -68,6 +72,10 @@ func NewContextMenu() *ContextMenu {
 // The function takes the following parameters:
 //
 //    - items of KitContextMenuItem.
+//
+// The function returns the following values:
+//
+//    - contextMenu: newly created KitContextMenu object.
 //
 func NewContextMenuWithItems(items []ContextMenuItem) *ContextMenu {
 	var _arg1 *C.GList             // out
@@ -110,6 +118,12 @@ func (menu *ContextMenu) Append(item *ContextMenuItem) {
 }
 
 // First gets the first item in the menu.
+//
+// The function returns the following values:
+//
+//    - contextMenuItem: first KitContextMenuItem of menu, or NULL if the
+//      KitContextMenu is empty.
+//
 func (menu *ContextMenu) First() *ContextMenuItem {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _cret *C.WebKitContextMenuItem // in
@@ -132,6 +146,11 @@ func (menu *ContextMenu) First() *ContextMenuItem {
 //
 //    - position of the item, counting from 0.
 //
+// The function returns the following values:
+//
+//    - contextMenuItem at position position in menu, or NULL if the position is
+//      off the end of the menu.
+//
 func (menu *ContextMenu) ItemAtPosition(position uint) *ContextMenuItem {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _arg1 C.guint                  // out
@@ -152,6 +171,11 @@ func (menu *ContextMenu) ItemAtPosition(position uint) *ContextMenuItem {
 }
 
 // Items returns the item list of menu.
+//
+// The function returns the following values:
+//
+//    - list of KitContextMenuItem<!-- -->s.
+//
 func (menu *ContextMenu) Items() []ContextMenuItem {
 	var _arg0 *C.WebKitContextMenu // out
 	var _cret *C.GList             // in
@@ -175,6 +199,11 @@ func (menu *ContextMenu) Items() []ContextMenuItem {
 }
 
 // NItems gets the length of the menu.
+//
+// The function returns the following values:
+//
+//    - guint: number of KitContextMenuItem<!-- -->s in menu.
+//
 func (menu *ContextMenu) NItems() uint {
 	var _arg0 *C.WebKitContextMenu // out
 	var _cret C.guint              // in
@@ -194,6 +223,11 @@ func (menu *ContextMenu) NItems() uint {
 // UserData gets the user data of menu. This function can be used from the UI
 // Process to get user data previously set from the Web Process with
 // webkit_context_menu_set_user_data().
+//
+// The function returns the following values:
+//
+//    - variant: user data of menu, or NULL if menu doesn't have user data.
+//
 func (menu *ContextMenu) UserData() *glib.Variant {
 	var _arg0 *C.WebKitContextMenu // out
 	var _cret *C.GVariant          // in
@@ -242,6 +276,12 @@ func (menu *ContextMenu) Insert(item *ContextMenuItem, position int) {
 }
 
 // Last gets the last item in the menu.
+//
+// The function returns the following values:
+//
+//    - contextMenuItem: last KitContextMenuItem of menu, or NULL if the
+//      KitContextMenu is empty.
+//
 func (menu *ContextMenu) Last() *ContextMenuItem {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _cret *C.WebKitContextMenuItem // in

@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -94,8 +92,18 @@ func (c CookieJarAcceptPolicy) String() string {
 // As of right now, interface overriding and subclassing is not supported
 // yet, so the interface currently has no use.
 type CookieJarOverrider interface {
+	// The function takes the following parameters:
+	//
+	//    - oldCookie
+	//    - newCookie
+	//
 	Changed(oldCookie, newCookie *Cookie)
 	// IsPersistent gets whether jar stores cookies persistenly.
+	//
+	// The function returns the following values:
+	//
+	//    - ok: TRUE if jar storage is persistent or FALSE otherwise.
+	//
 	IsPersistent() bool
 	// Save: this function exists for backward compatibility, but does not do
 	// anything any more; cookie jars are saved automatically when they are
@@ -106,6 +114,7 @@ type CookieJarOverrider interface {
 }
 
 type CookieJar struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 
 	SessionFeature
@@ -128,8 +137,22 @@ func marshalCookieJarrer(p uintptr) (interface{}, error) {
 	return wrapCookieJar(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+// ConnectChanged: emitted when jar changes. If a cookie has been added,
+// new_cookie will contain the newly-added cookie and old_cookie will be NULL.
+// If a cookie has been deleted, old_cookie will contain the to-be-deleted
+// cookie and new_cookie will be NULL. If a cookie has been changed, old_cookie
+// will contain its old value, and new_cookie its new value.
+func (jar *CookieJar) ConnectChanged(f func(oldCookie, newCookie *Cookie)) externglib.SignalHandle {
+	return jar.Connect("changed", f)
+}
+
 // NewCookieJar creates a new CookieJar. The base CookieJar class does not
 // support persistent storage of cookies; use a subclass for that.
+//
+// The function returns the following values:
+//
+//    - cookieJar: new CookieJar.
+//
 func NewCookieJar() *CookieJar {
 	var _cret *C.SoupCookieJar // in
 
@@ -180,8 +203,8 @@ func (jar *CookieJar) AddCookie(cookie *Cookie) {
 // The function takes the following parameters:
 //
 //    - cookie: Cookie.
-//    - uri: URI setting the cookie.
-//    - firstParty: URI for the main document.
+//    - uri (optional): URI setting the cookie.
+//    - firstParty (optional): URI for the main document.
 //
 func (jar *CookieJar) AddCookieFull(cookie *Cookie, uri, firstParty *URI) {
 	var _arg0 *C.SoupCookieJar // out
@@ -242,6 +265,11 @@ func (jar *CookieJar) AddCookieWithFirstParty(firstParty *URI, cookie *Cookie) {
 // AllCookies constructs a List with every cookie inside the jar. The cookies in
 // the list are a copy of the original, so you have to free them when you are
 // done with them.
+//
+// The function returns the following values:
+//
+//    - sList all the cookies in the jar.
+//
 func (jar *CookieJar) AllCookies() []*Cookie {
 	var _arg0 *C.SoupCookieJar // out
 	var _cret *C.GSList        // in
@@ -289,6 +317,11 @@ func (jar *CookieJar) DeleteCookie(cookie *Cookie) {
 }
 
 // AcceptPolicy gets jar's CookieJarAcceptPolicy.
+//
+// The function returns the following values:
+//
+//    - cookieJarAcceptPolicy set in the jar.
+//
 func (jar *CookieJar) AcceptPolicy() CookieJarAcceptPolicy {
 	var _arg0 *C.SoupCookieJar            // out
 	var _cret C.SoupCookieJarAcceptPolicy // in
@@ -319,7 +352,11 @@ func (jar *CookieJar) AcceptPolicy() CookieJarAcceptPolicy {
 //
 //    - uri: URI.
 //    - forHttp: whether or not the return value is being passed directly to an
-//    HTTP operation.
+//      HTTP operation.
+//
+// The function returns the following values:
+//
+//    - sList the cookies in the jar that would be sent with a request to uri.
 //
 func (jar *CookieJar) CookieList(uri *URI, forHttp bool) []*Cookie {
 	var _arg0 *C.SoupCookieJar // out
@@ -366,14 +403,18 @@ func (jar *CookieJar) CookieList(uri *URI, forHttp bool) []*Cookie {
 // The function takes the following parameters:
 //
 //    - uri: URI.
-//    - topLevel for the top level document.
-//    - siteForCookies indicating the origin to get cookies for.
+//    - topLevel (optional) for the top level document.
+//    - siteForCookies (optional) indicating the origin to get cookies for.
 //    - forHttp: whether or not the return value is being passed directly to an
-//    HTTP operation.
-//    - isSafeMethod: if the HTTP method is safe, as defined by RFC 7231,
-//    ignored when for_http is FALSE.
+//      HTTP operation.
+//    - isSafeMethod: if the HTTP method is safe, as defined by RFC 7231, ignored
+//      when for_http is FALSE.
 //    - isTopLevelNavigation: whether or not the HTTP request is part of top
-//    level navigation.
+//      level navigation.
+//
+// The function returns the following values:
+//
+//    - sList the cookies in the jar that would be sent with a request to uri.
 //
 func (jar *CookieJar) CookieListWithSameSiteInfo(uri, topLevel, siteForCookies *URI, forHttp, isSafeMethod, isTopLevelNavigation bool) []*Cookie {
 	var _arg0 *C.SoupCookieJar // out
@@ -445,7 +486,12 @@ func (jar *CookieJar) CookieListWithSameSiteInfo(uri, topLevel, siteForCookies *
 //
 //    - uri: URI.
 //    - forHttp: whether or not the return value is being passed directly to an
-//    HTTP operation.
+//      HTTP operation.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): cookies, in string form, or NULL if there are no cookies
+//      for uri.
 //
 func (jar *CookieJar) Cookies(uri *URI, forHttp bool) string {
 	var _arg0 *C.SoupCookieJar // out
@@ -475,6 +521,11 @@ func (jar *CookieJar) Cookies(uri *URI, forHttp bool) string {
 }
 
 // IsPersistent gets whether jar stores cookies persistenly.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if jar storage is persistent or FALSE otherwise.
+//
 func (jar *CookieJar) IsPersistent() bool {
 	var _arg0 *C.SoupCookieJar // out
 	var _cret C.gboolean       // in
@@ -582,13 +633,4 @@ func (jar *CookieJar) SetCookieWithFirstParty(uri, firstParty *URI, cookie strin
 	runtime.KeepAlive(uri)
 	runtime.KeepAlive(firstParty)
 	runtime.KeepAlive(cookie)
-}
-
-// ConnectChanged: emitted when jar changes. If a cookie has been added,
-// new_cookie will contain the newly-added cookie and old_cookie will be NULL.
-// If a cookie has been deleted, old_cookie will contain the to-be-deleted
-// cookie and new_cookie will be NULL. If a cookie has been changed, old_cookie
-// will contain its old value, and new_cookie its new value.
-func (jar *CookieJar) ConnectChanged(f func(oldCookie, newCookie *Cookie)) externglib.SignalHandle {
-	return jar.Connect("changed", f)
 }

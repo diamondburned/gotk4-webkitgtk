@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -57,6 +55,11 @@ func ValueHashInsertValue(hash map[string]externglib.Value, key string, value *e
 // #GValue.
 //
 // Deprecated: Use #GVariant API instead.
+//
+// The function returns the following values:
+//
+//    - hashTable: new empty Table.
+//
 func NewValueHash() map[string]externglib.Value {
 	var _cret *C.GHashTable // in
 

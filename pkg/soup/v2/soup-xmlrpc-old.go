@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -45,6 +43,10 @@ import "C"
 //
 //    - methodName: name of the XML-RPC method.
 //    - params arguments to method.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): text of the methodCall, or NULL on error.
 //
 func XmlrpcBuildMethodCall(methodName string, params []externglib.Value) string {
 	var _arg1 *C.char   // out
@@ -91,6 +93,10 @@ func XmlrpcBuildMethodCall(methodName string, params []externglib.Value) string 
 //
 //    - value: return value.
 //
+// The function returns the following values:
+//
+//    - utf8 (optional): text of the methodResponse, or NULL on error.
+//
 func XmlrpcBuildMethodResponse(value *externglib.Value) string {
 	var _arg1 *C.GValue // out
 	var _cret *C.char   // in
@@ -124,6 +130,10 @@ func XmlrpcBuildMethodResponse(value *externglib.Value) string {
 //
 //    - methodResponse: XML-RPC methodResponse string.
 //    - length of method_response, or -1 if it is NUL-terminated.
+//
+// The function returns the following values:
+//
+//    - value: on return, the return value from method_call.
 //
 func XmlrpcParseMethodResponse(methodResponse string, length int) (externglib.Value, error) {
 	var _arg1 *C.char   // out

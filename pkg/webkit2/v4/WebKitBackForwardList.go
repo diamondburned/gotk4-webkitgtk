@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -25,6 +23,7 @@ func init() {
 }
 
 type BackForwardList struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -42,7 +41,22 @@ func marshalBackForwardLister(p uintptr) (interface{}, error) {
 	return wrapBackForwardList(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+// ConnectChanged: this signal is emitted when back_forward_list changes. This
+// happens when the current item is updated, a new item is added or one or more
+// items are removed. Note that both item_added and items_removed can NULL when
+// only the current item is updated. Items are only removed when the list is
+// cleared or the maximum items limit is reached.
+func (backForwardList *BackForwardList) ConnectChanged(f func(itemAdded BackForwardListItem, itemsRemoved cgo.Handle)) externglib.SignalHandle {
+	return backForwardList.Connect("changed", f)
+}
+
 // BackItem returns the item that precedes the current item.
+//
+// The function returns the following values:
+//
+//    - backForwardListItem (optional): KitBackForwardListItem preceding the
+//      current item or NULL.
+//
 func (backForwardList *BackForwardList) BackItem() *BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList     // out
 	var _cret *C.WebKitBackForwardListItem // in
@@ -61,6 +75,10 @@ func (backForwardList *BackForwardList) BackItem() *BackForwardListItem {
 	return _backForwardListItem
 }
 
+// The function returns the following values:
+//
+//    - list of items preceding the current item.
+//
 func (backForwardList *BackForwardList) BackList() []BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList // out
 	var _cret *C.GList                 // in
@@ -83,10 +101,13 @@ func (backForwardList *BackForwardList) BackList() []BackForwardListItem {
 	return _list
 }
 
-//
 // The function takes the following parameters:
 //
 //    - limit: number of items to retrieve.
+//
+// The function returns the following values:
+//
+//    - list of items preceding the current item limited by limit.
 //
 func (backForwardList *BackForwardList) BackListWithLimit(limit uint) []BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList // out
@@ -114,6 +135,12 @@ func (backForwardList *BackForwardList) BackListWithLimit(limit uint) []BackForw
 }
 
 // CurrentItem returns the current item in back_forward_list.
+//
+// The function returns the following values:
+//
+//    - backForwardListItem (optional): KitBackForwardListItem or NULL if
+//      back_forward_list is empty.
+//
 func (backForwardList *BackForwardList) CurrentItem() *BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList     // out
 	var _cret *C.WebKitBackForwardListItem // in
@@ -133,6 +160,12 @@ func (backForwardList *BackForwardList) CurrentItem() *BackForwardListItem {
 }
 
 // ForwardItem returns the item that follows the current item.
+//
+// The function returns the following values:
+//
+//    - backForwardListItem (optional): KitBackForwardListItem following the
+//      current item or NULL.
+//
 func (backForwardList *BackForwardList) ForwardItem() *BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList     // out
 	var _cret *C.WebKitBackForwardListItem // in
@@ -151,6 +184,10 @@ func (backForwardList *BackForwardList) ForwardItem() *BackForwardListItem {
 	return _backForwardListItem
 }
 
+// The function returns the following values:
+//
+//    - list of items following the current item.
+//
 func (backForwardList *BackForwardList) ForwardList() []BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList // out
 	var _cret *C.GList                 // in
@@ -173,10 +210,13 @@ func (backForwardList *BackForwardList) ForwardList() []BackForwardListItem {
 	return _list
 }
 
-//
 // The function takes the following parameters:
 //
 //    - limit: number of items to retrieve.
+//
+// The function returns the following values:
+//
+//    - list of items following the current item limited by limit.
 //
 func (backForwardList *BackForwardList) ForwardListWithLimit(limit uint) []BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList // out
@@ -203,6 +243,10 @@ func (backForwardList *BackForwardList) ForwardListWithLimit(limit uint) []BackF
 	return _list
 }
 
+// The function returns the following values:
+//
+//    - guint: length of back_forward_list.
+//
 func (backForwardList *BackForwardList) Length() uint {
 	var _arg0 *C.WebKitBackForwardList // out
 	var _cret C.guint                  // in
@@ -225,6 +269,11 @@ func (backForwardList *BackForwardList) Length() uint {
 //
 //    - index of the item.
 //
+// The function returns the following values:
+//
+//    - backForwardListItem (optional): KitBackForwardListItem located at the
+//      specified index relative to the current item or NULL.
+//
 func (backForwardList *BackForwardList) NthItem(index int) *BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList     // out
 	var _arg1 C.gint                       // out
@@ -244,13 +293,4 @@ func (backForwardList *BackForwardList) NthItem(index int) *BackForwardListItem 
 	}
 
 	return _backForwardListItem
-}
-
-// ConnectChanged: this signal is emitted when back_forward_list changes. This
-// happens when the current item is updated, a new item is added or one or more
-// items are removed. Note that both item_added and items_removed can NULL when
-// only the current item is updated. Items are only removed when the list is
-// cleared or the maximum items limit is reached.
-func (backForwardList *BackForwardList) ConnectChanged(f func(itemAdded BackForwardListItem, itemsRemoved cgo.Handle)) externglib.SignalHandle {
-	return backForwardList.Connect("changed", f)
 }

@@ -2,8 +2,6 @@
 
 package javascriptcore
 
-// #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <jsc/jsc.h>
 import "C"
@@ -30,6 +28,11 @@ const MINOR_VERSION = 32
 // your code is running against. Contrast with the C_MAJOR_VERSION macro, which
 // represents the major version of the JavaScriptCore headers you have included
 // when compiling your code.
+//
+// The function returns the following values:
+//
+//    - guint: major version number of the JavaScriptCore library.
+//
 func GetMajorVersion() uint {
 	var _cret C.guint // in
 
@@ -49,6 +52,11 @@ func GetMajorVersion() uint {
 // your code is running against. Contrast with the C_MICRO_VERSION macro, which
 // represents the micro version of the JavaScriptCore headers you have included
 // when compiling your code.
+//
+// The function returns the following values:
+//
+//    - guint: micro version number of the JavaScriptCore library.
+//
 func GetMicroVersion() uint {
 	var _cret C.guint // in
 
@@ -68,6 +76,11 @@ func GetMicroVersion() uint {
 // your code is running against. Contrast with the C_MINOR_VERSION macro, which
 // represents the minor version of the JavaScriptCore headers you have included
 // when compiling your code.
+//
+// The function returns the following values:
+//
+//    - guint: minor version number of the JavaScriptCore library.
+//
 func GetMinorVersion() uint {
 	var _cret C.guint // in
 

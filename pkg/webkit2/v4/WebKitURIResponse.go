@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -25,6 +23,7 @@ func init() {
 }
 
 type URIResponse struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -44,6 +43,11 @@ func marshalURIResponser(p uintptr) (interface{}, error) {
 
 // ContentLength: get the expected content length of the KitURIResponse. It can
 // be 0 if the server provided an incorrect or missing Content-Length.
+//
+// The function returns the following values:
+//
+//    - guint64: expected content length of response.
+//
 func (response *URIResponse) ContentLength() uint64 {
 	var _arg0 *C.WebKitURIResponse // out
 	var _cret C.guint64            // in
@@ -61,6 +65,12 @@ func (response *URIResponse) ContentLength() uint64 {
 }
 
 // HTTPHeaders: get the HTTP headers of a KitURIResponse as a MessageHeaders.
+//
+// The function returns the following values:
+//
+//    - messageHeaders with the HTTP headers of response or NULL if response is
+//      not an HTTP response.
+//
 func (response *URIResponse) HTTPHeaders() *soup.MessageHeaders {
 	var _arg0 *C.WebKitURIResponse  // out
 	var _cret *C.SoupMessageHeaders // in
@@ -77,6 +87,10 @@ func (response *URIResponse) HTTPHeaders() *soup.MessageHeaders {
 	return _messageHeaders
 }
 
+// The function returns the following values:
+//
+//    - utf8: MIME type of the KitURIResponse.
+//
 func (response *URIResponse) MIMEType() string {
 	var _arg0 *C.WebKitURIResponse // out
 	var _cret *C.gchar             // in
@@ -96,6 +110,11 @@ func (response *URIResponse) MIMEType() string {
 // StatusCode: get the status code of the KitURIResponse as returned by the
 // server. It will normally be a KnownStatusCode, for example SOUP_STATUS_OK,
 // though the server can respond with any unsigned integer.
+//
+// The function returns the following values:
+//
+//    - guint status code of response.
+//
 func (response *URIResponse) StatusCode() uint {
 	var _arg0 *C.WebKitURIResponse // out
 	var _cret C.guint              // in
@@ -114,6 +133,12 @@ func (response *URIResponse) StatusCode() uint {
 
 // SuggestedFilename: get the suggested filename for response, as specified by
 // the 'Content-Disposition' HTTP header, or NULL if it's not present.
+//
+// The function returns the following values:
+//
+//    - utf8: suggested filename or NULL if the 'Content-Disposition' HTTP header
+//      is not present.
+//
 func (response *URIResponse) SuggestedFilename() string {
 	var _arg0 *C.WebKitURIResponse // out
 	var _cret *C.gchar             // in
@@ -130,6 +155,10 @@ func (response *URIResponse) SuggestedFilename() string {
 	return _utf8
 }
 
+// The function returns the following values:
+//
+//    - utf8: uri of the KitURIResponse.
+//
 func (response *URIResponse) URI() string {
 	var _arg0 *C.WebKitURIResponse // out
 	var _cret *C.gchar             // in

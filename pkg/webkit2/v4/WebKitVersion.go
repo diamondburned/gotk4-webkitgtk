@@ -2,8 +2,6 @@
 
 package webkit2
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <webkit2/webkit2.h>
 import "C"
@@ -30,6 +28,11 @@ const MINOR_VERSION = 32
 // code is running against. Contrast with the BKIT_MAJOR_VERSION macro, which
 // represents the major version of the WebKit headers you have included when
 // compiling your code.
+//
+// The function returns the following values:
+//
+//    - guint: major version number of the WebKit library.
+//
 func GetMajorVersion() uint {
 	var _cret C.guint // in
 
@@ -49,6 +52,11 @@ func GetMajorVersion() uint {
 // code is running against. Contrast with the BKIT_MICRO_VERSION macro, which
 // represents the micro version of the WebKit headers you have included when
 // compiling your code.
+//
+// The function returns the following values:
+//
+//    - guint: micro version number of the WebKit library.
+//
 func GetMicroVersion() uint {
 	var _cret C.guint // in
 
@@ -68,6 +76,11 @@ func GetMicroVersion() uint {
 // code is running against. Contrast with the BKIT_MINOR_VERSION macro, which
 // represents the minor version of the WebKit headers you have included when
 // compiling your code.
+//
+// The function returns the following values:
+//
+//    - guint: minor version number of the WebKit library.
+//
 func GetMinorVersion() uint {
 	var _cret C.guint // in
 

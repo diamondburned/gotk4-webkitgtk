@@ -15,8 +15,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -30,6 +28,7 @@ func init() {
 }
 
 type MultipartInputStream struct {
+	_ [0]func() // equal guard
 	gio.FilterInputStream
 
 	*externglib.Object
@@ -76,6 +75,10 @@ func marshalMultipartInputStreamer(p uintptr) (interface{}, error) {
 //    - msg the response is related to.
 //    - baseStream returned by sending the request.
 //
+// The function returns the following values:
+//
+//    - multipartInputStream: new MultipartInputStream.
+//
 func NewMultipartInputStream(msg *Message, baseStream gio.InputStreamer) *MultipartInputStream {
 	var _arg1 *C.SoupMessage              // out
 	var _arg2 *C.GInputStream             // out
@@ -103,6 +106,12 @@ func NewMultipartInputStream(msg *Message, baseStream gio.InputStreamer) *Multip
 //
 // Note that if a part had no headers at all an empty MessageHeaders will be
 // returned.
+//
+// The function returns the following values:
+//
+//    - messageHeaders (optional) the headers for the part currently being
+//      processed or NULL if the headers failed to parse.
+//
 func (multipart *MultipartInputStream) Headers() *MessageHeaders {
 	var _arg0 *C.SoupMultipartInputStream // out
 	var _cret *C.SoupMessageHeaders       // in
@@ -133,7 +142,11 @@ func (multipart *MultipartInputStream) Headers() *MessageHeaders {
 //
 // The function takes the following parameters:
 //
-//    - ctx: #GCancellable.
+//    - ctx (optional): #GCancellable.
+//
+// The function returns the following values:
+//
+//    - inputStream (optional): new Stream, or NULL if there are no more parts.
 //
 func (multipart *MultipartInputStream) NextPart(ctx context.Context) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupMultipartInputStream // out
@@ -160,9 +173,13 @@ func (multipart *MultipartInputStream) NextPart(ctx context.Context) (gio.InputS
 			objptr := unsafe.Pointer(_cret)
 
 			object := externglib.AssumeOwnership(objptr)
-			rv, ok := (externglib.CastObject(object)).(gio.InputStreamer)
+			casted := object.WalkCast(func(obj externglib.Objector) bool {
+				_, ok := obj.(gio.InputStreamer)
+				return ok
+			})
+			rv, ok := casted.(gio.InputStreamer)
 			if !ok {
-				panic("object of type " + object.TypeFromInstance().String() + " is not gio.InputStreamer")
+				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.InputStreamer")
 			}
 			_inputStream = rv
 		}
@@ -179,9 +196,9 @@ func (multipart *MultipartInputStream) NextPart(ctx context.Context) (gio.InputS
 //
 // The function takes the following parameters:
 //
-//    - ctx: #GCancellable.
+//    - ctx (optional): #GCancellable.
 //    - ioPriority: i/O priority for the request.
-//    - callback to call when request is satisfied.
+//    - callback (optional) to call when request is satisfied.
 //
 func (multipart *MultipartInputStream) NextPartAsync(ctx context.Context, ioPriority int, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.SoupMultipartInputStream // out
@@ -215,6 +232,11 @@ func (multipart *MultipartInputStream) NextPartAsync(ctx context.Context, ioPrio
 //
 //    - result: Result.
 //
+// The function returns the following values:
+//
+//    - inputStream (optional): newly created Stream for reading the next part or
+//      NULL if there are no more parts.
+//
 func (multipart *MultipartInputStream) NextPartFinish(result gio.AsyncResulter) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupMultipartInputStream // out
 	var _arg1 *C.GAsyncResult             // out
@@ -236,9 +258,13 @@ func (multipart *MultipartInputStream) NextPartFinish(result gio.AsyncResulter) 
 			objptr := unsafe.Pointer(_cret)
 
 			object := externglib.AssumeOwnership(objptr)
-			rv, ok := (externglib.CastObject(object)).(gio.InputStreamer)
+			casted := object.WalkCast(func(obj externglib.Objector) bool {
+				_, ok := obj.(gio.InputStreamer)
+				return ok
+			})
+			rv, ok := casted.(gio.InputStreamer)
 			if !ok {
-				panic("object of type " + object.TypeFromInstance().String() + " is not gio.InputStreamer")
+				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.InputStreamer")
 			}
 			_inputStream = rv
 		}

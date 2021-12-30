@@ -12,8 +12,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -50,6 +48,7 @@ func (u UserMessageError) String() string {
 }
 
 type UserMessage struct {
+	_ [0]func() // equal guard
 	externglib.InitiallyUnowned
 }
 
@@ -72,7 +71,11 @@ func marshalUserMessager(p uintptr) (interface{}, error) {
 // The function takes the following parameters:
 //
 //    - name: message name.
-//    - parameters: message parameters as a #GVariant, or NULL.
+//    - parameters (optional): message parameters as a #GVariant, or NULL.
+//
+// The function returns the following values:
+//
+//    - userMessage: newly created KitUserMessage object.
 //
 func NewUserMessage(name string, parameters *glib.Variant) *UserMessage {
 	var _arg1 *C.char              // out
@@ -97,6 +100,11 @@ func NewUserMessage(name string, parameters *glib.Variant) *UserMessage {
 }
 
 // Name: get the message name.
+//
+// The function returns the following values:
+//
+//    - utf8: message name.
+//
 func (message *UserMessage) Name() string {
 	var _arg0 *C.WebKitUserMessage // out
 	var _cret *C.char              // in
@@ -114,6 +122,11 @@ func (message *UserMessage) Name() string {
 }
 
 // Parameters: get the message parameters.
+//
+// The function returns the following values:
+//
+//    - variant (optional): message parameters.
+//
 func (message *UserMessage) Parameters() *glib.Variant {
 	var _arg0 *C.WebKitUserMessage // out
 	var _cret *C.GVariant          // in

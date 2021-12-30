@@ -10,8 +10,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v3"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -24,6 +22,7 @@ func init() {
 }
 
 type FileChooserRequest struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -60,6 +59,14 @@ func (request *FileChooserRequest) Cancel() {
 // should normally be called before presenting the file chooser dialog to the
 // user, to decide whether to allow the user to select multiple files at once or
 // only one.
+//
+// The function returns the following values:
+//
+//    - utf8s: a NULL-terminated array of strings if a list of accepted MIME
+//      types is defined or NULL otherwise, meaning that any MIME type should be
+//      accepted. This array and its contents are owned by WebKit and should not
+//      be modified or freed.
+//
 func (request *FileChooserRequest) MIMETypes() []string {
 	var _arg0 *C.WebKitFileChooserRequest // out
 	var _cret **C.gchar                   // in
@@ -96,6 +103,12 @@ func (request *FileChooserRequest) MIMETypes() []string {
 //
 // See webkit_file_chooser_request_get_mime_types() if you are interested in
 // getting the list of accepted MIME types.
+//
+// The function returns the following values:
+//
+//    - fileFilter if a list of accepted MIME types is defined or NULL otherwise.
+//      The returned object is owned by WebKit should not be modified or freed.
+//
 func (request *FileChooserRequest) MIMETypesFilter() *gtk.FileFilter {
 	var _arg0 *C.WebKitFileChooserRequest // out
 	var _cret *C.GtkFileFilter            // in
@@ -126,6 +139,12 @@ func (request *FileChooserRequest) MIMETypesFilter() *gtk.FileFilter {
 // SelectMultiple: determine whether the file chooser associated to this
 // KitFileChooserRequest should allow selecting multiple files, which depends on
 // the HTML input element having a 'multiple' attribute defined.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if the file chooser should allow selecting multiple files or
+//      FALSE otherwise.
+//
 func (request *FileChooserRequest) SelectMultiple() bool {
 	var _arg0 *C.WebKitFileChooserRequest // out
 	var _cret C.gboolean                  // in
@@ -153,6 +172,13 @@ func (request *FileChooserRequest) SelectMultiple() bool {
 // This function should normally be called only before presenting the file
 // chooser dialog to the user, to decide whether to perform some extra action,
 // like pre-selecting the files from a previous request.
+//
+// The function returns the following values:
+//
+//    - utf8s: a NULL-terminated array of strings if there are selected files
+//      associated with the request or NULL otherwise. This array and its
+//      contents are owned by WebKit and should not be modified or freed.
+//
 func (request *FileChooserRequest) SelectedFiles() []string {
 	var _arg0 *C.WebKitFileChooserRequest // out
 	var _cret **C.gchar                   // in
@@ -187,7 +213,7 @@ func (request *FileChooserRequest) SelectedFiles() []string {
 // The function takes the following parameters:
 //
 //    - files: a NULL-terminated array of strings, containing paths to local
-//    files.
+//      files.
 //
 func (request *FileChooserRequest) SelectFiles(files []string) {
 	var _arg0 *C.WebKitFileChooserRequest // out

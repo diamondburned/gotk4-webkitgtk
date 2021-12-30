@@ -9,8 +9,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -23,6 +21,7 @@ func init() {
 }
 
 type RequestData struct {
+	_ [0]func() // equal guard
 	Request
 }
 

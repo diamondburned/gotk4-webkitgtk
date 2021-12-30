@@ -16,8 +16,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -110,6 +108,7 @@ func _gotk4_soup2_AddressCallback(arg0 *C.SoupAddress, arg1 C.guint, arg2 C.gpoi
 }
 
 type Address struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 
 	gio.SocketConnectable
@@ -141,6 +140,10 @@ func marshalAddresser(p uintptr) (interface{}, error) {
 //    - name or physical address.
 //    - port number.
 //
+// The function returns the following values:
+//
+//    - address: Address.
+//
 func NewAddress(name string, port uint) *Address {
 	var _arg1 *C.char        // out
 	var _arg2 C.guint        // out
@@ -169,6 +172,10 @@ func NewAddress(name string, port uint) *Address {
 //
 //    - family address family.
 //    - port number (usually SOUP_ADDRESS_ANY_PORT).
+//
+// The function returns the following values:
+//
+//    - address (optional): new Address.
 //
 func NewAddressAny(family AddressFamily, port uint) *Address {
 	var _arg1 C.SoupAddressFamily // out
@@ -206,6 +213,10 @@ func NewAddressAny(family AddressFamily, port uint) *Address {
 // The function takes the following parameters:
 //
 //    - addr2: another Address with a resolved IP address.
+//
+// The function returns the following values:
+//
+//    - ok: whether or not addr1 and addr2 have the same IP address.
 //
 func (addr1 *Address) EqualByIP(addr2 *Address) bool {
 	var _arg0 C.gconstpointer // out
@@ -253,6 +264,10 @@ func (addr1 *Address) EqualByIP(addr2 *Address) bool {
 //
 //    - addr2: another Address with a resolved name.
 //
+// The function returns the following values:
+//
+//    - ok: whether or not addr1 and addr2 have the same name.
+//
 func (addr1 *Address) EqualByName(addr2 *Address) bool {
 	var _arg0 C.gconstpointer // out
 	var _arg1 C.gconstpointer // out
@@ -276,6 +291,11 @@ func (addr1 *Address) EqualByName(addr2 *Address) bool {
 
 // Gsockaddr creates a new Address corresponding to addr (which is assumed to
 // only have one socket address associated with it).
+//
+// The function returns the following values:
+//
+//    - socketAddress: new Address.
+//
 func (addr *Address) Gsockaddr() gio.SocketAddresser {
 	var _arg0 *C.SoupAddress    // out
 	var _cret *C.GSocketAddress // in
@@ -294,9 +314,13 @@ func (addr *Address) Gsockaddr() gio.SocketAddresser {
 		}
 
 		object := externglib.AssumeOwnership(objptr)
-		rv, ok := (externglib.CastObject(object)).(gio.SocketAddresser)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gio.SocketAddresser)
+			return ok
+		})
+		rv, ok := casted.(gio.SocketAddresser)
 		if !ok {
-			panic("object of type " + object.TypeFromInstance().String() + " is not gio.SocketAddresser")
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.SocketAddresser")
 		}
 		_socketAddress = rv
 	}
@@ -310,6 +334,11 @@ func (addr *Address) Gsockaddr() gio.SocketAddresser {
 // in another thread, it may return garbage. You can use
 // soup_address_is_resolved() to safely test whether or not an address is
 // resolved before fetching its name or address.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): hostname, or NULL if it is not known.
+//
 func (addr *Address) Name() string {
 	var _arg0 *C.SoupAddress // out
 	var _cret *C.char        // in
@@ -335,6 +364,11 @@ func (addr *Address) Name() string {
 // in another thread, it may return garbage. You can use
 // soup_address_is_resolved() to safely test whether or not an address is
 // resolved before fetching its name or address.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): physical address, or NULL.
+//
 func (addr *Address) Physical() string {
 	var _arg0 *C.SoupAddress // out
 	var _cret *C.char        // in
@@ -354,6 +388,11 @@ func (addr *Address) Physical() string {
 }
 
 // Port returns the port associated with addr.
+//
+// The function returns the following values:
+//
+//    - guint: port.
+//
 func (addr *Address) Port() uint {
 	var _arg0 *C.SoupAddress // out
 	var _cret C.guint        // in
@@ -372,6 +411,11 @@ func (addr *Address) Port() uint {
 
 // HashByIP: hash function (for Table) that corresponds to
 // soup_address_equal_by_ip(), qv.
+//
+// The function returns the following values:
+//
+//    - guint: IP-based hash value for addr.
+//
 func (addr *Address) HashByIP() uint {
 	var _arg0 C.gconstpointer // out
 	var _cret C.guint         // in
@@ -390,6 +434,11 @@ func (addr *Address) HashByIP() uint {
 
 // HashByName: hash function (for Table) that corresponds to
 // soup_address_equal_by_name(), qv.
+//
+// The function returns the following values:
+//
+//    - guint: named-based hash value for addr.
+//
 func (addr *Address) HashByName() uint {
 	var _arg0 C.gconstpointer // out
 	var _cret C.guint         // in
@@ -409,6 +458,11 @@ func (addr *Address) HashByName() uint {
 // IsResolved tests if addr has already been resolved. Unlike the other Address
 // "get" methods, this is safe to call when addr might be being resolved in
 // another thread.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if addr has been resolved.
+//
 func (addr *Address) IsResolved() bool {
 	var _arg0 *C.SoupAddress // out
 	var _cret C.gboolean     // in
@@ -442,8 +496,8 @@ func (addr *Address) IsResolved() bool {
 //
 // The function takes the following parameters:
 //
-//    - ctx object, or NULL.
-//    - asyncContext to call callback from.
+//    - ctx (optional) object, or NULL.
+//    - asyncContext (optional) to call callback from.
 //    - callback to call with the result.
 //
 func (addr *Address) ResolveAsync(ctx context.Context, asyncContext *glib.MainContext, callback AddressCallback) {
@@ -485,7 +539,12 @@ func (addr *Address) ResolveAsync(ctx context.Context, asyncContext *glib.MainCo
 //
 // The function takes the following parameters:
 //
-//    - ctx object, or NULL.
+//    - ctx (optional) object, or NULL.
+//
+// The function returns the following values:
+//
+//    - guint: SOUP_STATUS_OK, SOUP_STATUS_CANT_RESOLVE, or
+//      SOUP_STATUS_CANCELLED.
 //
 func (addr *Address) ResolveSync(ctx context.Context) uint {
 	var _arg0 *C.SoupAddress  // out

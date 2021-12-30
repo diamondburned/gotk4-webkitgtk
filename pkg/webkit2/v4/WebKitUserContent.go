@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -133,6 +131,11 @@ func marshalUserContentFilter(p uintptr) (interface{}, error) {
 
 // Identifier: obtain the identifier previously used to save the
 // user_content_filter in the KitUserContentFilterStore.
+//
+// The function returns the following values:
+//
+//    - utf8: identifier for the filter.
+//
 func (userContentFilter *UserContentFilter) Identifier() string {
 	var _arg0 *C.WebKitUserContentFilter // out
 	var _cret *C.char                    // in

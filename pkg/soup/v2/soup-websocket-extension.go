@@ -11,8 +11,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -30,18 +28,36 @@ func init() {
 // yet, so the interface currently has no use.
 type WebsocketExtensionOverrider interface {
 	// Configure configures extension with the given params.
+	//
+	// The function takes the following parameters:
+	//
+	//    - connectionType: either SOUP_WEBSOCKET_CONNECTION_CLIENT or
+	//      SOUP_WEBSOCKET_CONNECTION_SERVER.
+	//    - params (optional): parameters, or NULL.
+	//
 	Configure(connectionType WebsocketConnectionType, params map[cgo.Handle]cgo.Handle) error
 	// RequestParams: get the parameters strings to be included in the request
 	// header. If the extension doesn't include any parameter in the request,
 	// this function returns NULL.
+	//
+	// The function returns the following values:
+	//
+	//    - utf8 (optional): new allocated string with the parameters.
+	//
 	RequestParams() string
 	// ResponseParams: get the parameters strings to be included in the response
 	// header. If the extension doesn't include any parameter in the response,
 	// this function returns NULL.
+	//
+	// The function returns the following values:
+	//
+	//    - utf8 (optional): new allocated string with the parameters.
+	//
 	ResponseParams() string
 }
 
 type WebsocketExtension struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -50,7 +66,7 @@ var (
 )
 
 // WebsocketExtensioner describes types inherited from class WebsocketExtension.
-
+//
 // To get the original type, the caller must assert this to an interface or
 // another type.
 type WebsocketExtensioner interface {
@@ -70,13 +86,22 @@ func marshalWebsocketExtensioner(p uintptr) (interface{}, error) {
 	return wrapWebsocketExtension(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+func (extension *WebsocketExtension) baseWebsocketExtension() *WebsocketExtension {
+	return extension
+}
+
+// BaseWebsocketExtension returns the underlying base object.
+func BaseWebsocketExtension(obj WebsocketExtensioner) *WebsocketExtension {
+	return obj.baseWebsocketExtension()
+}
+
 // Configure configures extension with the given params.
 //
 // The function takes the following parameters:
 //
 //    - connectionType: either SOUP_WEBSOCKET_CONNECTION_CLIENT or
-//    SOUP_WEBSOCKET_CONNECTION_SERVER.
-//    - params: parameters, or NULL.
+//      SOUP_WEBSOCKET_CONNECTION_SERVER.
+//    - params (optional): parameters, or NULL.
 //
 func (extension *WebsocketExtension) Configure(connectionType WebsocketConnectionType, params map[cgo.Handle]cgo.Handle) error {
 	var _arg0 *C.SoupWebsocketExtension     // out
@@ -115,6 +140,11 @@ func (extension *WebsocketExtension) Configure(connectionType WebsocketConnectio
 // RequestParams: get the parameters strings to be included in the request
 // header. If the extension doesn't include any parameter in the request, this
 // function returns NULL.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): new allocated string with the parameters.
+//
 func (extension *WebsocketExtension) RequestParams() string {
 	var _arg0 *C.SoupWebsocketExtension // out
 	var _cret *C.char                   // in
@@ -137,6 +167,11 @@ func (extension *WebsocketExtension) RequestParams() string {
 // ResponseParams: get the parameters strings to be included in the response
 // header. If the extension doesn't include any parameter in the response, this
 // function returns NULL.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): new allocated string with the parameters.
+//
 func (extension *WebsocketExtension) ResponseParams() string {
 	var _arg0 *C.SoupWebsocketExtension // out
 	var _cret *C.char                   // in
@@ -154,13 +189,4 @@ func (extension *WebsocketExtension) ResponseParams() string {
 	}
 
 	return _utf8
-}
-
-func (extension *WebsocketExtension) baseWebsocketExtension() *WebsocketExtension {
-	return extension
-}
-
-// BaseWebsocketExtension returns the underlying base object.
-func BaseWebsocketExtension(obj WebsocketExtensioner) *WebsocketExtension {
-	return obj.baseWebsocketExtension()
 }

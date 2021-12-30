@@ -9,8 +9,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -31,23 +29,71 @@ type SessionFeatureOverrider interface {
 	// This is used for features that can be extended with multiple different
 	// types. Eg, the authentication manager can be extended with subtypes of
 	// Auth.
+	//
+	// The function takes the following parameters:
+	//
+	//    - typ of a "sub-feature".
+	//
+	// The function returns the following values:
+	//
+	//    - ok: TRUE if feature accepted type as a subfeature.
+	//
 	AddFeature(typ externglib.Type) bool
+	// The function takes the following parameters:
+	//
 	Attach(session *Session)
+	// The function takes the following parameters:
+	//
 	Detach(session *Session)
 	// HasFeature tests if feature has a "sub-feature" of type type. See
 	// soup_session_feature_add_feature().
+	//
+	// The function takes the following parameters:
+	//
+	//    - typ of a "sub-feature".
+	//
+	// The function returns the following values:
+	//
+	//    - ok: TRUE if feature has a subfeature of type type.
+	//
 	HasFeature(typ externglib.Type) bool
 	// RemoveFeature removes the "sub-feature" of type type from the base
 	// feature feature. See soup_session_feature_add_feature().
+	//
+	// The function takes the following parameters:
+	//
+	//    - typ of a "sub-feature".
+	//
+	// The function returns the following values:
+	//
+	//    - ok: TRUE if type was removed from feature.
+	//
 	RemoveFeature(typ externglib.Type) bool
+	// The function takes the following parameters:
+	//
+	//    - session
+	//    - msg
+	//
 	RequestQueued(session *Session, msg *Message)
+	// The function takes the following parameters:
+	//
+	//    - session
+	//    - msg
+	//    - socket
+	//
 	RequestStarted(session *Session, msg *Message, socket *Socket)
+	// The function takes the following parameters:
+	//
+	//    - session
+	//    - msg
+	//
 	RequestUnqueued(session *Session, msg *Message)
 }
 
 // SessionFeature: object that implement some sort of optional feature for
 // Session.
 type SessionFeature struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -90,6 +136,10 @@ func marshalSessionFeaturer(p uintptr) (interface{}, error) {
 //
 //    - typ of a "sub-feature".
 //
+// The function returns the following values:
+//
+//    - ok: TRUE if feature accepted type as a subfeature.
+//
 func (feature *SessionFeature) AddFeature(typ externglib.Type) bool {
 	var _arg0 *C.SoupSessionFeature // out
 	var _arg1 C.GType               // out
@@ -111,10 +161,7 @@ func (feature *SessionFeature) AddFeature(typ externglib.Type) bool {
 	return _ok
 }
 
-//
 // The function takes the following parameters:
-//
-
 //
 func (feature *SessionFeature) Attach(session *Session) {
 	var _arg0 *C.SoupSessionFeature // out
@@ -128,10 +175,7 @@ func (feature *SessionFeature) Attach(session *Session) {
 	runtime.KeepAlive(session)
 }
 
-//
 // The function takes the following parameters:
-//
-
 //
 func (feature *SessionFeature) Detach(session *Session) {
 	var _arg0 *C.SoupSessionFeature // out
@@ -151,6 +195,10 @@ func (feature *SessionFeature) Detach(session *Session) {
 // The function takes the following parameters:
 //
 //    - typ of a "sub-feature".
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if feature has a subfeature of type type.
 //
 func (feature *SessionFeature) HasFeature(typ externglib.Type) bool {
 	var _arg0 *C.SoupSessionFeature // out
@@ -179,6 +227,10 @@ func (feature *SessionFeature) HasFeature(typ externglib.Type) bool {
 // The function takes the following parameters:
 //
 //    - typ of a "sub-feature".
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if type was removed from feature.
 //
 func (feature *SessionFeature) RemoveFeature(typ externglib.Type) bool {
 	var _arg0 *C.SoupSessionFeature // out

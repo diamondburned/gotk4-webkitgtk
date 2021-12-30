@@ -9,8 +9,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -23,6 +21,7 @@ func init() {
 }
 
 type WebsiteDataAccessPermissionRequest struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 
 	PermissionRequest
@@ -46,6 +45,11 @@ func marshalWebsiteDataAccessPermissionRequester(p uintptr) (interface{}, error)
 }
 
 // CurrentDomain: get the current domain being browsed.
+//
+// The function returns the following values:
+//
+//    - utf8: current domain name.
+//
 func (request *WebsiteDataAccessPermissionRequest) CurrentDomain() string {
 	var _arg0 *C.WebKitWebsiteDataAccessPermissionRequest // out
 	var _cret *C.char                                     // in
@@ -64,6 +68,11 @@ func (request *WebsiteDataAccessPermissionRequest) CurrentDomain() string {
 
 // RequestingDomain: get the domain requesting permission to access its cookies
 // while browsing the current domain.
+//
+// The function returns the following values:
+//
+//    - utf8: requesting domain name.
+//
 func (request *WebsiteDataAccessPermissionRequest) RequestingDomain() string {
 	var _arg0 *C.WebKitWebsiteDataAccessPermissionRequest // out
 	var _cret *C.char                                     // in

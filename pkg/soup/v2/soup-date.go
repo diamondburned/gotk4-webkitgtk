@@ -12,8 +12,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: libsoup-2.4
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
@@ -215,6 +213,9 @@ func NewDateFromTimeT(when int32) *Date {
 }
 
 // Copy copies date.
+//
+// The function returns the following values:
+//
 func (date *Date) Copy() *Date {
 	var _arg0 *C.SoupDate // out
 	var _cret *C.SoupDate // in
@@ -238,6 +239,11 @@ func (date *Date) Copy() *Date {
 }
 
 // Day gets date's day.
+//
+// The function returns the following values:
+//
+//    - gint date's day.
+//
 func (date *Date) Day() int {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
@@ -255,6 +261,11 @@ func (date *Date) Day() int {
 }
 
 // Hour gets date's hour.
+//
+// The function returns the following values:
+//
+//    - gint date's hour.
+//
 func (date *Date) Hour() int {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
@@ -272,6 +283,11 @@ func (date *Date) Hour() int {
 }
 
 // Minute gets date's minute.
+//
+// The function returns the following values:
+//
+//    - gint date's minute.
+//
 func (date *Date) Minute() int {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
@@ -289,6 +305,11 @@ func (date *Date) Minute() int {
 }
 
 // Month gets date's month.
+//
+// The function returns the following values:
+//
+//    - gint date's month.
+//
 func (date *Date) Month() int {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
@@ -306,6 +327,13 @@ func (date *Date) Month() int {
 }
 
 // Offset gets date's offset from UTC.
+//
+// The function returns the following values:
+//
+//    - gint date's offset from UTC. If soup_date_get_utc() returns FALSE but
+//      soup_date_get_offset() returns 0, that means the date is a "floating"
+//      time with no associated offset information.
+//
 func (date *Date) Offset() int {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
@@ -323,6 +351,11 @@ func (date *Date) Offset() int {
 }
 
 // Second gets date's second.
+//
+// The function returns the following values:
+//
+//    - gint date's second.
+//
 func (date *Date) Second() int {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
@@ -340,6 +373,11 @@ func (date *Date) Second() int {
 }
 
 // UTC gets date's UTC flag.
+//
+// The function returns the following values:
+//
+//    - gint: TRUE if date is UTC.
+//
 func (date *Date) UTC() int {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
@@ -357,6 +395,11 @@ func (date *Date) UTC() int {
 }
 
 // Year gets date's year.
+//
+// The function returns the following values:
+//
+//    - gint date's year.
+//
 func (date *Date) Year() int {
 	var _arg0 *C.SoupDate // out
 	var _cret C.int       // in
@@ -374,6 +417,11 @@ func (date *Date) Year() int {
 }
 
 // IsPast determines if date is in the past.
+//
+// The function returns the following values:
+//
+//    - ok: TRUE if date is in the past.
+//
 func (date *Date) IsPast() bool {
 	var _arg0 *C.SoupDate // out
 	var _cret C.gboolean  // in
@@ -393,6 +441,15 @@ func (date *Date) IsPast() bool {
 }
 
 // String converts date to a string in the format described by format.
+//
+// The function takes the following parameters:
+//
+//    - format to generate the date in.
+//
+// The function returns the following values:
+//
+//    - utf8: date as a string.
+//
 func (date *Date) String(format DateFormat) string {
 	var _arg0 *C.SoupDate      // out
 	var _arg1 C.SoupDateFormat // out
@@ -418,6 +475,11 @@ func (date *Date) String(format DateFormat) string {
 // If date is not representable as a <type>time_t</type>, it will be clamped
 // into range. (In particular, some HTTP cookies have expiration dates after
 // "Y2.038k" (2038-01-19T03:14:07Z).).
+//
+// The function returns the following values:
+//
+//    - glong: date as a <type>time_t</type>.
+//
 func (date *Date) ToTimeT() int32 {
 	var _arg0 *C.SoupDate // out
 	var _cret C.time_t    // in
@@ -437,6 +499,11 @@ func (date *Date) ToTimeT() int32 {
 // ToTimeval converts date to a Val.
 //
 // Deprecated: Do not use Val, as it's not Y2038-safe.
+//
+// The function returns the following values:
+//
+//    - time structure in which to store the converted time.
+//
 func (date *Date) ToTimeval() *glib.TimeVal {
 	var _arg0 *C.SoupDate // out
 	var _arg1 C.GTimeVal  // in

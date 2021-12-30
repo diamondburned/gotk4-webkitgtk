@@ -10,8 +10,6 @@ import (
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -95,6 +93,11 @@ func NewSecurityOriginForURI(uri string) *SecurityOrigin {
 
 // Host gets the hostname of origin. It is reasonable for this to be NULL if its
 // protocol does not require a host component.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): host of the KitSecurityOrigin.
+//
 func (origin *SecurityOrigin) Host() string {
 	var _arg0 *C.WebKitSecurityOrigin // out
 	var _cret *C.gchar                // in
@@ -117,6 +120,11 @@ func (origin *SecurityOrigin) Host() string {
 // is the default port for the given protocol. For example, http://example.com
 // has the same security origin as http://example.com:80, and this function will
 // return 0 for a KitSecurityOrigin constructed from either URI.
+//
+// The function returns the following values:
+//
+//    - guint16: port of the KitSecurityOrigin.
+//
 func (origin *SecurityOrigin) Port() uint16 {
 	var _arg0 *C.WebKitSecurityOrigin // out
 	var _cret C.guint16               // in
@@ -134,6 +142,11 @@ func (origin *SecurityOrigin) Port() uint16 {
 }
 
 // Protocol gets the protocol of origin.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): protocol of the KitSecurityOrigin.
+//
 func (origin *SecurityOrigin) Protocol() string {
 	var _arg0 *C.WebKitSecurityOrigin // out
 	var _cret *C.gchar                // in
@@ -157,6 +170,11 @@ func (origin *SecurityOrigin) Protocol() string {
 // represents an origin as defined by web standards that may be opaque.
 //
 // Deprecated: since version 2.32.
+//
+// The function returns the following values:
+//
+//    - ok: FALSE.
+//
 func (origin *SecurityOrigin) IsOpaque() bool {
 	var _arg0 *C.WebKitSecurityOrigin // out
 	var _cret C.gboolean              // in
@@ -177,6 +195,11 @@ func (origin *SecurityOrigin) IsOpaque() bool {
 
 // String gets a string representation of origin. The string representation is a
 // valid URI with only protocol, host, and port components, or NULL.
+//
+// The function returns the following values:
+//
+//    - utf8 (optional): URI representing origin.
+//
 func (origin *SecurityOrigin) String() string {
 	var _arg0 *C.WebKitSecurityOrigin // out
 	var _cret *C.gchar                // in

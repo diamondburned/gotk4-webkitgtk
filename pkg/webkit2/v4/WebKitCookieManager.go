@@ -17,8 +17,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
-// #cgo pkg-config: webkit2gtk-4.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
@@ -95,6 +93,7 @@ func (c CookiePersistentStorage) String() string {
 }
 
 type CookieManager struct {
+	_ [0]func() // equal guard
 	*externglib.Object
 }
 
@@ -112,6 +111,12 @@ func marshalCookieManagerer(p uintptr) (interface{}, error) {
 	return wrapCookieManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+// ConnectChanged: this signal is emitted when cookies are added, removed or
+// modified.
+func (cookieManager *CookieManager) ConnectChanged(f func()) externglib.SignalHandle {
+	return cookieManager.Connect("changed", f)
+}
+
 // AddCookie: asynchronously add a Cookie to the underlying storage.
 //
 // When the operation is finished, callback will be called. You can then call
@@ -119,9 +124,9 @@ func marshalCookieManagerer(p uintptr) (interface{}, error) {
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL to ignore.
+//    - ctx (optional) or NULL to ignore.
 //    - cookie to be added.
-//    - callback to call when the request is satisfied.
+//    - callback (optional) to call when the request is satisfied.
 //
 func (cookieManager *CookieManager) AddCookie(ctx context.Context, cookie *soup.Cookie, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitCookieManager // out
@@ -197,9 +202,9 @@ func (cookieManager *CookieManager) DeleteAllCookies() {
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL to ignore.
+//    - ctx (optional) or NULL to ignore.
 //    - cookie to be deleted.
-//    - callback to call when the request is satisfied.
+//    - callback (optional) to call when the request is satisfied.
 //
 func (cookieManager *CookieManager) DeleteCookie(ctx context.Context, cookie *soup.Cookie, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitCookieManager // out
@@ -289,8 +294,8 @@ func (cookieManager *CookieManager) DeleteCookiesForDomain(domain string) {
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL to ignore.
-//    - callback to call when the request is satisfied.
+//    - ctx (optional) or NULL to ignore.
+//    - callback (optional) to call when the request is satisfied.
 //
 func (cookieManager *CookieManager) AcceptPolicy(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitCookieManager // out
@@ -321,6 +326,11 @@ func (cookieManager *CookieManager) AcceptPolicy(ctx context.Context, callback g
 // The function takes the following parameters:
 //
 //    - result: Result.
+//
+// The function returns the following values:
+//
+//    - cookieAcceptPolicy: cookie acceptance policy of cookie_manager as a
+//      KitCookieAcceptPolicy.
 //
 func (cookieManager *CookieManager) AcceptPolicyFinish(result gio.AsyncResulter) (CookieAcceptPolicy, error) {
 	var _arg0 *C.WebKitCookieManager     // out
@@ -355,9 +365,9 @@ func (cookieManager *CookieManager) AcceptPolicyFinish(result gio.AsyncResulter)
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL to ignore.
+//    - ctx (optional) or NULL to ignore.
 //    - uri: URI associated to the cookies to be retrieved.
-//    - callback to call when the request is satisfied.
+//    - callback (optional) to call when the request is satisfied.
 //
 func (cookieManager *CookieManager) Cookies(ctx context.Context, uri string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitCookieManager // out
@@ -394,6 +404,10 @@ func (cookieManager *CookieManager) Cookies(ctx context.Context, uri string, cal
 // The function takes the following parameters:
 //
 //    - result: Result.
+//
+// The function returns the following values:
+//
+//    - list of Cookie instances.
 //
 func (cookieManager *CookieManager) CookiesFinish(result gio.AsyncResulter) ([]*soup.Cookie, error) {
 	var _arg0 *C.WebKitCookieManager // out
@@ -442,8 +456,8 @@ func (cookieManager *CookieManager) CookiesFinish(result gio.AsyncResulter) ([]*
 //
 // The function takes the following parameters:
 //
-//    - ctx or NULL to ignore.
-//    - callback to call when the request is satisfied.
+//    - ctx (optional) or NULL to ignore.
+//    - callback (optional) to call when the request is satisfied.
 //
 func (cookieManager *CookieManager) DomainsWithCookies(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitCookieManager // out
@@ -477,6 +491,10 @@ func (cookieManager *CookieManager) DomainsWithCookies(ctx context.Context, call
 // The function takes the following parameters:
 //
 //    - result: Result.
+//
+// The function returns the following values:
+//
+//    - utf8s: NULL terminated array of domain names or NULL in case of error.
 //
 func (cookieManager *CookieManager) DomainsWithCookiesFinish(result gio.AsyncResulter) ([]string, error) {
 	var _arg0 *C.WebKitCookieManager // out
@@ -570,10 +588,4 @@ func (cookieManager *CookieManager) SetPersistentStorage(filename string, storag
 	runtime.KeepAlive(cookieManager)
 	runtime.KeepAlive(filename)
 	runtime.KeepAlive(storage)
-}
-
-// ConnectChanged: this signal is emitted when cookies are added, removed or
-// modified.
-func (cookieManager *CookieManager) ConnectChanged(f func()) externglib.SignalHandle {
-	return cookieManager.Connect("changed", f)
 }
