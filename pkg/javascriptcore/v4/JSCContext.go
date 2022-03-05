@@ -15,13 +15,16 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <jsc/jsc.h>
+// extern void _gotk4_javascriptcore4_ExceptionHandler(JSCContext*, JSCException*, gpointer);
 // extern void callbackDelete(gpointer);
-// void _gotk4_javascriptcore4_ExceptionHandler(JSCContext*, JSCException*, gpointer);
 import "C"
+
+// glib.Type values for JSCContext.go.
+var GTypeContext = externglib.Type(C.jsc_context_get_type())
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.jsc_context_get_type()), F: marshalContexter},
+		{T: GTypeContext, F: marshalContext},
 	})
 }
 
@@ -92,20 +95,27 @@ func (c CheckSyntaxResult) String() string {
 type ExceptionHandler func(context *Context, exception *Exception)
 
 //export _gotk4_javascriptcore4_ExceptionHandler
-func _gotk4_javascriptcore4_ExceptionHandler(arg0 *C.JSCContext, arg1 *C.JSCException, arg2 C.gpointer) {
-	v := gbox.Get(uintptr(arg2))
-	if v == nil {
-		panic(`callback not found`)
+func _gotk4_javascriptcore4_ExceptionHandler(arg1 *C.JSCContext, arg2 *C.JSCException, arg3 C.gpointer) {
+	var fn ExceptionHandler
+	{
+		v := gbox.Get(uintptr(arg3))
+		if v == nil {
+			panic(`callback not found`)
+		}
+		fn = v.(ExceptionHandler)
 	}
 
-	var context *Context     // out
-	var exception *Exception // out
+	var _context *Context     // out
+	var _exception *Exception // out
 
-	context = wrapContext(externglib.Take(unsafe.Pointer(arg0)))
-	exception = wrapException(externglib.Take(unsafe.Pointer(arg1)))
+	_context = wrapContext(externglib.Take(unsafe.Pointer(arg1)))
+	_exception = wrapException(externglib.Take(unsafe.Pointer(arg2)))
 
-	fn := v.(ExceptionHandler)
-	fn(context, exception)
+	fn(_context, _exception)
+}
+
+// ContextOverrider contains methods that are overridable.
+type ContextOverrider interface {
 }
 
 type Context struct {
@@ -117,13 +127,21 @@ var (
 	_ externglib.Objector = (*Context)(nil)
 )
 
+func classInitContexter(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapContext(obj *externglib.Object) *Context {
 	return &Context{
 		Object: obj,
 	}
 }
 
-func marshalContexter(p uintptr) (interface{}, error) {
+func marshalContext(p uintptr) (interface{}, error) {
 	return wrapContext(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -161,7 +179,7 @@ func NewContextWithVirtualMachine(vm *VirtualMachine) *Context {
 	var _arg1 *C.JSCVirtualMachine // out
 	var _cret *C.JSCContext        // in
 
-	_arg1 = (*C.JSCVirtualMachine)(unsafe.Pointer(vm.Native()))
+	_arg1 = (*C.JSCVirtualMachine)(unsafe.Pointer(externglib.InternObject(vm).Native()))
 
 	_cret = C.jsc_context_new_with_virtual_machine(_arg1)
 	runtime.KeepAlive(vm)
@@ -203,7 +221,7 @@ func (context *Context) CheckSyntax(code string, length int, mode CheckSyntaxMod
 	var _arg6 *C.JSCException        // in
 	var _cret C.JSCCheckSyntaxResult // in
 
-	_arg0 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(code)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.gssize(length)
@@ -235,7 +253,7 @@ func (context *Context) CheckSyntax(code string, length int, mode CheckSyntaxMod
 func (context *Context) ClearException() {
 	var _arg0 *C.JSCContext // out
 
-	_arg0 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 
 	C.jsc_context_clear_exception(_arg0)
 	runtime.KeepAlive(context)
@@ -258,7 +276,7 @@ func (context *Context) Evaluate(code string, length int) *Value {
 	var _arg2 C.gssize      // out
 	var _cret *C.JSCValue   // in
 
-	_arg0 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(code)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.gssize(length)
@@ -309,13 +327,13 @@ func (context *Context) EvaluateInObject(code string, length int, objectInstance
 	var _arg7 *C.JSCValue   // in
 	var _cret *C.JSCValue   // in
 
-	_arg0 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(code)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.gssize(length)
 	_arg3 = (C.gpointer)(unsafe.Pointer(objectInstance))
 	if objectClass != nil {
-		_arg4 = (*C.JSCClass)(unsafe.Pointer(objectClass.Native()))
+		_arg4 = (*C.JSCClass)(unsafe.Pointer(externglib.InternObject(objectClass).Native()))
 	}
 	_arg5 = (*C.char)(unsafe.Pointer(C.CString(uri)))
 	defer C.free(unsafe.Pointer(_arg5))
@@ -363,7 +381,7 @@ func (context *Context) EvaluateWithSourceURI(code string, length int, uri strin
 	var _arg4 C.guint       // out
 	var _cret *C.JSCValue   // in
 
-	_arg0 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(code)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.gssize(length)
@@ -397,7 +415,7 @@ func (context *Context) Exception() *Exception {
 	var _arg0 *C.JSCContext   // out
 	var _cret *C.JSCException // in
 
-	_arg0 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 
 	_cret = C.jsc_context_get_exception(_arg0)
 	runtime.KeepAlive(context)
@@ -421,7 +439,7 @@ func (context *Context) GlobalObject() *Value {
 	var _arg0 *C.JSCContext // out
 	var _cret *C.JSCValue   // in
 
-	_arg0 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 
 	_cret = C.jsc_context_get_global_object(_arg0)
 	runtime.KeepAlive(context)
@@ -448,7 +466,7 @@ func (context *Context) Value(name string) *Value {
 	var _arg1 *C.char       // out
 	var _cret *C.JSCValue   // in
 
-	_arg0 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -473,7 +491,7 @@ func (context *Context) VirtualMachine() *VirtualMachine {
 	var _arg0 *C.JSCContext        // out
 	var _cret *C.JSCVirtualMachine // in
 
-	_arg0 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 
 	_cret = C.jsc_context_get_virtual_machine(_arg0)
 	runtime.KeepAlive(context)
@@ -490,7 +508,7 @@ func (context *Context) VirtualMachine() *VirtualMachine {
 func (context *Context) PopExceptionHandler() {
 	var _arg0 *C.JSCContext // out
 
-	_arg0 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 
 	C.jsc_context_pop_exception_handler(_arg0)
 	runtime.KeepAlive(context)
@@ -517,7 +535,7 @@ func (context *Context) PushExceptionHandler(handler ExceptionHandler) {
 	var _arg2 C.gpointer
 	var _arg3 C.GDestroyNotify
 
-	_arg0 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg1 = (*[0]byte)(C._gotk4_javascriptcore4_ExceptionHandler)
 	_arg2 = C.gpointer(gbox.Assign(handler))
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
@@ -539,10 +557,10 @@ func (context *Context) SetValue(name string, value *Value) {
 	var _arg1 *C.char       // out
 	var _arg2 *C.JSCValue   // out
 
-	_arg0 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
 	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg2 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	C.jsc_context_set_value(_arg0, _arg1, _arg2)
 	runtime.KeepAlive(context)
@@ -561,7 +579,7 @@ func (context *Context) Throw(errorMessage string) {
 	var _arg0 *C.JSCContext // out
 	var _arg1 *C.char       // out
 
-	_arg0 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(errorMessage)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -580,8 +598,8 @@ func (context *Context) ThrowException(exception *Exception) {
 	var _arg0 *C.JSCContext   // out
 	var _arg1 *C.JSCException // out
 
-	_arg0 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
-	_arg1 = (*C.JSCException)(unsafe.Pointer(exception.Native()))
+	_arg0 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
+	_arg1 = (*C.JSCException)(unsafe.Pointer(externglib.InternObject(exception).Native()))
 
 	C.jsc_context_throw_exception(_arg0, _arg1)
 	runtime.KeepAlive(context)
@@ -602,7 +620,7 @@ func (context *Context) ThrowWithName(errorName, errorMessage string) {
 	var _arg1 *C.char       // out
 	var _arg2 *C.char       // out
 
-	_arg0 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(errorName)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(errorMessage)))

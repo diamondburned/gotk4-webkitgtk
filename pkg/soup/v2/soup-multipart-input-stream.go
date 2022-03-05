@@ -18,13 +18,20 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
-// void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
 import "C"
+
+// glib.Type values for soup-multipart-input-stream.go.
+var GTypeMultipartInputStream = externglib.Type(C.soup_multipart_input_stream_get_type())
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_multipart_input_stream_get_type()), F: marshalMultipartInputStreamer},
+		{T: GTypeMultipartInputStream, F: marshalMultipartInputStream},
 	})
+}
+
+// MultipartInputStreamOverrider contains methods that are overridable.
+type MultipartInputStreamOverrider interface {
 }
 
 type MultipartInputStream struct {
@@ -41,6 +48,14 @@ var (
 	_ externglib.Objector     = (*MultipartInputStream)(nil)
 	_ gio.InputStreamer       = (*MultipartInputStream)(nil)
 )
+
+func classInitMultipartInputStreamer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
 
 func wrapMultipartInputStream(obj *externglib.Object) *MultipartInputStream {
 	return &MultipartInputStream{
@@ -61,7 +76,7 @@ func wrapMultipartInputStream(obj *externglib.Object) *MultipartInputStream {
 	}
 }
 
-func marshalMultipartInputStreamer(p uintptr) (interface{}, error) {
+func marshalMultipartInputStream(p uintptr) (interface{}, error) {
 	return wrapMultipartInputStream(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -84,8 +99,8 @@ func NewMultipartInputStream(msg *Message, baseStream gio.InputStreamer) *Multip
 	var _arg2 *C.GInputStream             // out
 	var _cret *C.SoupMultipartInputStream // in
 
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
-	_arg2 = (*C.GInputStream)(unsafe.Pointer(baseStream.Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg2 = (*C.GInputStream)(unsafe.Pointer(externglib.InternObject(baseStream).Native()))
 
 	_cret = C.soup_multipart_input_stream_new(_arg1, _arg2)
 	runtime.KeepAlive(msg)
@@ -116,7 +131,7 @@ func (multipart *MultipartInputStream) Headers() *MessageHeaders {
 	var _arg0 *C.SoupMultipartInputStream // out
 	var _cret *C.SoupMessageHeaders       // in
 
-	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(multipart.Native()))
+	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(externglib.InternObject(multipart).Native()))
 
 	_cret = C.soup_multipart_input_stream_get_headers(_arg0)
 	runtime.KeepAlive(multipart)
@@ -154,7 +169,7 @@ func (multipart *MultipartInputStream) NextPart(ctx context.Context) (gio.InputS
 	var _cret *C.GInputStream             // in
 	var _cerr *C.GError                   // in
 
-	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(multipart.Native()))
+	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(externglib.InternObject(multipart).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -207,7 +222,7 @@ func (multipart *MultipartInputStream) NextPartAsync(ctx context.Context, ioPrio
 	var _arg3 C.GAsyncReadyCallback       // out
 	var _arg4 C.gpointer
 
-	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(multipart.Native()))
+	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(externglib.InternObject(multipart).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -243,8 +258,8 @@ func (multipart *MultipartInputStream) NextPartFinish(result gio.AsyncResulter) 
 	var _cret *C.GInputStream             // in
 	var _cerr *C.GError                   // in
 
-	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(multipart.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(externglib.InternObject(multipart).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	_cret = C.soup_multipart_input_stream_next_part_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(multipart)

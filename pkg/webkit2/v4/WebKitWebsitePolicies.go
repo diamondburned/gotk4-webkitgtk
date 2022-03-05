@@ -15,10 +15,16 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitWebsitePolicies.go.
+var (
+	GTypeAutoplayPolicy  = externglib.Type(C.webkit_autoplay_policy_get_type())
+	GTypeWebsitePolicies = externglib.Type(C.webkit_website_policies_get_type())
+)
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_autoplay_policy_get_type()), F: marshalAutoplayPolicy},
-		{T: externglib.Type(C.webkit_website_policies_get_type()), F: marshalWebsitePolicieser},
+		{T: GTypeAutoplayPolicy, F: marshalAutoplayPolicy},
+		{T: GTypeWebsitePolicies, F: marshalWebsitePolicies},
 	})
 }
 
@@ -53,6 +59,10 @@ func (a AutoplayPolicy) String() string {
 	}
 }
 
+// WebsitePoliciesOverrider contains methods that are overridable.
+type WebsitePoliciesOverrider interface {
+}
+
 type WebsitePolicies struct {
 	_ [0]func() // equal guard
 	*externglib.Object
@@ -62,13 +72,21 @@ var (
 	_ externglib.Objector = (*WebsitePolicies)(nil)
 )
 
+func classInitWebsitePolicieser(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapWebsitePolicies(obj *externglib.Object) *WebsitePolicies {
 	return &WebsitePolicies{
 		Object: obj,
 	}
 }
 
-func marshalWebsitePolicieser(p uintptr) (interface{}, error) {
+func marshalWebsitePolicies(p uintptr) (interface{}, error) {
 	return wrapWebsitePolicies(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -100,7 +118,7 @@ func (policies *WebsitePolicies) AutoplayPolicy() AutoplayPolicy {
 	var _arg0 *C.WebKitWebsitePolicies // out
 	var _cret C.WebKitAutoplayPolicy   // in
 
-	_arg0 = (*C.WebKitWebsitePolicies)(unsafe.Pointer(policies.Native()))
+	_arg0 = (*C.WebKitWebsitePolicies)(unsafe.Pointer(externglib.InternObject(policies).Native()))
 
 	_cret = C.webkit_website_policies_get_autoplay_policy(_arg0)
 	runtime.KeepAlive(policies)

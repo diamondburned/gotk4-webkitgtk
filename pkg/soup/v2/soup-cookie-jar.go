@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
@@ -14,12 +15,22 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
+// extern gboolean _gotk4_soup2_CookieJarClass_is_persistent(SoupCookieJar*);
+// extern void _gotk4_soup2_CookieJarClass_changed(SoupCookieJar*, SoupCookie*, SoupCookie*);
+// extern void _gotk4_soup2_CookieJarClass_save(SoupCookieJar*);
+// extern void _gotk4_soup2_CookieJar_ConnectChanged(gpointer, SoupCookie*, SoupCookie*, guintptr);
 import "C"
+
+// glib.Type values for soup-cookie-jar.go.
+var (
+	GTypeCookieJarAcceptPolicy = externglib.Type(C.soup_cookie_jar_accept_policy_get_type())
+	GTypeCookieJar             = externglib.Type(C.soup_cookie_jar_get_type())
+)
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_cookie_jar_accept_policy_get_type()), F: marshalCookieJarAcceptPolicy},
-		{T: externglib.Type(C.soup_cookie_jar_get_type()), F: marshalCookieJarrer},
+		{T: GTypeCookieJarAcceptPolicy, F: marshalCookieJarAcceptPolicy},
+		{T: GTypeCookieJar, F: marshalCookieJar},
 	})
 }
 
@@ -88,9 +99,6 @@ func (c CookieJarAcceptPolicy) String() string {
 }
 
 // CookieJarOverrider contains methods that are overridable.
-//
-// As of right now, interface overriding and subclassing is not supported
-// yet, so the interface currently has no use.
 type CookieJarOverrider interface {
 	// The function takes the following parameters:
 	//
@@ -124,6 +132,70 @@ var (
 	_ externglib.Objector = (*CookieJar)(nil)
 )
 
+func classInitCookieJarrer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+	goval := gbox.Get(uintptr(data))
+	pclass := (*C.SoupCookieJarClass)(unsafe.Pointer(gclassPtr))
+	// gclass := (*C.GTypeClass)(unsafe.Pointer(gclassPtr))
+	// pclass := (*C.SoupCookieJarClass)(unsafe.Pointer(C.g_type_class_peek_parent(gclass)))
+
+	if _, ok := goval.(interface {
+		Changed(oldCookie, newCookie *Cookie)
+	}); ok {
+		pclass.changed = (*[0]byte)(C._gotk4_soup2_CookieJarClass_changed)
+	}
+
+	if _, ok := goval.(interface{ IsPersistent() bool }); ok {
+		pclass.is_persistent = (*[0]byte)(C._gotk4_soup2_CookieJarClass_is_persistent)
+	}
+
+	if _, ok := goval.(interface{ Save() }); ok {
+		pclass.save = (*[0]byte)(C._gotk4_soup2_CookieJarClass_save)
+	}
+}
+
+//export _gotk4_soup2_CookieJarClass_changed
+func _gotk4_soup2_CookieJarClass_changed(arg0 *C.SoupCookieJar, arg1 *C.SoupCookie, arg2 *C.SoupCookie) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface {
+		Changed(oldCookie, newCookie *Cookie)
+	})
+
+	var _oldCookie *Cookie // out
+	var _newCookie *Cookie // out
+
+	_oldCookie = (*Cookie)(gextras.NewStructNative(unsafe.Pointer(arg1)))
+	_newCookie = (*Cookie)(gextras.NewStructNative(unsafe.Pointer(arg2)))
+
+	iface.Changed(_oldCookie, _newCookie)
+}
+
+//export _gotk4_soup2_CookieJarClass_is_persistent
+func _gotk4_soup2_CookieJarClass_is_persistent(arg0 *C.SoupCookieJar) (cret C.gboolean) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ IsPersistent() bool })
+
+	ok := iface.IsPersistent()
+
+	if ok {
+		cret = C.TRUE
+	}
+
+	return cret
+}
+
+//export _gotk4_soup2_CookieJarClass_save
+func _gotk4_soup2_CookieJarClass_save(arg0 *C.SoupCookieJar) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ Save() })
+
+	iface.Save()
+}
+
 func wrapCookieJar(obj *externglib.Object) *CookieJar {
 	return &CookieJar{
 		Object: obj,
@@ -133,17 +205,39 @@ func wrapCookieJar(obj *externglib.Object) *CookieJar {
 	}
 }
 
-func marshalCookieJarrer(p uintptr) (interface{}, error) {
+func marshalCookieJar(p uintptr) (interface{}, error) {
 	return wrapCookieJar(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// ConnectChanged: emitted when jar changes. If a cookie has been added,
+//export _gotk4_soup2_CookieJar_ConnectChanged
+func _gotk4_soup2_CookieJar_ConnectChanged(arg0 C.gpointer, arg1 *C.SoupCookie, arg2 *C.SoupCookie, arg3 C.guintptr) {
+	var f func(oldCookie, newCookie *Cookie)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(oldCookie, newCookie *Cookie))
+	}
+
+	var _oldCookie *Cookie // out
+	var _newCookie *Cookie // out
+
+	_oldCookie = (*Cookie)(gextras.NewStructNative(unsafe.Pointer(arg1)))
+	_newCookie = (*Cookie)(gextras.NewStructNative(unsafe.Pointer(arg2)))
+
+	f(_oldCookie, _newCookie)
+}
+
+// ConnectChanged is emitted when jar changes. If a cookie has been added,
 // new_cookie will contain the newly-added cookie and old_cookie will be NULL.
 // If a cookie has been deleted, old_cookie will contain the to-be-deleted
 // cookie and new_cookie will be NULL. If a cookie has been changed, old_cookie
 // will contain its old value, and new_cookie its new value.
 func (jar *CookieJar) ConnectChanged(f func(oldCookie, newCookie *Cookie)) externglib.SignalHandle {
-	return jar.Connect("changed", f)
+	return externglib.ConnectGeneratedClosure(jar, "changed", false, unsafe.Pointer(C._gotk4_soup2_CookieJar_ConnectChanged), f)
 }
 
 // NewCookieJar creates a new CookieJar. The base CookieJar class does not
@@ -179,7 +273,7 @@ func (jar *CookieJar) AddCookie(cookie *Cookie) {
 	var _arg0 *C.SoupCookieJar // out
 	var _arg1 *C.SoupCookie    // out
 
-	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
+	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(externglib.InternObject(jar).Native()))
 	_arg1 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 	runtime.SetFinalizer(gextras.StructIntern(unsafe.Pointer(cookie)), nil)
 
@@ -212,7 +306,7 @@ func (jar *CookieJar) AddCookieFull(cookie *Cookie, uri, firstParty *URI) {
 	var _arg2 *C.SoupURI       // out
 	var _arg3 *C.SoupURI       // out
 
-	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
+	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(externglib.InternObject(jar).Native()))
 	_arg1 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 	runtime.SetFinalizer(gextras.StructIntern(unsafe.Pointer(cookie)), nil)
 	if uri != nil {
@@ -251,7 +345,7 @@ func (jar *CookieJar) AddCookieWithFirstParty(firstParty *URI, cookie *Cookie) {
 	var _arg1 *C.SoupURI       // out
 	var _arg2 *C.SoupCookie    // out
 
-	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
+	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(externglib.InternObject(jar).Native()))
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(firstParty)))
 	_arg2 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 	runtime.SetFinalizer(gextras.StructIntern(unsafe.Pointer(cookie)), nil)
@@ -274,7 +368,7 @@ func (jar *CookieJar) AllCookies() []*Cookie {
 	var _arg0 *C.SoupCookieJar // out
 	var _cret *C.GSList        // in
 
-	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
+	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(externglib.InternObject(jar).Native()))
 
 	_cret = C.soup_cookie_jar_all_cookies(_arg0)
 	runtime.KeepAlive(jar)
@@ -308,7 +402,7 @@ func (jar *CookieJar) DeleteCookie(cookie *Cookie) {
 	var _arg0 *C.SoupCookieJar // out
 	var _arg1 *C.SoupCookie    // out
 
-	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
+	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(externglib.InternObject(jar).Native()))
 	_arg1 = (*C.SoupCookie)(gextras.StructNative(unsafe.Pointer(cookie)))
 
 	C.soup_cookie_jar_delete_cookie(_arg0, _arg1)
@@ -326,7 +420,7 @@ func (jar *CookieJar) AcceptPolicy() CookieJarAcceptPolicy {
 	var _arg0 *C.SoupCookieJar            // out
 	var _cret C.SoupCookieJarAcceptPolicy // in
 
-	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
+	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(externglib.InternObject(jar).Native()))
 
 	_cret = C.soup_cookie_jar_get_accept_policy(_arg0)
 	runtime.KeepAlive(jar)
@@ -364,7 +458,7 @@ func (jar *CookieJar) CookieList(uri *URI, forHttp bool) []*Cookie {
 	var _arg2 C.gboolean       // out
 	var _cret *C.GSList        // in
 
-	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
+	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(externglib.InternObject(jar).Native()))
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 	if forHttp {
 		_arg2 = C.TRUE
@@ -426,7 +520,7 @@ func (jar *CookieJar) CookieListWithSameSiteInfo(uri, topLevel, siteForCookies *
 	var _arg6 C.gboolean       // out
 	var _cret *C.GSList        // in
 
-	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
+	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(externglib.InternObject(jar).Native()))
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 	if topLevel != nil {
 		_arg2 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(topLevel)))
@@ -499,7 +593,7 @@ func (jar *CookieJar) Cookies(uri *URI, forHttp bool) string {
 	var _arg2 C.gboolean       // out
 	var _cret *C.char          // in
 
-	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
+	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(externglib.InternObject(jar).Native()))
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 	if forHttp {
 		_arg2 = C.TRUE
@@ -530,7 +624,7 @@ func (jar *CookieJar) IsPersistent() bool {
 	var _arg0 *C.SoupCookieJar // out
 	var _cret C.gboolean       // in
 
-	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
+	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(externglib.InternObject(jar).Native()))
 
 	_cret = C.soup_cookie_jar_is_persistent(_arg0)
 	runtime.KeepAlive(jar)
@@ -551,7 +645,7 @@ func (jar *CookieJar) IsPersistent() bool {
 func (jar *CookieJar) Save() {
 	var _arg0 *C.SoupCookieJar // out
 
-	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
+	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(externglib.InternObject(jar).Native()))
 
 	C.soup_cookie_jar_save(_arg0)
 	runtime.KeepAlive(jar)
@@ -567,7 +661,7 @@ func (jar *CookieJar) SetAcceptPolicy(policy CookieJarAcceptPolicy) {
 	var _arg0 *C.SoupCookieJar            // out
 	var _arg1 C.SoupCookieJarAcceptPolicy // out
 
-	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
+	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(externglib.InternObject(jar).Native()))
 	_arg1 = C.SoupCookieJarAcceptPolicy(policy)
 
 	C.soup_cookie_jar_set_accept_policy(_arg0, _arg1)
@@ -594,7 +688,7 @@ func (jar *CookieJar) SetCookie(uri *URI, cookie string) {
 	var _arg1 *C.SoupURI       // out
 	var _arg2 *C.char          // out
 
-	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
+	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(externglib.InternObject(jar).Native()))
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(cookie)))
 	defer C.free(unsafe.Pointer(_arg2))
@@ -622,7 +716,7 @@ func (jar *CookieJar) SetCookieWithFirstParty(uri, firstParty *URI, cookie strin
 	var _arg2 *C.SoupURI       // out
 	var _arg3 *C.char          // out
 
-	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(jar.Native()))
+	_arg0 = (*C.SoupCookieJar)(unsafe.Pointer(externglib.InternObject(jar).Native()))
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 	_arg2 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(firstParty)))
 	_arg3 = (*C.char)(unsafe.Pointer(C.CString(cookie)))

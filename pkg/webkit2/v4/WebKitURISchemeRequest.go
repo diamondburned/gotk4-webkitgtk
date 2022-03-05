@@ -16,10 +16,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitURISchemeRequest.go.
+var GTypeURISchemeRequest = externglib.Type(C.webkit_uri_scheme_request_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_uri_scheme_request_get_type()), F: marshalURISchemeRequester},
+		{T: GTypeURISchemeRequest, F: marshalURISchemeRequest},
 	})
+}
+
+// URISchemeRequestOverrider contains methods that are overridable.
+type URISchemeRequestOverrider interface {
 }
 
 type URISchemeRequest struct {
@@ -31,13 +38,21 @@ var (
 	_ externglib.Objector = (*URISchemeRequest)(nil)
 )
 
+func classInitURISchemeRequester(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapURISchemeRequest(obj *externglib.Object) *URISchemeRequest {
 	return &URISchemeRequest{
 		Object: obj,
 	}
 }
 
-func marshalURISchemeRequester(p uintptr) (interface{}, error) {
+func marshalURISchemeRequest(p uintptr) (interface{}, error) {
 	return wrapURISchemeRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -56,8 +71,8 @@ func (request *URISchemeRequest) Finish(stream gio.InputStreamer, streamLength i
 	var _arg2 C.gint64                  // out
 	var _arg3 *C.gchar                  // out
 
-	_arg0 = (*C.WebKitURISchemeRequest)(unsafe.Pointer(request.Native()))
-	_arg1 = (*C.GInputStream)(unsafe.Pointer(stream.Native()))
+	_arg0 = (*C.WebKitURISchemeRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg1 = (*C.GInputStream)(unsafe.Pointer(externglib.InternObject(stream).Native()))
 	_arg2 = C.gint64(streamLength)
 	if contentType != "" {
 		_arg3 = (*C.gchar)(unsafe.Pointer(C.CString(contentType)))
@@ -81,8 +96,10 @@ func (request *URISchemeRequest) FinishError(err error) {
 	var _arg0 *C.WebKitURISchemeRequest // out
 	var _arg1 *C.GError                 // out
 
-	_arg0 = (*C.WebKitURISchemeRequest)(unsafe.Pointer(request.Native()))
-	_arg1 = (*C.GError)(gerror.New(err))
+	_arg0 = (*C.WebKitURISchemeRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	if err != nil {
+		_arg1 = (*C.GError)(gerror.New(err))
+	}
 
 	C.webkit_uri_scheme_request_finish_error(_arg0, _arg1)
 	runtime.KeepAlive(request)
@@ -99,7 +116,7 @@ func (request *URISchemeRequest) Path() string {
 	var _arg0 *C.WebKitURISchemeRequest // out
 	var _cret *C.gchar                  // in
 
-	_arg0 = (*C.WebKitURISchemeRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitURISchemeRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_uri_scheme_request_get_path(_arg0)
 	runtime.KeepAlive(request)
@@ -121,7 +138,7 @@ func (request *URISchemeRequest) Scheme() string {
 	var _arg0 *C.WebKitURISchemeRequest // out
 	var _cret *C.gchar                  // in
 
-	_arg0 = (*C.WebKitURISchemeRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitURISchemeRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_uri_scheme_request_get_scheme(_arg0)
 	runtime.KeepAlive(request)
@@ -143,7 +160,7 @@ func (request *URISchemeRequest) URI() string {
 	var _arg0 *C.WebKitURISchemeRequest // out
 	var _cret *C.gchar                  // in
 
-	_arg0 = (*C.WebKitURISchemeRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitURISchemeRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_uri_scheme_request_get_uri(_arg0)
 	runtime.KeepAlive(request)
@@ -165,7 +182,7 @@ func (request *URISchemeRequest) WebView() *WebView {
 	var _arg0 *C.WebKitURISchemeRequest // out
 	var _cret *C.WebKitWebView          // in
 
-	_arg0 = (*C.WebKitURISchemeRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitURISchemeRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_uri_scheme_request_get_web_view(_arg0)
 	runtime.KeepAlive(request)

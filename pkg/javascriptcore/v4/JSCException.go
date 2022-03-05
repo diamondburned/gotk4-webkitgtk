@@ -14,10 +14,17 @@ import (
 // #include <jsc/jsc.h>
 import "C"
 
+// glib.Type values for JSCException.go.
+var GTypeException = externglib.Type(C.jsc_exception_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.jsc_exception_get_type()), F: marshalExceptioner},
+		{T: GTypeException, F: marshalException},
 	})
+}
+
+// ExceptionOverrider contains methods that are overridable.
+type ExceptionOverrider interface {
 }
 
 type Exception struct {
@@ -29,13 +36,21 @@ var (
 	_ externglib.Objector = (*Exception)(nil)
 )
 
+func classInitExceptioner(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapException(obj *externglib.Object) *Exception {
 	return &Exception{
 		Object: obj,
 	}
 }
 
-func marshalExceptioner(p uintptr) (interface{}, error) {
+func marshalException(p uintptr) (interface{}, error) {
 	return wrapException(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -55,7 +70,7 @@ func NewException(context *Context, message string) *Exception {
 	var _arg2 *C.char         // out
 	var _cret *C.JSCException // in
 
-	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg1 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(message)))
 	defer C.free(unsafe.Pointer(_arg2))
 
@@ -89,7 +104,7 @@ func NewExceptionWithName(context *Context, name, message string) *Exception {
 	var _arg3 *C.char         // out
 	var _cret *C.JSCException // in
 
-	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg1 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(name)))
 	defer C.free(unsafe.Pointer(_arg2))
 	_arg3 = (*C.char)(unsafe.Pointer(C.CString(message)))
@@ -117,7 +132,7 @@ func (exception *Exception) BacktraceString() string {
 	var _arg0 *C.JSCException // out
 	var _cret *C.char         // in
 
-	_arg0 = (*C.JSCException)(unsafe.Pointer(exception.Native()))
+	_arg0 = (*C.JSCException)(unsafe.Pointer(externglib.InternObject(exception).Native()))
 
 	_cret = C.jsc_exception_get_backtrace_string(_arg0)
 	runtime.KeepAlive(exception)
@@ -141,7 +156,7 @@ func (exception *Exception) ColumnNumber() uint {
 	var _arg0 *C.JSCException // out
 	var _cret C.guint         // in
 
-	_arg0 = (*C.JSCException)(unsafe.Pointer(exception.Native()))
+	_arg0 = (*C.JSCException)(unsafe.Pointer(externglib.InternObject(exception).Native()))
 
 	_cret = C.jsc_exception_get_column_number(_arg0)
 	runtime.KeepAlive(exception)
@@ -163,7 +178,7 @@ func (exception *Exception) LineNumber() uint {
 	var _arg0 *C.JSCException // out
 	var _cret C.guint         // in
 
-	_arg0 = (*C.JSCException)(unsafe.Pointer(exception.Native()))
+	_arg0 = (*C.JSCException)(unsafe.Pointer(externglib.InternObject(exception).Native()))
 
 	_cret = C.jsc_exception_get_line_number(_arg0)
 	runtime.KeepAlive(exception)
@@ -185,7 +200,7 @@ func (exception *Exception) Message() string {
 	var _arg0 *C.JSCException // out
 	var _cret *C.char         // in
 
-	_arg0 = (*C.JSCException)(unsafe.Pointer(exception.Native()))
+	_arg0 = (*C.JSCException)(unsafe.Pointer(externglib.InternObject(exception).Native()))
 
 	_cret = C.jsc_exception_get_message(_arg0)
 	runtime.KeepAlive(exception)
@@ -207,7 +222,7 @@ func (exception *Exception) Name() string {
 	var _arg0 *C.JSCException // out
 	var _cret *C.char         // in
 
-	_arg0 = (*C.JSCException)(unsafe.Pointer(exception.Native()))
+	_arg0 = (*C.JSCException)(unsafe.Pointer(externglib.InternObject(exception).Native()))
 
 	_cret = C.jsc_exception_get_name(_arg0)
 	runtime.KeepAlive(exception)
@@ -229,7 +244,7 @@ func (exception *Exception) SourceURI() string {
 	var _arg0 *C.JSCException // out
 	var _cret *C.char         // in
 
-	_arg0 = (*C.JSCException)(unsafe.Pointer(exception.Native()))
+	_arg0 = (*C.JSCException)(unsafe.Pointer(externglib.InternObject(exception).Native()))
 
 	_cret = C.jsc_exception_get_source_uri(_arg0)
 	runtime.KeepAlive(exception)
@@ -255,7 +270,7 @@ func (exception *Exception) Report() string {
 	var _arg0 *C.JSCException // out
 	var _cret *C.char         // in
 
-	_arg0 = (*C.JSCException)(unsafe.Pointer(exception.Native()))
+	_arg0 = (*C.JSCException)(unsafe.Pointer(externglib.InternObject(exception).Native()))
 
 	_cret = C.jsc_exception_report(_arg0)
 	runtime.KeepAlive(exception)
@@ -278,7 +293,7 @@ func (exception *Exception) String() string {
 	var _arg0 *C.JSCException // out
 	var _cret *C.char         // in
 
-	_arg0 = (*C.JSCException)(unsafe.Pointer(exception.Native()))
+	_arg0 = (*C.JSCException)(unsafe.Pointer(externglib.InternObject(exception).Native()))
 
 	_cret = C.jsc_exception_to_string(_arg0)
 	runtime.KeepAlive(exception)

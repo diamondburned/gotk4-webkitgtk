@@ -14,9 +14,12 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitContextMenuActions.go.
+var GTypeContextMenuAction = externglib.Type(C.webkit_context_menu_action_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_context_menu_action_get_type()), F: marshalContextMenuAction},
+		{T: GTypeContextMenuAction, F: marshalContextMenuAction},
 	})
 }
 

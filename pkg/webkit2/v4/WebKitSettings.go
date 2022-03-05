@@ -15,10 +15,16 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitSettings.go.
+var (
+	GTypeHardwareAccelerationPolicy = externglib.Type(C.webkit_hardware_acceleration_policy_get_type())
+	GTypeSettings                   = externglib.Type(C.webkit_settings_get_type())
+)
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_hardware_acceleration_policy_get_type()), F: marshalHardwareAccelerationPolicy},
-		{T: externglib.Type(C.webkit_settings_get_type()), F: marshalSettingser},
+		{T: GTypeHardwareAccelerationPolicy, F: marshalHardwareAccelerationPolicy},
+		{T: GTypeSettings, F: marshalSettings},
 	})
 }
 
@@ -56,6 +62,10 @@ func (h HardwareAccelerationPolicy) String() string {
 	}
 }
 
+// SettingsOverrider contains methods that are overridable.
+type SettingsOverrider interface {
+}
+
 type Settings struct {
 	_ [0]func() // equal guard
 	*externglib.Object
@@ -65,13 +75,21 @@ var (
 	_ externglib.Objector = (*Settings)(nil)
 )
 
+func classInitSettingser(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapSettings(obj *externglib.Object) *Settings {
 	return &Settings{
 		Object: obj,
 	}
 }
 
-func marshalSettingser(p uintptr) (interface{}, error) {
+func marshalSettings(p uintptr) (interface{}, error) {
 	return wrapSettings(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -106,7 +124,7 @@ func (settings *Settings) AllowFileAccessFromFileUrls() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_allow_file_access_from_file_urls(_arg0)
 	runtime.KeepAlive(settings)
@@ -131,7 +149,7 @@ func (settings *Settings) AllowModalDialogs() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_allow_modal_dialogs(_arg0)
 	runtime.KeepAlive(settings)
@@ -157,7 +175,7 @@ func (settings *Settings) AllowTopNavigationToDataUrls() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_allow_top_navigation_to_data_urls(_arg0)
 	runtime.KeepAlive(settings)
@@ -183,7 +201,7 @@ func (settings *Settings) AllowUniversalAccessFromFileUrls() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_allow_universal_access_from_file_urls(_arg0)
 	runtime.KeepAlive(settings)
@@ -207,7 +225,7 @@ func (settings *Settings) AutoLoadImages() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_auto_load_images(_arg0)
 	runtime.KeepAlive(settings)
@@ -232,7 +250,7 @@ func (settings *Settings) CursiveFontFamily() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_cursive_font_family(_arg0)
 	runtime.KeepAlive(settings)
@@ -254,7 +272,7 @@ func (settings *Settings) DefaultCharset() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_default_charset(_arg0)
 	runtime.KeepAlive(settings)
@@ -272,7 +290,7 @@ func (settings *Settings) DefaultFontFamily() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_default_font_family(_arg0)
 	runtime.KeepAlive(settings)
@@ -294,7 +312,7 @@ func (settings *Settings) DefaultFontSize() uint32 {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.guint32         // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_default_font_size(_arg0)
 	runtime.KeepAlive(settings)
@@ -317,7 +335,7 @@ func (settings *Settings) DefaultMonospaceFontSize() uint32 {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.guint32         // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_default_monospace_font_size(_arg0)
 	runtime.KeepAlive(settings)
@@ -340,7 +358,7 @@ func (settings *Settings) DrawCompositingIndicators() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_draw_compositing_indicators(_arg0)
 	runtime.KeepAlive(settings)
@@ -367,7 +385,7 @@ func (settings *Settings) EnableAccelerated2DCanvas() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_accelerated_2d_canvas(_arg0)
 	runtime.KeepAlive(settings)
@@ -393,7 +411,7 @@ func (settings *Settings) EnableBackForwardNavigationGestures() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_back_forward_navigation_gestures(_arg0)
 	runtime.KeepAlive(settings)
@@ -417,7 +435,7 @@ func (settings *Settings) EnableCaretBrowsing() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_caret_browsing(_arg0)
 	runtime.KeepAlive(settings)
@@ -441,7 +459,7 @@ func (settings *Settings) EnableDeveloperExtras() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_developer_extras(_arg0)
 	runtime.KeepAlive(settings)
@@ -465,7 +483,7 @@ func (settings *Settings) EnableDnsPrefetching() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_dns_prefetching(_arg0)
 	runtime.KeepAlive(settings)
@@ -489,7 +507,7 @@ func (settings *Settings) EnableEncryptedMedia() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_encrypted_media(_arg0)
 	runtime.KeepAlive(settings)
@@ -513,7 +531,7 @@ func (settings *Settings) EnableFrameFlattening() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_frame_flattening(_arg0)
 	runtime.KeepAlive(settings)
@@ -537,7 +555,7 @@ func (settings *Settings) EnableFullscreen() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_fullscreen(_arg0)
 	runtime.KeepAlive(settings)
@@ -561,7 +579,7 @@ func (settings *Settings) EnableHtml5Database() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_html5_database(_arg0)
 	runtime.KeepAlive(settings)
@@ -586,7 +604,7 @@ func (settings *Settings) EnableHtml5LocalStorage() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_html5_local_storage(_arg0)
 	runtime.KeepAlive(settings)
@@ -611,7 +629,7 @@ func (settings *Settings) EnableHyperlinkAuditing() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_hyperlink_auditing(_arg0)
 	runtime.KeepAlive(settings)
@@ -635,7 +653,7 @@ func (settings *Settings) EnableJava() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_java(_arg0)
 	runtime.KeepAlive(settings)
@@ -659,7 +677,7 @@ func (settings *Settings) EnableJavascript() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_javascript(_arg0)
 	runtime.KeepAlive(settings)
@@ -684,7 +702,7 @@ func (settings *Settings) EnableJavascriptMarkup() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_javascript_markup(_arg0)
 	runtime.KeepAlive(settings)
@@ -708,7 +726,7 @@ func (settings *Settings) EnableMedia() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_media(_arg0)
 	runtime.KeepAlive(settings)
@@ -733,7 +751,7 @@ func (settings *Settings) EnableMediaCapabilities() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_media_capabilities(_arg0)
 	runtime.KeepAlive(settings)
@@ -757,7 +775,7 @@ func (settings *Settings) EnableMediaStream() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_media_stream(_arg0)
 	runtime.KeepAlive(settings)
@@ -781,7 +799,7 @@ func (settings *Settings) EnableMediasource() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_mediasource(_arg0)
 	runtime.KeepAlive(settings)
@@ -806,7 +824,7 @@ func (settings *Settings) EnableMockCaptureDevices() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_mock_capture_devices(_arg0)
 	runtime.KeepAlive(settings)
@@ -832,7 +850,7 @@ func (settings *Settings) EnableOfflineWebApplicationCache() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_offline_web_application_cache(_arg0)
 	runtime.KeepAlive(settings)
@@ -856,7 +874,7 @@ func (settings *Settings) EnablePageCache() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_page_cache(_arg0)
 	runtime.KeepAlive(settings)
@@ -882,7 +900,7 @@ func (settings *Settings) EnablePlugins() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_plugins(_arg0)
 	runtime.KeepAlive(settings)
@@ -909,7 +927,7 @@ func (settings *Settings) EnablePrivateBrowsing() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_private_browsing(_arg0)
 	runtime.KeepAlive(settings)
@@ -934,7 +952,7 @@ func (settings *Settings) EnableResizableTextAreas() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_resizable_text_areas(_arg0)
 	runtime.KeepAlive(settings)
@@ -959,7 +977,7 @@ func (settings *Settings) EnableSiteSpecificQuirks() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_site_specific_quirks(_arg0)
 	runtime.KeepAlive(settings)
@@ -983,7 +1001,7 @@ func (settings *Settings) EnableSmoothScrolling() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_smooth_scrolling(_arg0)
 	runtime.KeepAlive(settings)
@@ -1009,7 +1027,7 @@ func (settings *Settings) EnableSpatialNavigation() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_spatial_navigation(_arg0)
 	runtime.KeepAlive(settings)
@@ -1033,7 +1051,7 @@ func (settings *Settings) EnableTabsToLinks() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_tabs_to_links(_arg0)
 	runtime.KeepAlive(settings)
@@ -1057,7 +1075,7 @@ func (settings *Settings) EnableWebaudio() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_webaudio(_arg0)
 	runtime.KeepAlive(settings)
@@ -1081,7 +1099,7 @@ func (settings *Settings) EnableWebgl() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_webgl(_arg0)
 	runtime.KeepAlive(settings)
@@ -1107,7 +1125,7 @@ func (settings *Settings) EnableWriteConsoleMessagesToStdout() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_write_console_messages_to_stdout(_arg0)
 	runtime.KeepAlive(settings)
@@ -1131,7 +1149,7 @@ func (settings *Settings) EnableXssAuditor() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_enable_xss_auditor(_arg0)
 	runtime.KeepAlive(settings)
@@ -1156,7 +1174,7 @@ func (settings *Settings) FantasyFontFamily() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_fantasy_font_family(_arg0)
 	runtime.KeepAlive(settings)
@@ -1179,7 +1197,7 @@ func (settings *Settings) HardwareAccelerationPolicy() HardwareAccelerationPolic
 	var _arg0 *C.WebKitSettings                  // out
 	var _cret C.WebKitHardwareAccelerationPolicy // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_hardware_acceleration_policy(_arg0)
 	runtime.KeepAlive(settings)
@@ -1203,7 +1221,7 @@ func (settings *Settings) JavascriptCanAccessClipboard() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_javascript_can_access_clipboard(_arg0)
 	runtime.KeepAlive(settings)
@@ -1228,7 +1246,7 @@ func (settings *Settings) JavascriptCanOpenWindowsAutomatically() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_javascript_can_open_windows_automatically(_arg0)
 	runtime.KeepAlive(settings)
@@ -1254,7 +1272,7 @@ func (settings *Settings) LoadIconsIgnoringImageLoadSetting() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_load_icons_ignoring_image_load_setting(_arg0)
 	runtime.KeepAlive(settings)
@@ -1279,7 +1297,7 @@ func (settings *Settings) MediaContentTypesRequiringHardwareSupport() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_media_content_types_requiring_hardware_support(_arg0)
 	runtime.KeepAlive(settings)
@@ -1303,7 +1321,7 @@ func (settings *Settings) MediaPlaybackAllowsInline() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_media_playback_allows_inline(_arg0)
 	runtime.KeepAlive(settings)
@@ -1329,7 +1347,7 @@ func (settings *Settings) MediaPlaybackRequiresUserGesture() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_media_playback_requires_user_gesture(_arg0)
 	runtime.KeepAlive(settings)
@@ -1353,7 +1371,7 @@ func (settings *Settings) MinimumFontSize() uint32 {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.guint32         // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_minimum_font_size(_arg0)
 	runtime.KeepAlive(settings)
@@ -1376,7 +1394,7 @@ func (settings *Settings) MonospaceFontFamily() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_monospace_font_family(_arg0)
 	runtime.KeepAlive(settings)
@@ -1399,7 +1417,7 @@ func (settings *Settings) PictographFontFamily() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_pictograph_font_family(_arg0)
 	runtime.KeepAlive(settings)
@@ -1421,7 +1439,7 @@ func (settings *Settings) PrintBackgrounds() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_print_backgrounds(_arg0)
 	runtime.KeepAlive(settings)
@@ -1446,7 +1464,7 @@ func (settings *Settings) SansSerifFontFamily() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_sans_serif_font_family(_arg0)
 	runtime.KeepAlive(settings)
@@ -1468,7 +1486,7 @@ func (settings *Settings) SerifFontFamily() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_serif_font_family(_arg0)
 	runtime.KeepAlive(settings)
@@ -1490,7 +1508,7 @@ func (settings *Settings) UserAgent() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_user_agent(_arg0)
 	runtime.KeepAlive(settings)
@@ -1513,7 +1531,7 @@ func (settings *Settings) ZoomTextOnly() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_settings_get_zoom_text_only(_arg0)
 	runtime.KeepAlive(settings)
@@ -1538,7 +1556,7 @@ func (settings *Settings) SetAllowFileAccessFromFileUrls(allowed bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if allowed {
 		_arg1 = C.TRUE
 	}
@@ -1558,7 +1576,7 @@ func (settings *Settings) SetAllowModalDialogs(allowed bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if allowed {
 		_arg1 = C.TRUE
 	}
@@ -1579,7 +1597,7 @@ func (settings *Settings) SetAllowTopNavigationToDataUrls(allowed bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if allowed {
 		_arg1 = C.TRUE
 	}
@@ -1600,7 +1618,7 @@ func (settings *Settings) SetAllowUniversalAccessFromFileUrls(allowed bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if allowed {
 		_arg1 = C.TRUE
 	}
@@ -1620,7 +1638,7 @@ func (settings *Settings) SetAutoLoadImages(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -1640,7 +1658,7 @@ func (settings *Settings) SetCursiveFontFamily(cursiveFontFamily string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(cursiveFontFamily)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -1659,7 +1677,7 @@ func (settings *Settings) SetDefaultCharset(defaultCharset string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(defaultCharset)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -1678,7 +1696,7 @@ func (settings *Settings) SetDefaultFontFamily(defaultFontFamily string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(defaultFontFamily)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -1697,7 +1715,7 @@ func (settings *Settings) SetDefaultFontSize(fontSize uint32) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.guint32         // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	_arg1 = C.guint32(fontSize)
 
 	C.webkit_settings_set_default_font_size(_arg0, _arg1)
@@ -1716,7 +1734,7 @@ func (settings *Settings) SetDefaultMonospaceFontSize(fontSize uint32) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.guint32         // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	_arg1 = C.guint32(fontSize)
 
 	C.webkit_settings_set_default_monospace_font_size(_arg0, _arg1)
@@ -1735,7 +1753,7 @@ func (settings *Settings) SetDrawCompositingIndicators(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -1758,7 +1776,7 @@ func (settings *Settings) SetEnableAccelerated2DCanvas(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -1779,7 +1797,7 @@ func (settings *Settings) SetEnableBackForwardNavigationGestures(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -1799,7 +1817,7 @@ func (settings *Settings) SetEnableCaretBrowsing(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -1820,7 +1838,7 @@ func (settings *Settings) SetEnableDeveloperExtras(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -1840,7 +1858,7 @@ func (settings *Settings) SetEnableDnsPrefetching(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -1860,7 +1878,7 @@ func (settings *Settings) SetEnableEncryptedMedia(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -1881,7 +1899,7 @@ func (settings *Settings) SetEnableFrameFlattening(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -1901,7 +1919,7 @@ func (settings *Settings) SetEnableFullscreen(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -1921,7 +1939,7 @@ func (settings *Settings) SetEnableHtml5Database(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -1942,7 +1960,7 @@ func (settings *Settings) SetEnableHtml5LocalStorage(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -1963,7 +1981,7 @@ func (settings *Settings) SetEnableHyperlinkAuditing(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -1983,7 +2001,7 @@ func (settings *Settings) SetEnableJava(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2003,7 +2021,7 @@ func (settings *Settings) SetEnableJavascript(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2024,7 +2042,7 @@ func (settings *Settings) SetEnableJavascriptMarkup(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2044,7 +2062,7 @@ func (settings *Settings) SetEnableMedia(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2065,7 +2083,7 @@ func (settings *Settings) SetEnableMediaCapabilities(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2085,7 +2103,7 @@ func (settings *Settings) SetEnableMediaStream(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2105,7 +2123,7 @@ func (settings *Settings) SetEnableMediasource(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2126,7 +2144,7 @@ func (settings *Settings) SetEnableMockCaptureDevices(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2147,7 +2165,7 @@ func (settings *Settings) SetEnableOfflineWebApplicationCache(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2167,7 +2185,7 @@ func (settings *Settings) SetEnablePageCache(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2189,7 +2207,7 @@ func (settings *Settings) SetEnablePlugins(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2213,7 +2231,7 @@ func (settings *Settings) SetEnablePrivateBrowsing(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2234,7 +2252,7 @@ func (settings *Settings) SetEnableResizableTextAreas(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2255,7 +2273,7 @@ func (settings *Settings) SetEnableSiteSpecificQuirks(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2276,7 +2294,7 @@ func (settings *Settings) SetEnableSmoothScrolling(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2297,7 +2315,7 @@ func (settings *Settings) SetEnableSpatialNavigation(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2317,7 +2335,7 @@ func (settings *Settings) SetEnableTabsToLinks(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2337,7 +2355,7 @@ func (settings *Settings) SetEnableWebaudio(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2357,7 +2375,7 @@ func (settings *Settings) SetEnableWebgl(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2378,7 +2396,7 @@ func (settings *Settings) SetEnableWriteConsoleMessagesToStdout(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2398,7 +2416,7 @@ func (settings *Settings) SetEnableXssAuditor(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2418,7 +2436,7 @@ func (settings *Settings) SetFantasyFontFamily(fantasyFontFamily string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(fantasyFontFamily)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -2438,7 +2456,7 @@ func (settings *Settings) SetHardwareAccelerationPolicy(policy HardwareAccelerat
 	var _arg0 *C.WebKitSettings                  // out
 	var _arg1 C.WebKitHardwareAccelerationPolicy // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	_arg1 = C.WebKitHardwareAccelerationPolicy(policy)
 
 	C.webkit_settings_set_hardware_acceleration_policy(_arg0, _arg1)
@@ -2457,7 +2475,7 @@ func (settings *Settings) SetJavascriptCanAccessClipboard(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2478,7 +2496,7 @@ func (settings *Settings) SetJavascriptCanOpenWindowsAutomatically(enabled bool)
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2499,7 +2517,7 @@ func (settings *Settings) SetLoadIconsIgnoringImageLoadSetting(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2521,7 +2539,7 @@ func (settings *Settings) SetMediaContentTypesRequiringHardwareSupport(contentTy
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if contentTypes != "" {
 		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(contentTypes)))
 		defer C.free(unsafe.Pointer(_arg1))
@@ -2543,7 +2561,7 @@ func (settings *Settings) SetMediaPlaybackAllowsInline(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2564,7 +2582,7 @@ func (settings *Settings) SetMediaPlaybackRequiresUserGesture(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -2584,7 +2602,7 @@ func (settings *Settings) SetMinimumFontSize(fontSize uint32) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.guint32         // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	_arg1 = C.guint32(fontSize)
 
 	C.webkit_settings_set_minimum_font_size(_arg0, _arg1)
@@ -2602,7 +2620,7 @@ func (settings *Settings) SetMonospaceFontFamily(monospaceFontFamily string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(monospaceFontFamily)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -2621,7 +2639,7 @@ func (settings *Settings) SetPictographFontFamily(pictographFontFamily string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(pictographFontFamily)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -2640,7 +2658,7 @@ func (settings *Settings) SetPrintBackgrounds(printBackgrounds bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if printBackgrounds {
 		_arg1 = C.TRUE
 	}
@@ -2660,7 +2678,7 @@ func (settings *Settings) SetSansSerifFontFamily(sansSerifFontFamily string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(sansSerifFontFamily)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -2679,7 +2697,7 @@ func (settings *Settings) SetSerifFontFamily(serifFontFamily string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(serifFontFamily)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -2699,7 +2717,7 @@ func (settings *Settings) SetUserAgent(userAgent string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if userAgent != "" {
 		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(userAgent)))
 		defer C.free(unsafe.Pointer(_arg1))
@@ -2728,7 +2746,7 @@ func (settings *Settings) SetUserAgentWithApplicationDetails(applicationName, ap
 	var _arg1 *C.gchar          // out
 	var _arg2 *C.gchar          // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if applicationName != "" {
 		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(applicationName)))
 		defer C.free(unsafe.Pointer(_arg1))
@@ -2754,7 +2772,7 @@ func (settings *Settings) SetZoomTextOnly(zoomTextOnly bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(settings.Native()))
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
 	if zoomTextOnly {
 		_arg1 = C.TRUE
 	}

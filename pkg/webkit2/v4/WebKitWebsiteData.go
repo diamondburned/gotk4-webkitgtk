@@ -17,10 +17,16 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitWebsiteData.go.
+var (
+	GTypeWebsiteDataTypes = externglib.Type(C.webkit_website_data_types_get_type())
+	GTypeWebsiteData      = externglib.Type(C.webkit_website_data_get_type())
+)
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_website_data_types_get_type()), F: marshalWebsiteDataTypes},
-		{T: externglib.Type(C.webkit_website_data_get_type()), F: marshalWebsiteData},
+		{T: GTypeWebsiteDataTypes, F: marshalWebsiteDataTypes},
+		{T: GTypeWebsiteData, F: marshalWebsiteData},
 	})
 }
 

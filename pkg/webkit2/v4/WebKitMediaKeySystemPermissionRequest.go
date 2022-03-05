@@ -14,9 +14,12 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitMediaKeySystemPermissionRequest.go.
+var GTypeMediaKeySystemPermissionRequest = externglib.Type(C.webkit_media_key_system_permission_request_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_media_key_system_permission_request_get_type()), F: marshalMediaKeySystemPermissionRequester},
+		{T: GTypeMediaKeySystemPermissionRequest, F: marshalMediaKeySystemPermissionRequest},
 	})
 }
 
@@ -35,7 +38,7 @@ func MediaKeySystemPermissionGetName(request *MediaKeySystemPermissionRequest) s
 	var _arg1 *C.WebKitMediaKeySystemPermissionRequest // out
 	var _cret *C.gchar                                 // in
 
-	_arg1 = (*C.WebKitMediaKeySystemPermissionRequest)(unsafe.Pointer(request.Native()))
+	_arg1 = (*C.WebKitMediaKeySystemPermissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_media_key_system_permission_get_name(_arg1)
 	runtime.KeepAlive(request)
@@ -45,6 +48,10 @@ func MediaKeySystemPermissionGetName(request *MediaKeySystemPermissionRequest) s
 	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
 
 	return _utf8
+}
+
+// MediaKeySystemPermissionRequestOverrider contains methods that are overridable.
+type MediaKeySystemPermissionRequestOverrider interface {
 }
 
 type MediaKeySystemPermissionRequest struct {
@@ -58,6 +65,14 @@ var (
 	_ externglib.Objector = (*MediaKeySystemPermissionRequest)(nil)
 )
 
+func classInitMediaKeySystemPermissionRequester(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapMediaKeySystemPermissionRequest(obj *externglib.Object) *MediaKeySystemPermissionRequest {
 	return &MediaKeySystemPermissionRequest{
 		Object: obj,
@@ -67,6 +82,6 @@ func wrapMediaKeySystemPermissionRequest(obj *externglib.Object) *MediaKeySystem
 	}
 }
 
-func marshalMediaKeySystemPermissionRequester(p uintptr) (interface{}, error) {
+func marshalMediaKeySystemPermissionRequest(p uintptr) (interface{}, error) {
 	return wrapMediaKeySystemPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }

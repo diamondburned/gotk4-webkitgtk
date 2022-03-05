@@ -18,10 +18,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitContextMenuItem.go.
+var GTypeContextMenuItem = externglib.Type(C.webkit_context_menu_item_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_context_menu_item_get_type()), F: marshalContextMenuItemmer},
+		{T: GTypeContextMenuItem, F: marshalContextMenuItem},
 	})
+}
+
+// ContextMenuItemOverrider contains methods that are overridable.
+type ContextMenuItemOverrider interface {
 }
 
 type ContextMenuItem struct {
@@ -31,6 +38,14 @@ type ContextMenuItem struct {
 
 var ()
 
+func classInitContextMenuItemmer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapContextMenuItem(obj *externglib.Object) *ContextMenuItem {
 	return &ContextMenuItem{
 		InitiallyUnowned: externglib.InitiallyUnowned{
@@ -39,7 +54,7 @@ func wrapContextMenuItem(obj *externglib.Object) *ContextMenuItem {
 	}
 }
 
-func marshalContextMenuItemmer(p uintptr) (interface{}, error) {
+func marshalContextMenuItem(p uintptr) (interface{}, error) {
 	return wrapContextMenuItem(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -59,7 +74,7 @@ func NewContextMenuItem(action *gtk.Action) *ContextMenuItem {
 	var _arg1 *C.GtkAction             // out
 	var _cret *C.WebKitContextMenuItem // in
 
-	_arg1 = (*C.GtkAction)(unsafe.Pointer(action.Native()))
+	_arg1 = (*C.GtkAction)(unsafe.Pointer(externglib.InternObject(action).Native()))
 
 	_cret = C.webkit_context_menu_item_new(_arg1)
 	runtime.KeepAlive(action)
@@ -91,7 +106,7 @@ func NewContextMenuItemFromGaction(action gio.Actioner, label string, target *gl
 	var _arg3 *C.GVariant              // out
 	var _cret *C.WebKitContextMenuItem // in
 
-	_arg1 = (*C.GAction)(unsafe.Pointer(action.Native()))
+	_arg1 = (*C.GAction)(unsafe.Pointer(externglib.InternObject(action).Native()))
 	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(label)))
 	defer C.free(unsafe.Pointer(_arg2))
 	if target != nil {
@@ -216,7 +231,7 @@ func NewContextMenuItemWithSubmenu(label string, submenu *ContextMenu) *ContextM
 
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(label)))
 	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.WebKitContextMenu)(unsafe.Pointer(submenu.Native()))
+	_arg2 = (*C.WebKitContextMenu)(unsafe.Pointer(externglib.InternObject(submenu).Native()))
 
 	_cret = C.webkit_context_menu_item_new_with_submenu(_arg1, _arg2)
 	runtime.KeepAlive(label)
@@ -242,7 +257,7 @@ func (item *ContextMenuItem) Action() *gtk.Action {
 	var _arg0 *C.WebKitContextMenuItem // out
 	var _cret *C.GtkAction             // in
 
-	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
+	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(item).Native()))
 
 	_cret = C.webkit_context_menu_item_get_action(_arg0)
 	runtime.KeepAlive(item)
@@ -273,7 +288,7 @@ func (item *ContextMenuItem) Gaction() gio.Actioner {
 	var _arg0 *C.WebKitContextMenuItem // out
 	var _cret *C.GAction               // in
 
-	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
+	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(item).Native()))
 
 	_cret = C.webkit_context_menu_item_get_gaction(_arg0)
 	runtime.KeepAlive(item)
@@ -314,7 +329,7 @@ func (item *ContextMenuItem) StockAction() ContextMenuAction {
 	var _arg0 *C.WebKitContextMenuItem  // out
 	var _cret C.WebKitContextMenuAction // in
 
-	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
+	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(item).Native()))
 
 	_cret = C.webkit_context_menu_item_get_stock_action(_arg0)
 	runtime.KeepAlive(item)
@@ -337,7 +352,7 @@ func (item *ContextMenuItem) Submenu() *ContextMenu {
 	var _arg0 *C.WebKitContextMenuItem // out
 	var _cret *C.WebKitContextMenu     // in
 
-	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
+	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(item).Native()))
 
 	_cret = C.webkit_context_menu_item_get_submenu(_arg0)
 	runtime.KeepAlive(item)
@@ -359,7 +374,7 @@ func (item *ContextMenuItem) IsSeparator() bool {
 	var _arg0 *C.WebKitContextMenuItem // out
 	var _cret C.gboolean               // in
 
-	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
+	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(item).Native()))
 
 	_cret = C.webkit_context_menu_item_is_separator(_arg0)
 	runtime.KeepAlive(item)
@@ -384,9 +399,9 @@ func (item *ContextMenuItem) SetSubmenu(submenu *ContextMenu) {
 	var _arg0 *C.WebKitContextMenuItem // out
 	var _arg1 *C.WebKitContextMenu     // out
 
-	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
+	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(item).Native()))
 	if submenu != nil {
-		_arg1 = (*C.WebKitContextMenu)(unsafe.Pointer(submenu.Native()))
+		_arg1 = (*C.WebKitContextMenu)(unsafe.Pointer(externglib.InternObject(submenu).Native()))
 	}
 
 	C.webkit_context_menu_item_set_submenu(_arg0, _arg1)

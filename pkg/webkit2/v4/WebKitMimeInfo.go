@@ -15,9 +15,12 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitMimeInfo.go.
+var GTypeMIMEInfo = externglib.Type(C.webkit_mime_info_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_mime_info_get_type()), F: marshalMIMEInfo},
+		{T: GTypeMIMEInfo, F: marshalMIMEInfo},
 	})
 }
 

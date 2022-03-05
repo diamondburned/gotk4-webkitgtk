@@ -15,9 +15,12 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitSecurityOrigin.go.
+var GTypeSecurityOrigin = externglib.Type(C.webkit_security_origin_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_security_origin_get_type()), F: marshalSecurityOrigin},
+		{T: GTypeSecurityOrigin, F: marshalSecurityOrigin},
 	})
 }
 

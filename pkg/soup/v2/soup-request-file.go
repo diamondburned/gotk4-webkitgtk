@@ -15,10 +15,17 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-request-file.go.
+var GTypeRequestFile = externglib.Type(C.soup_request_file_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_request_file_get_type()), F: marshalRequestFiler},
+		{T: GTypeRequestFile, F: marshalRequestFile},
 	})
+}
+
+// RequestFileOverrider contains methods that are overridable.
+type RequestFileOverrider interface {
 }
 
 type RequestFile struct {
@@ -29,6 +36,14 @@ type RequestFile struct {
 var (
 	_ externglib.Objector = (*RequestFile)(nil)
 )
+
+func classInitRequestFiler(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
 
 func wrapRequestFile(obj *externglib.Object) *RequestFile {
 	return &RequestFile{
@@ -41,7 +56,7 @@ func wrapRequestFile(obj *externglib.Object) *RequestFile {
 	}
 }
 
-func marshalRequestFiler(p uintptr) (interface{}, error) {
+func marshalRequestFile(p uintptr) (interface{}, error) {
 	return wrapRequestFile(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -55,7 +70,7 @@ func (file *RequestFile) File() gio.Filer {
 	var _arg0 *C.SoupRequestFile // out
 	var _cret *C.GFile           // in
 
-	_arg0 = (*C.SoupRequestFile)(unsafe.Pointer(file.Native()))
+	_arg0 = (*C.SoupRequestFile)(unsafe.Pointer(externglib.InternObject(file).Native()))
 
 	_cret = C.soup_request_file_get_file(_arg0)
 	runtime.KeepAlive(file)

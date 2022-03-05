@@ -16,9 +16,12 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-tld.go.
+var GTypeTLDError = externglib.Type(C.soup_tld_error_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_tld_error_get_type()), F: marshalTLDError},
+		{T: GTypeTLDError, F: marshalTLDError},
 	})
 }
 

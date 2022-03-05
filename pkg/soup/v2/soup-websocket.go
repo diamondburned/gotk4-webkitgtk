@@ -17,13 +17,22 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-websocket.go.
+var (
+	GTypeWebsocketCloseCode      = externglib.Type(C.soup_websocket_close_code_get_type())
+	GTypeWebsocketConnectionType = externglib.Type(C.soup_websocket_connection_type_get_type())
+	GTypeWebsocketDataType       = externglib.Type(C.soup_websocket_data_type_get_type())
+	GTypeWebsocketError          = externglib.Type(C.soup_websocket_error_get_type())
+	GTypeWebsocketState          = externglib.Type(C.soup_websocket_state_get_type())
+)
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_websocket_close_code_get_type()), F: marshalWebsocketCloseCode},
-		{T: externglib.Type(C.soup_websocket_connection_type_get_type()), F: marshalWebsocketConnectionType},
-		{T: externglib.Type(C.soup_websocket_data_type_get_type()), F: marshalWebsocketDataType},
-		{T: externglib.Type(C.soup_websocket_error_get_type()), F: marshalWebsocketError},
-		{T: externglib.Type(C.soup_websocket_state_get_type()), F: marshalWebsocketState},
+		{T: GTypeWebsocketCloseCode, F: marshalWebsocketCloseCode},
+		{T: GTypeWebsocketConnectionType, F: marshalWebsocketConnectionType},
+		{T: GTypeWebsocketDataType, F: marshalWebsocketDataType},
+		{T: GTypeWebsocketError, F: marshalWebsocketError},
+		{T: GTypeWebsocketState, F: marshalWebsocketState},
 	})
 }
 
@@ -266,7 +275,7 @@ func WebsocketClientPrepareHandshake(msg *Message, origin string, protocols []st
 	var _arg2 *C.char        // out
 	var _arg3 **C.char       // out
 
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 	if origin != "" {
 		_arg2 = (*C.char)(unsafe.Pointer(C.CString(origin)))
 		defer C.free(unsafe.Pointer(_arg2))
@@ -312,7 +321,7 @@ func WebsocketClientVerifyHandshake(msg *Message) error {
 	var _arg1 *C.SoupMessage // out
 	var _cerr *C.GError      // in
 
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 
 	C.soup_websocket_client_verify_handshake(_arg1, &_cerr)
 	runtime.KeepAlive(msg)
@@ -357,7 +366,7 @@ func WebsocketServerCheckHandshake(msg *Message, origin string, protocols []stri
 	var _arg3 **C.char       // out
 	var _cerr *C.GError      // in
 
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 	if origin != "" {
 		_arg2 = (*C.char)(unsafe.Pointer(C.CString(origin)))
 		defer C.free(unsafe.Pointer(_arg2))
@@ -424,7 +433,7 @@ func WebsocketServerProcessHandshake(msg *Message, expectedOrigin string, protoc
 	var _arg3 **C.char       // out
 	var _cret C.gboolean     // in
 
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 	if expectedOrigin != "" {
 		_arg2 = (*C.char)(unsafe.Pointer(C.CString(expectedOrigin)))
 		defer C.free(unsafe.Pointer(_arg2))

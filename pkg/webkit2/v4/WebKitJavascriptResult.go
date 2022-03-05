@@ -16,9 +16,12 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitJavascriptResult.go.
+var GTypeJavascriptResult = externglib.Type(C.webkit_javascript_result_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_javascript_result_get_type()), F: marshalJavascriptResult},
+		{T: GTypeJavascriptResult, F: marshalJavascriptResult},
 	})
 }
 

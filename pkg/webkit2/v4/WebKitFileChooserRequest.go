@@ -15,10 +15,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitFileChooserRequest.go.
+var GTypeFileChooserRequest = externglib.Type(C.webkit_file_chooser_request_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_file_chooser_request_get_type()), F: marshalFileChooserRequester},
+		{T: GTypeFileChooserRequest, F: marshalFileChooserRequest},
 	})
+}
+
+// FileChooserRequestOverrider contains methods that are overridable.
+type FileChooserRequestOverrider interface {
 }
 
 type FileChooserRequest struct {
@@ -30,13 +37,21 @@ var (
 	_ externglib.Objector = (*FileChooserRequest)(nil)
 )
 
+func classInitFileChooserRequester(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapFileChooserRequest(obj *externglib.Object) *FileChooserRequest {
 	return &FileChooserRequest{
 		Object: obj,
 	}
 }
 
-func marshalFileChooserRequester(p uintptr) (interface{}, error) {
+func marshalFileChooserRequest(p uintptr) (interface{}, error) {
 	return wrapFileChooserRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -47,7 +62,7 @@ func marshalFileChooserRequester(p uintptr) (interface{}, error) {
 func (request *FileChooserRequest) Cancel() {
 	var _arg0 *C.WebKitFileChooserRequest // out
 
-	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	C.webkit_file_chooser_request_cancel(_arg0)
 	runtime.KeepAlive(request)
@@ -71,7 +86,7 @@ func (request *FileChooserRequest) MIMETypes() []string {
 	var _arg0 *C.WebKitFileChooserRequest // out
 	var _cret **C.gchar                   // in
 
-	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_file_chooser_request_get_mime_types(_arg0)
 	runtime.KeepAlive(request)
@@ -113,7 +128,7 @@ func (request *FileChooserRequest) MIMETypesFilter() *gtk.FileFilter {
 	var _arg0 *C.WebKitFileChooserRequest // out
 	var _cret *C.GtkFileFilter            // in
 
-	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_file_chooser_request_get_mime_types_filter(_arg0)
 	runtime.KeepAlive(request)
@@ -149,7 +164,7 @@ func (request *FileChooserRequest) SelectMultiple() bool {
 	var _arg0 *C.WebKitFileChooserRequest // out
 	var _cret C.gboolean                  // in
 
-	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_file_chooser_request_get_select_multiple(_arg0)
 	runtime.KeepAlive(request)
@@ -183,7 +198,7 @@ func (request *FileChooserRequest) SelectedFiles() []string {
 	var _arg0 *C.WebKitFileChooserRequest // out
 	var _cret **C.gchar                   // in
 
-	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_file_chooser_request_get_selected_files(_arg0)
 	runtime.KeepAlive(request)
@@ -219,7 +234,7 @@ func (request *FileChooserRequest) SelectFiles(files []string) {
 	var _arg0 *C.WebKitFileChooserRequest // out
 	var _arg1 **C.gchar                   // out
 
-	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 	{
 		_arg1 = (**C.gchar)(C.calloc(C.size_t((len(files) + 1)), C.size_t(unsafe.Sizeof(uint(0)))))
 		defer C.free(unsafe.Pointer(_arg1))

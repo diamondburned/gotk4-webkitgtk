@@ -15,9 +15,12 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-auth.go.
+var GTypeAuth = externglib.Type(C.soup_auth_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_auth_get_type()), F: marshalAuther},
+		{T: GTypeAuth, F: marshalAuth},
 	})
 }
 
@@ -39,6 +42,10 @@ const AUTH_REALM = "realm"
 // AUTH_SCHEME_NAME alias for the Auth:scheme-name property. (The authentication
 // scheme name.).
 const AUTH_SCHEME_NAME = "scheme-name"
+
+// AuthOverrider contains methods that are overridable.
+type AuthOverrider interface {
+}
 
 // Auth: abstract base class for handling authentication. Specific HTTP
 // Authentication mechanisms are implemented by its subclasses, but applications
@@ -63,13 +70,21 @@ type Auther interface {
 
 var _ Auther = (*Auth)(nil)
 
+func classInitAuther(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapAuth(obj *externglib.Object) *Auth {
 	return &Auth{
 		Object: obj,
 	}
 }
 
-func marshalAuther(p uintptr) (interface{}, error) {
+func marshalAuth(p uintptr) (interface{}, error) {
 	return wrapAuth(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -104,7 +119,7 @@ func NewAuth(typ externglib.Type, msg *Message, authHeader string) *Auth {
 	var _cret *C.SoupAuth    // in
 
 	_arg1 = C.GType(typ)
-	_arg2 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg2 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 	_arg3 = (*C.char)(unsafe.Pointer(C.CString(authHeader)))
 	defer C.free(unsafe.Pointer(_arg3))
 
@@ -135,7 +150,7 @@ func (auth *Auth) Authenticate(username, password string) {
 	var _arg1 *C.char     // out
 	var _arg2 *C.char     // out
 
-	_arg0 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
+	_arg0 = (*C.SoupAuth)(unsafe.Pointer(externglib.InternObject(auth).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(username)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(password)))
@@ -158,7 +173,7 @@ func (auth *Auth) CanAuthenticate() bool {
 	var _arg0 *C.SoupAuth // out
 	var _cret C.gboolean  // in
 
-	_arg0 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
+	_arg0 = (*C.SoupAuth)(unsafe.Pointer(externglib.InternObject(auth).Native()))
 
 	_cret = C.soup_auth_can_authenticate(_arg0)
 	runtime.KeepAlive(auth)
@@ -188,8 +203,8 @@ func (auth *Auth) Authorization(msg *Message) string {
 	var _arg1 *C.SoupMessage // out
 	var _cret *C.char        // in
 
-	_arg0 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg0 = (*C.SoupAuth)(unsafe.Pointer(externglib.InternObject(auth).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 
 	_cret = C.soup_auth_get_authorization(_arg0, _arg1)
 	runtime.KeepAlive(auth)
@@ -213,7 +228,7 @@ func (auth *Auth) Host() string {
 	var _arg0 *C.SoupAuth // out
 	var _cret *C.char     // in
 
-	_arg0 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
+	_arg0 = (*C.SoupAuth)(unsafe.Pointer(externglib.InternObject(auth).Native()))
 
 	_cret = C.soup_auth_get_host(_arg0)
 	runtime.KeepAlive(auth)
@@ -238,7 +253,7 @@ func (auth *Auth) Info() string {
 	var _arg0 *C.SoupAuth // out
 	var _cret *C.char     // in
 
-	_arg0 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
+	_arg0 = (*C.SoupAuth)(unsafe.Pointer(externglib.InternObject(auth).Native()))
 
 	_cret = C.soup_auth_get_info(_arg0)
 	runtime.KeepAlive(auth)
@@ -269,7 +284,7 @@ func (auth *Auth) ProtectionSpace(sourceUri *URI) []string {
 	var _arg1 *C.SoupURI  // out
 	var _cret *C.GSList   // in
 
-	_arg0 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
+	_arg0 = (*C.SoupAuth)(unsafe.Pointer(externglib.InternObject(auth).Native()))
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(sourceUri)))
 
 	_cret = C.soup_auth_get_protection_space(_arg0, _arg1)
@@ -302,7 +317,7 @@ func (auth *Auth) Realm() string {
 	var _arg0 *C.SoupAuth // out
 	var _cret *C.char     // in
 
-	_arg0 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
+	_arg0 = (*C.SoupAuth)(unsafe.Pointer(externglib.InternObject(auth).Native()))
 
 	_cret = C.soup_auth_get_realm(_arg0)
 	runtime.KeepAlive(auth)
@@ -323,7 +338,7 @@ func (auth *Auth) SavedPassword(user string) string {
 	var _arg1 *C.char     // out
 	var _cret *C.char     // in
 
-	_arg0 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
+	_arg0 = (*C.SoupAuth)(unsafe.Pointer(externglib.InternObject(auth).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(user)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -344,7 +359,7 @@ func (auth *Auth) SavedUsers() []string {
 	var _arg0 *C.SoupAuth // out
 	var _cret *C.GSList   // in
 
-	_arg0 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
+	_arg0 = (*C.SoupAuth)(unsafe.Pointer(externglib.InternObject(auth).Native()))
 
 	_cret = C.soup_auth_get_saved_users(_arg0)
 	runtime.KeepAlive(auth)
@@ -373,7 +388,7 @@ func (auth *Auth) SchemeName() string {
 	var _arg0 *C.SoupAuth // out
 	var _cret *C.char     // in
 
-	_arg0 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
+	_arg0 = (*C.SoupAuth)(unsafe.Pointer(externglib.InternObject(auth).Native()))
 
 	_cret = C.soup_auth_get_scheme_name(_arg0)
 	runtime.KeepAlive(auth)
@@ -395,7 +410,7 @@ func (auth *Auth) HasSavedPassword(username, password string) {
 	var _arg1 *C.char     // out
 	var _arg2 *C.char     // out
 
-	_arg0 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
+	_arg0 = (*C.SoupAuth)(unsafe.Pointer(externglib.InternObject(auth).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(username)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(password)))
@@ -417,7 +432,7 @@ func (auth *Auth) IsAuthenticated() bool {
 	var _arg0 *C.SoupAuth // out
 	var _cret C.gboolean  // in
 
-	_arg0 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
+	_arg0 = (*C.SoupAuth)(unsafe.Pointer(externglib.InternObject(auth).Native()))
 
 	_cret = C.soup_auth_is_authenticated(_arg0)
 	runtime.KeepAlive(auth)
@@ -442,7 +457,7 @@ func (auth *Auth) IsForProxy() bool {
 	var _arg0 *C.SoupAuth // out
 	var _cret C.gboolean  // in
 
-	_arg0 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
+	_arg0 = (*C.SoupAuth)(unsafe.Pointer(externglib.InternObject(auth).Native()))
 
 	_cret = C.soup_auth_is_for_proxy(_arg0)
 	runtime.KeepAlive(auth)
@@ -474,8 +489,8 @@ func (auth *Auth) IsReady(msg *Message) bool {
 	var _arg1 *C.SoupMessage // out
 	var _cret C.gboolean     // in
 
-	_arg0 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg0 = (*C.SoupAuth)(unsafe.Pointer(externglib.InternObject(auth).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 
 	_cret = C.soup_auth_is_ready(_arg0, _arg1)
 	runtime.KeepAlive(auth)
@@ -500,7 +515,7 @@ func (auth *Auth) SavePassword(username, password string) {
 	var _arg1 *C.char     // out
 	var _arg2 *C.char     // out
 
-	_arg0 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
+	_arg0 = (*C.SoupAuth)(unsafe.Pointer(externglib.InternObject(auth).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(username)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(password)))
@@ -533,8 +548,8 @@ func (auth *Auth) Update(msg *Message, authHeader string) bool {
 	var _arg2 *C.char        // out
 	var _cret C.gboolean     // in
 
-	_arg0 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg0 = (*C.SoupAuth)(unsafe.Pointer(externglib.InternObject(auth).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(authHeader)))
 	defer C.free(unsafe.Pointer(_arg2))
 

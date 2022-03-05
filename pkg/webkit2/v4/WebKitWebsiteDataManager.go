@@ -20,15 +20,23 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
-// void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
 import "C"
+
+// glib.Type values for WebKitWebsiteDataManager.go.
+var (
+	GTypeTLSErrorsPolicy    = externglib.Type(C.webkit_tls_errors_policy_get_type())
+	GTypeWebsiteDataManager = externglib.Type(C.webkit_website_data_manager_get_type())
+	GTypeITPFirstParty      = externglib.Type(C.webkit_itp_first_party_get_type())
+	GTypeITPThirdParty      = externglib.Type(C.webkit_itp_third_party_get_type())
+)
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_tls_errors_policy_get_type()), F: marshalTLSErrorsPolicy},
-		{T: externglib.Type(C.webkit_website_data_manager_get_type()), F: marshalWebsiteDataManagerer},
-		{T: externglib.Type(C.webkit_itp_first_party_get_type()), F: marshalITPFirstParty},
-		{T: externglib.Type(C.webkit_itp_third_party_get_type()), F: marshalITPThirdParty},
+		{T: GTypeTLSErrorsPolicy, F: marshalTLSErrorsPolicy},
+		{T: GTypeWebsiteDataManager, F: marshalWebsiteDataManager},
+		{T: GTypeITPFirstParty, F: marshalITPFirstParty},
+		{T: GTypeITPThirdParty, F: marshalITPThirdParty},
 	})
 }
 
@@ -61,6 +69,10 @@ func (t TLSErrorsPolicy) String() string {
 	}
 }
 
+// WebsiteDataManagerOverrider contains methods that are overridable.
+type WebsiteDataManagerOverrider interface {
+}
+
 type WebsiteDataManager struct {
 	_ [0]func() // equal guard
 	*externglib.Object
@@ -70,13 +82,21 @@ var (
 	_ externglib.Objector = (*WebsiteDataManager)(nil)
 )
 
+func classInitWebsiteDataManagerer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapWebsiteDataManager(obj *externglib.Object) *WebsiteDataManager {
 	return &WebsiteDataManager{
 		Object: obj,
 	}
 }
 
-func marshalWebsiteDataManagerer(p uintptr) (interface{}, error) {
+func marshalWebsiteDataManager(p uintptr) (interface{}, error) {
 	return wrapWebsiteDataManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -125,7 +145,7 @@ func (manager *WebsiteDataManager) Clear(ctx context.Context, types WebsiteDataT
 	var _arg4 C.GAsyncReadyCallback       // out
 	var _arg5 C.gpointer
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -158,8 +178,8 @@ func (manager *WebsiteDataManager) ClearFinish(result gio.AsyncResulter) error {
 	var _arg1 *C.GAsyncResult             // out
 	var _cerr *C.GError                   // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	C.webkit_website_data_manager_clear_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(manager)
@@ -193,7 +213,7 @@ func (manager *WebsiteDataManager) Fetch(ctx context.Context, types WebsiteDataT
 	var _arg3 C.GAsyncReadyCallback       // out
 	var _arg4 C.gpointer
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -231,8 +251,8 @@ func (manager *WebsiteDataManager) FetchFinish(result gio.AsyncResulter) ([]*Web
 	var _cret *C.GList                    // in
 	var _cerr *C.GError                   // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	_cret = C.webkit_website_data_manager_fetch_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(manager)
@@ -274,7 +294,7 @@ func (manager *WebsiteDataManager) BaseCacheDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	_cret = C.webkit_website_data_manager_get_base_cache_directory(_arg0)
 	runtime.KeepAlive(manager)
@@ -301,7 +321,7 @@ func (manager *WebsiteDataManager) BaseDataDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	_cret = C.webkit_website_data_manager_get_base_data_directory(_arg0)
 	runtime.KeepAlive(manager)
@@ -325,7 +345,7 @@ func (manager *WebsiteDataManager) CookieManager() *CookieManager {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.WebKitCookieManager      // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	_cret = C.webkit_website_data_manager_get_cookie_manager(_arg0)
 	runtime.KeepAlive(manager)
@@ -349,7 +369,7 @@ func (manager *WebsiteDataManager) DiskCacheDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	_cret = C.webkit_website_data_manager_get_disk_cache_directory(_arg0)
 	runtime.KeepAlive(manager)
@@ -375,7 +395,7 @@ func (manager *WebsiteDataManager) DomCacheDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	_cret = C.webkit_website_data_manager_get_dom_cache_directory(_arg0)
 	runtime.KeepAlive(manager)
@@ -401,7 +421,7 @@ func (manager *WebsiteDataManager) HstsCacheDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	_cret = C.webkit_website_data_manager_get_hsts_cache_directory(_arg0)
 	runtime.KeepAlive(manager)
@@ -427,7 +447,7 @@ func (manager *WebsiteDataManager) IndexeddbDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	_cret = C.webkit_website_data_manager_get_indexeddb_directory(_arg0)
 	runtime.KeepAlive(manager)
@@ -452,7 +472,7 @@ func (manager *WebsiteDataManager) ITPDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	_cret = C.webkit_website_data_manager_get_itp_directory(_arg0)
 	runtime.KeepAlive(manager)
@@ -477,7 +497,7 @@ func (manager *WebsiteDataManager) ITPEnabled() bool {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret C.gboolean                  // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	_cret = C.webkit_website_data_manager_get_itp_enabled(_arg0)
 	runtime.KeepAlive(manager)
@@ -510,7 +530,7 @@ func (manager *WebsiteDataManager) ITPSummary(ctx context.Context, callback gio.
 	var _arg2 C.GAsyncReadyCallback       // out
 	var _arg3 C.gpointer
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -546,8 +566,8 @@ func (manager *WebsiteDataManager) ITPSummaryFinish(result gio.AsyncResulter) ([
 	var _cret *C.GList                    // in
 	var _cerr *C.GError                   // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	_cret = C.webkit_website_data_manager_get_itp_summary_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(manager)
@@ -588,7 +608,7 @@ func (manager *WebsiteDataManager) LocalStorageDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	_cret = C.webkit_website_data_manager_get_local_storage_directory(_arg0)
 	runtime.KeepAlive(manager)
@@ -614,7 +634,7 @@ func (manager *WebsiteDataManager) OfflineApplicationCacheDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	_cret = C.webkit_website_data_manager_get_offline_application_cache_directory(_arg0)
 	runtime.KeepAlive(manager)
@@ -640,7 +660,7 @@ func (manager *WebsiteDataManager) PersistentCredentialStorageEnabled() bool {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret C.gboolean                  // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	_cret = C.webkit_website_data_manager_get_persistent_credential_storage_enabled(_arg0)
 	runtime.KeepAlive(manager)
@@ -666,7 +686,7 @@ func (manager *WebsiteDataManager) ServiceWorkerRegistrationsDirectory() string 
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	_cret = C.webkit_website_data_manager_get_service_worker_registrations_directory(_arg0)
 	runtime.KeepAlive(manager)
@@ -690,7 +710,7 @@ func (manager *WebsiteDataManager) TLSErrorsPolicy() TLSErrorsPolicy {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret C.WebKitTLSErrorsPolicy     // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	_cret = C.webkit_website_data_manager_get_tls_errors_policy(_arg0)
 	runtime.KeepAlive(manager)
@@ -715,7 +735,7 @@ func (manager *WebsiteDataManager) WebsqlDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	_cret = C.webkit_website_data_manager_get_websql_directory(_arg0)
 	runtime.KeepAlive(manager)
@@ -740,7 +760,7 @@ func (manager *WebsiteDataManager) IsEphemeral() bool {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret C.gboolean                  // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	_cret = C.webkit_website_data_manager_is_ephemeral(_arg0)
 	runtime.KeepAlive(manager)
@@ -778,7 +798,7 @@ func (manager *WebsiteDataManager) Remove(ctx context.Context, types WebsiteData
 	var _arg4 C.GAsyncReadyCallback       // out
 	var _arg5 C.gpointer
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -817,8 +837,8 @@ func (manager *WebsiteDataManager) RemoveFinish(result gio.AsyncResulter) error 
 	var _arg1 *C.GAsyncResult             // out
 	var _cerr *C.GError                   // in
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	C.webkit_website_data_manager_remove_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(manager)
@@ -849,7 +869,7 @@ func (manager *WebsiteDataManager) SetITPEnabled(enabled bool) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 C.gboolean                  // out
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -879,7 +899,7 @@ func (manager *WebsiteDataManager) SetNetworkProxySettings(proxyMode NetworkProx
 	var _arg1 C.WebKitNetworkProxyMode      // out
 	var _arg2 *C.WebKitNetworkProxySettings // out
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	_arg1 = C.WebKitNetworkProxyMode(proxyMode)
 	if proxySettings != nil {
 		_arg2 = (*C.WebKitNetworkProxySettings)(gextras.StructNative(unsafe.Pointer(proxySettings)))
@@ -904,7 +924,7 @@ func (manager *WebsiteDataManager) SetPersistentCredentialStorageEnabled(enabled
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 C.gboolean                  // out
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -924,7 +944,7 @@ func (manager *WebsiteDataManager) SetTLSErrorsPolicy(policy TLSErrorsPolicy) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 C.WebKitTLSErrorsPolicy     // out
 
-	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	_arg1 = C.WebKitTLSErrorsPolicy(policy)
 
 	C.webkit_website_data_manager_set_tls_errors_policy(_arg0, _arg1)

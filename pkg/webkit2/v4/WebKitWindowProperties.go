@@ -16,10 +16,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitWindowProperties.go.
+var GTypeWindowProperties = externglib.Type(C.webkit_window_properties_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_window_properties_get_type()), F: marshalWindowPropertieser},
+		{T: GTypeWindowProperties, F: marshalWindowProperties},
 	})
+}
+
+// WindowPropertiesOverrider contains methods that are overridable.
+type WindowPropertiesOverrider interface {
 }
 
 type WindowProperties struct {
@@ -31,13 +38,21 @@ var (
 	_ externglib.Objector = (*WindowProperties)(nil)
 )
 
+func classInitWindowPropertieser(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapWindowProperties(obj *externglib.Object) *WindowProperties {
 	return &WindowProperties{
 		Object: obj,
 	}
 }
 
-func marshalWindowPropertieser(p uintptr) (interface{}, error) {
+func marshalWindowProperties(p uintptr) (interface{}, error) {
 	return wrapWindowProperties(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -52,7 +67,7 @@ func (windowProperties *WindowProperties) Fullscreen() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
 
-	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(windowProperties.Native()))
+	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(externglib.InternObject(windowProperties).Native()))
 
 	_cret = C.webkit_window_properties_get_fullscreen(_arg0)
 	runtime.KeepAlive(windowProperties)
@@ -76,7 +91,7 @@ func (windowProperties *WindowProperties) Geometry() *gdk.Rectangle {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _arg1 C.GdkRectangle            // in
 
-	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(windowProperties.Native()))
+	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(externglib.InternObject(windowProperties).Native()))
 
 	C.webkit_window_properties_get_geometry(_arg0, &_arg1)
 	runtime.KeepAlive(windowProperties)
@@ -99,7 +114,7 @@ func (windowProperties *WindowProperties) LocationbarVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
 
-	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(windowProperties.Native()))
+	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(externglib.InternObject(windowProperties).Native()))
 
 	_cret = C.webkit_window_properties_get_locationbar_visible(_arg0)
 	runtime.KeepAlive(windowProperties)
@@ -124,7 +139,7 @@ func (windowProperties *WindowProperties) MenubarVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
 
-	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(windowProperties.Native()))
+	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(externglib.InternObject(windowProperties).Native()))
 
 	_cret = C.webkit_window_properties_get_menubar_visible(_arg0)
 	runtime.KeepAlive(windowProperties)
@@ -148,7 +163,7 @@ func (windowProperties *WindowProperties) Resizable() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
 
-	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(windowProperties.Native()))
+	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(externglib.InternObject(windowProperties).Native()))
 
 	_cret = C.webkit_window_properties_get_resizable(_arg0)
 	runtime.KeepAlive(windowProperties)
@@ -173,7 +188,7 @@ func (windowProperties *WindowProperties) ScrollbarsVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
 
-	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(windowProperties.Native()))
+	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(externglib.InternObject(windowProperties).Native()))
 
 	_cret = C.webkit_window_properties_get_scrollbars_visible(_arg0)
 	runtime.KeepAlive(windowProperties)
@@ -198,7 +213,7 @@ func (windowProperties *WindowProperties) StatusbarVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
 
-	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(windowProperties.Native()))
+	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(externglib.InternObject(windowProperties).Native()))
 
 	_cret = C.webkit_window_properties_get_statusbar_visible(_arg0)
 	runtime.KeepAlive(windowProperties)
@@ -223,7 +238,7 @@ func (windowProperties *WindowProperties) ToolbarVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
 
-	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(windowProperties.Native()))
+	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(externglib.InternObject(windowProperties).Native()))
 
 	_cret = C.webkit_window_properties_get_toolbar_visible(_arg0)
 	runtime.KeepAlive(windowProperties)

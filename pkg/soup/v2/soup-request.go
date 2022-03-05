@@ -18,12 +18,20 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
-// void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern GInputStream* _gotk4_soup2_RequestClass_send(SoupRequest*, GCancellable*, GError**);
+// extern GInputStream* _gotk4_soup2_RequestClass_send_finish(SoupRequest*, GAsyncResult*, GError**);
+// extern char* _gotk4_soup2_RequestClass_get_content_type(SoupRequest*);
+// extern gboolean _gotk4_soup2_RequestClass_check_uri(SoupRequest*, SoupURI*, GError**);
+// extern goffset _gotk4_soup2_RequestClass_get_content_length(SoupRequest*);
+// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
 import "C"
+
+// glib.Type values for soup-request.go.
+var GTypeRequest = externglib.Type(C.soup_request_get_type())
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_request_get_type()), F: marshalRequester},
+		{T: GTypeRequest, F: marshalRequest},
 	})
 }
 
@@ -34,9 +42,6 @@ const REQUEST_SESSION = "session"
 const REQUEST_URI = "uri"
 
 // RequestOverrider contains methods that are overridable.
-//
-// As of right now, interface overriding and subclassing is not supported
-// yet, so the interface currently has no use.
 type RequestOverrider interface {
 	// The function takes the following parameters:
 	//
@@ -80,18 +85,6 @@ type RequestOverrider interface {
 	//      request.
 	//
 	Send(ctx context.Context) (gio.InputStreamer, error)
-	// SendAsync begins an asynchronously request for the URI pointed to by
-	// request.
-	//
-	// Note that you cannot use this method with Requests attached to a
-	// SessionSync.
-	//
-	// The function takes the following parameters:
-	//
-	//    - ctx (optional) or NULL.
-	//    - callback (optional): ReadyCallback.
-	//
-	SendAsync(ctx context.Context, callback gio.AsyncReadyCallback)
 	// SendFinish gets the result of a soup_request_send_async().
 	//
 	// The function takes the following parameters:
@@ -118,6 +111,149 @@ var (
 	_ externglib.Objector = (*Request)(nil)
 )
 
+func classInitRequester(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+	goval := gbox.Get(uintptr(data))
+	pclass := (*C.SoupRequestClass)(unsafe.Pointer(gclassPtr))
+	// gclass := (*C.GTypeClass)(unsafe.Pointer(gclassPtr))
+	// pclass := (*C.SoupRequestClass)(unsafe.Pointer(C.g_type_class_peek_parent(gclass)))
+
+	if _, ok := goval.(interface{ CheckURI(uri *URI) error }); ok {
+		pclass.check_uri = (*[0]byte)(C._gotk4_soup2_RequestClass_check_uri)
+	}
+
+	if _, ok := goval.(interface{ ContentLength() int64 }); ok {
+		pclass.get_content_length = (*[0]byte)(C._gotk4_soup2_RequestClass_get_content_length)
+	}
+
+	if _, ok := goval.(interface{ ContentType() string }); ok {
+		pclass.get_content_type = (*[0]byte)(C._gotk4_soup2_RequestClass_get_content_type)
+	}
+
+	if _, ok := goval.(interface {
+		Send(ctx context.Context) (gio.InputStreamer, error)
+	}); ok {
+		pclass.send = (*[0]byte)(C._gotk4_soup2_RequestClass_send)
+	}
+
+	if _, ok := goval.(interface {
+		SendFinish(result gio.AsyncResulter) (gio.InputStreamer, error)
+	}); ok {
+		pclass.send_finish = (*[0]byte)(C._gotk4_soup2_RequestClass_send_finish)
+	}
+}
+
+//export _gotk4_soup2_RequestClass_check_uri
+func _gotk4_soup2_RequestClass_check_uri(arg0 *C.SoupRequest, arg1 *C.SoupURI, _cerr **C.GError) (cret C.gboolean) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ CheckURI(uri *URI) error })
+
+	var _uri *URI // out
+
+	_uri = (*URI)(gextras.NewStructNative(unsafe.Pointer(arg1)))
+
+	_goerr := iface.CheckURI(_uri)
+
+	if _goerr != nil && _cerr != nil {
+		*_cerr = (*C.GError)(gerror.New(_goerr))
+	}
+
+	return cret
+}
+
+//export _gotk4_soup2_RequestClass_get_content_length
+func _gotk4_soup2_RequestClass_get_content_length(arg0 *C.SoupRequest) (cret C.goffset) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ ContentLength() int64 })
+
+	gint64 := iface.ContentLength()
+
+	cret = C.goffset(gint64)
+
+	return cret
+}
+
+//export _gotk4_soup2_RequestClass_get_content_type
+func _gotk4_soup2_RequestClass_get_content_type(arg0 *C.SoupRequest) (cret *C.char) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ ContentType() string })
+
+	utf8 := iface.ContentType()
+
+	if utf8 != "" {
+		cret = (*C.char)(unsafe.Pointer(C.CString(utf8)))
+		defer C.free(unsafe.Pointer(cret))
+	}
+
+	return cret
+}
+
+//export _gotk4_soup2_RequestClass_send
+func _gotk4_soup2_RequestClass_send(arg0 *C.SoupRequest, arg1 *C.GCancellable, _cerr **C.GError) (cret *C.GInputStream) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface {
+		Send(ctx context.Context) (gio.InputStreamer, error)
+	})
+
+	var _cancellable context.Context // out
+
+	if arg1 != nil {
+		_cancellable = gcancel.NewCancellableContext(unsafe.Pointer(arg1))
+	}
+
+	inputStream, _goerr := iface.Send(_cancellable)
+
+	cret = (*C.GInputStream)(unsafe.Pointer(externglib.InternObject(inputStream).Native()))
+	C.g_object_ref(C.gpointer(externglib.InternObject(inputStream).Native()))
+	if _goerr != nil && _cerr != nil {
+		*_cerr = (*C.GError)(gerror.New(_goerr))
+	}
+
+	return cret
+}
+
+//export _gotk4_soup2_RequestClass_send_finish
+func _gotk4_soup2_RequestClass_send_finish(arg0 *C.SoupRequest, arg1 *C.GAsyncResult, _cerr **C.GError) (cret *C.GInputStream) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface {
+		SendFinish(result gio.AsyncResulter) (gio.InputStreamer, error)
+	})
+
+	var _result gio.AsyncResulter // out
+
+	{
+		objptr := unsafe.Pointer(arg1)
+		if objptr == nil {
+			panic("object of type gio.AsyncResulter is nil")
+		}
+
+		object := externglib.Take(objptr)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gio.AsyncResulter)
+			return ok
+		})
+		rv, ok := casted.(gio.AsyncResulter)
+		if !ok {
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.AsyncResulter")
+		}
+		_result = rv
+	}
+
+	inputStream, _goerr := iface.SendFinish(_result)
+
+	cret = (*C.GInputStream)(unsafe.Pointer(externglib.InternObject(inputStream).Native()))
+	C.g_object_ref(C.gpointer(externglib.InternObject(inputStream).Native()))
+	if _goerr != nil && _cerr != nil {
+		*_cerr = (*C.GError)(gerror.New(_goerr))
+	}
+
+	return cret
+}
+
 func wrapRequest(obj *externglib.Object) *Request {
 	return &Request{
 		Object: obj,
@@ -127,7 +263,7 @@ func wrapRequest(obj *externglib.Object) *Request {
 	}
 }
 
-func marshalRequester(p uintptr) (interface{}, error) {
+func marshalRequest(p uintptr) (interface{}, error) {
 	return wrapRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -143,7 +279,7 @@ func (request *Request) ContentLength() int64 {
 	var _arg0 *C.SoupRequest // out
 	var _cret C.goffset      // in
 
-	_arg0 = (*C.SoupRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.SoupRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.soup_request_get_content_length(_arg0)
 	runtime.KeepAlive(request)
@@ -171,7 +307,7 @@ func (request *Request) ContentType() string {
 	var _arg0 *C.SoupRequest // out
 	var _cret *C.char        // in
 
-	_arg0 = (*C.SoupRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.SoupRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.soup_request_get_content_type(_arg0)
 	runtime.KeepAlive(request)
@@ -195,7 +331,7 @@ func (request *Request) Session() *Session {
 	var _arg0 *C.SoupRequest // out
 	var _cret *C.SoupSession // in
 
-	_arg0 = (*C.SoupRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.SoupRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.soup_request_get_session(_arg0)
 	runtime.KeepAlive(request)
@@ -217,7 +353,7 @@ func (request *Request) URI() *URI {
 	var _arg0 *C.SoupRequest // out
 	var _cret *C.SoupURI     // in
 
-	_arg0 = (*C.SoupRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.SoupRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.soup_request_get_uri(_arg0)
 	runtime.KeepAlive(request)
@@ -249,7 +385,7 @@ func (request *Request) Send(ctx context.Context) (gio.InputStreamer, error) {
 	var _cret *C.GInputStream // in
 	var _cerr *C.GError       // in
 
-	_arg0 = (*C.SoupRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.SoupRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -302,7 +438,7 @@ func (request *Request) SendAsync(ctx context.Context, callback gio.AsyncReadyCa
 	var _arg2 C.GAsyncReadyCallback // out
 	var _arg3 C.gpointer
 
-	_arg0 = (*C.SoupRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.SoupRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -335,8 +471,8 @@ func (request *Request) SendFinish(result gio.AsyncResulter) (gio.InputStreamer,
 	var _cret *C.GInputStream // in
 	var _cerr *C.GError       // in
 
-	_arg0 = (*C.SoupRequest)(unsafe.Pointer(request.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.SoupRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	_cret = C.soup_request_send_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(request)

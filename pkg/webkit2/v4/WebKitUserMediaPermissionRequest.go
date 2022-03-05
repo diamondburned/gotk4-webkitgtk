@@ -14,9 +14,12 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitUserMediaPermissionRequest.go.
+var GTypeUserMediaPermissionRequest = externglib.Type(C.webkit_user_media_permission_request_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_user_media_permission_request_get_type()), F: marshalUserMediaPermissionRequester},
+		{T: GTypeUserMediaPermissionRequest, F: marshalUserMediaPermissionRequest},
 	})
 }
 
@@ -32,7 +35,7 @@ func UserMediaPermissionIsForAudioDevice(request *UserMediaPermissionRequest) bo
 	var _arg1 *C.WebKitUserMediaPermissionRequest // out
 	var _cret C.gboolean                          // in
 
-	_arg1 = (*C.WebKitUserMediaPermissionRequest)(unsafe.Pointer(request.Native()))
+	_arg1 = (*C.WebKitUserMediaPermissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_user_media_permission_is_for_audio_device(_arg1)
 	runtime.KeepAlive(request)
@@ -58,7 +61,7 @@ func UserMediaPermissionIsForVideoDevice(request *UserMediaPermissionRequest) bo
 	var _arg1 *C.WebKitUserMediaPermissionRequest // out
 	var _cret C.gboolean                          // in
 
-	_arg1 = (*C.WebKitUserMediaPermissionRequest)(unsafe.Pointer(request.Native()))
+	_arg1 = (*C.WebKitUserMediaPermissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_user_media_permission_is_for_video_device(_arg1)
 	runtime.KeepAlive(request)
@@ -72,6 +75,10 @@ func UserMediaPermissionIsForVideoDevice(request *UserMediaPermissionRequest) bo
 	return _ok
 }
 
+// UserMediaPermissionRequestOverrider contains methods that are overridable.
+type UserMediaPermissionRequestOverrider interface {
+}
+
 type UserMediaPermissionRequest struct {
 	_ [0]func() // equal guard
 	*externglib.Object
@@ -83,6 +90,14 @@ var (
 	_ externglib.Objector = (*UserMediaPermissionRequest)(nil)
 )
 
+func classInitUserMediaPermissionRequester(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapUserMediaPermissionRequest(obj *externglib.Object) *UserMediaPermissionRequest {
 	return &UserMediaPermissionRequest{
 		Object: obj,
@@ -92,6 +107,6 @@ func wrapUserMediaPermissionRequest(obj *externglib.Object) *UserMediaPermission
 	}
 }
 
-func marshalUserMediaPermissionRequester(p uintptr) (interface{}, error) {
+func marshalUserMediaPermissionRequest(p uintptr) (interface{}, error) {
 	return wrapUserMediaPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }

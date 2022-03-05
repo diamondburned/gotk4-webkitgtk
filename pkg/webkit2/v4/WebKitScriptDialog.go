@@ -16,10 +16,16 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitScriptDialog.go.
+var (
+	GTypeScriptDialogType = externglib.Type(C.webkit_script_dialog_type_get_type())
+	GTypeScriptDialog     = externglib.Type(C.webkit_script_dialog_get_type())
+)
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_script_dialog_type_get_type()), F: marshalScriptDialogType},
-		{T: externglib.Type(C.webkit_script_dialog_get_type()), F: marshalScriptDialog},
+		{T: GTypeScriptDialogType, F: marshalScriptDialogType},
+		{T: GTypeScriptDialog, F: marshalScriptDialog},
 	})
 }
 

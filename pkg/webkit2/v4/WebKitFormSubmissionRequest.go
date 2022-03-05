@@ -16,10 +16,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitFormSubmissionRequest.go.
+var GTypeFormSubmissionRequest = externglib.Type(C.webkit_form_submission_request_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_form_submission_request_get_type()), F: marshalFormSubmissionRequester},
+		{T: GTypeFormSubmissionRequest, F: marshalFormSubmissionRequest},
 	})
+}
+
+// FormSubmissionRequestOverrider contains methods that are overridable.
+type FormSubmissionRequestOverrider interface {
 }
 
 type FormSubmissionRequest struct {
@@ -31,13 +38,21 @@ var (
 	_ externglib.Objector = (*FormSubmissionRequest)(nil)
 )
 
+func classInitFormSubmissionRequester(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapFormSubmissionRequest(obj *externglib.Object) *FormSubmissionRequest {
 	return &FormSubmissionRequest{
 		Object: obj,
 	}
 }
 
-func marshalFormSubmissionRequester(p uintptr) (interface{}, error) {
+func marshalFormSubmissionRequest(p uintptr) (interface{}, error) {
 	return wrapFormSubmissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -57,7 +72,7 @@ func (request *FormSubmissionRequest) TextFields() map[cgo.Handle]cgo.Handle {
 	var _arg0 *C.WebKitFormSubmissionRequest // out
 	var _cret *C.GHashTable                  // in
 
-	_arg0 = (*C.WebKitFormSubmissionRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitFormSubmissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_form_submission_request_get_text_fields(_arg0)
 	runtime.KeepAlive(request)
@@ -84,7 +99,7 @@ func (request *FormSubmissionRequest) TextFields() map[cgo.Handle]cgo.Handle {
 func (request *FormSubmissionRequest) Submit() {
 	var _arg0 *C.WebKitFormSubmissionRequest // out
 
-	_arg0 = (*C.WebKitFormSubmissionRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitFormSubmissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	C.webkit_form_submission_request_submit(_arg0)
 	runtime.KeepAlive(request)

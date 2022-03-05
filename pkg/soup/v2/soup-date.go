@@ -17,10 +17,16 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-date.go.
+var (
+	GTypeDateFormat = externglib.Type(C.soup_date_format_get_type())
+	GTypeDate       = externglib.Type(C.soup_date_get_type())
+)
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_date_format_get_type()), F: marshalDateFormat},
-		{T: externglib.Type(C.soup_date_get_type()), F: marshalDate},
+		{T: GTypeDateFormat, F: marshalDateFormat},
+		{T: GTypeDate, F: marshalDate},
 	})
 }
 

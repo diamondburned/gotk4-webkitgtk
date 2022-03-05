@@ -20,14 +20,22 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
-// void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern void _gotk4_webkit24_CookieManager_ConnectChanged(gpointer, guintptr);
 import "C"
+
+// glib.Type values for WebKitCookieManager.go.
+var (
+	GTypeCookieAcceptPolicy      = externglib.Type(C.webkit_cookie_accept_policy_get_type())
+	GTypeCookiePersistentStorage = externglib.Type(C.webkit_cookie_persistent_storage_get_type())
+	GTypeCookieManager           = externglib.Type(C.webkit_cookie_manager_get_type())
+)
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_cookie_accept_policy_get_type()), F: marshalCookieAcceptPolicy},
-		{T: externglib.Type(C.webkit_cookie_persistent_storage_get_type()), F: marshalCookiePersistentStorage},
-		{T: externglib.Type(C.webkit_cookie_manager_get_type()), F: marshalCookieManagerer},
+		{T: GTypeCookieAcceptPolicy, F: marshalCookieAcceptPolicy},
+		{T: GTypeCookiePersistentStorage, F: marshalCookiePersistentStorage},
+		{T: GTypeCookieManager, F: marshalCookieManager},
 	})
 }
 
@@ -92,6 +100,10 @@ func (c CookiePersistentStorage) String() string {
 	}
 }
 
+// CookieManagerOverrider contains methods that are overridable.
+type CookieManagerOverrider interface {
+}
+
 type CookieManager struct {
 	_ [0]func() // equal guard
 	*externglib.Object
@@ -101,20 +113,44 @@ var (
 	_ externglib.Objector = (*CookieManager)(nil)
 )
 
+func classInitCookieManagerer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapCookieManager(obj *externglib.Object) *CookieManager {
 	return &CookieManager{
 		Object: obj,
 	}
 }
 
-func marshalCookieManagerer(p uintptr) (interface{}, error) {
+func marshalCookieManager(p uintptr) (interface{}, error) {
 	return wrapCookieManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+//export _gotk4_webkit24_CookieManager_ConnectChanged
+func _gotk4_webkit24_CookieManager_ConnectChanged(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
 }
 
 // ConnectChanged: this signal is emitted when cookies are added, removed or
 // modified.
 func (cookieManager *CookieManager) ConnectChanged(f func()) externglib.SignalHandle {
-	return cookieManager.Connect("changed", f)
+	return externglib.ConnectGeneratedClosure(cookieManager, "changed", false, unsafe.Pointer(C._gotk4_webkit24_CookieManager_ConnectChanged), f)
 }
 
 // AddCookie: asynchronously add a Cookie to the underlying storage.
@@ -135,7 +171,7 @@ func (cookieManager *CookieManager) AddCookie(ctx context.Context, cookie *soup.
 	var _arg3 C.GAsyncReadyCallback  // out
 	var _arg4 C.gpointer
 
-	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
+	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(externglib.InternObject(cookieManager).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -166,8 +202,8 @@ func (cookieManager *CookieManager) AddCookieFinish(result gio.AsyncResulter) er
 	var _arg1 *C.GAsyncResult        // out
 	var _cerr *C.GError              // in
 
-	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(externglib.InternObject(cookieManager).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	C.webkit_cookie_manager_add_cookie_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(cookieManager)
@@ -188,7 +224,7 @@ func (cookieManager *CookieManager) AddCookieFinish(result gio.AsyncResulter) er
 func (cookieManager *CookieManager) DeleteAllCookies() {
 	var _arg0 *C.WebKitCookieManager // out
 
-	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
+	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(externglib.InternObject(cookieManager).Native()))
 
 	C.webkit_cookie_manager_delete_all_cookies(_arg0)
 	runtime.KeepAlive(cookieManager)
@@ -213,7 +249,7 @@ func (cookieManager *CookieManager) DeleteCookie(ctx context.Context, cookie *so
 	var _arg3 C.GAsyncReadyCallback  // out
 	var _arg4 C.gpointer
 
-	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
+	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(externglib.InternObject(cookieManager).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -244,8 +280,8 @@ func (cookieManager *CookieManager) DeleteCookieFinish(result gio.AsyncResulter)
 	var _arg1 *C.GAsyncResult        // out
 	var _cerr *C.GError              // in
 
-	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(externglib.InternObject(cookieManager).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	C.webkit_cookie_manager_delete_cookie_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(cookieManager)
@@ -273,7 +309,7 @@ func (cookieManager *CookieManager) DeleteCookiesForDomain(domain string) {
 	var _arg0 *C.WebKitCookieManager // out
 	var _arg1 *C.gchar               // out
 
-	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
+	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(externglib.InternObject(cookieManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(domain)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -303,7 +339,7 @@ func (cookieManager *CookieManager) AcceptPolicy(ctx context.Context, callback g
 	var _arg2 C.GAsyncReadyCallback  // out
 	var _arg3 C.gpointer
 
-	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
+	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(externglib.InternObject(cookieManager).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -338,8 +374,8 @@ func (cookieManager *CookieManager) AcceptPolicyFinish(result gio.AsyncResulter)
 	var _cret C.WebKitCookieAcceptPolicy // in
 	var _cerr *C.GError                  // in
 
-	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(externglib.InternObject(cookieManager).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	_cret = C.webkit_cookie_manager_get_accept_policy_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(cookieManager)
@@ -376,7 +412,7 @@ func (cookieManager *CookieManager) Cookies(ctx context.Context, uri string, cal
 	var _arg3 C.GAsyncReadyCallback  // out
 	var _arg4 C.gpointer
 
-	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
+	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(externglib.InternObject(cookieManager).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -415,8 +451,8 @@ func (cookieManager *CookieManager) CookiesFinish(result gio.AsyncResulter) ([]*
 	var _cret *C.GList               // in
 	var _cerr *C.GError              // in
 
-	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(externglib.InternObject(cookieManager).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	_cret = C.webkit_cookie_manager_get_cookies_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(cookieManager)
@@ -465,7 +501,7 @@ func (cookieManager *CookieManager) DomainsWithCookies(ctx context.Context, call
 	var _arg2 C.GAsyncReadyCallback  // out
 	var _arg3 C.gpointer
 
-	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
+	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(externglib.InternObject(cookieManager).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -502,8 +538,8 @@ func (cookieManager *CookieManager) DomainsWithCookiesFinish(result gio.AsyncRes
 	var _cret **C.gchar              // in
 	var _cerr *C.GError              // in
 
-	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(externglib.InternObject(cookieManager).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	_cret = C.webkit_cookie_manager_get_domains_with_cookies_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(cookieManager)
@@ -550,7 +586,7 @@ func (cookieManager *CookieManager) SetAcceptPolicy(policy CookieAcceptPolicy) {
 	var _arg0 *C.WebKitCookieManager     // out
 	var _arg1 C.WebKitCookieAcceptPolicy // out
 
-	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
+	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(externglib.InternObject(cookieManager).Native()))
 	_arg1 = C.WebKitCookieAcceptPolicy(policy)
 
 	C.webkit_cookie_manager_set_accept_policy(_arg0, _arg1)
@@ -579,7 +615,7 @@ func (cookieManager *CookieManager) SetPersistentStorage(filename string, storag
 	var _arg1 *C.gchar                        // out
 	var _arg2 C.WebKitCookiePersistentStorage // out
 
-	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(cookieManager.Native()))
+	_arg0 = (*C.WebKitCookieManager)(unsafe.Pointer(externglib.InternObject(cookieManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(filename)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.WebKitCookiePersistentStorage(storage)

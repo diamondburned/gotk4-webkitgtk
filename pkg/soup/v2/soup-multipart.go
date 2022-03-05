@@ -15,9 +15,12 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-multipart.go.
+var GTypeMultipart = externglib.Type(C.soup_multipart_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_multipart_get_type()), F: marshalMultipart},
+		{T: GTypeMultipart, F: marshalMultipart},
 	})
 }
 
@@ -204,6 +207,46 @@ func (multipart *Multipart) Length() int {
 	_gint = int(_cret)
 
 	return _gint
+}
+
+// Part gets the indicated body part from multipart.
+//
+// The function takes the following parameters:
+//
+//    - part number to get (counting from 0).
+//
+// The function returns the following values:
+//
+//    - headers: return location for the MIME part headers.
+//    - body: return location for the MIME part body.
+//    - ok: TRUE on success, FALSE if part is out of range (in which case headers
+//      and body won't be set).
+//
+func (multipart *Multipart) Part(part int) (*MessageHeaders, *Buffer, bool) {
+	var _arg0 *C.SoupMultipart      // out
+	var _arg1 C.int                 // out
+	var _arg2 *C.SoupMessageHeaders // in
+	var _arg3 *C.SoupBuffer         // in
+	var _cret C.gboolean            // in
+
+	_arg0 = (*C.SoupMultipart)(gextras.StructNative(unsafe.Pointer(multipart)))
+	_arg1 = C.int(part)
+
+	_cret = C.soup_multipart_get_part(_arg0, _arg1, &_arg2, &_arg3)
+	runtime.KeepAlive(multipart)
+	runtime.KeepAlive(part)
+
+	var _headers *MessageHeaders // out
+	var _body *Buffer            // out
+	var _ok bool                 // out
+
+	_headers = (*MessageHeaders)(gextras.NewStructNative(unsafe.Pointer(_arg2)))
+	_body = (*Buffer)(gextras.NewStructNative(unsafe.Pointer(_arg3)))
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _headers, _body, _ok
 }
 
 // ToMessage serializes multipart to dest_headers and dest_body.

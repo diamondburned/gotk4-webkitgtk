@@ -13,10 +13,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitGeolocationPermissionRequest.go.
+var GTypeGeolocationPermissionRequest = externglib.Type(C.webkit_geolocation_permission_request_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_geolocation_permission_request_get_type()), F: marshalGeolocationPermissionRequester},
+		{T: GTypeGeolocationPermissionRequest, F: marshalGeolocationPermissionRequest},
 	})
+}
+
+// GeolocationPermissionRequestOverrider contains methods that are overridable.
+type GeolocationPermissionRequestOverrider interface {
 }
 
 type GeolocationPermissionRequest struct {
@@ -30,6 +37,14 @@ var (
 	_ externglib.Objector = (*GeolocationPermissionRequest)(nil)
 )
 
+func classInitGeolocationPermissionRequester(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapGeolocationPermissionRequest(obj *externglib.Object) *GeolocationPermissionRequest {
 	return &GeolocationPermissionRequest{
 		Object: obj,
@@ -39,6 +54,6 @@ func wrapGeolocationPermissionRequest(obj *externglib.Object) *GeolocationPermis
 	}
 }
 
-func marshalGeolocationPermissionRequester(p uintptr) (interface{}, error) {
+func marshalGeolocationPermissionRequest(p uintptr) (interface{}, error) {
 	return wrapGeolocationPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }

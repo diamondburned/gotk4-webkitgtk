@@ -16,10 +16,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitURIResponse.go.
+var GTypeURIResponse = externglib.Type(C.webkit_uri_response_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_uri_response_get_type()), F: marshalURIResponser},
+		{T: GTypeURIResponse, F: marshalURIResponse},
 	})
+}
+
+// URIResponseOverrider contains methods that are overridable.
+type URIResponseOverrider interface {
 }
 
 type URIResponse struct {
@@ -31,13 +38,21 @@ var (
 	_ externglib.Objector = (*URIResponse)(nil)
 )
 
+func classInitURIResponser(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapURIResponse(obj *externglib.Object) *URIResponse {
 	return &URIResponse{
 		Object: obj,
 	}
 }
 
-func marshalURIResponser(p uintptr) (interface{}, error) {
+func marshalURIResponse(p uintptr) (interface{}, error) {
 	return wrapURIResponse(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -52,7 +67,7 @@ func (response *URIResponse) ContentLength() uint64 {
 	var _arg0 *C.WebKitURIResponse // out
 	var _cret C.guint64            // in
 
-	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(response.Native()))
+	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(externglib.InternObject(response).Native()))
 
 	_cret = C.webkit_uri_response_get_content_length(_arg0)
 	runtime.KeepAlive(response)
@@ -75,7 +90,7 @@ func (response *URIResponse) HTTPHeaders() *soup.MessageHeaders {
 	var _arg0 *C.WebKitURIResponse  // out
 	var _cret *C.SoupMessageHeaders // in
 
-	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(response.Native()))
+	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(externglib.InternObject(response).Native()))
 
 	_cret = C.webkit_uri_response_get_http_headers(_arg0)
 	runtime.KeepAlive(response)
@@ -95,7 +110,7 @@ func (response *URIResponse) MIMEType() string {
 	var _arg0 *C.WebKitURIResponse // out
 	var _cret *C.gchar             // in
 
-	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(response.Native()))
+	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(externglib.InternObject(response).Native()))
 
 	_cret = C.webkit_uri_response_get_mime_type(_arg0)
 	runtime.KeepAlive(response)
@@ -119,7 +134,7 @@ func (response *URIResponse) StatusCode() uint {
 	var _arg0 *C.WebKitURIResponse // out
 	var _cret C.guint              // in
 
-	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(response.Native()))
+	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(externglib.InternObject(response).Native()))
 
 	_cret = C.webkit_uri_response_get_status_code(_arg0)
 	runtime.KeepAlive(response)
@@ -143,7 +158,7 @@ func (response *URIResponse) SuggestedFilename() string {
 	var _arg0 *C.WebKitURIResponse // out
 	var _cret *C.gchar             // in
 
-	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(response.Native()))
+	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(externglib.InternObject(response).Native()))
 
 	_cret = C.webkit_uri_response_get_suggested_filename(_arg0)
 	runtime.KeepAlive(response)
@@ -163,7 +178,7 @@ func (response *URIResponse) URI() string {
 	var _arg0 *C.WebKitURIResponse // out
 	var _cret *C.gchar             // in
 
-	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(response.Native()))
+	_arg0 = (*C.WebKitURIResponse)(unsafe.Pointer(externglib.InternObject(response).Native()))
 
 	_cret = C.webkit_uri_response_get_uri(_arg0)
 	runtime.KeepAlive(response)

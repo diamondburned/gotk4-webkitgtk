@@ -13,10 +13,17 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-websocket-extension-manager.go.
+var GTypeWebsocketExtensionManager = externglib.Type(C.soup_websocket_extension_manager_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_websocket_extension_manager_get_type()), F: marshalWebsocketExtensionManagerer},
+		{T: GTypeWebsocketExtensionManager, F: marshalWebsocketExtensionManager},
 	})
+}
+
+// WebsocketExtensionManagerOverrider contains methods that are overridable.
+type WebsocketExtensionManagerOverrider interface {
 }
 
 type WebsocketExtensionManager struct {
@@ -30,6 +37,14 @@ var (
 	_ externglib.Objector = (*WebsocketExtensionManager)(nil)
 )
 
+func classInitWebsocketExtensionManagerer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapWebsocketExtensionManager(obj *externglib.Object) *WebsocketExtensionManager {
 	return &WebsocketExtensionManager{
 		Object: obj,
@@ -39,6 +54,6 @@ func wrapWebsocketExtensionManager(obj *externglib.Object) *WebsocketExtensionMa
 	}
 }
 
-func marshalWebsocketExtensionManagerer(p uintptr) (interface{}, error) {
+func marshalWebsocketExtensionManager(p uintptr) (interface{}, error) {
 	return wrapWebsocketExtensionManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }

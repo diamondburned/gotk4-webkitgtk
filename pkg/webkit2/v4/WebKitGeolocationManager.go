@@ -13,13 +13,25 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
+// extern gboolean _gotk4_webkit24_GeolocationManager_ConnectStart(gpointer, guintptr);
+// extern void _gotk4_webkit24_GeolocationManager_ConnectStop(gpointer, guintptr);
 import "C"
+
+// glib.Type values for WebKitGeolocationManager.go.
+var (
+	GTypeGeolocationManager  = externglib.Type(C.webkit_geolocation_manager_get_type())
+	GTypeGeolocationPosition = externglib.Type(C.webkit_geolocation_position_get_type())
+)
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_geolocation_manager_get_type()), F: marshalGeolocationManagerer},
-		{T: externglib.Type(C.webkit_geolocation_position_get_type()), F: marshalGeolocationPosition},
+		{T: GTypeGeolocationManager, F: marshalGeolocationManager},
+		{T: GTypeGeolocationPosition, F: marshalGeolocationPosition},
 	})
+}
+
+// GeolocationManagerOverrider contains methods that are overridable.
+type GeolocationManagerOverrider interface {
 }
 
 type GeolocationManager struct {
@@ -31,14 +43,44 @@ var (
 	_ externglib.Objector = (*GeolocationManager)(nil)
 )
 
+func classInitGeolocationManagerer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapGeolocationManager(obj *externglib.Object) *GeolocationManager {
 	return &GeolocationManager{
 		Object: obj,
 	}
 }
 
-func marshalGeolocationManagerer(p uintptr) (interface{}, error) {
+func marshalGeolocationManager(p uintptr) (interface{}, error) {
 	return wrapGeolocationManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+//export _gotk4_webkit24_GeolocationManager_ConnectStart
+func _gotk4_webkit24_GeolocationManager_ConnectStart(arg0 C.gpointer, arg1 C.guintptr) (cret C.gboolean) {
+	var f func() (ok bool)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func() (ok bool))
+	}
+
+	ok := f()
+
+	if ok {
+		cret = C.TRUE
+	}
+
+	return cret
 }
 
 // ConnectStart: signal is emitted to notify that manager needs to start
@@ -49,14 +91,30 @@ func marshalGeolocationManagerer(p uintptr) (interface{}, error) {
 //
 // If the signal is not handled, WebKit will try to determine the position using
 // GeoClue if available.
-func (manager *GeolocationManager) ConnectStart(f func() bool) externglib.SignalHandle {
-	return manager.Connect("start", f)
+func (manager *GeolocationManager) ConnectStart(f func() (ok bool)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(manager, "start", false, unsafe.Pointer(C._gotk4_webkit24_GeolocationManager_ConnectStart), f)
+}
+
+//export _gotk4_webkit24_GeolocationManager_ConnectStop
+func _gotk4_webkit24_GeolocationManager_ConnectStop(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
 }
 
 // ConnectStop: signal is emitted to notify that manager doesn't need to receive
 // position updates anymore.
 func (manager *GeolocationManager) ConnectStop(f func()) externglib.SignalHandle {
-	return manager.Connect("stop", f)
+	return externglib.ConnectGeneratedClosure(manager, "stop", false, unsafe.Pointer(C._gotk4_webkit24_GeolocationManager_ConnectStop), f)
 }
 
 // Failed: notify manager that determining the position failed.
@@ -69,7 +127,7 @@ func (manager *GeolocationManager) Failed(errorMessage string) {
 	var _arg0 *C.WebKitGeolocationManager // out
 	var _arg1 *C.char                     // out
 
-	_arg0 = (*C.WebKitGeolocationManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitGeolocationManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(errorMessage)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -86,7 +144,7 @@ func (manager *GeolocationManager) EnableHighAccuracy() bool {
 	var _arg0 *C.WebKitGeolocationManager // out
 	var _cret C.gboolean                  // in
 
-	_arg0 = (*C.WebKitGeolocationManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitGeolocationManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	_cret = C.webkit_geolocation_manager_get_enable_high_accuracy(_arg0)
 	runtime.KeepAlive(manager)
@@ -110,7 +168,7 @@ func (manager *GeolocationManager) UpdatePosition(position *GeolocationPosition)
 	var _arg0 *C.WebKitGeolocationManager  // out
 	var _arg1 *C.WebKitGeolocationPosition // out
 
-	_arg0 = (*C.WebKitGeolocationManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitGeolocationManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	_arg1 = (*C.WebKitGeolocationPosition)(gextras.StructNative(unsafe.Pointer(position)))
 
 	C.webkit_geolocation_manager_update_position(_arg0, _arg1)

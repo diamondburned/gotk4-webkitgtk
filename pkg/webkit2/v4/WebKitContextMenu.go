@@ -16,10 +16,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitContextMenu.go.
+var GTypeContextMenu = externglib.Type(C.webkit_context_menu_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_context_menu_get_type()), F: marshalContextMenuer},
+		{T: GTypeContextMenu, F: marshalContextMenu},
 	})
+}
+
+// ContextMenuOverrider contains methods that are overridable.
+type ContextMenuOverrider interface {
 }
 
 type ContextMenu struct {
@@ -31,13 +38,21 @@ var (
 	_ externglib.Objector = (*ContextMenu)(nil)
 )
 
+func classInitContextMenuer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapContextMenu(obj *externglib.Object) *ContextMenu {
 	return &ContextMenu{
 		Object: obj,
 	}
 }
 
-func marshalContextMenuer(p uintptr) (interface{}, error) {
+func marshalContextMenu(p uintptr) (interface{}, error) {
 	return wrapContextMenu(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -84,7 +99,7 @@ func NewContextMenuWithItems(items []ContextMenuItem) *ContextMenu {
 	for i := len(items) - 1; i >= 0; i-- {
 		src := items[i]
 		var dst *C.WebKitContextMenuItem // out
-		dst = (*C.WebKitContextMenuItem)(unsafe.Pointer((&src).Native()))
+		dst = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject((&src)).Native()))
 		_arg1 = C.g_list_prepend(_arg1, C.gpointer(unsafe.Pointer(dst)))
 	}
 	defer C.g_list_free(_arg1)
@@ -109,8 +124,8 @@ func (menu *ContextMenu) Append(item *ContextMenuItem) {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _arg1 *C.WebKitContextMenuItem // out
 
-	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
-	_arg1 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
+	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
+	_arg1 = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(item).Native()))
 
 	C.webkit_context_menu_append(_arg0, _arg1)
 	runtime.KeepAlive(menu)
@@ -128,7 +143,7 @@ func (menu *ContextMenu) First() *ContextMenuItem {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _cret *C.WebKitContextMenuItem // in
 
-	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
+	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
 
 	_cret = C.webkit_context_menu_first(_arg0)
 	runtime.KeepAlive(menu)
@@ -156,7 +171,7 @@ func (menu *ContextMenu) ItemAtPosition(position uint) *ContextMenuItem {
 	var _arg1 C.guint                  // out
 	var _cret *C.WebKitContextMenuItem // in
 
-	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
+	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
 	_arg1 = C.guint(position)
 
 	_cret = C.webkit_context_menu_get_item_at_position(_arg0, _arg1)
@@ -180,7 +195,7 @@ func (menu *ContextMenu) Items() []ContextMenuItem {
 	var _arg0 *C.WebKitContextMenu // out
 	var _cret *C.GList             // in
 
-	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
+	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
 
 	_cret = C.webkit_context_menu_get_items(_arg0)
 	runtime.KeepAlive(menu)
@@ -208,7 +223,7 @@ func (menu *ContextMenu) NItems() uint {
 	var _arg0 *C.WebKitContextMenu // out
 	var _cret C.guint              // in
 
-	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
+	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
 
 	_cret = C.webkit_context_menu_get_n_items(_arg0)
 	runtime.KeepAlive(menu)
@@ -232,7 +247,7 @@ func (menu *ContextMenu) UserData() *glib.Variant {
 	var _arg0 *C.WebKitContextMenu // out
 	var _cret *C.GVariant          // in
 
-	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
+	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
 
 	_cret = C.webkit_context_menu_get_user_data(_arg0)
 	runtime.KeepAlive(menu)
@@ -265,8 +280,8 @@ func (menu *ContextMenu) Insert(item *ContextMenuItem, position int) {
 	var _arg1 *C.WebKitContextMenuItem // out
 	var _arg2 C.gint                   // out
 
-	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
-	_arg1 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
+	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
+	_arg1 = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(item).Native()))
 	_arg2 = C.gint(position)
 
 	C.webkit_context_menu_insert(_arg0, _arg1, _arg2)
@@ -286,7 +301,7 @@ func (menu *ContextMenu) Last() *ContextMenuItem {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _cret *C.WebKitContextMenuItem // in
 
-	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
+	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
 
 	_cret = C.webkit_context_menu_last(_arg0)
 	runtime.KeepAlive(menu)
@@ -312,8 +327,8 @@ func (menu *ContextMenu) MoveItem(item *ContextMenuItem, position int) {
 	var _arg1 *C.WebKitContextMenuItem // out
 	var _arg2 C.gint                   // out
 
-	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
-	_arg1 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
+	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
+	_arg1 = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(item).Native()))
 	_arg2 = C.gint(position)
 
 	C.webkit_context_menu_move_item(_arg0, _arg1, _arg2)
@@ -332,8 +347,8 @@ func (menu *ContextMenu) Prepend(item *ContextMenuItem) {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _arg1 *C.WebKitContextMenuItem // out
 
-	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
-	_arg1 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
+	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
+	_arg1 = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(item).Native()))
 
 	C.webkit_context_menu_prepend(_arg0, _arg1)
 	runtime.KeepAlive(menu)
@@ -351,8 +366,8 @@ func (menu *ContextMenu) Remove(item *ContextMenuItem) {
 	var _arg0 *C.WebKitContextMenu     // out
 	var _arg1 *C.WebKitContextMenuItem // out
 
-	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
-	_arg1 = (*C.WebKitContextMenuItem)(unsafe.Pointer(item.Native()))
+	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
+	_arg1 = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(item).Native()))
 
 	C.webkit_context_menu_remove(_arg0, _arg1)
 	runtime.KeepAlive(menu)
@@ -363,7 +378,7 @@ func (menu *ContextMenu) Remove(item *ContextMenuItem) {
 func (menu *ContextMenu) RemoveAll() {
 	var _arg0 *C.WebKitContextMenu // out
 
-	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
+	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
 
 	C.webkit_context_menu_remove_all(_arg0)
 	runtime.KeepAlive(menu)
@@ -382,7 +397,7 @@ func (menu *ContextMenu) SetUserData(userData *glib.Variant) {
 	var _arg0 *C.WebKitContextMenu // out
 	var _arg1 *C.GVariant          // out
 
-	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(menu.Native()))
+	_arg0 = (*C.WebKitContextMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
 	_arg1 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(userData)))
 
 	C.webkit_context_menu_set_user_data(_arg0, _arg1)

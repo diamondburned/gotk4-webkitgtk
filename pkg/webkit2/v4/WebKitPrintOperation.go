@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gtk/v3"
 )
@@ -14,12 +15,21 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
+// extern WebKitPrintCustomWidget* _gotk4_webkit24_PrintOperation_ConnectCreateCustomWidget(gpointer, guintptr);
+// extern void _gotk4_webkit24_PrintOperation_ConnectFailed(gpointer, GError*, guintptr);
+// extern void _gotk4_webkit24_PrintOperation_ConnectFinished(gpointer, guintptr);
 import "C"
+
+// glib.Type values for WebKitPrintOperation.go.
+var (
+	GTypePrintOperationResponse = externglib.Type(C.webkit_print_operation_response_get_type())
+	GTypePrintOperation         = externglib.Type(C.webkit_print_operation_get_type())
+)
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_print_operation_response_get_type()), F: marshalPrintOperationResponse},
-		{T: externglib.Type(C.webkit_print_operation_get_type()), F: marshalPrintOperationer},
+		{T: GTypePrintOperationResponse, F: marshalPrintOperationResponse},
+		{T: GTypePrintOperation, F: marshalPrintOperation},
 	})
 }
 
@@ -50,6 +60,10 @@ func (p PrintOperationResponse) String() string {
 	}
 }
 
+// PrintOperationOverrider contains methods that are overridable.
+type PrintOperationOverrider interface {
+}
+
 type PrintOperation struct {
 	_ [0]func() // equal guard
 	*externglib.Object
@@ -59,29 +73,101 @@ var (
 	_ externglib.Objector = (*PrintOperation)(nil)
 )
 
+func classInitPrintOperationer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapPrintOperation(obj *externglib.Object) *PrintOperation {
 	return &PrintOperation{
 		Object: obj,
 	}
 }
 
-func marshalPrintOperationer(p uintptr) (interface{}, error) {
+func marshalPrintOperation(p uintptr) (interface{}, error) {
 	return wrapPrintOperation(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// ConnectCreateCustomWidget: emitted when displaying the print dialog with
+//export _gotk4_webkit24_PrintOperation_ConnectCreateCustomWidget
+func _gotk4_webkit24_PrintOperation_ConnectCreateCustomWidget(arg0 C.gpointer, arg1 C.guintptr) (cret *C.WebKitPrintCustomWidget) {
+	var f func() (printCustomWidget *PrintCustomWidget)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func() (printCustomWidget *PrintCustomWidget))
+	}
+
+	printCustomWidget := f()
+
+	cret = (*C.WebKitPrintCustomWidget)(unsafe.Pointer(externglib.InternObject(printCustomWidget).Native()))
+	C.g_object_ref(C.gpointer(externglib.InternObject(printCustomWidget).Native()))
+
+	return cret
+}
+
+// ConnectCreateCustomWidget is emitted when displaying the print dialog with
 // webkit_print_operation_run_dialog(). The returned KitPrintCustomWidget will
 // be added to the print dialog and it will be owned by the print_operation.
 // However, the object is guaranteed to be alive until the
 // KitPrintCustomWidget::apply is emitted.
-func (printOperation *PrintOperation) ConnectCreateCustomWidget(f func() PrintCustomWidget) externglib.SignalHandle {
-	return printOperation.Connect("create-custom-widget", f)
+func (printOperation *PrintOperation) ConnectCreateCustomWidget(f func() (printCustomWidget *PrintCustomWidget)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(printOperation, "create-custom-widget", false, unsafe.Pointer(C._gotk4_webkit24_PrintOperation_ConnectCreateCustomWidget), f)
 }
 
-// ConnectFinished: emitted when the print operation has finished doing
+//export _gotk4_webkit24_PrintOperation_ConnectFailed
+func _gotk4_webkit24_PrintOperation_ConnectFailed(arg0 C.gpointer, arg1 *C.GError, arg2 C.guintptr) {
+	var f func(err error)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(err error))
+	}
+
+	var _err error // out
+
+	_err = gerror.Take(unsafe.Pointer(arg1))
+
+	f(_err)
+}
+
+// ConnectFailed is emitted when an error occurs while printing. The given
+// error, of the domain WEBKIT_PRINT_ERROR, contains further details of the
+// failure. The KitPrintOperation::finished signal is emitted after this one.
+func (printOperation *PrintOperation) ConnectFailed(f func(err error)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(printOperation, "failed", false, unsafe.Pointer(C._gotk4_webkit24_PrintOperation_ConnectFailed), f)
+}
+
+//export _gotk4_webkit24_PrintOperation_ConnectFinished
+func _gotk4_webkit24_PrintOperation_ConnectFinished(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
+}
+
+// ConnectFinished is emitted when the print operation has finished doing
 // everything required for printing.
 func (printOperation *PrintOperation) ConnectFinished(f func()) externglib.SignalHandle {
-	return printOperation.Connect("finished", f)
+	return externglib.ConnectGeneratedClosure(printOperation, "finished", false, unsafe.Pointer(C._gotk4_webkit24_PrintOperation_ConnectFinished), f)
 }
 
 // NewPrintOperation: create a new KitPrintOperation to print web_view contents.
@@ -98,7 +184,7 @@ func NewPrintOperation(webView *WebView) *PrintOperation {
 	var _arg1 *C.WebKitWebView        // out
 	var _cret *C.WebKitPrintOperation // in
 
-	_arg1 = (*C.WebKitWebView)(unsafe.Pointer(webView.Native()))
+	_arg1 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_print_operation_new(_arg1)
 	runtime.KeepAlive(webView)
@@ -122,7 +208,7 @@ func (printOperation *PrintOperation) PageSetup() *gtk.PageSetup {
 	var _arg0 *C.WebKitPrintOperation // out
 	var _cret *C.GtkPageSetup         // in
 
-	_arg0 = (*C.WebKitPrintOperation)(unsafe.Pointer(printOperation.Native()))
+	_arg0 = (*C.WebKitPrintOperation)(unsafe.Pointer(externglib.InternObject(printOperation).Native()))
 
 	_cret = C.webkit_print_operation_get_page_setup(_arg0)
 	runtime.KeepAlive(printOperation)
@@ -151,7 +237,7 @@ func (printOperation *PrintOperation) PrintSettings() *gtk.PrintSettings {
 	var _arg0 *C.WebKitPrintOperation // out
 	var _cret *C.GtkPrintSettings     // in
 
-	_arg0 = (*C.WebKitPrintOperation)(unsafe.Pointer(printOperation.Native()))
+	_arg0 = (*C.WebKitPrintOperation)(unsafe.Pointer(externglib.InternObject(printOperation).Native()))
 
 	_cret = C.webkit_print_operation_get_print_settings(_arg0)
 	runtime.KeepAlive(printOperation)
@@ -179,7 +265,7 @@ func (printOperation *PrintOperation) PrintSettings() *gtk.PrintSettings {
 func (printOperation *PrintOperation) Print() {
 	var _arg0 *C.WebKitPrintOperation // out
 
-	_arg0 = (*C.WebKitPrintOperation)(unsafe.Pointer(printOperation.Native()))
+	_arg0 = (*C.WebKitPrintOperation)(unsafe.Pointer(externglib.InternObject(printOperation).Native()))
 
 	C.webkit_print_operation_print(_arg0)
 	runtime.KeepAlive(printOperation)
@@ -212,9 +298,9 @@ func (printOperation *PrintOperation) RunDialog(parent *gtk.Window) PrintOperati
 	var _arg1 *C.GtkWindow                   // out
 	var _cret C.WebKitPrintOperationResponse // in
 
-	_arg0 = (*C.WebKitPrintOperation)(unsafe.Pointer(printOperation.Native()))
+	_arg0 = (*C.WebKitPrintOperation)(unsafe.Pointer(externglib.InternObject(printOperation).Native()))
 	if parent != nil {
-		_arg1 = (*C.GtkWindow)(unsafe.Pointer(parent.Native()))
+		_arg1 = (*C.GtkWindow)(unsafe.Pointer(externglib.InternObject(parent).Native()))
 	}
 
 	_cret = C.webkit_print_operation_run_dialog(_arg0, _arg1)
@@ -240,8 +326,8 @@ func (printOperation *PrintOperation) SetPageSetup(pageSetup *gtk.PageSetup) {
 	var _arg0 *C.WebKitPrintOperation // out
 	var _arg1 *C.GtkPageSetup         // out
 
-	_arg0 = (*C.WebKitPrintOperation)(unsafe.Pointer(printOperation.Native()))
-	_arg1 = (*C.GtkPageSetup)(unsafe.Pointer(pageSetup.Native()))
+	_arg0 = (*C.WebKitPrintOperation)(unsafe.Pointer(externglib.InternObject(printOperation).Native()))
+	_arg1 = (*C.GtkPageSetup)(unsafe.Pointer(externglib.InternObject(pageSetup).Native()))
 
 	C.webkit_print_operation_set_page_setup(_arg0, _arg1)
 	runtime.KeepAlive(printOperation)
@@ -260,8 +346,8 @@ func (printOperation *PrintOperation) SetPrintSettings(printSettings *gtk.PrintS
 	var _arg0 *C.WebKitPrintOperation // out
 	var _arg1 *C.GtkPrintSettings     // out
 
-	_arg0 = (*C.WebKitPrintOperation)(unsafe.Pointer(printOperation.Native()))
-	_arg1 = (*C.GtkPrintSettings)(unsafe.Pointer(printSettings.Native()))
+	_arg0 = (*C.WebKitPrintOperation)(unsafe.Pointer(externglib.InternObject(printOperation).Native()))
+	_arg1 = (*C.GtkPrintSettings)(unsafe.Pointer(externglib.InternObject(printSettings).Native()))
 
 	C.webkit_print_operation_set_print_settings(_arg0, _arg1)
 	runtime.KeepAlive(printOperation)

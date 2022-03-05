@@ -14,10 +14,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitPolicyDecision.go.
+var GTypePolicyDecision = externglib.Type(C.webkit_policy_decision_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_policy_decision_get_type()), F: marshalPolicyDecisioner},
+		{T: GTypePolicyDecision, F: marshalPolicyDecision},
 	})
+}
+
+// PolicyDecisionOverrider contains methods that are overridable.
+type PolicyDecisionOverrider interface {
 }
 
 type PolicyDecision struct {
@@ -40,13 +47,21 @@ type PolicyDecisioner interface {
 
 var _ PolicyDecisioner = (*PolicyDecision)(nil)
 
+func classInitPolicyDecisioner(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapPolicyDecision(obj *externglib.Object) *PolicyDecision {
 	return &PolicyDecision{
 		Object: obj,
 	}
 }
 
-func marshalPolicyDecisioner(p uintptr) (interface{}, error) {
+func marshalPolicyDecision(p uintptr) (interface{}, error) {
 	return wrapPolicyDecision(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -63,7 +78,7 @@ func BasePolicyDecision(obj PolicyDecisioner) *PolicyDecision {
 func (decision *PolicyDecision) Download() {
 	var _arg0 *C.WebKitPolicyDecision // out
 
-	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(decision.Native()))
+	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
 
 	C.webkit_policy_decision_download(_arg0)
 	runtime.KeepAlive(decision)
@@ -74,7 +89,7 @@ func (decision *PolicyDecision) Download() {
 func (decision *PolicyDecision) Ignore() {
 	var _arg0 *C.WebKitPolicyDecision // out
 
-	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(decision.Native()))
+	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
 
 	C.webkit_policy_decision_ignore(_arg0)
 	runtime.KeepAlive(decision)
@@ -84,7 +99,7 @@ func (decision *PolicyDecision) Ignore() {
 func (decision *PolicyDecision) Use() {
 	var _arg0 *C.WebKitPolicyDecision // out
 
-	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(decision.Native()))
+	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
 
 	C.webkit_policy_decision_use(_arg0)
 	runtime.KeepAlive(decision)
@@ -106,8 +121,8 @@ func (decision *PolicyDecision) UseWithPolicies(policies *WebsitePolicies) {
 	var _arg0 *C.WebKitPolicyDecision  // out
 	var _arg1 *C.WebKitWebsitePolicies // out
 
-	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(decision.Native()))
-	_arg1 = (*C.WebKitWebsitePolicies)(unsafe.Pointer(policies.Native()))
+	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
+	_arg1 = (*C.WebKitWebsitePolicies)(unsafe.Pointer(externglib.InternObject(policies).Native()))
 
 	C.webkit_policy_decision_use_with_policies(_arg0, _arg1)
 	runtime.KeepAlive(decision)

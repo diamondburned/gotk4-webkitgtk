@@ -18,11 +18,18 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-message-body.go.
+var (
+	GTypeMemoryUse   = externglib.Type(C.soup_memory_use_get_type())
+	GTypeBuffer      = externglib.Type(C.soup_buffer_get_type())
+	GTypeMessageBody = externglib.Type(C.soup_message_body_get_type())
+)
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_memory_use_get_type()), F: marshalMemoryUse},
-		{T: externglib.Type(C.soup_buffer_get_type()), F: marshalBuffer},
-		{T: externglib.Type(C.soup_message_body_get_type()), F: marshalMessageBody},
+		{T: GTypeMemoryUse, F: marshalMemoryUse},
+		{T: GTypeBuffer, F: marshalBuffer},
+		{T: GTypeMessageBody, F: marshalMessageBody},
 	})
 }
 

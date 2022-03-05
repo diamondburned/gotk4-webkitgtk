@@ -16,10 +16,16 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitNavigationAction.go.
+var (
+	GTypeNavigationType   = externglib.Type(C.webkit_navigation_type_get_type())
+	GTypeNavigationAction = externglib.Type(C.webkit_navigation_action_get_type())
+)
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_navigation_type_get_type()), F: marshalNavigationType},
-		{T: externglib.Type(C.webkit_navigation_action_get_type()), F: marshalNavigationAction},
+		{T: GTypeNavigationType, F: marshalNavigationType},
+		{T: GTypeNavigationAction, F: marshalNavigationAction},
 	})
 }
 

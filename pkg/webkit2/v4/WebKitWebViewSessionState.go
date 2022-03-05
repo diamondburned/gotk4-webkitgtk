@@ -16,9 +16,12 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitWebViewSessionState.go.
+var GTypeWebViewSessionState = externglib.Type(C.webkit_web_view_session_state_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_web_view_session_state_get_type()), F: marshalWebViewSessionState},
+		{T: GTypeWebViewSessionState, F: marshalWebViewSessionState},
 	})
 }
 

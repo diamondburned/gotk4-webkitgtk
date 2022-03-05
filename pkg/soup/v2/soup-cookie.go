@@ -15,9 +15,12 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-cookie.go.
+var GTypeCookie = externglib.Type(C.soup_cookie_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_cookie_get_type()), F: marshalCookie},
+		{T: GTypeCookie, F: marshalCookie},
 	})
 }
 
@@ -55,7 +58,7 @@ func CookiesFromRequest(msg *Message) []*Cookie {
 	var _arg1 *C.SoupMessage // out
 	var _cret *C.GSList      // in
 
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 
 	_cret = C.soup_cookies_from_request(_arg1)
 	runtime.KeepAlive(msg)
@@ -95,7 +98,7 @@ func CookiesFromResponse(msg *Message) []*Cookie {
 	var _arg1 *C.SoupMessage // out
 	var _cret *C.GSList      // in
 
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 
 	_cret = C.soup_cookies_from_response(_arg1)
 	runtime.KeepAlive(msg)
@@ -174,7 +177,7 @@ func CookiesToRequest(cookies []*Cookie, msg *Message) {
 		_arg1 = C.g_slist_prepend(_arg1, C.gpointer(unsafe.Pointer(dst)))
 	}
 	defer C.g_slist_free(_arg1)
-	_arg2 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg2 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 
 	C.soup_cookies_to_request(_arg1, _arg2)
 	runtime.KeepAlive(cookies)
@@ -201,7 +204,7 @@ func CookiesToResponse(cookies []*Cookie, msg *Message) {
 		_arg1 = C.g_slist_prepend(_arg1, C.gpointer(unsafe.Pointer(dst)))
 	}
 	defer C.g_slist_free(_arg1)
-	_arg2 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg2 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 
 	C.soup_cookies_to_response(_arg1, _arg2)
 	runtime.KeepAlive(cookies)

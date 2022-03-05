@@ -15,10 +15,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitNavigationPolicyDecision.go.
+var GTypeNavigationPolicyDecision = externglib.Type(C.webkit_navigation_policy_decision_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_navigation_policy_decision_get_type()), F: marshalNavigationPolicyDecisioner},
+		{T: GTypeNavigationPolicyDecision, F: marshalNavigationPolicyDecision},
 	})
+}
+
+// NavigationPolicyDecisionOverrider contains methods that are overridable.
+type NavigationPolicyDecisionOverrider interface {
 }
 
 type NavigationPolicyDecision struct {
@@ -30,6 +37,14 @@ var (
 	_ PolicyDecisioner = (*NavigationPolicyDecision)(nil)
 )
 
+func classInitNavigationPolicyDecisioner(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapNavigationPolicyDecision(obj *externglib.Object) *NavigationPolicyDecision {
 	return &NavigationPolicyDecision{
 		PolicyDecision: PolicyDecision{
@@ -38,7 +53,7 @@ func wrapNavigationPolicyDecision(obj *externglib.Object) *NavigationPolicyDecis
 	}
 }
 
-func marshalNavigationPolicyDecisioner(p uintptr) (interface{}, error) {
+func marshalNavigationPolicyDecision(p uintptr) (interface{}, error) {
 	return wrapNavigationPolicyDecision(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -53,7 +68,7 @@ func (decision *NavigationPolicyDecision) FrameName() string {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret *C.gchar                          // in
 
-	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(decision.Native()))
+	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
 
 	_cret = C.webkit_navigation_policy_decision_get_frame_name(_arg0)
 	runtime.KeepAlive(decision)
@@ -79,7 +94,7 @@ func (decision *NavigationPolicyDecision) Modifiers() uint {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret C.guint                           // in
 
-	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(decision.Native()))
+	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
 
 	_cret = C.webkit_navigation_policy_decision_get_modifiers(_arg0)
 	runtime.KeepAlive(decision)
@@ -106,7 +121,7 @@ func (decision *NavigationPolicyDecision) MouseButton() uint {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret C.guint                           // in
 
-	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(decision.Native()))
+	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
 
 	_cret = C.webkit_navigation_policy_decision_get_mouse_button(_arg0)
 	runtime.KeepAlive(decision)
@@ -129,7 +144,7 @@ func (decision *NavigationPolicyDecision) NavigationAction() *NavigationAction {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret *C.WebKitNavigationAction         // in
 
-	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(decision.Native()))
+	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
 
 	_cret = C.webkit_navigation_policy_decision_get_navigation_action(_arg0)
 	runtime.KeepAlive(decision)
@@ -155,7 +170,7 @@ func (decision *NavigationPolicyDecision) NavigationType() NavigationType {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret C.WebKitNavigationType            // in
 
-	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(decision.Native()))
+	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
 
 	_cret = C.webkit_navigation_policy_decision_get_navigation_type(_arg0)
 	runtime.KeepAlive(decision)
@@ -180,7 +195,7 @@ func (decision *NavigationPolicyDecision) Request() *URIRequest {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret *C.WebKitURIRequest               // in
 
-	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(decision.Native()))
+	_arg0 = (*C.WebKitNavigationPolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
 
 	_cret = C.webkit_navigation_policy_decision_get_request(_arg0)
 	runtime.KeepAlive(decision)

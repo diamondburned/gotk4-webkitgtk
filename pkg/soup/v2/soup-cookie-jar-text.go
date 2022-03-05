@@ -14,15 +14,22 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-cookie-jar-text.go.
+var GTypeCookieJarText = externglib.Type(C.soup_cookie_jar_text_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_cookie_jar_text_get_type()), F: marshalCookieJarTexter},
+		{T: GTypeCookieJarText, F: marshalCookieJarText},
 	})
 }
 
 // COOKIE_JAR_TEXT_FILENAME alias for the CookieJarText:filename property. (The
 // cookie-storage filename.).
 const COOKIE_JAR_TEXT_FILENAME = "filename"
+
+// CookieJarTextOverrider contains methods that are overridable.
+type CookieJarTextOverrider interface {
+}
 
 type CookieJarText struct {
 	_ [0]func() // equal guard
@@ -32,6 +39,14 @@ type CookieJarText struct {
 var (
 	_ externglib.Objector = (*CookieJarText)(nil)
 )
+
+func classInitCookieJarTexter(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
 
 func wrapCookieJarText(obj *externglib.Object) *CookieJarText {
 	return &CookieJarText{
@@ -44,7 +59,7 @@ func wrapCookieJarText(obj *externglib.Object) *CookieJarText {
 	}
 }
 
-func marshalCookieJarTexter(p uintptr) (interface{}, error) {
+func marshalCookieJarText(p uintptr) (interface{}, error) {
 	return wrapCookieJarText(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 

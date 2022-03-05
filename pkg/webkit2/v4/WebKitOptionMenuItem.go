@@ -15,9 +15,12 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitOptionMenuItem.go.
+var GTypeOptionMenuItem = externglib.Type(C.webkit_option_menu_item_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_option_menu_item_get_type()), F: marshalOptionMenuItem},
+		{T: GTypeOptionMenuItem, F: marshalOptionMenuItem},
 	})
 }
 

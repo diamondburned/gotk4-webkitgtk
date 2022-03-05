@@ -14,10 +14,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitInstallMissingMediaPluginsPermissionRequest.go.
+var GTypeInstallMissingMediaPluginsPermissionRequest = externglib.Type(C.webkit_install_missing_media_plugins_permission_request_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_install_missing_media_plugins_permission_request_get_type()), F: marshalInstallMissingMediaPluginsPermissionRequester},
+		{T: GTypeInstallMissingMediaPluginsPermissionRequest, F: marshalInstallMissingMediaPluginsPermissionRequest},
 	})
+}
+
+// InstallMissingMediaPluginsPermissionRequestOverrider contains methods that are overridable.
+type InstallMissingMediaPluginsPermissionRequestOverrider interface {
 }
 
 type InstallMissingMediaPluginsPermissionRequest struct {
@@ -31,6 +38,14 @@ var (
 	_ externglib.Objector = (*InstallMissingMediaPluginsPermissionRequest)(nil)
 )
 
+func classInitInstallMissingMediaPluginsPermissionRequester(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapInstallMissingMediaPluginsPermissionRequest(obj *externglib.Object) *InstallMissingMediaPluginsPermissionRequest {
 	return &InstallMissingMediaPluginsPermissionRequest{
 		Object: obj,
@@ -40,7 +55,7 @@ func wrapInstallMissingMediaPluginsPermissionRequest(obj *externglib.Object) *In
 	}
 }
 
-func marshalInstallMissingMediaPluginsPermissionRequester(p uintptr) (interface{}, error) {
+func marshalInstallMissingMediaPluginsPermissionRequest(p uintptr) (interface{}, error) {
 	return wrapInstallMissingMediaPluginsPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -55,7 +70,7 @@ func (request *InstallMissingMediaPluginsPermissionRequest) Description() string
 	var _arg0 *C.WebKitInstallMissingMediaPluginsPermissionRequest // out
 	var _cret *C.gchar                                             // in
 
-	_arg0 = (*C.WebKitInstallMissingMediaPluginsPermissionRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitInstallMissingMediaPluginsPermissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_install_missing_media_plugins_permission_request_get_description(_arg0)
 	runtime.KeepAlive(request)

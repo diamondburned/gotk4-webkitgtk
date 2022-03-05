@@ -15,10 +15,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitWebViewBase.go.
+var GTypeWebViewBase = externglib.Type(C.webkit_web_view_base_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_web_view_base_get_type()), F: marshalWebViewBaser},
+		{T: GTypeWebViewBase, F: marshalWebViewBase},
 	})
+}
+
+// WebViewBaseOverrider contains methods that are overridable.
+type WebViewBaseOverrider interface {
 }
 
 type WebViewBase struct {
@@ -29,6 +36,14 @@ type WebViewBase struct {
 var (
 	_ gtk.Containerer = (*WebViewBase)(nil)
 )
+
+func classInitWebViewBaser(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
 
 func wrapWebViewBase(obj *externglib.Object) *WebViewBase {
 	return &WebViewBase{
@@ -49,6 +64,6 @@ func wrapWebViewBase(obj *externglib.Object) *WebViewBase {
 	}
 }
 
-func marshalWebViewBaser(p uintptr) (interface{}, error) {
+func marshalWebViewBase(p uintptr) (interface{}, error) {
 	return wrapWebViewBase(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }

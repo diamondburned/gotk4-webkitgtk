@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gtk/v3"
 )
@@ -13,18 +14,22 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
+// extern void _gotk4_webkit24_PrintCustomWidgetClass_apply(WebKitPrintCustomWidget*, GtkWidget*);
+// extern void _gotk4_webkit24_PrintCustomWidgetClass_update(WebKitPrintCustomWidget*, GtkWidget*, GtkPageSetup*, GtkPrintSettings*);
+// extern void _gotk4_webkit24_PrintCustomWidget_ConnectApply(gpointer, guintptr);
+// extern void _gotk4_webkit24_PrintCustomWidget_ConnectUpdate(gpointer, GtkPageSetup*, GtkPrintSettings*, guintptr);
 import "C"
+
+// glib.Type values for WebKitPrintCustomWidget.go.
+var GTypePrintCustomWidget = externglib.Type(C.webkit_print_custom_widget_get_type())
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_print_custom_widget_get_type()), F: marshalPrintCustomWidgetter},
+		{T: GTypePrintCustomWidget, F: marshalPrintCustomWidget},
 	})
 }
 
 // PrintCustomWidgetOverrider contains methods that are overridable.
-//
-// As of right now, interface overriding and subclassing is not supported
-// yet, so the interface currently has no use.
 type PrintCustomWidgetOverrider interface {
 	// The function takes the following parameters:
 	//
@@ -47,28 +52,170 @@ var (
 	_ externglib.Objector = (*PrintCustomWidget)(nil)
 )
 
+func classInitPrintCustomWidgetter(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+	goval := gbox.Get(uintptr(data))
+	pclass := (*C.WebKitPrintCustomWidgetClass)(unsafe.Pointer(gclassPtr))
+	// gclass := (*C.GTypeClass)(unsafe.Pointer(gclassPtr))
+	// pclass := (*C.WebKitPrintCustomWidgetClass)(unsafe.Pointer(C.g_type_class_peek_parent(gclass)))
+
+	if _, ok := goval.(interface{ Apply(widget gtk.Widgetter) }); ok {
+		pclass.apply = (*[0]byte)(C._gotk4_webkit24_PrintCustomWidgetClass_apply)
+	}
+
+	if _, ok := goval.(interface {
+		Update(widget gtk.Widgetter, pageSetup *gtk.PageSetup, printSettings *gtk.PrintSettings)
+	}); ok {
+		pclass.update = (*[0]byte)(C._gotk4_webkit24_PrintCustomWidgetClass_update)
+	}
+}
+
+//export _gotk4_webkit24_PrintCustomWidgetClass_apply
+func _gotk4_webkit24_PrintCustomWidgetClass_apply(arg0 *C.WebKitPrintCustomWidget, arg1 *C.GtkWidget) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ Apply(widget gtk.Widgetter) })
+
+	var _widget gtk.Widgetter // out
+
+	{
+		objptr := unsafe.Pointer(arg1)
+		if objptr == nil {
+			panic("object of type gtk.Widgetter is nil")
+		}
+
+		object := externglib.Take(objptr)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gtk.Widgetter)
+			return ok
+		})
+		rv, ok := casted.(gtk.Widgetter)
+		if !ok {
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gtk.Widgetter")
+		}
+		_widget = rv
+	}
+
+	iface.Apply(_widget)
+}
+
+//export _gotk4_webkit24_PrintCustomWidgetClass_update
+func _gotk4_webkit24_PrintCustomWidgetClass_update(arg0 *C.WebKitPrintCustomWidget, arg1 *C.GtkWidget, arg2 *C.GtkPageSetup, arg3 *C.GtkPrintSettings) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface {
+		Update(widget gtk.Widgetter, pageSetup *gtk.PageSetup, printSettings *gtk.PrintSettings)
+	})
+
+	var _widget gtk.Widgetter             // out
+	var _pageSetup *gtk.PageSetup         // out
+	var _printSettings *gtk.PrintSettings // out
+
+	{
+		objptr := unsafe.Pointer(arg1)
+		if objptr == nil {
+			panic("object of type gtk.Widgetter is nil")
+		}
+
+		object := externglib.Take(objptr)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gtk.Widgetter)
+			return ok
+		})
+		rv, ok := casted.(gtk.Widgetter)
+		if !ok {
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gtk.Widgetter")
+		}
+		_widget = rv
+	}
+	{
+		obj := externglib.Take(unsafe.Pointer(arg2))
+		_pageSetup = &gtk.PageSetup{
+			Object: obj,
+		}
+	}
+	{
+		obj := externglib.Take(unsafe.Pointer(arg3))
+		_printSettings = &gtk.PrintSettings{
+			Object: obj,
+		}
+	}
+
+	iface.Update(_widget, _pageSetup, _printSettings)
+}
+
 func wrapPrintCustomWidget(obj *externglib.Object) *PrintCustomWidget {
 	return &PrintCustomWidget{
 		Object: obj,
 	}
 }
 
-func marshalPrintCustomWidgetter(p uintptr) (interface{}, error) {
+func marshalPrintCustomWidget(p uintptr) (interface{}, error) {
 	return wrapPrintCustomWidget(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// ConnectApply: emitted right before the printing will start. You should read
+//export _gotk4_webkit24_PrintCustomWidget_ConnectApply
+func _gotk4_webkit24_PrintCustomWidget_ConnectApply(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
+}
+
+// ConnectApply is emitted right before the printing will start. You should read
 // the information from the widget and update the content based on it if
 // necessary. The widget is not guaranteed to be valid at a later time.
 func (printCustomWidget *PrintCustomWidget) ConnectApply(f func()) externglib.SignalHandle {
-	return printCustomWidget.Connect("apply", f)
+	return externglib.ConnectGeneratedClosure(printCustomWidget, "apply", false, unsafe.Pointer(C._gotk4_webkit24_PrintCustomWidget_ConnectApply), f)
 }
 
-// ConnectUpdate: emitted after change of selected printer in the dialog. The
+//export _gotk4_webkit24_PrintCustomWidget_ConnectUpdate
+func _gotk4_webkit24_PrintCustomWidget_ConnectUpdate(arg0 C.gpointer, arg1 *C.GtkPageSetup, arg2 *C.GtkPrintSettings, arg3 C.guintptr) {
+	var f func(pageSetup *gtk.PageSetup, printSettings *gtk.PrintSettings)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(pageSetup *gtk.PageSetup, printSettings *gtk.PrintSettings))
+	}
+
+	var _pageSetup *gtk.PageSetup         // out
+	var _printSettings *gtk.PrintSettings // out
+
+	{
+		obj := externglib.Take(unsafe.Pointer(arg1))
+		_pageSetup = &gtk.PageSetup{
+			Object: obj,
+		}
+	}
+	{
+		obj := externglib.Take(unsafe.Pointer(arg2))
+		_printSettings = &gtk.PrintSettings{
+			Object: obj,
+		}
+	}
+
+	f(_pageSetup, _printSettings)
+}
+
+// ConnectUpdate is emitted after change of selected printer in the dialog. The
 // actual page setup and print settings are available and the custom widget can
 // actualize itself according to their values.
-func (printCustomWidget *PrintCustomWidget) ConnectUpdate(f func(pageSetup gtk.PageSetup, printSettings gtk.PrintSettings)) externglib.SignalHandle {
-	return printCustomWidget.Connect("update", f)
+func (printCustomWidget *PrintCustomWidget) ConnectUpdate(f func(pageSetup *gtk.PageSetup, printSettings *gtk.PrintSettings)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(printCustomWidget, "update", false, unsafe.Pointer(C._gotk4_webkit24_PrintCustomWidget_ConnectUpdate), f)
 }
 
 // NewPrintCustomWidget: create a new KitPrintCustomWidget with given widget and
@@ -90,7 +237,7 @@ func NewPrintCustomWidget(widget gtk.Widgetter, title string) *PrintCustomWidget
 	var _arg2 *C.char                    // out
 	var _cret *C.WebKitPrintCustomWidget // in
 
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(widget.Native()))
+	_arg1 = (*C.GtkWidget)(unsafe.Pointer(externglib.InternObject(widget).Native()))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(title)))
 	defer C.free(unsafe.Pointer(_arg2))
 
@@ -116,7 +263,7 @@ func (printCustomWidget *PrintCustomWidget) Title() string {
 	var _arg0 *C.WebKitPrintCustomWidget // out
 	var _cret *C.gchar                   // in
 
-	_arg0 = (*C.WebKitPrintCustomWidget)(unsafe.Pointer(printCustomWidget.Native()))
+	_arg0 = (*C.WebKitPrintCustomWidget)(unsafe.Pointer(externglib.InternObject(printCustomWidget).Native()))
 
 	_cret = C.webkit_print_custom_widget_get_title(_arg0)
 	runtime.KeepAlive(printCustomWidget)
@@ -142,7 +289,7 @@ func (printCustomWidget *PrintCustomWidget) Widget() gtk.Widgetter {
 	var _arg0 *C.WebKitPrintCustomWidget // out
 	var _cret *C.GtkWidget               // in
 
-	_arg0 = (*C.WebKitPrintCustomWidget)(unsafe.Pointer(printCustomWidget.Native()))
+	_arg0 = (*C.WebKitPrintCustomWidget)(unsafe.Pointer(externglib.InternObject(printCustomWidget).Native()))
 
 	_cret = C.webkit_print_custom_widget_get_widget(_arg0)
 	runtime.KeepAlive(printCustomWidget)

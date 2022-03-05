@@ -13,10 +13,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitDeviceInfoPermissionRequest.go.
+var GTypeDeviceInfoPermissionRequest = externglib.Type(C.webkit_device_info_permission_request_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_device_info_permission_request_get_type()), F: marshalDeviceInfoPermissionRequester},
+		{T: GTypeDeviceInfoPermissionRequest, F: marshalDeviceInfoPermissionRequest},
 	})
+}
+
+// DeviceInfoPermissionRequestOverrider contains methods that are overridable.
+type DeviceInfoPermissionRequestOverrider interface {
 }
 
 type DeviceInfoPermissionRequest struct {
@@ -30,6 +37,14 @@ var (
 	_ externglib.Objector = (*DeviceInfoPermissionRequest)(nil)
 )
 
+func classInitDeviceInfoPermissionRequester(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapDeviceInfoPermissionRequest(obj *externglib.Object) *DeviceInfoPermissionRequest {
 	return &DeviceInfoPermissionRequest{
 		Object: obj,
@@ -39,6 +54,6 @@ func wrapDeviceInfoPermissionRequest(obj *externglib.Object) *DeviceInfoPermissi
 	}
 }
 
-func marshalDeviceInfoPermissionRequester(p uintptr) (interface{}, error) {
+func marshalDeviceInfoPermissionRequest(p uintptr) (interface{}, error) {
 	return wrapDeviceInfoPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }

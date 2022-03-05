@@ -19,19 +19,34 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup.go.
+var (
+	GTypeCacheResponse   = externglib.Type(C.soup_cache_response_get_type())
+	GTypeConnectionState = externglib.Type(C.soup_connection_state_get_type())
+	GTypeKnownStatusCode = externglib.Type(C.soup_known_status_code_get_type())
+	GTypeRequesterError  = externglib.Type(C.soup_requester_error_get_type())
+	GTypeSameSitePolicy  = externglib.Type(C.soup_same_site_policy_get_type())
+	GTypeXMLRPCError     = externglib.Type(C.soup_xmlrpc_error_get_type())
+	GTypeCacheability    = externglib.Type(C.soup_cacheability_get_type())
+	GTypeAuthBasic       = externglib.Type(C.soup_auth_basic_get_type())
+	GTypeAuthDigest      = externglib.Type(C.soup_auth_digest_get_type())
+	GTypeAuthNTLM        = externglib.Type(C.soup_auth_ntlm_get_type())
+	GTypeAuthNegotiate   = externglib.Type(C.soup_auth_negotiate_get_type())
+)
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_cache_response_get_type()), F: marshalCacheResponse},
-		{T: externglib.Type(C.soup_connection_state_get_type()), F: marshalConnectionState},
-		{T: externglib.Type(C.soup_known_status_code_get_type()), F: marshalKnownStatusCode},
-		{T: externglib.Type(C.soup_requester_error_get_type()), F: marshalRequesterError},
-		{T: externglib.Type(C.soup_same_site_policy_get_type()), F: marshalSameSitePolicy},
-		{T: externglib.Type(C.soup_xmlrpc_error_get_type()), F: marshalXMLRPCError},
-		{T: externglib.Type(C.soup_cacheability_get_type()), F: marshalCacheability},
-		{T: externglib.Type(C.soup_auth_basic_get_type()), F: marshalAuthBasiccer},
-		{T: externglib.Type(C.soup_auth_digest_get_type()), F: marshalAuthDigester},
-		{T: externglib.Type(C.soup_auth_ntlm_get_type()), F: marshalAuthNTLMer},
-		{T: externglib.Type(C.soup_auth_negotiate_get_type()), F: marshalAuthNegotiater},
+		{T: GTypeCacheResponse, F: marshalCacheResponse},
+		{T: GTypeConnectionState, F: marshalConnectionState},
+		{T: GTypeKnownStatusCode, F: marshalKnownStatusCode},
+		{T: GTypeRequesterError, F: marshalRequesterError},
+		{T: GTypeSameSitePolicy, F: marshalSameSitePolicy},
+		{T: GTypeXMLRPCError, F: marshalXMLRPCError},
+		{T: GTypeCacheability, F: marshalCacheability},
+		{T: GTypeAuthBasic, F: marshalAuthBasic},
+		{T: GTypeAuthDigest, F: marshalAuthDigest},
+		{T: GTypeAuthNTLM, F: marshalAuthNTLM},
+		{T: GTypeAuthNegotiate, F: marshalAuthNegotiate},
 	})
 }
 
@@ -496,7 +511,7 @@ func wrapAuthBasic(obj *externglib.Object) *AuthBasic {
 	}
 }
 
-func marshalAuthBasiccer(p uintptr) (interface{}, error) {
+func marshalAuthBasic(p uintptr) (interface{}, error) {
 	return wrapAuthBasic(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -517,7 +532,7 @@ func wrapAuthDigest(obj *externglib.Object) *AuthDigest {
 	}
 }
 
-func marshalAuthDigester(p uintptr) (interface{}, error) {
+func marshalAuthDigest(p uintptr) (interface{}, error) {
 	return wrapAuthDigest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -538,7 +553,7 @@ func wrapAuthNTLM(obj *externglib.Object) *AuthNTLM {
 	}
 }
 
-func marshalAuthNTLMer(p uintptr) (interface{}, error) {
+func marshalAuthNTLM(p uintptr) (interface{}, error) {
 	return wrapAuthNTLM(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -559,6 +574,6 @@ func wrapAuthNegotiate(obj *externglib.Object) *AuthNegotiate {
 	}
 }
 
-func marshalAuthNegotiater(p uintptr) (interface{}, error) {
+func marshalAuthNegotiate(p uintptr) (interface{}, error) {
 	return wrapAuthNegotiate(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }

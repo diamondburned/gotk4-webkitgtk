@@ -18,13 +18,28 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
-// void _gotk4_soup2_SocketCallback(SoupSocket*, guint, gpointer);
+// extern void _gotk4_soup2_SocketCallback(SoupSocket*, guint, gpointer);
+// extern void _gotk4_soup2_SocketClass_disconnected(SoupSocket*);
+// extern void _gotk4_soup2_SocketClass_new_connection(SoupSocket*, SoupSocket*);
+// extern void _gotk4_soup2_SocketClass_readable(SoupSocket*);
+// extern void _gotk4_soup2_SocketClass_writable(SoupSocket*);
+// extern void _gotk4_soup2_Socket_ConnectDisconnected(gpointer, guintptr);
+// extern void _gotk4_soup2_Socket_ConnectEvent(gpointer, GSocketClientEvent, GIOStream*, guintptr);
+// extern void _gotk4_soup2_Socket_ConnectNewConnection(gpointer, SoupSocket*, guintptr);
+// extern void _gotk4_soup2_Socket_ConnectReadable(gpointer, guintptr);
+// extern void _gotk4_soup2_Socket_ConnectWritable(gpointer, guintptr);
 import "C"
+
+// glib.Type values for soup-socket.go.
+var (
+	GTypeSocketIOStatus = externglib.Type(C.soup_socket_io_status_get_type())
+	GTypeSocket         = externglib.Type(C.soup_socket_get_type())
+)
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_socket_io_status_get_type()), F: marshalSocketIOStatus},
-		{T: externglib.Type(C.soup_socket_get_type()), F: marshalSocketter},
+		{T: GTypeSocketIOStatus, F: marshalSocketIOStatus},
+		{T: GTypeSocket, F: marshalSocket},
 	})
 }
 
@@ -117,26 +132,26 @@ func (s SocketIOStatus) String() string {
 type SocketCallback func(sock *Socket, status uint)
 
 //export _gotk4_soup2_SocketCallback
-func _gotk4_soup2_SocketCallback(arg0 *C.SoupSocket, arg1 C.guint, arg2 C.gpointer) {
-	v := gbox.Get(uintptr(arg2))
-	if v == nil {
-		panic(`callback not found`)
+func _gotk4_soup2_SocketCallback(arg1 *C.SoupSocket, arg2 C.guint, arg3 C.gpointer) {
+	var fn SocketCallback
+	{
+		v := gbox.Get(uintptr(arg3))
+		if v == nil {
+			panic(`callback not found`)
+		}
+		fn = v.(SocketCallback)
 	}
 
-	var sock *Socket // out
-	var status uint  // out
+	var _sock *Socket // out
+	var _status uint  // out
 
-	sock = wrapSocket(externglib.Take(unsafe.Pointer(arg0)))
-	status = uint(arg1)
+	_sock = wrapSocket(externglib.Take(unsafe.Pointer(arg1)))
+	_status = uint(arg2)
 
-	fn := v.(SocketCallback)
-	fn(sock, status)
+	fn(_sock, _status)
 }
 
 // SocketOverrider contains methods that are overridable.
-//
-// As of right now, interface overriding and subclassing is not supported
-// yet, so the interface currently has no use.
 type SocketOverrider interface {
 	Disconnected()
 	// The function takes the following parameters:
@@ -157,6 +172,70 @@ var (
 	_ externglib.Objector = (*Socket)(nil)
 )
 
+func classInitSocketter(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+	goval := gbox.Get(uintptr(data))
+	pclass := (*C.SoupSocketClass)(unsafe.Pointer(gclassPtr))
+	// gclass := (*C.GTypeClass)(unsafe.Pointer(gclassPtr))
+	// pclass := (*C.SoupSocketClass)(unsafe.Pointer(C.g_type_class_peek_parent(gclass)))
+
+	if _, ok := goval.(interface{ Disconnected() }); ok {
+		pclass.disconnected = (*[0]byte)(C._gotk4_soup2_SocketClass_disconnected)
+	}
+
+	if _, ok := goval.(interface{ NewConnection(newSock *Socket) }); ok {
+		pclass.new_connection = (*[0]byte)(C._gotk4_soup2_SocketClass_new_connection)
+	}
+
+	if _, ok := goval.(interface{ Readable() }); ok {
+		pclass.readable = (*[0]byte)(C._gotk4_soup2_SocketClass_readable)
+	}
+
+	if _, ok := goval.(interface{ Writable() }); ok {
+		pclass.writable = (*[0]byte)(C._gotk4_soup2_SocketClass_writable)
+	}
+}
+
+//export _gotk4_soup2_SocketClass_disconnected
+func _gotk4_soup2_SocketClass_disconnected(arg0 *C.SoupSocket) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ Disconnected() })
+
+	iface.Disconnected()
+}
+
+//export _gotk4_soup2_SocketClass_new_connection
+func _gotk4_soup2_SocketClass_new_connection(arg0 *C.SoupSocket, arg1 *C.SoupSocket) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ NewConnection(newSock *Socket) })
+
+	var _newSock *Socket // out
+
+	_newSock = wrapSocket(externglib.Take(unsafe.Pointer(arg1)))
+
+	iface.NewConnection(_newSock)
+}
+
+//export _gotk4_soup2_SocketClass_readable
+func _gotk4_soup2_SocketClass_readable(arg0 *C.SoupSocket) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ Readable() })
+
+	iface.Readable()
+}
+
+//export _gotk4_soup2_SocketClass_writable
+func _gotk4_soup2_SocketClass_writable(arg0 *C.SoupSocket) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ Writable() })
+
+	iface.Writable()
+}
+
 func wrapSocket(obj *externglib.Object) *Socket {
 	return &Socket{
 		Object: obj,
@@ -166,41 +245,147 @@ func wrapSocket(obj *externglib.Object) *Socket {
 	}
 }
 
-func marshalSocketter(p uintptr) (interface{}, error) {
+func marshalSocket(p uintptr) (interface{}, error) {
 	return wrapSocket(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// ConnectDisconnected: emitted when the socket is disconnected, for whatever
+//export _gotk4_soup2_Socket_ConnectDisconnected
+func _gotk4_soup2_Socket_ConnectDisconnected(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
+}
+
+// ConnectDisconnected is emitted when the socket is disconnected, for whatever
 // reason.
 func (sock *Socket) ConnectDisconnected(f func()) externglib.SignalHandle {
-	return sock.Connect("disconnected", f)
+	return externglib.ConnectGeneratedClosure(sock, "disconnected", false, unsafe.Pointer(C._gotk4_soup2_Socket_ConnectDisconnected), f)
 }
 
-// ConnectEvent: emitted when a network-related event occurs. See Client::event
-// for more details.
+//export _gotk4_soup2_Socket_ConnectEvent
+func _gotk4_soup2_Socket_ConnectEvent(arg0 C.gpointer, arg1 C.GSocketClientEvent, arg2 *C.GIOStream, arg3 C.guintptr) {
+	var f func(event gio.SocketClientEvent, connection gio.IOStreamer)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(event gio.SocketClientEvent, connection gio.IOStreamer))
+	}
+
+	var _event gio.SocketClientEvent // out
+	var _connection gio.IOStreamer   // out
+
+	_event = gio.SocketClientEvent(arg1)
+	{
+		objptr := unsafe.Pointer(arg2)
+		if objptr == nil {
+			panic("object of type gio.IOStreamer is nil")
+		}
+
+		object := externglib.Take(objptr)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gio.IOStreamer)
+			return ok
+		})
+		rv, ok := casted.(gio.IOStreamer)
+		if !ok {
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.IOStreamer")
+		}
+		_connection = rv
+	}
+
+	f(_event, _connection)
+}
+
+// ConnectEvent is emitted when a network-related event occurs. See
+// Client::event for more details.
 func (sock *Socket) ConnectEvent(f func(event gio.SocketClientEvent, connection gio.IOStreamer)) externglib.SignalHandle {
-	return sock.Connect("event", f)
+	return externglib.ConnectGeneratedClosure(sock, "event", false, unsafe.Pointer(C._gotk4_soup2_Socket_ConnectEvent), f)
 }
 
-// ConnectNewConnection: emitted when a listening socket (set up with
+//export _gotk4_soup2_Socket_ConnectNewConnection
+func _gotk4_soup2_Socket_ConnectNewConnection(arg0 C.gpointer, arg1 *C.SoupSocket, arg2 C.guintptr) {
+	var f func(new *Socket)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(new *Socket))
+	}
+
+	var _new *Socket // out
+
+	_new = wrapSocket(externglib.Take(unsafe.Pointer(arg1)))
+
+	f(_new)
+}
+
+// ConnectNewConnection is emitted when a listening socket (set up with
 // soup_socket_listen()) receives a new connection.
 //
 // You must ref the new if you want to keep it; otherwise it will be destroyed
 // after the signal is emitted.
-func (sock *Socket) ConnectNewConnection(f func(new Socket)) externglib.SignalHandle {
-	return sock.Connect("new-connection", f)
+func (sock *Socket) ConnectNewConnection(f func(new *Socket)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(sock, "new-connection", false, unsafe.Pointer(C._gotk4_soup2_Socket_ConnectNewConnection), f)
 }
 
-// ConnectReadable: emitted when an async socket is readable. See
+//export _gotk4_soup2_Socket_ConnectReadable
+func _gotk4_soup2_Socket_ConnectReadable(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
+}
+
+// ConnectReadable is emitted when an async socket is readable. See
 // soup_socket_read(), soup_socket_read_until() and Socket:non-blocking.
 func (sock *Socket) ConnectReadable(f func()) externglib.SignalHandle {
-	return sock.Connect("readable", f)
+	return externglib.ConnectGeneratedClosure(sock, "readable", false, unsafe.Pointer(C._gotk4_soup2_Socket_ConnectReadable), f)
 }
 
-// ConnectWritable: emitted when an async socket is writable. See
+//export _gotk4_soup2_Socket_ConnectWritable
+func _gotk4_soup2_Socket_ConnectWritable(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
+}
+
+// ConnectWritable is emitted when an async socket is writable. See
 // soup_socket_write() and Socket:non-blocking.
 func (sock *Socket) ConnectWritable(f func()) externglib.SignalHandle {
-	return sock.Connect("writable", f)
+	return externglib.ConnectGeneratedClosure(sock, "writable", false, unsafe.Pointer(C._gotk4_soup2_Socket_ConnectWritable), f)
 }
 
 // ConnectAsync begins asynchronously connecting to sock's remote address. The
@@ -221,7 +406,7 @@ func (sock *Socket) ConnectAsync(ctx context.Context, callback SocketCallback) {
 	var _arg2 C.SoupSocketCallback // out
 	var _arg3 C.gpointer
 
-	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
+	_arg0 = (*C.SoupSocket)(unsafe.Pointer(externglib.InternObject(sock).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -254,7 +439,7 @@ func (sock *Socket) ConnectSync(ctx context.Context) uint {
 	var _arg1 *C.GCancellable // out
 	var _cret C.guint         // in
 
-	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
+	_arg0 = (*C.SoupSocket)(unsafe.Pointer(externglib.InternObject(sock).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -277,7 +462,7 @@ func (sock *Socket) ConnectSync(ctx context.Context) uint {
 func (sock *Socket) Disconnect() {
 	var _arg0 *C.SoupSocket // out
 
-	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
+	_arg0 = (*C.SoupSocket)(unsafe.Pointer(externglib.InternObject(sock).Native()))
 
 	C.soup_socket_disconnect(_arg0)
 	runtime.KeepAlive(sock)
@@ -295,7 +480,7 @@ func (sock *Socket) Fd() int {
 	var _arg0 *C.SoupSocket // out
 	var _cret C.int         // in
 
-	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
+	_arg0 = (*C.SoupSocket)(unsafe.Pointer(externglib.InternObject(sock).Native()))
 
 	_cret = C.soup_socket_get_fd(_arg0)
 	runtime.KeepAlive(sock)
@@ -320,7 +505,7 @@ func (sock *Socket) LocalAddress() *Address {
 	var _arg0 *C.SoupSocket  // out
 	var _cret *C.SoupAddress // in
 
-	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
+	_arg0 = (*C.SoupSocket)(unsafe.Pointer(externglib.InternObject(sock).Native()))
 
 	_cret = C.soup_socket_get_local_address(_arg0)
 	runtime.KeepAlive(sock)
@@ -345,7 +530,7 @@ func (sock *Socket) RemoteAddress() *Address {
 	var _arg0 *C.SoupSocket  // out
 	var _cret *C.SoupAddress // in
 
-	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
+	_arg0 = (*C.SoupSocket)(unsafe.Pointer(externglib.InternObject(sock).Native()))
 
 	_cret = C.soup_socket_get_remote_address(_arg0)
 	runtime.KeepAlive(sock)
@@ -367,7 +552,7 @@ func (sock *Socket) IsConnected() bool {
 	var _arg0 *C.SoupSocket // out
 	var _cret C.gboolean    // in
 
-	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
+	_arg0 = (*C.SoupSocket)(unsafe.Pointer(externglib.InternObject(sock).Native()))
 
 	_cret = C.soup_socket_is_connected(_arg0)
 	runtime.KeepAlive(sock)
@@ -391,7 +576,7 @@ func (sock *Socket) IsSSL() bool {
 	var _arg0 *C.SoupSocket // out
 	var _cret C.gboolean    // in
 
-	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
+	_arg0 = (*C.SoupSocket)(unsafe.Pointer(externglib.InternObject(sock).Native()))
 
 	_cret = C.soup_socket_is_ssl(_arg0)
 	runtime.KeepAlive(sock)
@@ -416,7 +601,7 @@ func (sock *Socket) Listen() bool {
 	var _arg0 *C.SoupSocket // out
 	var _cret C.gboolean    // in
 
-	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
+	_arg0 = (*C.SoupSocket)(unsafe.Pointer(externglib.InternObject(sock).Native()))
 
 	_cret = C.soup_socket_listen(_arg0)
 	runtime.KeepAlive(sock)
@@ -462,7 +647,7 @@ func (sock *Socket) Read(ctx context.Context, buffer []byte) (uint, SocketIOStat
 	var _cret C.SoupSocketIOStatus // in
 	var _cerr *C.GError            // in
 
-	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
+	_arg0 = (*C.SoupSocket)(unsafe.Pointer(externglib.InternObject(sock).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -509,7 +694,7 @@ func (sock *Socket) StartProxySsl(ctx context.Context, sslHost string) bool {
 	var _arg1 *C.char         // out
 	var _cret C.gboolean      // in
 
-	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
+	_arg0 = (*C.SoupSocket)(unsafe.Pointer(externglib.InternObject(sock).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -547,7 +732,7 @@ func (sock *Socket) StartSSL(ctx context.Context) bool {
 	var _arg1 *C.GCancellable // out
 	var _cret C.gboolean      // in
 
-	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
+	_arg0 = (*C.SoupSocket)(unsafe.Pointer(externglib.InternObject(sock).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -600,7 +785,7 @@ func (sock *Socket) Write(ctx context.Context, buffer []byte) (uint, SocketIOSta
 	var _cret C.SoupSocketIOStatus // in
 	var _cerr *C.GError            // in
 
-	_arg0 = (*C.SoupSocket)(unsafe.Pointer(sock.Native()))
+	_arg0 = (*C.SoupSocket)(unsafe.Pointer(externglib.InternObject(sock).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)

@@ -14,15 +14,22 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-cookie-jar-db.go.
+var GTypeCookieJarDB = externglib.Type(C.soup_cookie_jar_db_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_cookie_jar_db_get_type()), F: marshalCookieJarDBer},
+		{T: GTypeCookieJarDB, F: marshalCookieJarDB},
 	})
 }
 
 // COOKIE_JAR_DB_FILENAME alias for the CookieJarDB:filename property. (The
 // cookie-storage filename.).
 const COOKIE_JAR_DB_FILENAME = "filename"
+
+// CookieJarDBOverrider contains methods that are overridable.
+type CookieJarDBOverrider interface {
+}
 
 type CookieJarDB struct {
 	_ [0]func() // equal guard
@@ -32,6 +39,14 @@ type CookieJarDB struct {
 var (
 	_ externglib.Objector = (*CookieJarDB)(nil)
 )
+
+func classInitCookieJarDBer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
 
 func wrapCookieJarDB(obj *externglib.Object) *CookieJarDB {
 	return &CookieJarDB{
@@ -44,7 +59,7 @@ func wrapCookieJarDB(obj *externglib.Object) *CookieJarDB {
 	}
 }
 
-func marshalCookieJarDBer(p uintptr) (interface{}, error) {
+func marshalCookieJarDB(p uintptr) (interface{}, error) {
 	return wrapCookieJarDB(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 

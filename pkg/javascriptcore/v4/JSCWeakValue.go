@@ -12,12 +12,20 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <jsc/jsc.h>
+// extern void _gotk4_javascriptcore4_WeakValue_ConnectCleared(gpointer, guintptr);
 import "C"
+
+// glib.Type values for JSCWeakValue.go.
+var GTypeWeakValue = externglib.Type(C.jsc_weak_value_get_type())
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.jsc_weak_value_get_type()), F: marshalWeakValueer},
+		{T: GTypeWeakValue, F: marshalWeakValue},
 	})
+}
+
+// WeakValueOverrider contains methods that are overridable.
+type WeakValueOverrider interface {
 }
 
 type WeakValue struct {
@@ -29,20 +37,44 @@ var (
 	_ externglib.Objector = (*WeakValue)(nil)
 )
 
+func classInitWeakValueer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapWeakValue(obj *externglib.Object) *WeakValue {
 	return &WeakValue{
 		Object: obj,
 	}
 }
 
-func marshalWeakValueer(p uintptr) (interface{}, error) {
+func marshalWeakValue(p uintptr) (interface{}, error) {
 	return wrapWeakValue(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+//export _gotk4_javascriptcore4_WeakValue_ConnectCleared
+func _gotk4_javascriptcore4_WeakValue_ConnectCleared(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
 }
 
 // ConnectCleared: this signal is emitted when the JavaScript value is
 // destroyed.
 func (weakValue *WeakValue) ConnectCleared(f func()) externglib.SignalHandle {
-	return weakValue.Connect("cleared", f)
+	return externglib.ConnectGeneratedClosure(weakValue, "cleared", false, unsafe.Pointer(C._gotk4_javascriptcore4_WeakValue_ConnectCleared), f)
 }
 
 // NewWeakValue: create a new CWeakValue for the JavaScript value referenced by
@@ -60,7 +92,7 @@ func NewWeakValue(value *Value) *WeakValue {
 	var _arg1 *C.JSCValue     // out
 	var _cret *C.JSCWeakValue // in
 
-	_arg1 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg1 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	_cret = C.jsc_weak_value_new(_arg1)
 	runtime.KeepAlive(value)
@@ -82,7 +114,7 @@ func (weakValue *WeakValue) Value() *Value {
 	var _arg0 *C.JSCWeakValue // out
 	var _cret *C.JSCValue     // in
 
-	_arg0 = (*C.JSCWeakValue)(unsafe.Pointer(weakValue.Native()))
+	_arg0 = (*C.JSCWeakValue)(unsafe.Pointer(externglib.InternObject(weakValue).Native()))
 
 	_cret = C.jsc_weak_value_get_value(_arg0)
 	runtime.KeepAlive(weakValue)

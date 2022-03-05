@@ -13,10 +13,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitNotificationPermissionRequest.go.
+var GTypeNotificationPermissionRequest = externglib.Type(C.webkit_notification_permission_request_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_notification_permission_request_get_type()), F: marshalNotificationPermissionRequester},
+		{T: GTypeNotificationPermissionRequest, F: marshalNotificationPermissionRequest},
 	})
+}
+
+// NotificationPermissionRequestOverrider contains methods that are overridable.
+type NotificationPermissionRequestOverrider interface {
 }
 
 type NotificationPermissionRequest struct {
@@ -30,6 +37,14 @@ var (
 	_ externglib.Objector = (*NotificationPermissionRequest)(nil)
 )
 
+func classInitNotificationPermissionRequester(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapNotificationPermissionRequest(obj *externglib.Object) *NotificationPermissionRequest {
 	return &NotificationPermissionRequest{
 		Object: obj,
@@ -39,6 +54,6 @@ func wrapNotificationPermissionRequest(obj *externglib.Object) *NotificationPerm
 	}
 }
 
-func marshalNotificationPermissionRequester(p uintptr) (interface{}, error) {
+func marshalNotificationPermissionRequest(p uintptr) (interface{}, error) {
 	return wrapNotificationPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }

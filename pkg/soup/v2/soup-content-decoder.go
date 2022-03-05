@@ -13,10 +13,17 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-content-decoder.go.
+var GTypeContentDecoder = externglib.Type(C.soup_content_decoder_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_content_decoder_get_type()), F: marshalContentDecoderer},
+		{T: GTypeContentDecoder, F: marshalContentDecoder},
 	})
+}
+
+// ContentDecoderOverrider contains methods that are overridable.
+type ContentDecoderOverrider interface {
 }
 
 type ContentDecoder struct {
@@ -30,6 +37,14 @@ var (
 	_ externglib.Objector = (*ContentDecoder)(nil)
 )
 
+func classInitContentDecoderer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapContentDecoder(obj *externglib.Object) *ContentDecoder {
 	return &ContentDecoder{
 		Object: obj,
@@ -39,6 +54,6 @@ func wrapContentDecoder(obj *externglib.Object) *ContentDecoder {
 	}
 }
 
-func marshalContentDecoderer(p uintptr) (interface{}, error) {
+func marshalContentDecoder(p uintptr) (interface{}, error) {
 	return wrapContentDecoder(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }

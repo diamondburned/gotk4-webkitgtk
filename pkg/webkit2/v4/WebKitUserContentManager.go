@@ -13,12 +13,20 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
+// extern void _gotk4_webkit24_UserContentManager_ConnectScriptMessageReceived(gpointer, WebKitJavascriptResult*, guintptr);
 import "C"
+
+// glib.Type values for WebKitUserContentManager.go.
+var GTypeUserContentManager = externglib.Type(C.webkit_user_content_manager_get_type())
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_user_content_manager_get_type()), F: marshalUserContentManagerer},
+		{T: GTypeUserContentManager, F: marshalUserContentManager},
 	})
+}
+
+// UserContentManagerOverrider contains methods that are overridable.
+type UserContentManagerOverrider interface {
 }
 
 type UserContentManager struct {
@@ -30,14 +38,49 @@ var (
 	_ externglib.Objector = (*UserContentManager)(nil)
 )
 
+func classInitUserContentManagerer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapUserContentManager(obj *externglib.Object) *UserContentManager {
 	return &UserContentManager{
 		Object: obj,
 	}
 }
 
-func marshalUserContentManagerer(p uintptr) (interface{}, error) {
+func marshalUserContentManager(p uintptr) (interface{}, error) {
 	return wrapUserContentManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+//export _gotk4_webkit24_UserContentManager_ConnectScriptMessageReceived
+func _gotk4_webkit24_UserContentManager_ConnectScriptMessageReceived(arg0 C.gpointer, arg1 *C.WebKitJavascriptResult, arg2 C.guintptr) {
+	var f func(jsResult *JavascriptResult)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(jsResult *JavascriptResult))
+	}
+
+	var _jsResult *JavascriptResult // out
+
+	_jsResult = (*JavascriptResult)(gextras.NewStructNative(unsafe.Pointer(arg1)))
+	C.webkit_javascript_result_ref(arg1)
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_jsResult)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.webkit_javascript_result_unref((*C.WebKitJavascriptResult)(intern.C))
+		},
+	)
+
+	f(_jsResult)
 }
 
 // ConnectScriptMessageReceived: this signal is emitted when JavaScript in a web
@@ -46,7 +89,7 @@ func marshalUserContentManagerer(p uintptr) (interface{}, error) {
 // registering <code>&lt;name&gt;</code> using
 // webkit_user_content_manager_register_script_message_handler().
 func (manager *UserContentManager) ConnectScriptMessageReceived(f func(jsResult *JavascriptResult)) externglib.SignalHandle {
-	return manager.Connect("script-message-received", f)
+	return externglib.ConnectGeneratedClosure(manager, "script-message-received", false, unsafe.Pointer(C._gotk4_webkit24_UserContentManager_ConnectScriptMessageReceived), f)
 }
 
 // NewUserContentManager creates a new user content manager.
@@ -81,7 +124,7 @@ func (manager *UserContentManager) AddFilter(filter *UserContentFilter) {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.WebKitUserContentFilter  // out
 
-	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	_arg1 = (*C.WebKitUserContentFilter)(gextras.StructNative(unsafe.Pointer(filter)))
 
 	C.webkit_user_content_manager_add_filter(_arg0, _arg1)
@@ -100,7 +143,7 @@ func (manager *UserContentManager) AddScript(script *UserScript) {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.WebKitUserScript         // out
 
-	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	_arg1 = (*C.WebKitUserScript)(gextras.StructNative(unsafe.Pointer(script)))
 
 	C.webkit_user_content_manager_add_script(_arg0, _arg1)
@@ -120,7 +163,7 @@ func (manager *UserContentManager) AddStyleSheet(stylesheet *UserStyleSheet) {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.WebKitUserStyleSheet     // out
 
-	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	_arg1 = (*C.WebKitUserStyleSheet)(gextras.StructNative(unsafe.Pointer(stylesheet)))
 
 	C.webkit_user_content_manager_add_style_sheet(_arg0, _arg1)
@@ -161,7 +204,7 @@ func (manager *UserContentManager) RegisterScriptMessageHandler(name string) boo
 	var _arg1 *C.gchar                    // out
 	var _cret C.gboolean                  // in
 
-	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -202,7 +245,7 @@ func (manager *UserContentManager) RegisterScriptMessageHandlerInWorld(name, wor
 	var _arg2 *C.gchar                    // out
 	var _cret C.gboolean                  // in
 
-	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(worldName)))
@@ -227,7 +270,7 @@ func (manager *UserContentManager) RegisterScriptMessageHandlerInWorld(name, wor
 func (manager *UserContentManager) RemoveAllFilters() {
 	var _arg0 *C.WebKitUserContentManager // out
 
-	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	C.webkit_user_content_manager_remove_all_filters(_arg0)
 	runtime.KeepAlive(manager)
@@ -240,7 +283,7 @@ func (manager *UserContentManager) RemoveAllFilters() {
 func (manager *UserContentManager) RemoveAllScripts() {
 	var _arg0 *C.WebKitUserContentManager // out
 
-	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	C.webkit_user_content_manager_remove_all_scripts(_arg0)
 	runtime.KeepAlive(manager)
@@ -251,7 +294,7 @@ func (manager *UserContentManager) RemoveAllScripts() {
 func (manager *UserContentManager) RemoveAllStyleSheets() {
 	var _arg0 *C.WebKitUserContentManager // out
 
-	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	C.webkit_user_content_manager_remove_all_style_sheets(_arg0)
 	runtime.KeepAlive(manager)
@@ -269,7 +312,7 @@ func (manager *UserContentManager) RemoveFilter(filter *UserContentFilter) {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.WebKitUserContentFilter  // out
 
-	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	_arg1 = (*C.WebKitUserContentFilter)(gextras.StructNative(unsafe.Pointer(filter)))
 
 	C.webkit_user_content_manager_remove_filter(_arg0, _arg1)
@@ -289,7 +332,7 @@ func (manager *UserContentManager) RemoveFilterByID(filterId string) {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.char                     // out
 
-	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(filterId)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -310,7 +353,7 @@ func (manager *UserContentManager) RemoveScript(script *UserScript) {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.WebKitUserScript         // out
 
-	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	_arg1 = (*C.WebKitUserScript)(gextras.StructNative(unsafe.Pointer(script)))
 
 	C.webkit_user_content_manager_remove_script(_arg0, _arg1)
@@ -331,7 +374,7 @@ func (manager *UserContentManager) RemoveStyleSheet(stylesheet *UserStyleSheet) 
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.WebKitUserStyleSheet     // out
 
-	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	_arg1 = (*C.WebKitUserStyleSheet)(gextras.StructNative(unsafe.Pointer(stylesheet)))
 
 	C.webkit_user_content_manager_remove_style_sheet(_arg0, _arg1)
@@ -357,7 +400,7 @@ func (manager *UserContentManager) UnregisterScriptMessageHandler(name string) {
 	var _arg0 *C.WebKitUserContentManager // out
 	var _arg1 *C.gchar                    // out
 
-	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -387,7 +430,7 @@ func (manager *UserContentManager) UnregisterScriptMessageHandlerInWorld(name, w
 	var _arg1 *C.gchar                    // out
 	var _arg2 *C.gchar                    // out
 
-	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.WebKitUserContentManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(worldName)))

@@ -19,13 +19,19 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
-// void _gotk4_soup2_AddressCallback(SoupAddress*, guint, gpointer);
+// extern void _gotk4_soup2_AddressCallback(SoupAddress*, guint, gpointer);
 import "C"
+
+// glib.Type values for soup-address.go.
+var (
+	GTypeAddressFamily = externglib.Type(C.soup_address_family_get_type())
+	GTypeAddress       = externglib.Type(C.soup_address_get_type())
+)
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_address_family_get_type()), F: marshalAddressFamily},
-		{T: externglib.Type(C.soup_address_get_type()), F: marshalAddresser},
+		{T: GTypeAddressFamily, F: marshalAddressFamily},
+		{T: GTypeAddress, F: marshalAddress},
 	})
 }
 
@@ -91,20 +97,27 @@ func (a AddressFamily) String() string {
 type AddressCallback func(addr *Address, status uint)
 
 //export _gotk4_soup2_AddressCallback
-func _gotk4_soup2_AddressCallback(arg0 *C.SoupAddress, arg1 C.guint, arg2 C.gpointer) {
-	v := gbox.Get(uintptr(arg2))
-	if v == nil {
-		panic(`callback not found`)
+func _gotk4_soup2_AddressCallback(arg1 *C.SoupAddress, arg2 C.guint, arg3 C.gpointer) {
+	var fn AddressCallback
+	{
+		v := gbox.Get(uintptr(arg3))
+		if v == nil {
+			panic(`callback not found`)
+		}
+		fn = v.(AddressCallback)
 	}
 
-	var addr *Address // out
-	var status uint   // out
+	var _addr *Address // out
+	var _status uint   // out
 
-	addr = wrapAddress(externglib.Take(unsafe.Pointer(arg0)))
-	status = uint(arg1)
+	_addr = wrapAddress(externglib.Take(unsafe.Pointer(arg1)))
+	_status = uint(arg2)
 
-	fn := v.(AddressCallback)
-	fn(addr, status)
+	fn(_addr, _status)
+}
+
+// AddressOverrider contains methods that are overridable.
+type AddressOverrider interface {
 }
 
 type Address struct {
@@ -118,6 +131,14 @@ var (
 	_ externglib.Objector = (*Address)(nil)
 )
 
+func classInitAddresser(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapAddress(obj *externglib.Object) *Address {
 	return &Address{
 		Object: obj,
@@ -127,7 +148,7 @@ func wrapAddress(obj *externglib.Object) *Address {
 	}
 }
 
-func marshalAddresser(p uintptr) (interface{}, error) {
+func marshalAddress(p uintptr) (interface{}, error) {
 	return wrapAddress(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -223,8 +244,8 @@ func (addr1 *Address) EqualByIP(addr2 *Address) bool {
 	var _arg1 C.gconstpointer // out
 	var _cret C.gboolean      // in
 
-	_arg0 = C.gconstpointer(unsafe.Pointer(addr1.Native()))
-	_arg1 = C.gconstpointer(unsafe.Pointer(addr2.Native()))
+	_arg0 = C.gconstpointer(unsafe.Pointer(externglib.InternObject(addr1).Native()))
+	_arg1 = C.gconstpointer(unsafe.Pointer(externglib.InternObject(addr2).Native()))
 
 	_cret = C.soup_address_equal_by_ip(_arg0, _arg1)
 	runtime.KeepAlive(addr1)
@@ -273,8 +294,8 @@ func (addr1 *Address) EqualByName(addr2 *Address) bool {
 	var _arg1 C.gconstpointer // out
 	var _cret C.gboolean      // in
 
-	_arg0 = C.gconstpointer(unsafe.Pointer(addr1.Native()))
-	_arg1 = C.gconstpointer(unsafe.Pointer(addr2.Native()))
+	_arg0 = C.gconstpointer(unsafe.Pointer(externglib.InternObject(addr1).Native()))
+	_arg1 = C.gconstpointer(unsafe.Pointer(externglib.InternObject(addr2).Native()))
 
 	_cret = C.soup_address_equal_by_name(_arg0, _arg1)
 	runtime.KeepAlive(addr1)
@@ -300,7 +321,7 @@ func (addr *Address) Gsockaddr() gio.SocketAddresser {
 	var _arg0 *C.SoupAddress    // out
 	var _cret *C.GSocketAddress // in
 
-	_arg0 = (*C.SoupAddress)(unsafe.Pointer(addr.Native()))
+	_arg0 = (*C.SoupAddress)(unsafe.Pointer(externglib.InternObject(addr).Native()))
 
 	_cret = C.soup_address_get_gsockaddr(_arg0)
 	runtime.KeepAlive(addr)
@@ -343,7 +364,7 @@ func (addr *Address) Name() string {
 	var _arg0 *C.SoupAddress // out
 	var _cret *C.char        // in
 
-	_arg0 = (*C.SoupAddress)(unsafe.Pointer(addr.Native()))
+	_arg0 = (*C.SoupAddress)(unsafe.Pointer(externglib.InternObject(addr).Native()))
 
 	_cret = C.soup_address_get_name(_arg0)
 	runtime.KeepAlive(addr)
@@ -373,7 +394,7 @@ func (addr *Address) Physical() string {
 	var _arg0 *C.SoupAddress // out
 	var _cret *C.char        // in
 
-	_arg0 = (*C.SoupAddress)(unsafe.Pointer(addr.Native()))
+	_arg0 = (*C.SoupAddress)(unsafe.Pointer(externglib.InternObject(addr).Native()))
 
 	_cret = C.soup_address_get_physical(_arg0)
 	runtime.KeepAlive(addr)
@@ -397,7 +418,7 @@ func (addr *Address) Port() uint {
 	var _arg0 *C.SoupAddress // out
 	var _cret C.guint        // in
 
-	_arg0 = (*C.SoupAddress)(unsafe.Pointer(addr.Native()))
+	_arg0 = (*C.SoupAddress)(unsafe.Pointer(externglib.InternObject(addr).Native()))
 
 	_cret = C.soup_address_get_port(_arg0)
 	runtime.KeepAlive(addr)
@@ -420,7 +441,7 @@ func (addr *Address) HashByIP() uint {
 	var _arg0 C.gconstpointer // out
 	var _cret C.guint         // in
 
-	_arg0 = C.gconstpointer(unsafe.Pointer(addr.Native()))
+	_arg0 = C.gconstpointer(unsafe.Pointer(externglib.InternObject(addr).Native()))
 
 	_cret = C.soup_address_hash_by_ip(_arg0)
 	runtime.KeepAlive(addr)
@@ -443,7 +464,7 @@ func (addr *Address) HashByName() uint {
 	var _arg0 C.gconstpointer // out
 	var _cret C.guint         // in
 
-	_arg0 = C.gconstpointer(unsafe.Pointer(addr.Native()))
+	_arg0 = C.gconstpointer(unsafe.Pointer(externglib.InternObject(addr).Native()))
 
 	_cret = C.soup_address_hash_by_name(_arg0)
 	runtime.KeepAlive(addr)
@@ -467,7 +488,7 @@ func (addr *Address) IsResolved() bool {
 	var _arg0 *C.SoupAddress // out
 	var _cret C.gboolean     // in
 
-	_arg0 = (*C.SoupAddress)(unsafe.Pointer(addr.Native()))
+	_arg0 = (*C.SoupAddress)(unsafe.Pointer(externglib.InternObject(addr).Native()))
 
 	_cret = C.soup_address_is_resolved(_arg0)
 	runtime.KeepAlive(addr)
@@ -507,7 +528,7 @@ func (addr *Address) ResolveAsync(ctx context.Context, asyncContext *glib.MainCo
 	var _arg3 C.SoupAddressCallback // out
 	var _arg4 C.gpointer
 
-	_arg0 = (*C.SoupAddress)(unsafe.Pointer(addr.Native()))
+	_arg0 = (*C.SoupAddress)(unsafe.Pointer(externglib.InternObject(addr).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -551,7 +572,7 @@ func (addr *Address) ResolveSync(ctx context.Context) uint {
 	var _arg1 *C.GCancellable // out
 	var _cret C.guint         // in
 
-	_arg0 = (*C.SoupAddress)(unsafe.Pointer(addr.Native()))
+	_arg0 = (*C.SoupAddress)(unsafe.Pointer(externglib.InternObject(addr).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)

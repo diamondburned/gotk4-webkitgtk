@@ -13,10 +13,17 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-proxy-resolver-default.go.
+var GTypeProxyResolverDefault = externglib.Type(C.soup_proxy_resolver_default_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_proxy_resolver_default_get_type()), F: marshalProxyResolverDefaulter},
+		{T: GTypeProxyResolverDefault, F: marshalProxyResolverDefault},
 	})
+}
+
+// ProxyResolverDefaultOverrider contains methods that are overridable.
+type ProxyResolverDefaultOverrider interface {
 }
 
 type ProxyResolverDefault struct {
@@ -30,6 +37,14 @@ var (
 	_ externglib.Objector = (*ProxyResolverDefault)(nil)
 )
 
+func classInitProxyResolverDefaulter(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapProxyResolverDefault(obj *externglib.Object) *ProxyResolverDefault {
 	return &ProxyResolverDefault{
 		Object: obj,
@@ -41,6 +56,6 @@ func wrapProxyResolverDefault(obj *externglib.Object) *ProxyResolverDefault {
 	}
 }
 
-func marshalProxyResolverDefaulter(p uintptr) (interface{}, error) {
+func marshalProxyResolverDefault(p uintptr) (interface{}, error) {
 	return wrapProxyResolverDefault(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }

@@ -7,25 +7,30 @@ import (
 	"runtime/cgo"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
+// extern char* _gotk4_soup2_WebsocketExtensionClass_get_request_params(SoupWebsocketExtension*);
+// extern char* _gotk4_soup2_WebsocketExtensionClass_get_response_params(SoupWebsocketExtension*);
+// extern gboolean _gotk4_soup2_WebsocketExtensionClass_configure(SoupWebsocketExtension*, SoupWebsocketConnectionType, GHashTable*, GError**);
 import "C"
+
+// glib.Type values for soup-websocket-extension.go.
+var GTypeWebsocketExtension = externglib.Type(C.soup_websocket_extension_get_type())
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_websocket_extension_get_type()), F: marshalWebsocketExtensioner},
+		{T: GTypeWebsocketExtension, F: marshalWebsocketExtension},
 	})
 }
 
 // WebsocketExtensionOverrider contains methods that are overridable.
-//
-// As of right now, interface overriding and subclassing is not supported
-// yet, so the interface currently has no use.
 type WebsocketExtensionOverrider interface {
 	// Configure configures extension with the given params.
 	//
@@ -76,13 +81,100 @@ type WebsocketExtensioner interface {
 
 var _ WebsocketExtensioner = (*WebsocketExtension)(nil)
 
+func classInitWebsocketExtensioner(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+	goval := gbox.Get(uintptr(data))
+	pclass := (*C.SoupWebsocketExtensionClass)(unsafe.Pointer(gclassPtr))
+	// gclass := (*C.GTypeClass)(unsafe.Pointer(gclassPtr))
+	// pclass := (*C.SoupWebsocketExtensionClass)(unsafe.Pointer(C.g_type_class_peek_parent(gclass)))
+
+	if _, ok := goval.(interface {
+		Configure(connectionType WebsocketConnectionType, params map[cgo.Handle]cgo.Handle) error
+	}); ok {
+		pclass.configure = (*[0]byte)(C._gotk4_soup2_WebsocketExtensionClass_configure)
+	}
+
+	if _, ok := goval.(interface{ RequestParams() string }); ok {
+		pclass.get_request_params = (*[0]byte)(C._gotk4_soup2_WebsocketExtensionClass_get_request_params)
+	}
+
+	if _, ok := goval.(interface{ ResponseParams() string }); ok {
+		pclass.get_response_params = (*[0]byte)(C._gotk4_soup2_WebsocketExtensionClass_get_response_params)
+	}
+}
+
+//export _gotk4_soup2_WebsocketExtensionClass_configure
+func _gotk4_soup2_WebsocketExtensionClass_configure(arg0 *C.SoupWebsocketExtension, arg1 C.SoupWebsocketConnectionType, arg2 *C.GHashTable, _cerr **C.GError) (cret C.gboolean) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface {
+		Configure(connectionType WebsocketConnectionType, params map[cgo.Handle]cgo.Handle) error
+	})
+
+	var _connectionType WebsocketConnectionType // out
+	var _params map[cgo.Handle]cgo.Handle       // out
+
+	_connectionType = WebsocketConnectionType(arg1)
+	if arg2 != nil {
+		_params = make(map[cgo.Handle]cgo.Handle, gextras.HashTableSize(unsafe.Pointer(arg2)))
+		gextras.MoveHashTable(unsafe.Pointer(arg2), false, func(k, v unsafe.Pointer) {
+			ksrc := *(**C.gpointer)(k)
+			vsrc := *(**C.gpointer)(v)
+			var kdst cgo.Handle // out
+			var vdst cgo.Handle // out
+			kdst = (cgo.Handle)(unsafe.Pointer(ksrc))
+			vdst = (cgo.Handle)(unsafe.Pointer(vsrc))
+			_params[kdst] = vdst
+		})
+	}
+
+	_goerr := iface.Configure(_connectionType, _params)
+
+	if _goerr != nil && _cerr != nil {
+		*_cerr = (*C.GError)(gerror.New(_goerr))
+	}
+
+	return cret
+}
+
+//export _gotk4_soup2_WebsocketExtensionClass_get_request_params
+func _gotk4_soup2_WebsocketExtensionClass_get_request_params(arg0 *C.SoupWebsocketExtension) (cret *C.char) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ RequestParams() string })
+
+	utf8 := iface.RequestParams()
+
+	if utf8 != "" {
+		cret = (*C.char)(unsafe.Pointer(C.CString(utf8)))
+	}
+
+	return cret
+}
+
+//export _gotk4_soup2_WebsocketExtensionClass_get_response_params
+func _gotk4_soup2_WebsocketExtensionClass_get_response_params(arg0 *C.SoupWebsocketExtension) (cret *C.char) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ ResponseParams() string })
+
+	utf8 := iface.ResponseParams()
+
+	if utf8 != "" {
+		cret = (*C.char)(unsafe.Pointer(C.CString(utf8)))
+	}
+
+	return cret
+}
+
 func wrapWebsocketExtension(obj *externglib.Object) *WebsocketExtension {
 	return &WebsocketExtension{
 		Object: obj,
 	}
 }
 
-func marshalWebsocketExtensioner(p uintptr) (interface{}, error) {
+func marshalWebsocketExtension(p uintptr) (interface{}, error) {
 	return wrapWebsocketExtension(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -109,7 +201,7 @@ func (extension *WebsocketExtension) Configure(connectionType WebsocketConnectio
 	var _arg2 *C.GHashTable                 // out
 	var _cerr *C.GError                     // in
 
-	_arg0 = (*C.SoupWebsocketExtension)(unsafe.Pointer(extension.Native()))
+	_arg0 = (*C.SoupWebsocketExtension)(unsafe.Pointer(externglib.InternObject(extension).Native()))
 	_arg1 = C.SoupWebsocketConnectionType(connectionType)
 	if params != nil {
 		_arg2 = C.g_hash_table_new_full(nil, nil, (*[0]byte)(C.free), (*[0]byte)(C.free))
@@ -149,7 +241,7 @@ func (extension *WebsocketExtension) RequestParams() string {
 	var _arg0 *C.SoupWebsocketExtension // out
 	var _cret *C.char                   // in
 
-	_arg0 = (*C.SoupWebsocketExtension)(unsafe.Pointer(extension.Native()))
+	_arg0 = (*C.SoupWebsocketExtension)(unsafe.Pointer(externglib.InternObject(extension).Native()))
 
 	_cret = C.soup_websocket_extension_get_request_params(_arg0)
 	runtime.KeepAlive(extension)
@@ -176,7 +268,7 @@ func (extension *WebsocketExtension) ResponseParams() string {
 	var _arg0 *C.SoupWebsocketExtension // out
 	var _cret *C.char                   // in
 
-	_arg0 = (*C.SoupWebsocketExtension)(unsafe.Pointer(extension.Native()))
+	_arg0 = (*C.SoupWebsocketExtension)(unsafe.Pointer(externglib.InternObject(extension).Native()))
 
 	_cret = C.soup_websocket_extension_get_response_params(_arg0)
 	runtime.KeepAlive(extension)

@@ -14,10 +14,17 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-request-data.go.
+var GTypeRequestData = externglib.Type(C.soup_request_data_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_request_data_get_type()), F: marshalRequestDatar},
+		{T: GTypeRequestData, F: marshalRequestData},
 	})
+}
+
+// RequestDataOverrider contains methods that are overridable.
+type RequestDataOverrider interface {
 }
 
 type RequestData struct {
@@ -28,6 +35,14 @@ type RequestData struct {
 var (
 	_ externglib.Objector = (*RequestData)(nil)
 )
+
+func classInitRequestDatar(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
 
 func wrapRequestData(obj *externglib.Object) *RequestData {
 	return &RequestData{
@@ -40,6 +55,6 @@ func wrapRequestData(obj *externglib.Object) *RequestData {
 	}
 }
 
-func marshalRequestDatar(p uintptr) (interface{}, error) {
+func marshalRequestData(p uintptr) (interface{}, error) {
 	return wrapRequestData(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }

@@ -16,10 +16,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitURIRequest.go.
+var GTypeURIRequest = externglib.Type(C.webkit_uri_request_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_uri_request_get_type()), F: marshalURIRequester},
+		{T: GTypeURIRequest, F: marshalURIRequest},
 	})
+}
+
+// URIRequestOverrider contains methods that are overridable.
+type URIRequestOverrider interface {
 }
 
 type URIRequest struct {
@@ -31,13 +38,21 @@ var (
 	_ externglib.Objector = (*URIRequest)(nil)
 )
 
+func classInitURIRequester(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapURIRequest(obj *externglib.Object) *URIRequest {
 	return &URIRequest{
 		Object: obj,
 	}
 }
 
-func marshalURIRequester(p uintptr) (interface{}, error) {
+func marshalURIRequest(p uintptr) (interface{}, error) {
 	return wrapURIRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -79,7 +94,7 @@ func (request *URIRequest) HTTPHeaders() *soup.MessageHeaders {
 	var _arg0 *C.WebKitURIRequest   // out
 	var _cret *C.SoupMessageHeaders // in
 
-	_arg0 = (*C.WebKitURIRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitURIRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_uri_request_get_http_headers(_arg0)
 	runtime.KeepAlive(request)
@@ -102,7 +117,7 @@ func (request *URIRequest) HTTPMethod() string {
 	var _arg0 *C.WebKitURIRequest // out
 	var _cret *C.gchar            // in
 
-	_arg0 = (*C.WebKitURIRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitURIRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_uri_request_get_http_method(_arg0)
 	runtime.KeepAlive(request)
@@ -122,7 +137,7 @@ func (request *URIRequest) URI() string {
 	var _arg0 *C.WebKitURIRequest // out
 	var _cret *C.gchar            // in
 
-	_arg0 = (*C.WebKitURIRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitURIRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_uri_request_get_uri(_arg0)
 	runtime.KeepAlive(request)
@@ -144,7 +159,7 @@ func (request *URIRequest) SetURI(uri string) {
 	var _arg0 *C.WebKitURIRequest // out
 	var _arg1 *C.gchar            // out
 
-	_arg0 = (*C.WebKitURIRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitURIRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(uri)))
 	defer C.free(unsafe.Pointer(_arg1))
 

@@ -14,10 +14,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitWebsiteDataAccessPermissionRequest.go.
+var GTypeWebsiteDataAccessPermissionRequest = externglib.Type(C.webkit_website_data_access_permission_request_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_website_data_access_permission_request_get_type()), F: marshalWebsiteDataAccessPermissionRequester},
+		{T: GTypeWebsiteDataAccessPermissionRequest, F: marshalWebsiteDataAccessPermissionRequest},
 	})
+}
+
+// WebsiteDataAccessPermissionRequestOverrider contains methods that are overridable.
+type WebsiteDataAccessPermissionRequestOverrider interface {
 }
 
 type WebsiteDataAccessPermissionRequest struct {
@@ -31,6 +38,14 @@ var (
 	_ externglib.Objector = (*WebsiteDataAccessPermissionRequest)(nil)
 )
 
+func classInitWebsiteDataAccessPermissionRequester(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapWebsiteDataAccessPermissionRequest(obj *externglib.Object) *WebsiteDataAccessPermissionRequest {
 	return &WebsiteDataAccessPermissionRequest{
 		Object: obj,
@@ -40,7 +55,7 @@ func wrapWebsiteDataAccessPermissionRequest(obj *externglib.Object) *WebsiteData
 	}
 }
 
-func marshalWebsiteDataAccessPermissionRequester(p uintptr) (interface{}, error) {
+func marshalWebsiteDataAccessPermissionRequest(p uintptr) (interface{}, error) {
 	return wrapWebsiteDataAccessPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -54,7 +69,7 @@ func (request *WebsiteDataAccessPermissionRequest) CurrentDomain() string {
 	var _arg0 *C.WebKitWebsiteDataAccessPermissionRequest // out
 	var _cret *C.char                                     // in
 
-	_arg0 = (*C.WebKitWebsiteDataAccessPermissionRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitWebsiteDataAccessPermissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_website_data_access_permission_request_get_current_domain(_arg0)
 	runtime.KeepAlive(request)
@@ -77,7 +92,7 @@ func (request *WebsiteDataAccessPermissionRequest) RequestingDomain() string {
 	var _arg0 *C.WebKitWebsiteDataAccessPermissionRequest // out
 	var _cret *C.char                                     // in
 
-	_arg0 = (*C.WebKitWebsiteDataAccessPermissionRequest)(unsafe.Pointer(request.Native()))
+	_arg0 = (*C.WebKitWebsiteDataAccessPermissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
 
 	_cret = C.webkit_website_data_access_permission_request_get_requesting_domain(_arg0)
 	runtime.KeepAlive(request)

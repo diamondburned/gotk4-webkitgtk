@@ -12,12 +12,21 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
+// extern void _gotk4_webkit24_Notification_ConnectClicked(gpointer, guintptr);
+// extern void _gotk4_webkit24_Notification_ConnectClosed(gpointer, guintptr);
 import "C"
+
+// glib.Type values for WebKitNotification.go.
+var GTypeNotification = externglib.Type(C.webkit_notification_get_type())
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_notification_get_type()), F: marshalNotificationer},
+		{T: GTypeNotification, F: marshalNotification},
 	})
+}
+
+// NotificationOverrider contains methods that are overridable.
+type NotificationOverrider interface {
 }
 
 type Notification struct {
@@ -29,28 +38,68 @@ var (
 	_ externglib.Objector = (*Notification)(nil)
 )
 
+func classInitNotificationer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapNotification(obj *externglib.Object) *Notification {
 	return &Notification{
 		Object: obj,
 	}
 }
 
-func marshalNotificationer(p uintptr) (interface{}, error) {
+func marshalNotification(p uintptr) (interface{}, error) {
 	return wrapNotification(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// ConnectClicked: emitted when a notification has been clicked. See
-// webkit_notification_clicked().
-func (notification *Notification) ConnectClicked(f func()) externglib.SignalHandle {
-	return notification.Connect("clicked", f)
+//export _gotk4_webkit24_Notification_ConnectClicked
+func _gotk4_webkit24_Notification_ConnectClicked(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
 }
 
-// ConnectClosed: emitted when a notification has been withdrawn.
+// ConnectClicked is emitted when a notification has been clicked. See
+// webkit_notification_clicked().
+func (notification *Notification) ConnectClicked(f func()) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(notification, "clicked", false, unsafe.Pointer(C._gotk4_webkit24_Notification_ConnectClicked), f)
+}
+
+//export _gotk4_webkit24_Notification_ConnectClosed
+func _gotk4_webkit24_Notification_ConnectClosed(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
+}
+
+// ConnectClosed is emitted when a notification has been withdrawn.
 //
 // The default handler will close the notification using libnotify, if built
 // with support for it.
 func (notification *Notification) ConnectClosed(f func()) externglib.SignalHandle {
-	return notification.Connect("closed", f)
+	return externglib.ConnectGeneratedClosure(notification, "closed", false, unsafe.Pointer(C._gotk4_webkit24_Notification_ConnectClosed), f)
 }
 
 // Clicked tells WebKit the notification has been clicked. This will emit the
@@ -58,7 +107,7 @@ func (notification *Notification) ConnectClosed(f func()) externglib.SignalHandl
 func (notification *Notification) Clicked() {
 	var _arg0 *C.WebKitNotification // out
 
-	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(notification.Native()))
+	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(externglib.InternObject(notification).Native()))
 
 	C.webkit_notification_clicked(_arg0)
 	runtime.KeepAlive(notification)
@@ -68,7 +117,7 @@ func (notification *Notification) Clicked() {
 func (notification *Notification) Close() {
 	var _arg0 *C.WebKitNotification // out
 
-	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(notification.Native()))
+	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(externglib.InternObject(notification).Native()))
 
 	C.webkit_notification_close(_arg0)
 	runtime.KeepAlive(notification)
@@ -84,7 +133,7 @@ func (notification *Notification) Body() string {
 	var _arg0 *C.WebKitNotification // out
 	var _cret *C.gchar              // in
 
-	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(notification.Native()))
+	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(externglib.InternObject(notification).Native()))
 
 	_cret = C.webkit_notification_get_body(_arg0)
 	runtime.KeepAlive(notification)
@@ -106,7 +155,7 @@ func (notification *Notification) ID() uint64 {
 	var _arg0 *C.WebKitNotification // out
 	var _cret C.guint64             // in
 
-	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(notification.Native()))
+	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(externglib.InternObject(notification).Native()))
 
 	_cret = C.webkit_notification_get_id(_arg0)
 	runtime.KeepAlive(notification)
@@ -128,7 +177,7 @@ func (notification *Notification) Tag() string {
 	var _arg0 *C.WebKitNotification // out
 	var _cret *C.gchar              // in
 
-	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(notification.Native()))
+	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(externglib.InternObject(notification).Native()))
 
 	_cret = C.webkit_notification_get_tag(_arg0)
 	runtime.KeepAlive(notification)
@@ -152,7 +201,7 @@ func (notification *Notification) Title() string {
 	var _arg0 *C.WebKitNotification // out
 	var _cret *C.gchar              // in
 
-	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(notification.Native()))
+	_arg0 = (*C.WebKitNotification)(unsafe.Pointer(externglib.InternObject(notification).Native()))
 
 	_cret = C.webkit_notification_get_title(_arg0)
 	runtime.KeepAlive(notification)

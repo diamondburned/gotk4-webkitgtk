@@ -17,10 +17,16 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitUserMessage.go.
+var (
+	GTypeUserMessageError = externglib.Type(C.webkit_user_message_error_get_type())
+	GTypeUserMessage      = externglib.Type(C.webkit_user_message_get_type())
+)
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_user_message_error_get_type()), F: marshalUserMessageError},
-		{T: externglib.Type(C.webkit_user_message_get_type()), F: marshalUserMessager},
+		{T: GTypeUserMessageError, F: marshalUserMessageError},
+		{T: GTypeUserMessage, F: marshalUserMessage},
 	})
 }
 
@@ -47,12 +53,24 @@ func (u UserMessageError) String() string {
 	}
 }
 
+// UserMessageOverrider contains methods that are overridable.
+type UserMessageOverrider interface {
+}
+
 type UserMessage struct {
 	_ [0]func() // equal guard
 	externglib.InitiallyUnowned
 }
 
 var ()
+
+func classInitUserMessager(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
 
 func wrapUserMessage(obj *externglib.Object) *UserMessage {
 	return &UserMessage{
@@ -62,7 +80,7 @@ func wrapUserMessage(obj *externglib.Object) *UserMessage {
 	}
 }
 
-func marshalUserMessager(p uintptr) (interface{}, error) {
+func marshalUserMessage(p uintptr) (interface{}, error) {
 	return wrapUserMessage(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -109,7 +127,7 @@ func (message *UserMessage) Name() string {
 	var _arg0 *C.WebKitUserMessage // out
 	var _cret *C.char              // in
 
-	_arg0 = (*C.WebKitUserMessage)(unsafe.Pointer(message.Native()))
+	_arg0 = (*C.WebKitUserMessage)(unsafe.Pointer(externglib.InternObject(message).Native()))
 
 	_cret = C.webkit_user_message_get_name(_arg0)
 	runtime.KeepAlive(message)
@@ -131,7 +149,7 @@ func (message *UserMessage) Parameters() *glib.Variant {
 	var _arg0 *C.WebKitUserMessage // out
 	var _cret *C.GVariant          // in
 
-	_arg0 = (*C.WebKitUserMessage)(unsafe.Pointer(message.Native()))
+	_arg0 = (*C.WebKitUserMessage)(unsafe.Pointer(externglib.InternObject(message).Native()))
 
 	_cret = C.webkit_user_message_get_parameters(_arg0)
 	runtime.KeepAlive(message)
@@ -163,8 +181,8 @@ func (message *UserMessage) SendReply(reply *UserMessage) {
 	var _arg0 *C.WebKitUserMessage // out
 	var _arg1 *C.WebKitUserMessage // out
 
-	_arg0 = (*C.WebKitUserMessage)(unsafe.Pointer(message.Native()))
-	_arg1 = (*C.WebKitUserMessage)(unsafe.Pointer(reply.Native()))
+	_arg0 = (*C.WebKitUserMessage)(unsafe.Pointer(externglib.InternObject(message).Native()))
+	_arg1 = (*C.WebKitUserMessage)(unsafe.Pointer(externglib.InternObject(reply).Native()))
 
 	C.webkit_user_message_send_reply(_arg0, _arg1)
 	runtime.KeepAlive(message)

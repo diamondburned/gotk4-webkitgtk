@@ -14,12 +14,19 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
+// extern WebKitWebView* _gotk4_webkit24_AutomationSession_ConnectCreateWebView(gpointer, guintptr);
 import "C"
+
+// glib.Type values for WebKitAutomationSession.go.
+var (
+	GTypeAutomationBrowsingContextPresentation = externglib.Type(C.webkit_automation_browsing_context_presentation_get_type())
+	GTypeAutomationSession                     = externglib.Type(C.webkit_automation_session_get_type())
+)
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_automation_browsing_context_presentation_get_type()), F: marshalAutomationBrowsingContextPresentation},
-		{T: externglib.Type(C.webkit_automation_session_get_type()), F: marshalAutomationSessioner},
+		{T: GTypeAutomationBrowsingContextPresentation, F: marshalAutomationBrowsingContextPresentation},
+		{T: GTypeAutomationSession, F: marshalAutomationSession},
 	})
 }
 
@@ -50,6 +57,10 @@ func (a AutomationBrowsingContextPresentation) String() string {
 	}
 }
 
+// AutomationSessionOverrider contains methods that are overridable.
+type AutomationSessionOverrider interface {
+}
+
 type AutomationSession struct {
 	_ [0]func() // equal guard
 	*externglib.Object
@@ -59,14 +70,42 @@ var (
 	_ externglib.Objector = (*AutomationSession)(nil)
 )
 
+func classInitAutomationSessioner(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapAutomationSession(obj *externglib.Object) *AutomationSession {
 	return &AutomationSession{
 		Object: obj,
 	}
 }
 
-func marshalAutomationSessioner(p uintptr) (interface{}, error) {
+func marshalAutomationSession(p uintptr) (interface{}, error) {
 	return wrapAutomationSession(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+//export _gotk4_webkit24_AutomationSession_ConnectCreateWebView
+func _gotk4_webkit24_AutomationSession_ConnectCreateWebView(arg0 C.gpointer, arg1 C.guintptr) (cret *C.WebKitWebView) {
+	var f func() (webView *WebView)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func() (webView *WebView))
+	}
+
+	webView := f()
+
+	cret = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+
+	return cret
 }
 
 // ConnectCreateWebView: this signal is emitted when the automation client
@@ -81,8 +120,8 @@ func marshalAutomationSessioner(p uintptr) (interface{}, error) {
 // a new web view added to a new window. When creating a new web view and
 // there's an active browsing context, the new window or tab shouldn't be
 // focused.
-func (session *AutomationSession) ConnectCreateWebView(f func() WebView) externglib.SignalHandle {
-	return session.Connect("create-web-view", f)
+func (session *AutomationSession) ConnectCreateWebView(f func() (webView *WebView)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(session, "create-web-view", false, unsafe.Pointer(C._gotk4_webkit24_AutomationSession_ConnectCreateWebView), f)
 }
 
 // ApplicationInfo: get the KitAutomationSession previously set with
@@ -96,7 +135,7 @@ func (session *AutomationSession) ApplicationInfo() *ApplicationInfo {
 	var _arg0 *C.WebKitAutomationSession // out
 	var _cret *C.WebKitApplicationInfo   // in
 
-	_arg0 = (*C.WebKitAutomationSession)(unsafe.Pointer(session.Native()))
+	_arg0 = (*C.WebKitAutomationSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
 
 	_cret = C.webkit_automation_session_get_application_info(_arg0)
 	runtime.KeepAlive(session)
@@ -125,7 +164,7 @@ func (session *AutomationSession) ID() string {
 	var _arg0 *C.WebKitAutomationSession // out
 	var _cret *C.char                    // in
 
-	_arg0 = (*C.WebKitAutomationSession)(unsafe.Pointer(session.Native()))
+	_arg0 = (*C.WebKitAutomationSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
 
 	_cret = C.webkit_automation_session_get_id(_arg0)
 	runtime.KeepAlive(session)
@@ -154,7 +193,7 @@ func (session *AutomationSession) SetApplicationInfo(info *ApplicationInfo) {
 	var _arg0 *C.WebKitAutomationSession // out
 	var _arg1 *C.WebKitApplicationInfo   // out
 
-	_arg0 = (*C.WebKitAutomationSession)(unsafe.Pointer(session.Native()))
+	_arg0 = (*C.WebKitAutomationSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
 	_arg1 = (*C.WebKitApplicationInfo)(gextras.StructNative(unsafe.Pointer(info)))
 
 	C.webkit_automation_session_set_application_info(_arg0, _arg1)

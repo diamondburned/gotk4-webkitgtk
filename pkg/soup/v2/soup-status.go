@@ -15,9 +15,12 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-status.go.
+var GTypeStatus = externglib.Type(C.soup_status_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_status_get_type()), F: marshalStatus},
+		{T: GTypeStatus, F: marshalStatus},
 	})
 }
 

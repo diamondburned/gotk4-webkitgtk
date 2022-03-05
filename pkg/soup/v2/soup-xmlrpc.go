@@ -18,9 +18,12 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-xmlrpc.go.
+var GTypeXMLRPCFault = externglib.Type(C.soup_xmlrpc_fault_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_xmlrpc_fault_get_type()), F: marshalXMLRPCFault},
+		{T: GTypeXMLRPCFault, F: marshalXMLRPCFault},
 	})
 }
 
@@ -263,7 +266,7 @@ func XmlrpcMessageSetResponse(msg *Message, value *glib.Variant) error {
 	var _arg2 *C.GVariant    // out
 	var _cerr *C.GError      // in
 
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 	_arg2 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(value)))
 
 	C.soup_xmlrpc_message_set_response(_arg1, _arg2, &_cerr)

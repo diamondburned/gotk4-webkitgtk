@@ -15,9 +15,12 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-hsts-policy.go.
+var GTypeHSTSPolicy = externglib.Type(C.soup_hsts_policy_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_hsts_policy_get_type()), F: marshalHSTSPolicy},
+		{T: GTypeHSTSPolicy, F: marshalHSTSPolicy},
 	})
 }
 
@@ -91,7 +94,7 @@ func NewHSTSPolicyFromResponse(msg *Message) *HSTSPolicy {
 	var _arg1 *C.SoupMessage    // out
 	var _cret *C.SoupHSTSPolicy // in
 
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 
 	_cret = C.soup_hsts_policy_new_from_response(_arg1)
 	runtime.KeepAlive(msg)

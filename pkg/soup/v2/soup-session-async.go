@@ -13,10 +13,17 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-session-async.go.
+var GTypeSessionAsync = externglib.Type(C.soup_session_async_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_session_async_get_type()), F: marshalSessionAsyncer},
+		{T: GTypeSessionAsync, F: marshalSessionAsync},
 	})
+}
+
+// SessionAsyncOverrider contains methods that are overridable.
+type SessionAsyncOverrider interface {
 }
 
 type SessionAsync struct {
@@ -28,6 +35,14 @@ var (
 	_ externglib.Objector = (*SessionAsync)(nil)
 )
 
+func classInitSessionAsyncer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapSessionAsync(obj *externglib.Object) *SessionAsync {
 	return &SessionAsync{
 		Session: Session{
@@ -36,7 +51,7 @@ func wrapSessionAsync(obj *externglib.Object) *SessionAsync {
 	}
 }
 
-func marshalSessionAsyncer(p uintptr) (interface{}, error) {
+func marshalSessionAsync(p uintptr) (interface{}, error) {
 	return wrapSessionAsync(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 

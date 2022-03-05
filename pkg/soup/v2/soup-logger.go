@@ -14,15 +14,21 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
-// SoupLoggerLogLevel _gotk4_soup2_LoggerFilter(SoupLogger*, SoupMessage*, gpointer);
+// extern SoupLoggerLogLevel _gotk4_soup2_LoggerFilter(SoupLogger*, SoupMessage*, gpointer);
+// extern void _gotk4_soup2_LoggerPrinter(SoupLogger*, SoupLoggerLogLevel, char, char*, gpointer);
 // extern void callbackDelete(gpointer);
-// void _gotk4_soup2_LoggerPrinter(SoupLogger*, SoupLoggerLogLevel, char, char*, gpointer);
 import "C"
+
+// glib.Type values for soup-logger.go.
+var (
+	GTypeLoggerLogLevel = externglib.Type(C.soup_logger_log_level_get_type())
+	GTypeLogger         = externglib.Type(C.soup_logger_get_type())
+)
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_logger_log_level_get_type()), F: marshalLoggerLogLevel},
-		{T: externglib.Type(C.soup_logger_get_type()), F: marshalLoggerer},
+		{T: GTypeLoggerLogLevel, F: marshalLoggerLogLevel},
+		{T: GTypeLogger, F: marshalLogger},
 	})
 }
 
@@ -75,20 +81,23 @@ func (l LoggerLogLevel) String() string {
 type LoggerFilter func(logger *Logger, msg *Message) (loggerLogLevel LoggerLogLevel)
 
 //export _gotk4_soup2_LoggerFilter
-func _gotk4_soup2_LoggerFilter(arg0 *C.SoupLogger, arg1 *C.SoupMessage, arg2 C.gpointer) (cret C.SoupLoggerLogLevel) {
-	v := gbox.Get(uintptr(arg2))
-	if v == nil {
-		panic(`callback not found`)
+func _gotk4_soup2_LoggerFilter(arg1 *C.SoupLogger, arg2 *C.SoupMessage, arg3 C.gpointer) (cret C.SoupLoggerLogLevel) {
+	var fn LoggerFilter
+	{
+		v := gbox.Get(uintptr(arg3))
+		if v == nil {
+			panic(`callback not found`)
+		}
+		fn = v.(LoggerFilter)
 	}
 
-	var logger *Logger // out
-	var msg *Message   // out
+	var _logger *Logger // out
+	var _msg *Message   // out
 
-	logger = wrapLogger(externglib.Take(unsafe.Pointer(arg0)))
-	msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
+	_logger = wrapLogger(externglib.Take(unsafe.Pointer(arg1)))
+	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg2)))
 
-	fn := v.(LoggerFilter)
-	loggerLogLevel := fn(logger, msg)
+	loggerLogLevel := fn(_logger, _msg)
 
 	cret = C.SoupLoggerLogLevel(loggerLogLevel)
 
@@ -110,24 +119,31 @@ func _gotk4_soup2_LoggerFilter(arg0 *C.SoupLogger, arg1 *C.SoupMessage, arg2 C.g
 type LoggerPrinter func(logger *Logger, level LoggerLogLevel, direction byte, data string)
 
 //export _gotk4_soup2_LoggerPrinter
-func _gotk4_soup2_LoggerPrinter(arg0 *C.SoupLogger, arg1 C.SoupLoggerLogLevel, arg2 C.char, arg3 *C.char, arg4 C.gpointer) {
-	v := gbox.Get(uintptr(arg4))
-	if v == nil {
-		panic(`callback not found`)
+func _gotk4_soup2_LoggerPrinter(arg1 *C.SoupLogger, arg2 C.SoupLoggerLogLevel, arg3 C.char, arg4 *C.char, arg5 C.gpointer) {
+	var fn LoggerPrinter
+	{
+		v := gbox.Get(uintptr(arg5))
+		if v == nil {
+			panic(`callback not found`)
+		}
+		fn = v.(LoggerPrinter)
 	}
 
-	var logger *Logger       // out
-	var level LoggerLogLevel // out
-	var direction byte       // out
-	var data string          // out
+	var _logger *Logger       // out
+	var _level LoggerLogLevel // out
+	var _direction byte       // out
+	var _data string          // out
 
-	logger = wrapLogger(externglib.Take(unsafe.Pointer(arg0)))
-	level = LoggerLogLevel(arg1)
-	direction = byte(arg2)
-	data = C.GoString((*C.gchar)(unsafe.Pointer(arg3)))
+	_logger = wrapLogger(externglib.Take(unsafe.Pointer(arg1)))
+	_level = LoggerLogLevel(arg2)
+	_direction = byte(arg3)
+	_data = C.GoString((*C.gchar)(unsafe.Pointer(arg4)))
 
-	fn := v.(LoggerPrinter)
-	fn(logger, level, direction, data)
+	fn(_logger, _level, _direction, _data)
+}
+
+// LoggerOverrider contains methods that are overridable.
+type LoggerOverrider interface {
 }
 
 type Logger struct {
@@ -141,6 +157,14 @@ var (
 	_ externglib.Objector = (*Logger)(nil)
 )
 
+func classInitLoggerer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapLogger(obj *externglib.Object) *Logger {
 	return &Logger{
 		Object: obj,
@@ -150,7 +174,7 @@ func wrapLogger(obj *externglib.Object) *Logger {
 	}
 }
 
-func marshalLoggerer(p uintptr) (interface{}, error) {
+func marshalLogger(p uintptr) (interface{}, error) {
 	return wrapLogger(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -205,8 +229,8 @@ func (logger *Logger) Attach(session *Session) {
 	var _arg0 *C.SoupLogger  // out
 	var _arg1 *C.SoupSession // out
 
-	_arg0 = (*C.SoupLogger)(unsafe.Pointer(logger.Native()))
-	_arg1 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
+	_arg0 = (*C.SoupLogger)(unsafe.Pointer(externglib.InternObject(logger).Native()))
+	_arg1 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
 
 	C.soup_logger_attach(_arg0, _arg1)
 	runtime.KeepAlive(logger)
@@ -225,8 +249,8 @@ func (logger *Logger) Detach(session *Session) {
 	var _arg0 *C.SoupLogger  // out
 	var _arg1 *C.SoupSession // out
 
-	_arg0 = (*C.SoupLogger)(unsafe.Pointer(logger.Native()))
-	_arg1 = (*C.SoupSession)(unsafe.Pointer(session.Native()))
+	_arg0 = (*C.SoupLogger)(unsafe.Pointer(externglib.InternObject(logger).Native()))
+	_arg1 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
 
 	C.soup_logger_detach(_arg0, _arg1)
 	runtime.KeepAlive(logger)
@@ -246,7 +270,7 @@ func (logger *Logger) SetPrinter(printer LoggerPrinter) {
 	var _arg2 C.gpointer
 	var _arg3 C.GDestroyNotify
 
-	_arg0 = (*C.SoupLogger)(unsafe.Pointer(logger.Native()))
+	_arg0 = (*C.SoupLogger)(unsafe.Pointer(externglib.InternObject(logger).Native()))
 	_arg1 = (*[0]byte)(C._gotk4_soup2_LoggerPrinter)
 	_arg2 = C.gpointer(gbox.Assign(printer))
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
@@ -272,7 +296,7 @@ func (logger *Logger) SetRequestFilter(requestFilter LoggerFilter) {
 	var _arg2 C.gpointer
 	var _arg3 C.GDestroyNotify
 
-	_arg0 = (*C.SoupLogger)(unsafe.Pointer(logger.Native()))
+	_arg0 = (*C.SoupLogger)(unsafe.Pointer(externglib.InternObject(logger).Native()))
 	_arg1 = (*[0]byte)(C._gotk4_soup2_LoggerFilter)
 	_arg2 = C.gpointer(gbox.Assign(requestFilter))
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
@@ -298,7 +322,7 @@ func (logger *Logger) SetResponseFilter(responseFilter LoggerFilter) {
 	var _arg2 C.gpointer
 	var _arg3 C.GDestroyNotify
 
-	_arg0 = (*C.SoupLogger)(unsafe.Pointer(logger.Native()))
+	_arg0 = (*C.SoupLogger)(unsafe.Pointer(externglib.InternObject(logger).Native()))
 	_arg1 = (*[0]byte)(C._gotk4_soup2_LoggerFilter)
 	_arg2 = C.gpointer(gbox.Assign(responseFilter))
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))

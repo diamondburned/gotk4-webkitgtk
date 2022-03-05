@@ -17,13 +17,25 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
-// void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern void _gotk4_webkit24_WebResource_ConnectFailed(gpointer, GError*, guintptr);
+// extern void _gotk4_webkit24_WebResource_ConnectFailedWithTLSErrors(gpointer, GTlsCertificate*, GTlsCertificateFlags, guintptr);
+// extern void _gotk4_webkit24_WebResource_ConnectFinished(gpointer, guintptr);
+// extern void _gotk4_webkit24_WebResource_ConnectReceivedData(gpointer, guint64, guintptr);
+// extern void _gotk4_webkit24_WebResource_ConnectSentRequest(gpointer, WebKitURIRequest*, WebKitURIResponse*, guintptr);
 import "C"
+
+// glib.Type values for WebKitWebResource.go.
+var GTypeWebResource = externglib.Type(C.webkit_web_resource_get_type())
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_web_resource_get_type()), F: marshalWebResourcer},
+		{T: GTypeWebResource, F: marshalWebResource},
 	})
+}
+
+// WebResourceOverrider contains methods that are overridable.
+type WebResourceOverrider interface {
 }
 
 type WebResource struct {
@@ -35,34 +47,164 @@ var (
 	_ externglib.Objector = (*WebResource)(nil)
 )
 
+func classInitWebResourcer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapWebResource(obj *externglib.Object) *WebResource {
 	return &WebResource{
 		Object: obj,
 	}
 }
 
-func marshalWebResourcer(p uintptr) (interface{}, error) {
+func marshalWebResource(p uintptr) (interface{}, error) {
 	return wrapWebResource(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+//export _gotk4_webkit24_WebResource_ConnectFailed
+func _gotk4_webkit24_WebResource_ConnectFailed(arg0 C.gpointer, arg1 *C.GError, arg2 C.guintptr) {
+	var f func(err error)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(err error))
+	}
+
+	var _err error // out
+
+	_err = gerror.Take(unsafe.Pointer(arg1))
+
+	f(_err)
+}
+
+// ConnectFailed: this signal is emitted when an error occurs during the
+// resource load operation.
+func (resource *WebResource) ConnectFailed(f func(err error)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(resource, "failed", false, unsafe.Pointer(C._gotk4_webkit24_WebResource_ConnectFailed), f)
+}
+
+//export _gotk4_webkit24_WebResource_ConnectFailedWithTLSErrors
+func _gotk4_webkit24_WebResource_ConnectFailedWithTLSErrors(arg0 C.gpointer, arg1 *C.GTlsCertificate, arg2 C.GTlsCertificateFlags, arg3 C.guintptr) {
+	var f func(certificate gio.TLSCertificater, errors gio.TLSCertificateFlags)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(certificate gio.TLSCertificater, errors gio.TLSCertificateFlags))
+	}
+
+	var _certificate gio.TLSCertificater // out
+	var _errors gio.TLSCertificateFlags  // out
+
+	{
+		objptr := unsafe.Pointer(arg1)
+		if objptr == nil {
+			panic("object of type gio.TLSCertificater is nil")
+		}
+
+		object := externglib.Take(objptr)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(gio.TLSCertificater)
+			return ok
+		})
+		rv, ok := casted.(gio.TLSCertificater)
+		if !ok {
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.TLSCertificater")
+		}
+		_certificate = rv
+	}
+	_errors = gio.TLSCertificateFlags(arg2)
+
+	f(_certificate, _errors)
 }
 
 // ConnectFailedWithTLSErrors: this signal is emitted when a TLS error occurs
 // during the resource load operation.
 func (resource *WebResource) ConnectFailedWithTLSErrors(f func(certificate gio.TLSCertificater, errors gio.TLSCertificateFlags)) externglib.SignalHandle {
-	return resource.Connect("failed-with-tls-errors", f)
+	return externglib.ConnectGeneratedClosure(resource, "failed-with-tls-errors", false, unsafe.Pointer(C._gotk4_webkit24_WebResource_ConnectFailedWithTLSErrors), f)
+}
+
+//export _gotk4_webkit24_WebResource_ConnectFinished
+func _gotk4_webkit24_WebResource_ConnectFinished(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
 }
 
 // ConnectFinished: this signal is emitted when the resource load finishes
 // successfully or due to an error. In case of errors KitWebResource::failed
 // signal is emitted before this one.
 func (resource *WebResource) ConnectFinished(f func()) externglib.SignalHandle {
-	return resource.Connect("finished", f)
+	return externglib.ConnectGeneratedClosure(resource, "finished", false, unsafe.Pointer(C._gotk4_webkit24_WebResource_ConnectFinished), f)
+}
+
+//export _gotk4_webkit24_WebResource_ConnectReceivedData
+func _gotk4_webkit24_WebResource_ConnectReceivedData(arg0 C.gpointer, arg1 C.guint64, arg2 C.guintptr) {
+	var f func(dataLength uint64)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(dataLength uint64))
+	}
+
+	var _dataLength uint64 // out
+
+	_dataLength = uint64(arg1)
+
+	f(_dataLength)
 }
 
 // ConnectReceivedData: this signal is emitted after response is received, every
 // time new data has been received. It's useful to know the progress of the
 // resource load operation.
 func (resource *WebResource) ConnectReceivedData(f func(dataLength uint64)) externglib.SignalHandle {
-	return resource.Connect("received-data", f)
+	return externglib.ConnectGeneratedClosure(resource, "received-data", false, unsafe.Pointer(C._gotk4_webkit24_WebResource_ConnectReceivedData), f)
+}
+
+//export _gotk4_webkit24_WebResource_ConnectSentRequest
+func _gotk4_webkit24_WebResource_ConnectSentRequest(arg0 C.gpointer, arg1 *C.WebKitURIRequest, arg2 *C.WebKitURIResponse, arg3 C.guintptr) {
+	var f func(request *URIRequest, redirectedResponse *URIResponse)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(request *URIRequest, redirectedResponse *URIResponse))
+	}
+
+	var _request *URIRequest             // out
+	var _redirectedResponse *URIResponse // out
+
+	_request = wrapURIRequest(externglib.Take(unsafe.Pointer(arg1)))
+	_redirectedResponse = wrapURIResponse(externglib.Take(unsafe.Pointer(arg2)))
+
+	f(_request, _redirectedResponse)
 }
 
 // ConnectSentRequest: this signal is emitted when request has been sent to the
@@ -70,8 +212,8 @@ func (resource *WebResource) ConnectReceivedData(f func(dataLength uint64)) exte
 // request argument containing the new request sent to the server due to the
 // redirection and the redirected_response parameter containing the response
 // received by the server for the initial request.
-func (resource *WebResource) ConnectSentRequest(f func(request URIRequest, redirectedResponse URIResponse)) externglib.SignalHandle {
-	return resource.Connect("sent-request", f)
+func (resource *WebResource) ConnectSentRequest(f func(request *URIRequest, redirectedResponse *URIResponse)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(resource, "sent-request", false, unsafe.Pointer(C._gotk4_webkit24_WebResource_ConnectSentRequest), f)
 }
 
 // Data: asynchronously get the raw data for resource.
@@ -90,7 +232,7 @@ func (resource *WebResource) Data(ctx context.Context, callback gio.AsyncReadyCa
 	var _arg2 C.GAsyncReadyCallback // out
 	var _arg3 C.gpointer
 
-	_arg0 = (*C.WebKitWebResource)(unsafe.Pointer(resource.Native()))
+	_arg0 = (*C.WebKitWebResource)(unsafe.Pointer(externglib.InternObject(resource).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -126,8 +268,8 @@ func (resource *WebResource) DataFinish(result gio.AsyncResulter) ([]byte, error
 	var _arg2 C.gsize              // in
 	var _cerr *C.GError            // in
 
-	_arg0 = (*C.WebKitWebResource)(unsafe.Pointer(resource.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.WebKitWebResource)(unsafe.Pointer(externglib.InternObject(resource).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	_cret = C.webkit_web_resource_get_data_finish(_arg0, _arg1, &_arg2, &_cerr)
 	runtime.KeepAlive(resource)
@@ -159,7 +301,7 @@ func (resource *WebResource) Response() *URIResponse {
 	var _arg0 *C.WebKitWebResource // out
 	var _cret *C.WebKitURIResponse // in
 
-	_arg0 = (*C.WebKitWebResource)(unsafe.Pointer(resource.Native()))
+	_arg0 = (*C.WebKitWebResource)(unsafe.Pointer(externglib.InternObject(resource).Native()))
 
 	_cret = C.webkit_web_resource_get_response(_arg0)
 	runtime.KeepAlive(resource)
@@ -196,7 +338,7 @@ func (resource *WebResource) URI() string {
 	var _arg0 *C.WebKitWebResource // out
 	var _cret *C.gchar             // in
 
-	_arg0 = (*C.WebKitWebResource)(unsafe.Pointer(resource.Native()))
+	_arg0 = (*C.WebKitWebResource)(unsafe.Pointer(externglib.InternObject(resource).Native()))
 
 	_cret = C.webkit_web_resource_get_uri(_arg0)
 	runtime.KeepAlive(resource)

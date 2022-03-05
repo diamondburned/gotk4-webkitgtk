@@ -16,10 +16,16 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitHitTestResult.go.
+var (
+	GTypeHitTestResultContext = externglib.Type(C.webkit_hit_test_result_context_get_type())
+	GTypeHitTestResult        = externglib.Type(C.webkit_hit_test_result_get_type())
+)
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_hit_test_result_context_get_type()), F: marshalHitTestResultContext},
-		{T: externglib.Type(C.webkit_hit_test_result_get_type()), F: marshalHitTestResulter},
+		{T: GTypeHitTestResultContext, F: marshalHitTestResultContext},
+		{T: GTypeHitTestResult, F: marshalHitTestResult},
 	})
 }
 
@@ -91,6 +97,10 @@ func (h HitTestResultContext) Has(other HitTestResultContext) bool {
 	return (h & other) == other
 }
 
+// HitTestResultOverrider contains methods that are overridable.
+type HitTestResultOverrider interface {
+}
+
 type HitTestResult struct {
 	_ [0]func() // equal guard
 	*externglib.Object
@@ -100,13 +110,21 @@ var (
 	_ externglib.Objector = (*HitTestResult)(nil)
 )
 
+func classInitHitTestResulter(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapHitTestResult(obj *externglib.Object) *HitTestResult {
 	return &HitTestResult{
 		Object: obj,
 	}
 }
 
-func marshalHitTestResulter(p uintptr) (interface{}, error) {
+func marshalHitTestResult(p uintptr) (interface{}, error) {
 	return wrapHitTestResult(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -122,7 +140,7 @@ func (hitTestResult *HitTestResult) ContextIsEditable() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
 
-	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
+	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(externglib.InternObject(hitTestResult).Native()))
 
 	_cret = C.webkit_hit_test_result_context_is_editable(_arg0)
 	runtime.KeepAlive(hitTestResult)
@@ -148,7 +166,7 @@ func (hitTestResult *HitTestResult) ContextIsImage() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
 
-	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
+	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(externglib.InternObject(hitTestResult).Native()))
 
 	_cret = C.webkit_hit_test_result_context_is_image(_arg0)
 	runtime.KeepAlive(hitTestResult)
@@ -174,7 +192,7 @@ func (hitTestResult *HitTestResult) ContextIsLink() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
 
-	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
+	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(externglib.InternObject(hitTestResult).Native()))
 
 	_cret = C.webkit_hit_test_result_context_is_link(_arg0)
 	runtime.KeepAlive(hitTestResult)
@@ -200,7 +218,7 @@ func (hitTestResult *HitTestResult) ContextIsMedia() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
 
-	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
+	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(externglib.InternObject(hitTestResult).Native()))
 
 	_cret = C.webkit_hit_test_result_context_is_media(_arg0)
 	runtime.KeepAlive(hitTestResult)
@@ -226,7 +244,7 @@ func (hitTestResult *HitTestResult) ContextIsScrollbar() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
 
-	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
+	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(externglib.InternObject(hitTestResult).Native()))
 
 	_cret = C.webkit_hit_test_result_context_is_scrollbar(_arg0)
 	runtime.KeepAlive(hitTestResult)
@@ -252,7 +270,7 @@ func (hitTestResult *HitTestResult) ContextIsSelection() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
 
-	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
+	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(externglib.InternObject(hitTestResult).Native()))
 
 	_cret = C.webkit_hit_test_result_context_is_selection(_arg0)
 	runtime.KeepAlive(hitTestResult)
@@ -276,7 +294,7 @@ func (hitTestResult *HitTestResult) Context() uint {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.guint                // in
 
-	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
+	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(externglib.InternObject(hitTestResult).Native()))
 
 	_cret = C.webkit_hit_test_result_get_context(_arg0)
 	runtime.KeepAlive(hitTestResult)
@@ -299,7 +317,7 @@ func (hitTestResult *HitTestResult) ImageURI() string {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret *C.gchar               // in
 
-	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
+	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(externglib.InternObject(hitTestResult).Native()))
 
 	_cret = C.webkit_hit_test_result_get_image_uri(_arg0)
 	runtime.KeepAlive(hitTestResult)
@@ -323,7 +341,7 @@ func (hitTestResult *HitTestResult) LinkLabel() string {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret *C.gchar               // in
 
-	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
+	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(externglib.InternObject(hitTestResult).Native()))
 
 	_cret = C.webkit_hit_test_result_get_link_label(_arg0)
 	runtime.KeepAlive(hitTestResult)
@@ -347,7 +365,7 @@ func (hitTestResult *HitTestResult) LinkTitle() string {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret *C.gchar               // in
 
-	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
+	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(externglib.InternObject(hitTestResult).Native()))
 
 	_cret = C.webkit_hit_test_result_get_link_title(_arg0)
 	runtime.KeepAlive(hitTestResult)
@@ -370,7 +388,7 @@ func (hitTestResult *HitTestResult) LinkURI() string {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret *C.gchar               // in
 
-	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
+	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(externglib.InternObject(hitTestResult).Native()))
 
 	_cret = C.webkit_hit_test_result_get_link_uri(_arg0)
 	runtime.KeepAlive(hitTestResult)
@@ -393,7 +411,7 @@ func (hitTestResult *HitTestResult) MediaURI() string {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret *C.gchar               // in
 
-	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(hitTestResult.Native()))
+	_arg0 = (*C.WebKitHitTestResult)(unsafe.Pointer(externglib.InternObject(hitTestResult).Native()))
 
 	_cret = C.webkit_hit_test_result_get_media_uri(_arg0)
 	runtime.KeepAlive(hitTestResult)

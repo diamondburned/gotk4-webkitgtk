@@ -13,10 +13,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitPointerLockPermissionRequest.go.
+var GTypePointerLockPermissionRequest = externglib.Type(C.webkit_pointer_lock_permission_request_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_pointer_lock_permission_request_get_type()), F: marshalPointerLockPermissionRequester},
+		{T: GTypePointerLockPermissionRequest, F: marshalPointerLockPermissionRequest},
 	})
+}
+
+// PointerLockPermissionRequestOverrider contains methods that are overridable.
+type PointerLockPermissionRequestOverrider interface {
 }
 
 type PointerLockPermissionRequest struct {
@@ -30,6 +37,14 @@ var (
 	_ externglib.Objector = (*PointerLockPermissionRequest)(nil)
 )
 
+func classInitPointerLockPermissionRequester(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapPointerLockPermissionRequest(obj *externglib.Object) *PointerLockPermissionRequest {
 	return &PointerLockPermissionRequest{
 		Object: obj,
@@ -39,6 +54,6 @@ func wrapPointerLockPermissionRequest(obj *externglib.Object) *PointerLockPermis
 	}
 }
 
-func marshalPointerLockPermissionRequester(p uintptr) (interface{}, error) {
+func marshalPointerLockPermissionRequest(p uintptr) (interface{}, error) {
 	return wrapPointerLockPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }

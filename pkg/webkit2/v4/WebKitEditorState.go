@@ -16,10 +16,16 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitEditorState.go.
+var (
+	GTypeEditorTypingAttributes = externglib.Type(C.webkit_editor_typing_attributes_get_type())
+	GTypeEditorState            = externglib.Type(C.webkit_editor_state_get_type())
+)
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_editor_typing_attributes_get_type()), F: marshalEditorTypingAttributes},
-		{T: externglib.Type(C.webkit_editor_state_get_type()), F: marshalEditorStater},
+		{T: GTypeEditorTypingAttributes, F: marshalEditorTypingAttributes},
+		{T: GTypeEditorState, F: marshalEditorState},
 	})
 }
 
@@ -83,6 +89,10 @@ func (e EditorTypingAttributes) Has(other EditorTypingAttributes) bool {
 	return (e & other) == other
 }
 
+// EditorStateOverrider contains methods that are overridable.
+type EditorStateOverrider interface {
+}
+
 type EditorState struct {
 	_ [0]func() // equal guard
 	*externglib.Object
@@ -92,13 +102,21 @@ var (
 	_ externglib.Objector = (*EditorState)(nil)
 )
 
+func classInitEditorStater(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapEditorState(obj *externglib.Object) *EditorState {
 	return &EditorState{
 		Object: obj,
 	}
 }
 
-func marshalEditorStater(p uintptr) (interface{}, error) {
+func marshalEditorState(p uintptr) (interface{}, error) {
 	return wrapEditorState(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -115,7 +133,7 @@ func (editorState *EditorState) TypingAttributes() uint {
 	var _arg0 *C.WebKitEditorState // out
 	var _cret C.guint              // in
 
-	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(editorState.Native()))
+	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(externglib.InternObject(editorState).Native()))
 
 	_cret = C.webkit_editor_state_get_typing_attributes(_arg0)
 	runtime.KeepAlive(editorState)
@@ -137,7 +155,7 @@ func (editorState *EditorState) IsCopyAvailable() bool {
 	var _arg0 *C.WebKitEditorState // out
 	var _cret C.gboolean           // in
 
-	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(editorState.Native()))
+	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(externglib.InternObject(editorState).Native()))
 
 	_cret = C.webkit_editor_state_is_copy_available(_arg0)
 	runtime.KeepAlive(editorState)
@@ -161,7 +179,7 @@ func (editorState *EditorState) IsCutAvailable() bool {
 	var _arg0 *C.WebKitEditorState // out
 	var _cret C.gboolean           // in
 
-	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(editorState.Native()))
+	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(externglib.InternObject(editorState).Native()))
 
 	_cret = C.webkit_editor_state_is_cut_available(_arg0)
 	runtime.KeepAlive(editorState)
@@ -185,7 +203,7 @@ func (editorState *EditorState) IsPasteAvailable() bool {
 	var _arg0 *C.WebKitEditorState // out
 	var _cret C.gboolean           // in
 
-	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(editorState.Native()))
+	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(externglib.InternObject(editorState).Native()))
 
 	_cret = C.webkit_editor_state_is_paste_available(_arg0)
 	runtime.KeepAlive(editorState)
@@ -209,7 +227,7 @@ func (editorState *EditorState) IsRedoAvailable() bool {
 	var _arg0 *C.WebKitEditorState // out
 	var _cret C.gboolean           // in
 
-	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(editorState.Native()))
+	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(externglib.InternObject(editorState).Native()))
 
 	_cret = C.webkit_editor_state_is_redo_available(_arg0)
 	runtime.KeepAlive(editorState)
@@ -233,7 +251,7 @@ func (editorState *EditorState) IsUndoAvailable() bool {
 	var _arg0 *C.WebKitEditorState // out
 	var _cret C.gboolean           // in
 
-	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(editorState.Native()))
+	_arg0 = (*C.WebKitEditorState)(unsafe.Pointer(externglib.InternObject(editorState).Native()))
 
 	_cret = C.webkit_editor_state_is_undo_available(_arg0)
 	runtime.KeepAlive(editorState)

@@ -16,14 +16,24 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitUserContent.go.
+var (
+	GTypeUserContentInjectedFrames = externglib.Type(C.webkit_user_content_injected_frames_get_type())
+	GTypeUserScriptInjectionTime   = externglib.Type(C.webkit_user_script_injection_time_get_type())
+	GTypeUserStyleLevel            = externglib.Type(C.webkit_user_style_level_get_type())
+	GTypeUserContentFilter         = externglib.Type(C.webkit_user_content_filter_get_type())
+	GTypeUserScript                = externglib.Type(C.webkit_user_script_get_type())
+	GTypeUserStyleSheet            = externglib.Type(C.webkit_user_style_sheet_get_type())
+)
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_user_content_injected_frames_get_type()), F: marshalUserContentInjectedFrames},
-		{T: externglib.Type(C.webkit_user_script_injection_time_get_type()), F: marshalUserScriptInjectionTime},
-		{T: externglib.Type(C.webkit_user_style_level_get_type()), F: marshalUserStyleLevel},
-		{T: externglib.Type(C.webkit_user_content_filter_get_type()), F: marshalUserContentFilter},
-		{T: externglib.Type(C.webkit_user_script_get_type()), F: marshalUserScript},
-		{T: externglib.Type(C.webkit_user_style_sheet_get_type()), F: marshalUserStyleSheet},
+		{T: GTypeUserContentInjectedFrames, F: marshalUserContentInjectedFrames},
+		{T: GTypeUserScriptInjectionTime, F: marshalUserScriptInjectionTime},
+		{T: GTypeUserStyleLevel, F: marshalUserStyleLevel},
+		{T: GTypeUserContentFilter, F: marshalUserContentFilter},
+		{T: GTypeUserScript, F: marshalUserScript},
+		{T: GTypeUserStyleSheet, F: marshalUserStyleSheet},
 	})
 }
 

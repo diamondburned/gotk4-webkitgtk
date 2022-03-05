@@ -15,13 +15,20 @@ import (
 // #include <libsoup/soup-gnome.h>
 import "C"
 
+// glib.Type values for soup-cookie-jar-sqlite.go.
+var GTypeCookieJarSqlite = externglib.Type(C.soup_cookie_jar_sqlite_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_cookie_jar_sqlite_get_type()), F: marshalCookieJarSqliter},
+		{T: GTypeCookieJarSqlite, F: marshalCookieJarSqlite},
 	})
 }
 
 const COOKIE_JAR_SQLITE_FILENAME = "filename"
+
+// CookieJarSqliteOverrider contains methods that are overridable.
+type CookieJarSqliteOverrider interface {
+}
 
 type CookieJarSqlite struct {
 	_ [0]func() // equal guard
@@ -31,6 +38,14 @@ type CookieJarSqlite struct {
 var (
 	_ externglib.Objector = (*CookieJarSqlite)(nil)
 )
+
+func classInitCookieJarSqliter(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
 
 func wrapCookieJarSqlite(obj *externglib.Object) *CookieJarSqlite {
 	return &CookieJarSqlite{
@@ -45,7 +60,7 @@ func wrapCookieJarSqlite(obj *externglib.Object) *CookieJarSqlite {
 	}
 }
 
-func marshalCookieJarSqliter(p uintptr) (interface{}, error) {
+func marshalCookieJarSqlite(p uintptr) (interface{}, error) {
 	return wrapCookieJarSqlite(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 

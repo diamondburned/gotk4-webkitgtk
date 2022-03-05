@@ -6,6 +6,8 @@ import (
 	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
@@ -15,18 +17,28 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
+// extern void _gotk4_soup2_WebsocketConnectionClass_closed(SoupWebsocketConnection*);
+// extern void _gotk4_soup2_WebsocketConnectionClass_closing(SoupWebsocketConnection*);
+// extern void _gotk4_soup2_WebsocketConnectionClass_error(SoupWebsocketConnection*, GError*);
+// extern void _gotk4_soup2_WebsocketConnectionClass_message(SoupWebsocketConnection*, SoupWebsocketDataType, GBytes*);
+// extern void _gotk4_soup2_WebsocketConnectionClass_pong(SoupWebsocketConnection*, GBytes*);
+// extern void _gotk4_soup2_WebsocketConnection_ConnectClosed(gpointer, guintptr);
+// extern void _gotk4_soup2_WebsocketConnection_ConnectClosing(gpointer, guintptr);
+// extern void _gotk4_soup2_WebsocketConnection_ConnectError(gpointer, GError*, guintptr);
+// extern void _gotk4_soup2_WebsocketConnection_ConnectMessage(gpointer, gint, GBytes*, guintptr);
+// extern void _gotk4_soup2_WebsocketConnection_ConnectPong(gpointer, GBytes*, guintptr);
 import "C"
+
+// glib.Type values for soup-websocket-connection.go.
+var GTypeWebsocketConnection = externglib.Type(C.soup_websocket_connection_get_type())
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_websocket_connection_get_type()), F: marshalWebsocketConnectioner},
+		{T: GTypeWebsocketConnection, F: marshalWebsocketConnection},
 	})
 }
 
 // WebsocketConnectionOverrider contains methods that are overridable.
-//
-// As of right now, interface overriding and subclassing is not supported
-// yet, so the interface currently has no use.
 type WebsocketConnectionOverrider interface {
 	Closed()
 	Closing()
@@ -54,46 +66,265 @@ var (
 	_ externglib.Objector = (*WebsocketConnection)(nil)
 )
 
+func classInitWebsocketConnectioner(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+	goval := gbox.Get(uintptr(data))
+	pclass := (*C.SoupWebsocketConnectionClass)(unsafe.Pointer(gclassPtr))
+	// gclass := (*C.GTypeClass)(unsafe.Pointer(gclassPtr))
+	// pclass := (*C.SoupWebsocketConnectionClass)(unsafe.Pointer(C.g_type_class_peek_parent(gclass)))
+
+	if _, ok := goval.(interface{ Closed() }); ok {
+		pclass.closed = (*[0]byte)(C._gotk4_soup2_WebsocketConnectionClass_closed)
+	}
+
+	if _, ok := goval.(interface{ Closing() }); ok {
+		pclass.closing = (*[0]byte)(C._gotk4_soup2_WebsocketConnectionClass_closing)
+	}
+
+	if _, ok := goval.(interface{ Error(err error) }); ok {
+		pclass.error = (*[0]byte)(C._gotk4_soup2_WebsocketConnectionClass_error)
+	}
+
+	if _, ok := goval.(interface {
+		Message(typ WebsocketDataType, message *glib.Bytes)
+	}); ok {
+		pclass.message = (*[0]byte)(C._gotk4_soup2_WebsocketConnectionClass_message)
+	}
+
+	if _, ok := goval.(interface{ Pong(message *glib.Bytes) }); ok {
+		pclass.pong = (*[0]byte)(C._gotk4_soup2_WebsocketConnectionClass_pong)
+	}
+}
+
+//export _gotk4_soup2_WebsocketConnectionClass_closed
+func _gotk4_soup2_WebsocketConnectionClass_closed(arg0 *C.SoupWebsocketConnection) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ Closed() })
+
+	iface.Closed()
+}
+
+//export _gotk4_soup2_WebsocketConnectionClass_closing
+func _gotk4_soup2_WebsocketConnectionClass_closing(arg0 *C.SoupWebsocketConnection) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ Closing() })
+
+	iface.Closing()
+}
+
+//export _gotk4_soup2_WebsocketConnectionClass_error
+func _gotk4_soup2_WebsocketConnectionClass_error(arg0 *C.SoupWebsocketConnection, arg1 *C.GError) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ Error(err error) })
+
+	var _err error // out
+
+	_err = gerror.Take(unsafe.Pointer(arg1))
+
+	iface.Error(_err)
+}
+
+//export _gotk4_soup2_WebsocketConnectionClass_message
+func _gotk4_soup2_WebsocketConnectionClass_message(arg0 *C.SoupWebsocketConnection, arg1 C.SoupWebsocketDataType, arg2 *C.GBytes) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface {
+		Message(typ WebsocketDataType, message *glib.Bytes)
+	})
+
+	var _typ WebsocketDataType // out
+	var _message *glib.Bytes   // out
+
+	_typ = WebsocketDataType(arg1)
+	_message = (*glib.Bytes)(gextras.NewStructNative(unsafe.Pointer(arg2)))
+	C.g_bytes_ref(arg2)
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_message)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.g_bytes_unref((*C.GBytes)(intern.C))
+		},
+	)
+
+	iface.Message(_typ, _message)
+}
+
+//export _gotk4_soup2_WebsocketConnectionClass_pong
+func _gotk4_soup2_WebsocketConnectionClass_pong(arg0 *C.SoupWebsocketConnection, arg1 *C.GBytes) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ Pong(message *glib.Bytes) })
+
+	var _message *glib.Bytes // out
+
+	_message = (*glib.Bytes)(gextras.NewStructNative(unsafe.Pointer(arg1)))
+	C.g_bytes_ref(arg1)
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_message)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.g_bytes_unref((*C.GBytes)(intern.C))
+		},
+	)
+
+	iface.Pong(_message)
+}
+
 func wrapWebsocketConnection(obj *externglib.Object) *WebsocketConnection {
 	return &WebsocketConnection{
 		Object: obj,
 	}
 }
 
-func marshalWebsocketConnectioner(p uintptr) (interface{}, error) {
+func marshalWebsocketConnection(p uintptr) (interface{}, error) {
 	return wrapWebsocketConnection(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// ConnectClosed: emitted when the connection has completely closed, either due
-// to an orderly close from the peer, one initiated via
+//export _gotk4_soup2_WebsocketConnection_ConnectClosed
+func _gotk4_soup2_WebsocketConnection_ConnectClosed(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
+}
+
+// ConnectClosed is emitted when the connection has completely closed, either
+// due to an orderly close from the peer, one initiated via
 // soup_websocket_connection_close() or a fatal error condition that caused a
 // close.
 //
 // This signal will be emitted once.
 func (self *WebsocketConnection) ConnectClosed(f func()) externglib.SignalHandle {
-	return self.Connect("closed", f)
+	return externglib.ConnectGeneratedClosure(self, "closed", false, unsafe.Pointer(C._gotk4_soup2_WebsocketConnection_ConnectClosed), f)
+}
+
+//export _gotk4_soup2_WebsocketConnection_ConnectClosing
+func _gotk4_soup2_WebsocketConnection_ConnectClosing(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
 }
 
 // ConnectClosing: this signal will be emitted during an orderly close.
 func (self *WebsocketConnection) ConnectClosing(f func()) externglib.SignalHandle {
-	return self.Connect("closing", f)
+	return externglib.ConnectGeneratedClosure(self, "closing", false, unsafe.Pointer(C._gotk4_soup2_WebsocketConnection_ConnectClosing), f)
 }
 
-// ConnectMessage: emitted when we receive a message from the peer.
+//export _gotk4_soup2_WebsocketConnection_ConnectError
+func _gotk4_soup2_WebsocketConnection_ConnectError(arg0 C.gpointer, arg1 *C.GError, arg2 C.guintptr) {
+	var f func(err error)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(err error))
+	}
+
+	var _err error // out
+
+	_err = gerror.Take(unsafe.Pointer(arg1))
+
+	f(_err)
+}
+
+// ConnectError is emitted when an error occurred on the WebSocket. This may be
+// fired multiple times. Fatal errors will be followed by the
+// WebsocketConnection::closed signal being emitted.
+func (self *WebsocketConnection) ConnectError(f func(err error)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(self, "error", false, unsafe.Pointer(C._gotk4_soup2_WebsocketConnection_ConnectError), f)
+}
+
+//export _gotk4_soup2_WebsocketConnection_ConnectMessage
+func _gotk4_soup2_WebsocketConnection_ConnectMessage(arg0 C.gpointer, arg1 C.gint, arg2 *C.GBytes, arg3 C.guintptr) {
+	var f func(typ int, message *glib.Bytes)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(typ int, message *glib.Bytes))
+	}
+
+	var _typ int             // out
+	var _message *glib.Bytes // out
+
+	_typ = int(arg1)
+	_message = (*glib.Bytes)(gextras.NewStructNative(unsafe.Pointer(arg2)))
+	C.g_bytes_ref(arg2)
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_message)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.g_bytes_unref((*C.GBytes)(intern.C))
+		},
+	)
+
+	f(_typ, _message)
+}
+
+// ConnectMessage is emitted when we receive a message from the peer.
 //
 // As a convenience, the message data will always be NUL-terminated, but the NUL
 // byte will not be included in the length count.
 func (self *WebsocketConnection) ConnectMessage(f func(typ int, message *glib.Bytes)) externglib.SignalHandle {
-	return self.Connect("message", f)
+	return externglib.ConnectGeneratedClosure(self, "message", false, unsafe.Pointer(C._gotk4_soup2_WebsocketConnection_ConnectMessage), f)
 }
 
-// ConnectPong: emitted when we receive a Pong frame (solicited or unsolicited)
-// from the peer.
+//export _gotk4_soup2_WebsocketConnection_ConnectPong
+func _gotk4_soup2_WebsocketConnection_ConnectPong(arg0 C.gpointer, arg1 *C.GBytes, arg2 C.guintptr) {
+	var f func(message *glib.Bytes)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(message *glib.Bytes))
+	}
+
+	var _message *glib.Bytes // out
+
+	_message = (*glib.Bytes)(gextras.NewStructNative(unsafe.Pointer(arg1)))
+	C.g_bytes_ref(arg1)
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_message)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.g_bytes_unref((*C.GBytes)(intern.C))
+		},
+	)
+
+	f(_message)
+}
+
+// ConnectPong is emitted when we receive a Pong frame (solicited or
+// unsolicited) from the peer.
 //
 // As a convenience, the message data will always be NUL-terminated, but the NUL
 // byte will not be included in the length count.
 func (self *WebsocketConnection) ConnectPong(f func(message *glib.Bytes)) externglib.SignalHandle {
-	return self.Connect("pong", f)
+	return externglib.ConnectGeneratedClosure(self, "pong", false, unsafe.Pointer(C._gotk4_soup2_WebsocketConnection_ConnectPong), f)
 }
 
 // NewWebsocketConnection creates a WebsocketConnection on stream. This should
@@ -120,7 +351,7 @@ func NewWebsocketConnection(stream gio.IOStreamer, uri *URI, typ WebsocketConnec
 	var _arg5 *C.char                       // out
 	var _cret *C.SoupWebsocketConnection    // in
 
-	_arg1 = (*C.GIOStream)(unsafe.Pointer(stream.Native()))
+	_arg1 = (*C.GIOStream)(unsafe.Pointer(externglib.InternObject(stream).Native()))
 	_arg2 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 	_arg3 = C.SoupWebsocketConnectionType(typ)
 	if origin != "" {
@@ -172,7 +403,7 @@ func NewWebsocketConnectionWithExtensions(stream gio.IOStreamer, uri *URI, typ W
 	var _arg6 *C.GList                      // out
 	var _cret *C.SoupWebsocketConnection    // in
 
-	_arg1 = (*C.GIOStream)(unsafe.Pointer(stream.Native()))
+	_arg1 = (*C.GIOStream)(unsafe.Pointer(externglib.InternObject(stream).Native()))
 	_arg2 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 	_arg3 = C.SoupWebsocketConnectionType(typ)
 	if origin != "" {
@@ -186,8 +417,8 @@ func NewWebsocketConnectionWithExtensions(stream gio.IOStreamer, uri *URI, typ W
 	for i := len(extensions) - 1; i >= 0; i-- {
 		src := extensions[i]
 		var dst *C.SoupWebsocketExtension // out
-		dst = (*C.SoupWebsocketExtension)(unsafe.Pointer(src.Native()))
-		C.g_object_ref(C.gpointer(src.Native()))
+		dst = (*C.SoupWebsocketExtension)(unsafe.Pointer(externglib.InternObject(src).Native()))
+		C.g_object_ref(C.gpointer(externglib.InternObject(src).Native()))
 		_arg6 = C.g_list_prepend(_arg6, C.gpointer(unsafe.Pointer(dst)))
 	}
 
@@ -226,7 +457,7 @@ func (self *WebsocketConnection) Close(code uint16, data string) {
 	var _arg1 C.gushort                  // out
 	var _arg2 *C.char                    // out
 
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(externglib.InternObject(self).Native()))
 	_arg1 = C.gushort(code)
 	if data != "" {
 		_arg2 = (*C.char)(unsafe.Pointer(C.CString(data)))
@@ -254,7 +485,7 @@ func (self *WebsocketConnection) CloseCode() uint16 {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _cret C.gushort                  // in
 
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(externglib.InternObject(self).Native()))
 
 	_cret = C.soup_websocket_connection_get_close_code(_arg0)
 	runtime.KeepAlive(self)
@@ -280,7 +511,7 @@ func (self *WebsocketConnection) CloseData() string {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _cret *C.char                    // in
 
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(externglib.InternObject(self).Native()))
 
 	_cret = C.soup_websocket_connection_get_close_data(_arg0)
 	runtime.KeepAlive(self)
@@ -302,7 +533,7 @@ func (self *WebsocketConnection) ConnectionType() WebsocketConnectionType {
 	var _arg0 *C.SoupWebsocketConnection    // out
 	var _cret C.SoupWebsocketConnectionType // in
 
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(externglib.InternObject(self).Native()))
 
 	_cret = C.soup_websocket_connection_get_connection_type(_arg0)
 	runtime.KeepAlive(self)
@@ -324,7 +555,7 @@ func (self *WebsocketConnection) Extensions() []WebsocketExtensioner {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _cret *C.GList                   // in
 
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(externglib.InternObject(self).Native()))
 
 	_cret = C.soup_websocket_connection_get_extensions(_arg0)
 	runtime.KeepAlive(self)
@@ -368,7 +599,7 @@ func (self *WebsocketConnection) IOStream() gio.IOStreamer {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _cret *C.GIOStream               // in
 
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(externglib.InternObject(self).Native()))
 
 	_cret = C.soup_websocket_connection_get_io_stream(_arg0)
 	runtime.KeepAlive(self)
@@ -406,7 +637,7 @@ func (self *WebsocketConnection) KeepaliveInterval() uint {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _cret C.guint                    // in
 
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(externglib.InternObject(self).Native()))
 
 	_cret = C.soup_websocket_connection_get_keepalive_interval(_arg0)
 	runtime.KeepAlive(self)
@@ -429,7 +660,7 @@ func (self *WebsocketConnection) MaxIncomingPayloadSize() uint64 {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _cret C.guint64                  // in
 
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(externglib.InternObject(self).Native()))
 
 	_cret = C.soup_websocket_connection_get_max_incoming_payload_size(_arg0)
 	runtime.KeepAlive(self)
@@ -451,7 +682,7 @@ func (self *WebsocketConnection) Origin() string {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _cret *C.char                    // in
 
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(externglib.InternObject(self).Native()))
 
 	_cret = C.soup_websocket_connection_get_origin(_arg0)
 	runtime.KeepAlive(self)
@@ -475,7 +706,7 @@ func (self *WebsocketConnection) Protocol() string {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _cret *C.char                    // in
 
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(externglib.InternObject(self).Native()))
 
 	_cret = C.soup_websocket_connection_get_protocol(_arg0)
 	runtime.KeepAlive(self)
@@ -499,7 +730,7 @@ func (self *WebsocketConnection) State() WebsocketState {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _cret C.SoupWebsocketState       // in
 
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(externglib.InternObject(self).Native()))
 
 	_cret = C.soup_websocket_connection_get_state(_arg0)
 	runtime.KeepAlive(self)
@@ -524,7 +755,7 @@ func (self *WebsocketConnection) URI() *URI {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _cret *C.SoupURI                 // in
 
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(externglib.InternObject(self).Native()))
 
 	_cret = C.soup_websocket_connection_get_uri(_arg0)
 	runtime.KeepAlive(self)
@@ -550,7 +781,7 @@ func (self *WebsocketConnection) SendBinary(data []byte) {
 	var _arg1 C.gconstpointer            // out
 	var _arg2 C.gsize
 
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(externglib.InternObject(self).Native()))
 	_arg2 = (C.gsize)(len(data))
 	if len(data) > 0 {
 		_arg1 = (C.gconstpointer)(unsafe.Pointer(&data[0]))
@@ -576,7 +807,7 @@ func (self *WebsocketConnection) SendMessage(typ WebsocketDataType, message *gli
 	var _arg1 C.SoupWebsocketDataType    // out
 	var _arg2 *C.GBytes                  // out
 
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(externglib.InternObject(self).Native()))
 	_arg1 = C.SoupWebsocketDataType(typ)
 	_arg2 = (*C.GBytes)(gextras.StructNative(unsafe.Pointer(message)))
 
@@ -600,7 +831,7 @@ func (self *WebsocketConnection) SendText(text string) {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _arg1 *C.char                    // out
 
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(externglib.InternObject(self).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(text)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -621,7 +852,7 @@ func (self *WebsocketConnection) SetKeepaliveInterval(interval uint) {
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _arg1 C.guint                    // out
 
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(externglib.InternObject(self).Native()))
 	_arg1 = C.guint(interval)
 
 	C.soup_websocket_connection_set_keepalive_interval(_arg0, _arg1)
@@ -640,7 +871,7 @@ func (self *WebsocketConnection) SetMaxIncomingPayloadSize(maxIncomingPayloadSiz
 	var _arg0 *C.SoupWebsocketConnection // out
 	var _arg1 C.guint64                  // out
 
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(self.Native()))
+	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(externglib.InternObject(self).Native()))
 	_arg1 = C.guint64(maxIncomingPayloadSize)
 
 	C.soup_websocket_connection_set_max_incoming_payload_size(_arg0, _arg1)

@@ -13,12 +13,20 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
+// extern void _gotk4_webkit24_OptionMenu_ConnectClose(gpointer, guintptr);
 import "C"
+
+// glib.Type values for WebKitOptionMenu.go.
+var GTypeOptionMenu = externglib.Type(C.webkit_option_menu_get_type())
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_option_menu_get_type()), F: marshalOptionMenuer},
+		{T: GTypeOptionMenu, F: marshalOptionMenu},
 	})
+}
+
+// OptionMenuOverrider contains methods that are overridable.
+type OptionMenuOverrider interface {
 }
 
 type OptionMenu struct {
@@ -30,21 +38,45 @@ var (
 	_ externglib.Objector = (*OptionMenu)(nil)
 )
 
+func classInitOptionMenuer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapOptionMenu(obj *externglib.Object) *OptionMenu {
 	return &OptionMenu{
 		Object: obj,
 	}
 }
 
-func marshalOptionMenuer(p uintptr) (interface{}, error) {
+func marshalOptionMenu(p uintptr) (interface{}, error) {
 	return wrapOptionMenu(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// ConnectClose: emitted when closing a KitOptionMenu is requested. This can
+//export _gotk4_webkit24_OptionMenu_ConnectClose
+func _gotk4_webkit24_OptionMenu_ConnectClose(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
+}
+
+// ConnectClose is emitted when closing a KitOptionMenu is requested. This can
 // happen when the user explicitly calls webkit_option_menu_close() or when the
 // element is detached from the current page.
 func (menu *OptionMenu) ConnectClose(f func()) externglib.SignalHandle {
-	return menu.Connect("close", f)
+	return externglib.ConnectGeneratedClosure(menu, "close", false, unsafe.Pointer(C._gotk4_webkit24_OptionMenu_ConnectClose), f)
 }
 
 // ActivateItem activates the KitOptionMenuItem at index in menu. Activating an
@@ -60,7 +92,7 @@ func (menu *OptionMenu) ActivateItem(index uint) {
 	var _arg0 *C.WebKitOptionMenu // out
 	var _arg1 C.guint             // out
 
-	_arg0 = (*C.WebKitOptionMenu)(unsafe.Pointer(menu.Native()))
+	_arg0 = (*C.WebKitOptionMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
 	_arg1 = C.guint(index)
 
 	C.webkit_option_menu_activate_item(_arg0, _arg1)
@@ -76,7 +108,7 @@ func (menu *OptionMenu) ActivateItem(index uint) {
 func (menu *OptionMenu) Close() {
 	var _arg0 *C.WebKitOptionMenu // out
 
-	_arg0 = (*C.WebKitOptionMenu)(unsafe.Pointer(menu.Native()))
+	_arg0 = (*C.WebKitOptionMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
 
 	C.webkit_option_menu_close(_arg0)
 	runtime.KeepAlive(menu)
@@ -97,7 +129,7 @@ func (menu *OptionMenu) Item(index uint) *OptionMenuItem {
 	var _arg1 C.guint                 // out
 	var _cret *C.WebKitOptionMenuItem // in
 
-	_arg0 = (*C.WebKitOptionMenu)(unsafe.Pointer(menu.Native()))
+	_arg0 = (*C.WebKitOptionMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
 	_arg1 = C.guint(index)
 
 	_cret = C.webkit_option_menu_get_item(_arg0, _arg1)
@@ -121,7 +153,7 @@ func (menu *OptionMenu) NItems() uint {
 	var _arg0 *C.WebKitOptionMenu // out
 	var _cret C.guint             // in
 
-	_arg0 = (*C.WebKitOptionMenu)(unsafe.Pointer(menu.Native()))
+	_arg0 = (*C.WebKitOptionMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
 
 	_cret = C.webkit_option_menu_get_n_items(_arg0)
 	runtime.KeepAlive(menu)
@@ -148,7 +180,7 @@ func (menu *OptionMenu) SelectItem(index uint) {
 	var _arg0 *C.WebKitOptionMenu // out
 	var _arg1 C.guint             // out
 
-	_arg0 = (*C.WebKitOptionMenu)(unsafe.Pointer(menu.Native()))
+	_arg0 = (*C.WebKitOptionMenu)(unsafe.Pointer(externglib.InternObject(menu).Native()))
 	_arg1 = C.guint(index)
 
 	C.webkit_option_menu_select_item(_arg0, _arg1)

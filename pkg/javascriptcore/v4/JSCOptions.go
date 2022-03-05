@@ -14,7 +14,7 @@ import (
 
 // #include <stdlib.h>
 // #include <jsc/jsc.h>
-// gboolean _gotk4_javascriptcore4_OptionsFunc(char*, JSCOptionType, char*, gpointer);
+// extern gboolean _gotk4_javascriptcore4_OptionsFunc(char*, JSCOptionType, char*, gpointer);
 import "C"
 
 // OPTIONS_USE_DFG allows the DFG JIT to be used if TRUE. Option type:
@@ -81,24 +81,27 @@ func (o OptionType) String() string {
 type OptionsFunc func(option string, typ OptionType, description string) (ok bool)
 
 //export _gotk4_javascriptcore4_OptionsFunc
-func _gotk4_javascriptcore4_OptionsFunc(arg0 *C.char, arg1 C.JSCOptionType, arg2 *C.char, arg3 C.gpointer) (cret C.gboolean) {
-	v := gbox.Get(uintptr(arg3))
-	if v == nil {
-		panic(`callback not found`)
+func _gotk4_javascriptcore4_OptionsFunc(arg1 *C.char, arg2 C.JSCOptionType, arg3 *C.char, arg4 C.gpointer) (cret C.gboolean) {
+	var fn OptionsFunc
+	{
+		v := gbox.Get(uintptr(arg4))
+		if v == nil {
+			panic(`callback not found`)
+		}
+		fn = v.(OptionsFunc)
 	}
 
-	var option string      // out
-	var typ OptionType     // out
-	var description string // out
+	var _option string      // out
+	var _typ OptionType     // out
+	var _description string // out
 
-	option = C.GoString((*C.gchar)(unsafe.Pointer(arg0)))
-	typ = OptionType(arg1)
-	if arg2 != nil {
-		description = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
+	_option = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
+	_typ = OptionType(arg2)
+	if arg3 != nil {
+		_description = C.GoString((*C.gchar)(unsafe.Pointer(arg3)))
 	}
 
-	fn := v.(OptionsFunc)
-	ok := fn(option, typ, description)
+	ok := fn(_option, _typ, _description)
 
 	if ok {
 		cret = C.TRUE

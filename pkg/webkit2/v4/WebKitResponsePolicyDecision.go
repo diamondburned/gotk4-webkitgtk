@@ -14,10 +14,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitResponsePolicyDecision.go.
+var GTypeResponsePolicyDecision = externglib.Type(C.webkit_response_policy_decision_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_response_policy_decision_get_type()), F: marshalResponsePolicyDecisioner},
+		{T: GTypeResponsePolicyDecision, F: marshalResponsePolicyDecision},
 	})
+}
+
+// ResponsePolicyDecisionOverrider contains methods that are overridable.
+type ResponsePolicyDecisionOverrider interface {
 }
 
 type ResponsePolicyDecision struct {
@@ -29,6 +36,14 @@ var (
 	_ PolicyDecisioner = (*ResponsePolicyDecision)(nil)
 )
 
+func classInitResponsePolicyDecisioner(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapResponsePolicyDecision(obj *externglib.Object) *ResponsePolicyDecision {
 	return &ResponsePolicyDecision{
 		PolicyDecision: PolicyDecision{
@@ -37,7 +52,7 @@ func wrapResponsePolicyDecision(obj *externglib.Object) *ResponsePolicyDecision 
 	}
 }
 
-func marshalResponsePolicyDecisioner(p uintptr) (interface{}, error) {
+func marshalResponsePolicyDecision(p uintptr) (interface{}, error) {
 	return wrapResponsePolicyDecision(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -56,7 +71,7 @@ func (decision *ResponsePolicyDecision) Request() *URIRequest {
 	var _arg0 *C.WebKitResponsePolicyDecision // out
 	var _cret *C.WebKitURIRequest             // in
 
-	_arg0 = (*C.WebKitResponsePolicyDecision)(unsafe.Pointer(decision.Native()))
+	_arg0 = (*C.WebKitResponsePolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
 
 	_cret = C.webkit_response_policy_decision_get_request(_arg0)
 	runtime.KeepAlive(decision)
@@ -78,7 +93,7 @@ func (decision *ResponsePolicyDecision) Response() *URIResponse {
 	var _arg0 *C.WebKitResponsePolicyDecision // out
 	var _cret *C.WebKitURIResponse            // in
 
-	_arg0 = (*C.WebKitResponsePolicyDecision)(unsafe.Pointer(decision.Native()))
+	_arg0 = (*C.WebKitResponsePolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
 
 	_cret = C.webkit_response_policy_decision_get_response(_arg0)
 	runtime.KeepAlive(decision)
@@ -103,7 +118,7 @@ func (decision *ResponsePolicyDecision) IsMIMETypeSupported() bool {
 	var _arg0 *C.WebKitResponsePolicyDecision // out
 	var _cret C.gboolean                      // in
 
-	_arg0 = (*C.WebKitResponsePolicyDecision)(unsafe.Pointer(decision.Native()))
+	_arg0 = (*C.WebKitResponsePolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
 
 	_cret = C.webkit_response_policy_decision_is_mime_type_supported(_arg0)
 	runtime.KeepAlive(decision)

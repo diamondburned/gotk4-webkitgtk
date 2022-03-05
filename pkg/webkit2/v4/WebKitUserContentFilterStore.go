@@ -19,13 +19,20 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
-// void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
 import "C"
+
+// glib.Type values for WebKitUserContentFilterStore.go.
+var GTypeUserContentFilterStore = externglib.Type(C.webkit_user_content_filter_store_get_type())
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_user_content_filter_store_get_type()), F: marshalUserContentFilterStorer},
+		{T: GTypeUserContentFilterStore, F: marshalUserContentFilterStore},
 	})
+}
+
+// UserContentFilterStoreOverrider contains methods that are overridable.
+type UserContentFilterStoreOverrider interface {
 }
 
 type UserContentFilterStore struct {
@@ -37,13 +44,21 @@ var (
 	_ externglib.Objector = (*UserContentFilterStore)(nil)
 )
 
+func classInitUserContentFilterStorer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapUserContentFilterStore(obj *externglib.Object) *UserContentFilterStore {
 	return &UserContentFilterStore{
 		Object: obj,
 	}
 }
 
-func marshalUserContentFilterStorer(p uintptr) (interface{}, error) {
+func marshalUserContentFilterStore(p uintptr) (interface{}, error) {
 	return wrapUserContentFilterStore(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -94,7 +109,7 @@ func (store *UserContentFilterStore) FetchIdentifiers(ctx context.Context, callb
 	var _arg2 C.GAsyncReadyCallback           // out
 	var _arg3 C.gpointer
 
-	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(store.Native()))
+	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(externglib.InternObject(store).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -128,8 +143,8 @@ func (store *UserContentFilterStore) FetchIdentifiersFinish(result gio.AsyncResu
 	var _arg1 *C.GAsyncResult                 // out
 	var _cret **C.gchar                       // in
 
-	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(store.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(externglib.InternObject(store).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	_cret = C.webkit_user_content_filter_store_fetch_identifiers_finish(_arg0, _arg1)
 	runtime.KeepAlive(store)
@@ -164,7 +179,7 @@ func (store *UserContentFilterStore) Path() string {
 	var _arg0 *C.WebKitUserContentFilterStore // out
 	var _cret *C.gchar                        // in
 
-	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(store.Native()))
+	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(externglib.InternObject(store).Native()))
 
 	_cret = C.webkit_user_content_filter_store_get_path(_arg0)
 	runtime.KeepAlive(store)
@@ -197,7 +212,7 @@ func (store *UserContentFilterStore) Load(ctx context.Context, identifier string
 	var _arg3 C.GAsyncReadyCallback           // out
 	var _arg4 C.gpointer
 
-	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(store.Native()))
+	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(externglib.InternObject(store).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -234,8 +249,8 @@ func (store *UserContentFilterStore) LoadFinish(result gio.AsyncResulter) (*User
 	var _cret *C.WebKitUserContentFilter      // in
 	var _cerr *C.GError                       // in
 
-	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(store.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(externglib.InternObject(store).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	_cret = C.webkit_user_content_filter_store_load_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(store)
@@ -277,7 +292,7 @@ func (store *UserContentFilterStore) Remove(ctx context.Context, identifier stri
 	var _arg3 C.GAsyncReadyCallback           // out
 	var _arg4 C.gpointer
 
-	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(store.Native()))
+	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(externglib.InternObject(store).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -309,8 +324,8 @@ func (store *UserContentFilterStore) RemoveFinish(result gio.AsyncResulter) erro
 	var _arg1 *C.GAsyncResult                 // out
 	var _cerr *C.GError                       // in
 
-	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(store.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(externglib.InternObject(store).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	C.webkit_user_content_filter_store_remove_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(store)
@@ -354,7 +369,7 @@ func (store *UserContentFilterStore) Save(ctx context.Context, identifier string
 	var _arg4 C.GAsyncReadyCallback           // out
 	var _arg5 C.gpointer
 
-	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(store.Native()))
+	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(externglib.InternObject(store).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -393,8 +408,8 @@ func (store *UserContentFilterStore) SaveFinish(result gio.AsyncResulter) (*User
 	var _cret *C.WebKitUserContentFilter      // in
 	var _cerr *C.GError                       // in
 
-	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(store.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(externglib.InternObject(store).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	_cret = C.webkit_user_content_filter_store_save_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(store)
@@ -440,7 +455,7 @@ func (store *UserContentFilterStore) SaveFromFile(ctx context.Context, identifie
 	var _arg4 C.GAsyncReadyCallback           // out
 	var _arg5 C.gpointer
 
-	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(store.Native()))
+	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(externglib.InternObject(store).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -448,7 +463,7 @@ func (store *UserContentFilterStore) SaveFromFile(ctx context.Context, identifie
 	}
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(identifier)))
 	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.GFile)(unsafe.Pointer(file.Native()))
+	_arg2 = (*C.GFile)(unsafe.Pointer(externglib.InternObject(file).Native()))
 	if callback != nil {
 		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
 		_arg5 = C.gpointer(gbox.AssignOnce(callback))
@@ -479,8 +494,8 @@ func (store *UserContentFilterStore) SaveFromFileFinish(result gio.AsyncResulter
 	var _cret *C.WebKitUserContentFilter      // in
 	var _cerr *C.GError                       // in
 
-	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(store.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.WebKitUserContentFilterStore)(unsafe.Pointer(externglib.InternObject(store).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	_cret = C.webkit_user_content_filter_store_save_from_file_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(store)

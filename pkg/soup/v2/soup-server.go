@@ -19,16 +19,31 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
+// extern void _gotk4_soup2_ServerCallback(SoupServer*, SoupMessage*, char*, GHashTable*, SoupClientContext*, gpointer);
+// extern void _gotk4_soup2_ServerClass_request_aborted(SoupServer*, SoupMessage*, SoupClientContext*);
+// extern void _gotk4_soup2_ServerClass_request_finished(SoupServer*, SoupMessage*, SoupClientContext*);
+// extern void _gotk4_soup2_ServerClass_request_read(SoupServer*, SoupMessage*, SoupClientContext*);
+// extern void _gotk4_soup2_ServerClass_request_started(SoupServer*, SoupMessage*, SoupClientContext*);
+// extern void _gotk4_soup2_ServerWebsocketCallback(SoupServer*, SoupWebsocketConnection*, char*, SoupClientContext*, gpointer);
+// extern void _gotk4_soup2_Server_ConnectRequestAborted(gpointer, SoupMessage*, SoupClientContext*, guintptr);
+// extern void _gotk4_soup2_Server_ConnectRequestFinished(gpointer, SoupMessage*, SoupClientContext*, guintptr);
+// extern void _gotk4_soup2_Server_ConnectRequestRead(gpointer, SoupMessage*, SoupClientContext*, guintptr);
+// extern void _gotk4_soup2_Server_ConnectRequestStarted(gpointer, SoupMessage*, SoupClientContext*, guintptr);
 // extern void callbackDelete(gpointer);
-// void _gotk4_soup2_ServerCallback(SoupServer*, SoupMessage*, char*, GHashTable*, SoupClientContext*, gpointer);
-// void _gotk4_soup2_ServerWebsocketCallback(SoupServer*, SoupWebsocketConnection*, char*, SoupClientContext*, gpointer);
 import "C"
+
+// glib.Type values for soup-server.go.
+var (
+	GTypeServerListenOptions = externglib.Type(C.soup_server_listen_options_get_type())
+	GTypeServer              = externglib.Type(C.soup_server_get_type())
+	GTypeClientContext       = externglib.Type(C.soup_client_context_get_type())
+)
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_server_listen_options_get_type()), F: marshalServerListenOptions},
-		{T: externglib.Type(C.soup_server_get_type()), F: marshalServerer},
-		{T: externglib.Type(C.soup_client_context_get_type()), F: marshalClientContext},
+		{T: GTypeServerListenOptions, F: marshalServerListenOptions},
+		{T: GTypeServer, F: marshalServer},
+		{T: GTypeClientContext, F: marshalClientContext},
 	})
 }
 
@@ -167,37 +182,40 @@ func (s ServerListenOptions) Has(other ServerListenOptions) bool {
 type ServerCallback func(server *Server, msg *Message, path string, query map[string]string, client *ClientContext)
 
 //export _gotk4_soup2_ServerCallback
-func _gotk4_soup2_ServerCallback(arg0 *C.SoupServer, arg1 *C.SoupMessage, arg2 *C.char, arg3 *C.GHashTable, arg4 *C.SoupClientContext, arg5 C.gpointer) {
-	v := gbox.Get(uintptr(arg5))
-	if v == nil {
-		panic(`callback not found`)
+func _gotk4_soup2_ServerCallback(arg1 *C.SoupServer, arg2 *C.SoupMessage, arg3 *C.char, arg4 *C.GHashTable, arg5 *C.SoupClientContext, arg6 C.gpointer) {
+	var fn ServerCallback
+	{
+		v := gbox.Get(uintptr(arg6))
+		if v == nil {
+			panic(`callback not found`)
+		}
+		fn = v.(ServerCallback)
 	}
 
-	var server *Server          // out
-	var msg *Message            // out
-	var path string             // out
-	var query map[string]string // out
-	var client *ClientContext   // out
+	var _server *Server          // out
+	var _msg *Message            // out
+	var _path string             // out
+	var _query map[string]string // out
+	var _client *ClientContext   // out
 
-	server = wrapServer(externglib.Take(unsafe.Pointer(arg0)))
-	msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-	path = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-	if arg3 != nil {
-		query = make(map[string]string, gextras.HashTableSize(unsafe.Pointer(arg3)))
-		gextras.MoveHashTable(unsafe.Pointer(arg3), false, func(k, v unsafe.Pointer) {
+	_server = wrapServer(externglib.Take(unsafe.Pointer(arg1)))
+	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg2)))
+	_path = C.GoString((*C.gchar)(unsafe.Pointer(arg3)))
+	if arg4 != nil {
+		_query = make(map[string]string, gextras.HashTableSize(unsafe.Pointer(arg4)))
+		gextras.MoveHashTable(unsafe.Pointer(arg4), false, func(k, v unsafe.Pointer) {
 			ksrc := *(**C.gchar)(k)
 			vsrc := *(**C.gchar)(v)
 			var kdst string // out
 			var vdst string // out
 			kdst = C.GoString((*C.gchar)(unsafe.Pointer(ksrc)))
 			vdst = C.GoString((*C.gchar)(unsafe.Pointer(vsrc)))
-			query[kdst] = vdst
+			_query[kdst] = vdst
 		})
 	}
-	client = (*ClientContext)(gextras.NewStructNative(unsafe.Pointer(arg4)))
+	_client = (*ClientContext)(gextras.NewStructNative(unsafe.Pointer(arg5)))
 
-	fn := v.(ServerCallback)
-	fn(server, msg, path, query, client)
+	fn(_server, _msg, _path, _query, _client)
 }
 
 // ServerWebsocketCallback: callback used to handle WebSocket requests to a
@@ -209,30 +227,30 @@ func _gotk4_soup2_ServerCallback(arg0 *C.SoupServer, arg1 *C.SoupMessage, arg2 *
 type ServerWebsocketCallback func(server *Server, connection *WebsocketConnection, path string, client *ClientContext)
 
 //export _gotk4_soup2_ServerWebsocketCallback
-func _gotk4_soup2_ServerWebsocketCallback(arg0 *C.SoupServer, arg1 *C.SoupWebsocketConnection, arg2 *C.char, arg3 *C.SoupClientContext, arg4 C.gpointer) {
-	v := gbox.Get(uintptr(arg4))
-	if v == nil {
-		panic(`callback not found`)
+func _gotk4_soup2_ServerWebsocketCallback(arg1 *C.SoupServer, arg2 *C.SoupWebsocketConnection, arg3 *C.char, arg4 *C.SoupClientContext, arg5 C.gpointer) {
+	var fn ServerWebsocketCallback
+	{
+		v := gbox.Get(uintptr(arg5))
+		if v == nil {
+			panic(`callback not found`)
+		}
+		fn = v.(ServerWebsocketCallback)
 	}
 
-	var server *Server                  // out
-	var connection *WebsocketConnection // out
-	var path string                     // out
-	var client *ClientContext           // out
+	var _server *Server                  // out
+	var _connection *WebsocketConnection // out
+	var _path string                     // out
+	var _client *ClientContext           // out
 
-	server = wrapServer(externglib.Take(unsafe.Pointer(arg0)))
-	connection = wrapWebsocketConnection(externglib.Take(unsafe.Pointer(arg1)))
-	path = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-	client = (*ClientContext)(gextras.NewStructNative(unsafe.Pointer(arg3)))
+	_server = wrapServer(externglib.Take(unsafe.Pointer(arg1)))
+	_connection = wrapWebsocketConnection(externglib.Take(unsafe.Pointer(arg2)))
+	_path = C.GoString((*C.gchar)(unsafe.Pointer(arg3)))
+	_client = (*ClientContext)(gextras.NewStructNative(unsafe.Pointer(arg4)))
 
-	fn := v.(ServerWebsocketCallback)
-	fn(server, connection, path, client)
+	fn(_server, _connection, _path, _client)
 }
 
 // ServerOverrider contains methods that are overridable.
-//
-// As of right now, interface overriding and subclassing is not supported
-// yet, so the interface currently has no use.
 type ServerOverrider interface {
 	// The function takes the following parameters:
 	//
@@ -269,46 +287,234 @@ var (
 	_ externglib.Objector = (*Server)(nil)
 )
 
+func classInitServerer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+	goval := gbox.Get(uintptr(data))
+	pclass := (*C.SoupServerClass)(unsafe.Pointer(gclassPtr))
+	// gclass := (*C.GTypeClass)(unsafe.Pointer(gclassPtr))
+	// pclass := (*C.SoupServerClass)(unsafe.Pointer(C.g_type_class_peek_parent(gclass)))
+
+	if _, ok := goval.(interface {
+		RequestAborted(msg *Message, client *ClientContext)
+	}); ok {
+		pclass.request_aborted = (*[0]byte)(C._gotk4_soup2_ServerClass_request_aborted)
+	}
+
+	if _, ok := goval.(interface {
+		RequestFinished(msg *Message, client *ClientContext)
+	}); ok {
+		pclass.request_finished = (*[0]byte)(C._gotk4_soup2_ServerClass_request_finished)
+	}
+
+	if _, ok := goval.(interface {
+		RequestRead(msg *Message, client *ClientContext)
+	}); ok {
+		pclass.request_read = (*[0]byte)(C._gotk4_soup2_ServerClass_request_read)
+	}
+
+	if _, ok := goval.(interface {
+		RequestStarted(msg *Message, client *ClientContext)
+	}); ok {
+		pclass.request_started = (*[0]byte)(C._gotk4_soup2_ServerClass_request_started)
+	}
+}
+
+//export _gotk4_soup2_ServerClass_request_aborted
+func _gotk4_soup2_ServerClass_request_aborted(arg0 *C.SoupServer, arg1 *C.SoupMessage, arg2 *C.SoupClientContext) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface {
+		RequestAborted(msg *Message, client *ClientContext)
+	})
+
+	var _msg *Message          // out
+	var _client *ClientContext // out
+
+	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
+	_client = (*ClientContext)(gextras.NewStructNative(unsafe.Pointer(arg2)))
+
+	iface.RequestAborted(_msg, _client)
+}
+
+//export _gotk4_soup2_ServerClass_request_finished
+func _gotk4_soup2_ServerClass_request_finished(arg0 *C.SoupServer, arg1 *C.SoupMessage, arg2 *C.SoupClientContext) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface {
+		RequestFinished(msg *Message, client *ClientContext)
+	})
+
+	var _msg *Message          // out
+	var _client *ClientContext // out
+
+	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
+	_client = (*ClientContext)(gextras.NewStructNative(unsafe.Pointer(arg2)))
+
+	iface.RequestFinished(_msg, _client)
+}
+
+//export _gotk4_soup2_ServerClass_request_read
+func _gotk4_soup2_ServerClass_request_read(arg0 *C.SoupServer, arg1 *C.SoupMessage, arg2 *C.SoupClientContext) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface {
+		RequestRead(msg *Message, client *ClientContext)
+	})
+
+	var _msg *Message          // out
+	var _client *ClientContext // out
+
+	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
+	_client = (*ClientContext)(gextras.NewStructNative(unsafe.Pointer(arg2)))
+
+	iface.RequestRead(_msg, _client)
+}
+
+//export _gotk4_soup2_ServerClass_request_started
+func _gotk4_soup2_ServerClass_request_started(arg0 *C.SoupServer, arg1 *C.SoupMessage, arg2 *C.SoupClientContext) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface {
+		RequestStarted(msg *Message, client *ClientContext)
+	})
+
+	var _msg *Message          // out
+	var _client *ClientContext // out
+
+	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
+	_client = (*ClientContext)(gextras.NewStructNative(unsafe.Pointer(arg2)))
+
+	iface.RequestStarted(_msg, _client)
+}
+
 func wrapServer(obj *externglib.Object) *Server {
 	return &Server{
 		Object: obj,
 	}
 }
 
-func marshalServerer(p uintptr) (interface{}, error) {
+func marshalServer(p uintptr) (interface{}, error) {
 	return wrapServer(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// ConnectRequestAborted: emitted when processing has failed for a message; this
-// could mean either that it could not be read (if Server::request_read has not
-// been emitted for it yet), or that the response could not be written back (if
-// Server::request_read has been emitted but Server::request_finished has not
-// been).
+//export _gotk4_soup2_Server_ConnectRequestAborted
+func _gotk4_soup2_Server_ConnectRequestAborted(arg0 C.gpointer, arg1 *C.SoupMessage, arg2 *C.SoupClientContext, arg3 C.guintptr) {
+	var f func(message *Message, client *ClientContext)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(message *Message, client *ClientContext))
+	}
+
+	var _message *Message      // out
+	var _client *ClientContext // out
+
+	_message = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
+	_client = (*ClientContext)(gextras.NewStructNative(unsafe.Pointer(arg2)))
+
+	f(_message, _client)
+}
+
+// ConnectRequestAborted is emitted when processing has failed for a message;
+// this could mean either that it could not be read (if Server::request_read has
+// not been emitted for it yet), or that the response could not be written back
+// (if Server::request_read has been emitted but Server::request_finished has
+// not been).
 //
 // message is in an undefined state when this signal is emitted; the signal
 // exists primarily to allow the server to free any state that it may have
 // allocated in Server::request_started.
-func (server *Server) ConnectRequestAborted(f func(message Message, client *ClientContext)) externglib.SignalHandle {
-	return server.Connect("request-aborted", f)
+func (server *Server) ConnectRequestAborted(f func(message *Message, client *ClientContext)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(server, "request-aborted", false, unsafe.Pointer(C._gotk4_soup2_Server_ConnectRequestAborted), f)
 }
 
-// ConnectRequestFinished: emitted when the server has finished writing a
+//export _gotk4_soup2_Server_ConnectRequestFinished
+func _gotk4_soup2_Server_ConnectRequestFinished(arg0 C.gpointer, arg1 *C.SoupMessage, arg2 *C.SoupClientContext, arg3 C.guintptr) {
+	var f func(message *Message, client *ClientContext)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(message *Message, client *ClientContext))
+	}
+
+	var _message *Message      // out
+	var _client *ClientContext // out
+
+	_message = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
+	_client = (*ClientContext)(gextras.NewStructNative(unsafe.Pointer(arg2)))
+
+	f(_message, _client)
+}
+
+// ConnectRequestFinished is emitted when the server has finished writing a
 // response to a request.
-func (server *Server) ConnectRequestFinished(f func(message Message, client *ClientContext)) externglib.SignalHandle {
-	return server.Connect("request-finished", f)
+func (server *Server) ConnectRequestFinished(f func(message *Message, client *ClientContext)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(server, "request-finished", false, unsafe.Pointer(C._gotk4_soup2_Server_ConnectRequestFinished), f)
 }
 
-// ConnectRequestRead: emitted when the server has successfully read a request.
-// message will have all of its request-side information filled in, and if the
-// message was authenticated, client will have information about that. This
-// signal is emitted before any (non-early) handlers are called for the message,
-// and if it sets the message's #status_code, then normal handler processing
-// will be skipped.
-func (server *Server) ConnectRequestRead(f func(message Message, client *ClientContext)) externglib.SignalHandle {
-	return server.Connect("request-read", f)
+//export _gotk4_soup2_Server_ConnectRequestRead
+func _gotk4_soup2_Server_ConnectRequestRead(arg0 C.gpointer, arg1 *C.SoupMessage, arg2 *C.SoupClientContext, arg3 C.guintptr) {
+	var f func(message *Message, client *ClientContext)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(message *Message, client *ClientContext))
+	}
+
+	var _message *Message      // out
+	var _client *ClientContext // out
+
+	_message = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
+	_client = (*ClientContext)(gextras.NewStructNative(unsafe.Pointer(arg2)))
+
+	f(_message, _client)
 }
 
-// ConnectRequestStarted: emitted when the server has started reading a new
+// ConnectRequestRead is emitted when the server has successfully read a
+// request. message will have all of its request-side information filled in, and
+// if the message was authenticated, client will have information about that.
+// This signal is emitted before any (non-early) handlers are called for the
+// message, and if it sets the message's #status_code, then normal handler
+// processing will be skipped.
+func (server *Server) ConnectRequestRead(f func(message *Message, client *ClientContext)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(server, "request-read", false, unsafe.Pointer(C._gotk4_soup2_Server_ConnectRequestRead), f)
+}
+
+//export _gotk4_soup2_Server_ConnectRequestStarted
+func _gotk4_soup2_Server_ConnectRequestStarted(arg0 C.gpointer, arg1 *C.SoupMessage, arg2 *C.SoupClientContext, arg3 C.guintptr) {
+	var f func(message *Message, client *ClientContext)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(message *Message, client *ClientContext))
+	}
+
+	var _message *Message      // out
+	var _client *ClientContext // out
+
+	_message = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
+	_client = (*ClientContext)(gextras.NewStructNative(unsafe.Pointer(arg2)))
+
+	f(_message, _client)
+}
+
+// ConnectRequestStarted is emitted when the server has started reading a new
 // request. message will be completely blank; not even the Request-Line will
 // have been read yet. About the only thing you can usefully do with it is
 // connect to its signals.
@@ -317,8 +523,8 @@ func (server *Server) ConnectRequestRead(f func(message Message, client *ClientC
 // Server::request_read signal. If a response is then sent, the request
 // processing will end with a Server::request_finished signal. If a network
 // error occurs, the processing will instead end with Server::request_aborted.
-func (server *Server) ConnectRequestStarted(f func(message Message, client *ClientContext)) externglib.SignalHandle {
-	return server.Connect("request-started", f)
+func (server *Server) ConnectRequestStarted(f func(message *Message, client *ClientContext)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(server, "request-started", false, unsafe.Pointer(C._gotk4_soup2_Server_ConnectRequestStarted), f)
 }
 
 // AcceptIostream: add a new client stream to the server.
@@ -336,13 +542,13 @@ func (server *Server) AcceptIostream(stream gio.IOStreamer, localAddr, remoteAdd
 	var _arg3 *C.GSocketAddress // out
 	var _cerr *C.GError         // in
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
-	_arg1 = (*C.GIOStream)(unsafe.Pointer(stream.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
+	_arg1 = (*C.GIOStream)(unsafe.Pointer(externglib.InternObject(stream).Native()))
 	if localAddr != nil {
-		_arg2 = (*C.GSocketAddress)(unsafe.Pointer(localAddr.Native()))
+		_arg2 = (*C.GSocketAddress)(unsafe.Pointer(externglib.InternObject(localAddr).Native()))
 	}
 	if remoteAddr != nil {
-		_arg3 = (*C.GSocketAddress)(unsafe.Pointer(remoteAddr.Native()))
+		_arg3 = (*C.GSocketAddress)(unsafe.Pointer(externglib.InternObject(remoteAddr).Native()))
 	}
 
 	C.soup_server_accept_iostream(_arg0, _arg1, _arg2, _arg3, &_cerr)
@@ -378,8 +584,8 @@ func (server *Server) AddAuthDomain(authDomain AuthDomainer) {
 	var _arg0 *C.SoupServer     // out
 	var _arg1 *C.SoupAuthDomain // out
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
-	_arg1 = (*C.SoupAuthDomain)(unsafe.Pointer(authDomain.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
+	_arg1 = (*C.SoupAuthDomain)(unsafe.Pointer(externglib.InternObject(authDomain).Native()))
 
 	C.soup_server_add_auth_domain(_arg0, _arg1)
 	runtime.KeepAlive(server)
@@ -422,7 +628,7 @@ func (server *Server) AddEarlyHandler(path string, callback ServerCallback) {
 	var _arg3 C.gpointer
 	var _arg4 C.GDestroyNotify
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 	if path != "" {
 		_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
 		defer C.free(unsafe.Pointer(_arg1))
@@ -480,7 +686,7 @@ func (server *Server) AddHandler(path string, callback ServerCallback) {
 	var _arg3 C.gpointer
 	var _arg4 C.GDestroyNotify
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 	if path != "" {
 		_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
 		defer C.free(unsafe.Pointer(_arg1))
@@ -513,7 +719,7 @@ func (server *Server) AddWebsocketExtension(extensionType externglib.Type) {
 	var _arg0 *C.SoupServer // out
 	var _arg1 C.GType       // out
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 	_arg1 = C.GType(extensionType)
 
 	C.soup_server_add_websocket_extension(_arg0, _arg1)
@@ -554,7 +760,7 @@ func (server *Server) AddWebsocketHandler(path, origin string, protocols []strin
 	var _arg5 C.gpointer
 	var _arg6 C.GDestroyNotify
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 	if path != "" {
 		_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
 		defer C.free(unsafe.Pointer(_arg1))
@@ -599,7 +805,7 @@ func (server *Server) AddWebsocketHandler(path, origin string, protocols []strin
 func (server *Server) Disconnect() {
 	var _arg0 *C.SoupServer // out
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 
 	C.soup_server_disconnect(_arg0)
 	runtime.KeepAlive(server)
@@ -623,7 +829,7 @@ func (server *Server) AsyncContext() *glib.MainContext {
 	var _arg0 *C.SoupServer   // out
 	var _cret *C.GMainContext // in
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 
 	_cret = C.soup_server_get_async_context(_arg0)
 	runtime.KeepAlive(server)
@@ -661,7 +867,7 @@ func (server *Server) Listener() *Socket {
 	var _arg0 *C.SoupServer // out
 	var _cret *C.SoupSocket // in
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 
 	_cret = C.soup_server_get_listener(_arg0)
 	runtime.KeepAlive(server)
@@ -689,7 +895,7 @@ func (server *Server) Listeners() []gio.Socket {
 	var _arg0 *C.SoupServer // out
 	var _cret *C.GSList     // in
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 
 	_cret = C.soup_server_get_listeners(_arg0)
 	runtime.KeepAlive(server)
@@ -732,7 +938,7 @@ func (server *Server) Port() uint {
 	var _arg0 *C.SoupServer // out
 	var _cret C.guint       // in
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 
 	_cret = C.soup_server_get_port(_arg0)
 	runtime.KeepAlive(server)
@@ -760,7 +966,7 @@ func (server *Server) URIs() []*URI {
 	var _arg0 *C.SoupServer // out
 	var _cret *C.GSList     // in
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 
 	_cret = C.soup_server_get_uris(_arg0)
 	runtime.KeepAlive(server)
@@ -805,7 +1011,7 @@ func (server *Server) IsHTTPS() bool {
 	var _arg0 *C.SoupServer // out
 	var _cret C.gboolean    // in
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 
 	_cret = C.soup_server_is_https(_arg0)
 	runtime.KeepAlive(server)
@@ -847,8 +1053,8 @@ func (server *Server) Listen(address gio.SocketAddresser, options ServerListenOp
 	var _arg2 C.SoupServerListenOptions // out
 	var _cerr *C.GError                 // in
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
-	_arg1 = (*C.GSocketAddress)(unsafe.Pointer(address.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
+	_arg1 = (*C.GSocketAddress)(unsafe.Pointer(externglib.InternObject(address).Native()))
 	_arg2 = C.SoupServerListenOptions(options)
 
 	C.soup_server_listen(_arg0, _arg1, _arg2, &_cerr)
@@ -886,7 +1092,7 @@ func (server *Server) ListenAll(port uint, options ServerListenOptions) error {
 	var _arg2 C.SoupServerListenOptions // out
 	var _cerr *C.GError                 // in
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 	_arg1 = C.guint(port)
 	_arg2 = C.SoupServerListenOptions(options)
 
@@ -922,7 +1128,7 @@ func (server *Server) ListenFd(fd int, options ServerListenOptions) error {
 	var _arg2 C.SoupServerListenOptions // out
 	var _cerr *C.GError                 // in
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 	_arg1 = C.int(fd)
 	_arg2 = C.SoupServerListenOptions(options)
 
@@ -961,7 +1167,7 @@ func (server *Server) ListenLocal(port uint, options ServerListenOptions) error 
 	var _arg2 C.SoupServerListenOptions // out
 	var _cerr *C.GError                 // in
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 	_arg1 = C.guint(port)
 	_arg2 = C.SoupServerListenOptions(options)
 
@@ -995,8 +1201,8 @@ func (server *Server) ListenSocket(socket *gio.Socket, options ServerListenOptio
 	var _arg2 C.SoupServerListenOptions // out
 	var _cerr *C.GError                 // in
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
-	_arg1 = (*C.GSocket)(unsafe.Pointer(socket.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
+	_arg1 = (*C.GSocket)(unsafe.Pointer(externglib.InternObject(socket).Native()))
 	_arg2 = C.SoupServerListenOptions(options)
 
 	C.soup_server_listen_socket(_arg0, _arg1, _arg2, &_cerr)
@@ -1029,8 +1235,8 @@ func (server *Server) PauseMessage(msg *Message) {
 	var _arg0 *C.SoupServer  // out
 	var _arg1 *C.SoupMessage // out
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 
 	C.soup_server_pause_message(_arg0, _arg1)
 	runtime.KeepAlive(server)
@@ -1053,7 +1259,7 @@ func (server *Server) PauseMessage(msg *Message) {
 func (server *Server) Quit() {
 	var _arg0 *C.SoupServer // out
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 
 	C.soup_server_quit(_arg0)
 	runtime.KeepAlive(server)
@@ -1069,8 +1275,8 @@ func (server *Server) RemoveAuthDomain(authDomain AuthDomainer) {
 	var _arg0 *C.SoupServer     // out
 	var _arg1 *C.SoupAuthDomain // out
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
-	_arg1 = (*C.SoupAuthDomain)(unsafe.Pointer(authDomain.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
+	_arg1 = (*C.SoupAuthDomain)(unsafe.Pointer(externglib.InternObject(authDomain).Native()))
 
 	C.soup_server_remove_auth_domain(_arg0, _arg1)
 	runtime.KeepAlive(server)
@@ -1087,7 +1293,7 @@ func (server *Server) RemoveHandler(path string) {
 	var _arg0 *C.SoupServer // out
 	var _arg1 *C.char       // out
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -1109,7 +1315,7 @@ func (server *Server) RemoveWebsocketExtension(extensionType externglib.Type) {
 	var _arg0 *C.SoupServer // out
 	var _arg1 C.GType       // out
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 	_arg1 = C.GType(extensionType)
 
 	C.soup_server_remove_websocket_extension(_arg0, _arg1)
@@ -1128,7 +1334,7 @@ func (server *Server) RemoveWebsocketExtension(extensionType externglib.Type) {
 func (server *Server) Run() {
 	var _arg0 *C.SoupServer // out
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 
 	C.soup_server_run(_arg0)
 	runtime.KeepAlive(server)
@@ -1148,7 +1354,7 @@ func (server *Server) Run() {
 func (server *Server) RunAsync() {
 	var _arg0 *C.SoupServer // out
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 
 	C.soup_server_run_async(_arg0)
 	runtime.KeepAlive(server)
@@ -1172,7 +1378,7 @@ func (server *Server) SetSSLCertFile(sslCertFile, sslKeyFile string) error {
 	var _arg2 *C.char       // out
 	var _cerr *C.GError     // in
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(sslCertFile)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(sslKeyFile)))
@@ -1210,8 +1416,8 @@ func (server *Server) UnpauseMessage(msg *Message) {
 	var _arg0 *C.SoupServer  // out
 	var _arg1 *C.SoupMessage // out
 
-	_arg0 = (*C.SoupServer)(unsafe.Pointer(server.Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg0 = (*C.SoupServer)(unsafe.Pointer(externglib.InternObject(server).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 
 	C.soup_server_unpause_message(_arg0, _arg1)
 	runtime.KeepAlive(server)

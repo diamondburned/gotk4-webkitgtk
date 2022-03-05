@@ -13,13 +13,16 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
+// extern gboolean _gotk4_soup2_AuthDomainBasicAuthCallback(SoupAuthDomain*, SoupMessage*, char*, char*, gpointer);
 // extern void callbackDelete(gpointer);
-// gboolean _gotk4_soup2_AuthDomainBasicAuthCallback(SoupAuthDomain*, SoupMessage*, char*, char*, gpointer);
 import "C"
+
+// glib.Type values for soup-auth-domain-basic.go.
+var GTypeAuthDomainBasic = externglib.Type(C.soup_auth_domain_basic_get_type())
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_auth_domain_basic_get_type()), F: marshalAuthDomainBasiccer},
+		{T: GTypeAuthDomainBasic, F: marshalAuthDomainBasic},
 	})
 }
 
@@ -47,30 +50,37 @@ const AUTH_DOMAIN_BASIC_AUTH_DATA = "auth-data"
 type AuthDomainBasicAuthCallback func(domain *AuthDomainBasic, msg *Message, username, password string) (ok bool)
 
 //export _gotk4_soup2_AuthDomainBasicAuthCallback
-func _gotk4_soup2_AuthDomainBasicAuthCallback(arg0 *C.SoupAuthDomain, arg1 *C.SoupMessage, arg2 *C.char, arg3 *C.char, arg4 C.gpointer) (cret C.gboolean) {
-	v := gbox.Get(uintptr(arg4))
-	if v == nil {
-		panic(`callback not found`)
+func _gotk4_soup2_AuthDomainBasicAuthCallback(arg1 *C.SoupAuthDomain, arg2 *C.SoupMessage, arg3 *C.char, arg4 *C.char, arg5 C.gpointer) (cret C.gboolean) {
+	var fn AuthDomainBasicAuthCallback
+	{
+		v := gbox.Get(uintptr(arg5))
+		if v == nil {
+			panic(`callback not found`)
+		}
+		fn = v.(AuthDomainBasicAuthCallback)
 	}
 
-	var domain *AuthDomainBasic // out
-	var msg *Message            // out
-	var username string         // out
-	var password string         // out
+	var _domain *AuthDomainBasic // out
+	var _msg *Message            // out
+	var _username string         // out
+	var _password string         // out
 
-	domain = wrapAuthDomainBasic(externglib.Take(unsafe.Pointer(arg0)))
-	msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-	username = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-	password = C.GoString((*C.gchar)(unsafe.Pointer(arg3)))
+	_domain = wrapAuthDomainBasic(externglib.Take(unsafe.Pointer(arg1)))
+	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg2)))
+	_username = C.GoString((*C.gchar)(unsafe.Pointer(arg3)))
+	_password = C.GoString((*C.gchar)(unsafe.Pointer(arg4)))
 
-	fn := v.(AuthDomainBasicAuthCallback)
-	ok := fn(domain, msg, username, password)
+	ok := fn(_domain, _msg, _username, _password)
 
 	if ok {
 		cret = C.TRUE
 	}
 
 	return cret
+}
+
+// AuthDomainBasicOverrider contains methods that are overridable.
+type AuthDomainBasicOverrider interface {
 }
 
 type AuthDomainBasic struct {
@@ -82,6 +92,14 @@ var (
 	_ AuthDomainer = (*AuthDomainBasic)(nil)
 )
 
+func classInitAuthDomainBasiccer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapAuthDomainBasic(obj *externglib.Object) *AuthDomainBasic {
 	return &AuthDomainBasic{
 		AuthDomain: AuthDomain{
@@ -90,7 +108,7 @@ func wrapAuthDomainBasic(obj *externglib.Object) *AuthDomainBasic {
 	}
 }
 
-func marshalAuthDomainBasiccer(p uintptr) (interface{}, error) {
+func marshalAuthDomainBasic(p uintptr) (interface{}, error) {
 	return wrapAuthDomainBasic(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -113,7 +131,7 @@ func (domain *AuthDomainBasic) SetAuthCallback(callback AuthDomainBasicAuthCallb
 	var _arg2 C.gpointer
 	var _arg3 C.GDestroyNotify
 
-	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(domain.Native()))
+	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(externglib.InternObject(domain).Native()))
 	_arg1 = (*[0]byte)(C._gotk4_soup2_AuthDomainBasicAuthCallback)
 	_arg2 = C.gpointer(gbox.Assign(callback))
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))

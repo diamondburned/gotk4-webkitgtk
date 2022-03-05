@@ -15,10 +15,17 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-request-http.go.
+var GTypeRequestHTTP = externglib.Type(C.soup_request_http_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_request_http_get_type()), F: marshalRequestHTTPer},
+		{T: GTypeRequestHTTP, F: marshalRequestHTTP},
 	})
+}
+
+// RequestHTTPOverrider contains methods that are overridable.
+type RequestHTTPOverrider interface {
 }
 
 type RequestHTTP struct {
@@ -29,6 +36,14 @@ type RequestHTTP struct {
 var (
 	_ externglib.Objector = (*RequestHTTP)(nil)
 )
+
+func classInitRequestHTTPer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
 
 func wrapRequestHTTP(obj *externglib.Object) *RequestHTTP {
 	return &RequestHTTP{
@@ -41,7 +56,7 @@ func wrapRequestHTTP(obj *externglib.Object) *RequestHTTP {
 	}
 }
 
-func marshalRequestHTTPer(p uintptr) (interface{}, error) {
+func marshalRequestHTTP(p uintptr) (interface{}, error) {
 	return wrapRequestHTTP(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -55,7 +70,7 @@ func (http *RequestHTTP) Message() *Message {
 	var _arg0 *C.SoupRequestHTTP // out
 	var _cret *C.SoupMessage     // in
 
-	_arg0 = (*C.SoupRequestHTTP)(unsafe.Pointer(http.Native()))
+	_arg0 = (*C.SoupRequestHTTP)(unsafe.Pointer(externglib.InternObject(http).Native()))
 
 	_cret = C.soup_request_http_get_message(_arg0)
 	runtime.KeepAlive(http)

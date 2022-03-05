@@ -13,10 +13,17 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-session-sync.go.
+var GTypeSessionSync = externglib.Type(C.soup_session_sync_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_session_sync_get_type()), F: marshalSessionSyncer},
+		{T: GTypeSessionSync, F: marshalSessionSync},
 	})
+}
+
+// SessionSyncOverrider contains methods that are overridable.
+type SessionSyncOverrider interface {
 }
 
 type SessionSync struct {
@@ -28,6 +35,14 @@ var (
 	_ externglib.Objector = (*SessionSync)(nil)
 )
 
+func classInitSessionSyncer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapSessionSync(obj *externglib.Object) *SessionSync {
 	return &SessionSync{
 		Session: Session{
@@ -36,7 +51,7 @@ func wrapSessionSync(obj *externglib.Object) *SessionSync {
 	}
 }
 
-func marshalSessionSyncer(p uintptr) (interface{}, error) {
+func marshalSessionSync(p uintptr) (interface{}, error) {
 	return wrapSessionSync(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 

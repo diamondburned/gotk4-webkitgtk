@@ -15,9 +15,12 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-uri.go.
+var GTypeURI = externglib.Type(C.soup_uri_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_uri_get_type()), F: marshalURI},
+		{T: GTypeURI, F: marshalURI},
 	})
 }
 

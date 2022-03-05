@@ -19,9 +19,12 @@ import (
 // #include <jsc/jsc.h>
 import "C"
 
+// glib.Type values for JSCValue.go.
+var GTypeValue = externglib.Type(C.jsc_value_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.jsc_value_get_type()), F: marshalValueer},
+		{T: GTypeValue, F: marshalValue},
 	})
 }
 
@@ -78,6 +81,10 @@ func (v ValuePropertyFlags) Has(other ValuePropertyFlags) bool {
 	return (v & other) == other
 }
 
+// ValueOverrider contains methods that are overridable.
+type ValueOverrider interface {
+}
+
 type Value struct {
 	_ [0]func() // equal guard
 	*externglib.Object
@@ -87,13 +94,21 @@ var (
 	_ externglib.Objector = (*Value)(nil)
 )
 
+func classInitValueer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapValue(obj *externglib.Object) *Value {
 	return &Value{
 		Object: obj,
 	}
 }
 
-func marshalValueer(p uintptr) (interface{}, error) {
+func marshalValue(p uintptr) (interface{}, error) {
 	return wrapValue(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -115,7 +130,7 @@ func NewValueArrayFromStrv(context *Context, strv []string) *Value {
 	var _arg2 **C.char      // out
 	var _cret *C.JSCValue   // in
 
-	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg1 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	{
 		_arg2 = (**C.char)(C.calloc(C.size_t((len(strv) + 1)), C.size_t(unsafe.Sizeof(uint(0)))))
 		defer C.free(unsafe.Pointer(_arg2))
@@ -157,7 +172,7 @@ func NewValueBoolean(context *Context, value bool) *Value {
 	var _arg2 C.gboolean    // out
 	var _cret *C.JSCValue   // in
 
-	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg1 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	if value {
 		_arg2 = C.TRUE
 	}
@@ -190,7 +205,7 @@ func NewValueFromJson(context *Context, json string) *Value {
 	var _arg2 *C.char       // out
 	var _cret *C.JSCValue   // in
 
-	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg1 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(json)))
 	defer C.free(unsafe.Pointer(_arg2))
 
@@ -220,7 +235,7 @@ func NewValueNull(context *Context) *Value {
 	var _arg1 *C.JSCContext // out
 	var _cret *C.JSCValue   // in
 
-	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg1 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 
 	_cret = C.jsc_value_new_null(_arg1)
 	runtime.KeepAlive(context)
@@ -248,7 +263,7 @@ func NewValueNumber(context *Context, number float64) *Value {
 	var _arg2 C.double      // out
 	var _cret *C.JSCValue   // in
 
-	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg1 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg2 = C.double(number)
 
 	_cret = C.jsc_value_new_number(_arg1, _arg2)
@@ -283,10 +298,10 @@ func NewValueObject(context *Context, instance cgo.Handle, jscClass *Class) *Val
 	var _arg3 *C.JSCClass   // out
 	var _cret *C.JSCValue   // in
 
-	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg1 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg2 = (C.gpointer)(unsafe.Pointer(instance))
 	if jscClass != nil {
-		_arg3 = (*C.JSCClass)(unsafe.Pointer(jscClass.Native()))
+		_arg3 = (*C.JSCClass)(unsafe.Pointer(externglib.InternObject(jscClass).Native()))
 	}
 
 	_cret = C.jsc_value_new_object(_arg1, _arg2, _arg3)
@@ -319,7 +334,7 @@ func NewValueString(context *Context, str string) *Value {
 	var _arg2 *C.char       // out
 	var _cret *C.JSCValue   // in
 
-	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg1 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	if str != "" {
 		_arg2 = (*C.char)(unsafe.Pointer(C.CString(str)))
 		defer C.free(unsafe.Pointer(_arg2))
@@ -352,7 +367,7 @@ func NewValueStringFromBytes(context *Context, bytes *glib.Bytes) *Value {
 	var _arg2 *C.GBytes     // out
 	var _cret *C.JSCValue   // in
 
-	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg1 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	if bytes != nil {
 		_arg2 = (*C.GBytes)(gextras.StructNative(unsafe.Pointer(bytes)))
 	}
@@ -383,7 +398,7 @@ func NewValueUndefined(context *Context) *Value {
 	var _arg1 *C.JSCContext // out
 	var _cret *C.JSCValue   // in
 
-	_arg1 = (*C.JSCContext)(unsafe.Pointer(context.Native()))
+	_arg1 = (*C.JSCContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 
 	_cret = C.jsc_value_new_undefined(_arg1)
 	runtime.KeepAlive(context)
@@ -414,7 +429,7 @@ func (value *Value) ConstructorCall(parameters []*Value) *Value {
 	var _arg1 C.guint
 	var _cret *C.JSCValue // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 	if parameters != nil {
 		_arg1 = (C.guint)(len(parameters))
 		_arg2 = (**C.JSCValue)(C.calloc(C.size_t(len(parameters)), C.size_t(unsafe.Sizeof(uint(0)))))
@@ -422,7 +437,7 @@ func (value *Value) ConstructorCall(parameters []*Value) *Value {
 		{
 			out := unsafe.Slice((**C.JSCValue)(_arg2), len(parameters))
 			for i := range parameters {
-				out[i] = (*C.JSCValue)(unsafe.Pointer(parameters[i].Native()))
+				out[i] = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(parameters[i]).Native()))
 			}
 		}
 	}
@@ -460,7 +475,7 @@ func (value *Value) FunctionCall(parameters []*Value) *Value {
 	var _arg1 C.guint
 	var _cret *C.JSCValue // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 	if parameters != nil {
 		_arg1 = (C.guint)(len(parameters))
 		_arg2 = (**C.JSCValue)(C.calloc(C.size_t(len(parameters)), C.size_t(unsafe.Sizeof(uint(0)))))
@@ -468,7 +483,7 @@ func (value *Value) FunctionCall(parameters []*Value) *Value {
 		{
 			out := unsafe.Slice((**C.JSCValue)(_arg2), len(parameters))
 			for i := range parameters {
-				out[i] = (*C.JSCValue)(unsafe.Pointer(parameters[i].Native()))
+				out[i] = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(parameters[i]).Native()))
 			}
 		}
 	}
@@ -494,7 +509,7 @@ func (value *Value) Context() *Context {
 	var _arg0 *C.JSCValue   // out
 	var _cret *C.JSCContext // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	_cret = C.jsc_value_get_context(_arg0)
 	runtime.KeepAlive(value)
@@ -516,7 +531,7 @@ func (value *Value) IsArray() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	_cret = C.jsc_value_is_array(_arg0)
 	runtime.KeepAlive(value)
@@ -540,7 +555,7 @@ func (value *Value) IsBoolean() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	_cret = C.jsc_value_is_boolean(_arg0)
 	runtime.KeepAlive(value)
@@ -564,7 +579,7 @@ func (value *Value) IsConstructor() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	_cret = C.jsc_value_is_constructor(_arg0)
 	runtime.KeepAlive(value)
@@ -588,7 +603,7 @@ func (value *Value) IsFunction() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	_cret = C.jsc_value_is_function(_arg0)
 	runtime.KeepAlive(value)
@@ -613,7 +628,7 @@ func (value *Value) IsNull() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	_cret = C.jsc_value_is_null(_arg0)
 	runtime.KeepAlive(value)
@@ -637,7 +652,7 @@ func (value *Value) IsNumber() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	_cret = C.jsc_value_is_number(_arg0)
 	runtime.KeepAlive(value)
@@ -661,7 +676,7 @@ func (value *Value) IsObject() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	_cret = C.jsc_value_is_object(_arg0)
 	runtime.KeepAlive(value)
@@ -685,7 +700,7 @@ func (value *Value) IsString() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	_cret = C.jsc_value_is_string(_arg0)
 	runtime.KeepAlive(value)
@@ -710,7 +725,7 @@ func (value *Value) IsUndefined() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	_cret = C.jsc_value_is_undefined(_arg0)
 	runtime.KeepAlive(value)
@@ -741,12 +756,12 @@ func (value *Value) ObjectDefinePropertyData(propertyName string, flags ValuePro
 	var _arg2 C.JSCValuePropertyFlags // out
 	var _arg3 *C.JSCValue             // out
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(propertyName)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.JSCValuePropertyFlags(flags)
 	if propertyValue != nil {
-		_arg3 = (*C.JSCValue)(unsafe.Pointer(propertyValue.Native()))
+		_arg3 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(propertyValue).Native()))
 	}
 
 	C.jsc_value_object_define_property_data(_arg0, _arg1, _arg2, _arg3)
@@ -773,7 +788,7 @@ func (value *Value) ObjectDeleteProperty(name string) bool {
 	var _arg1 *C.char     // out
 	var _cret C.gboolean  // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -803,7 +818,7 @@ func (value *Value) ObjectEnumerateProperties() []string {
 	var _arg0 *C.JSCValue // out
 	var _cret **C.gchar   // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	_cret = C.jsc_value_object_enumerate_properties(_arg0)
 	runtime.KeepAlive(value)
@@ -846,7 +861,7 @@ func (value *Value) ObjectGetProperty(name string) *Value {
 	var _arg1 *C.char     // out
 	var _cret *C.JSCValue // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -876,7 +891,7 @@ func (value *Value) ObjectGetPropertyAtIndex(index uint) *Value {
 	var _arg1 C.guint     // out
 	var _cret *C.JSCValue // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 	_arg1 = C.guint(index)
 
 	_cret = C.jsc_value_object_get_property_at_index(_arg0, _arg1)
@@ -905,7 +920,7 @@ func (value *Value) ObjectHasProperty(name string) bool {
 	var _arg1 *C.char     // out
 	var _cret C.gboolean  // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -947,7 +962,7 @@ func (value *Value) ObjectInvokeMethod(name string, parameters []*Value) *Value 
 	var _arg2 C.guint
 	var _cret *C.JSCValue // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
 	defer C.free(unsafe.Pointer(_arg1))
 	if parameters != nil {
@@ -957,7 +972,7 @@ func (value *Value) ObjectInvokeMethod(name string, parameters []*Value) *Value 
 		{
 			out := unsafe.Slice((**C.JSCValue)(_arg3), len(parameters))
 			for i := range parameters {
-				out[i] = (*C.JSCValue)(unsafe.Pointer(parameters[i].Native()))
+				out[i] = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(parameters[i]).Native()))
 			}
 		}
 	}
@@ -990,7 +1005,7 @@ func (value *Value) ObjectIsInstanceOf(name string) bool {
 	var _arg1 *C.char     // out
 	var _cret C.gboolean  // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -1019,10 +1034,10 @@ func (value *Value) ObjectSetProperty(name string, property *Value) {
 	var _arg1 *C.char     // out
 	var _arg2 *C.JSCValue // out
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
 	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.JSCValue)(unsafe.Pointer(property.Native()))
+	_arg2 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(property).Native()))
 
 	C.jsc_value_object_set_property(_arg0, _arg1, _arg2)
 	runtime.KeepAlive(value)
@@ -1042,9 +1057,9 @@ func (value *Value) ObjectSetPropertyAtIndex(index uint, property *Value) {
 	var _arg1 C.guint     // out
 	var _arg2 *C.JSCValue // out
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 	_arg1 = C.guint(index)
-	_arg2 = (*C.JSCValue)(unsafe.Pointer(property.Native()))
+	_arg2 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(property).Native()))
 
 	C.jsc_value_object_set_property_at_index(_arg0, _arg1, _arg2)
 	runtime.KeepAlive(value)
@@ -1062,7 +1077,7 @@ func (value *Value) ToBoolean() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	_cret = C.jsc_value_to_boolean(_arg0)
 	runtime.KeepAlive(value)
@@ -1086,7 +1101,7 @@ func (value *Value) ToDouble() float64 {
 	var _arg0 *C.JSCValue // out
 	var _cret C.double    // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	_cret = C.jsc_value_to_double(_arg0)
 	runtime.KeepAlive(value)
@@ -1108,7 +1123,7 @@ func (value *Value) ToInt32() int32 {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gint32    // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	_cret = C.jsc_value_to_int32(_arg0)
 	runtime.KeepAlive(value)
@@ -1137,7 +1152,7 @@ func (value *Value) ToJson(indent uint) string {
 	var _arg1 C.guint     // out
 	var _cret *C.char     // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 	_arg1 = C.guint(indent)
 
 	_cret = C.jsc_value_to_json(_arg0, _arg1)
@@ -1163,7 +1178,7 @@ func (value *Value) String() string {
 	var _arg0 *C.JSCValue // out
 	var _cret *C.char     // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	_cret = C.jsc_value_to_string(_arg0)
 	runtime.KeepAlive(value)
@@ -1187,7 +1202,7 @@ func (value *Value) ToStringAsBytes() *glib.Bytes {
 	var _arg0 *C.JSCValue // out
 	var _cret *C.GBytes   // in
 
-	_arg0 = (*C.JSCValue)(unsafe.Pointer(value.Native()))
+	_arg0 = (*C.JSCValue)(unsafe.Pointer(externglib.InternObject(value).Native()))
 
 	_cret = C.jsc_value_to_string_as_bytes(_arg0)
 	runtime.KeepAlive(value)

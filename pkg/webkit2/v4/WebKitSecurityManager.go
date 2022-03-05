@@ -14,10 +14,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitSecurityManager.go.
+var GTypeSecurityManager = externglib.Type(C.webkit_security_manager_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_security_manager_get_type()), F: marshalSecurityManagerer},
+		{T: GTypeSecurityManager, F: marshalSecurityManager},
 	})
+}
+
+// SecurityManagerOverrider contains methods that are overridable.
+type SecurityManagerOverrider interface {
 }
 
 type SecurityManager struct {
@@ -29,13 +36,21 @@ var (
 	_ externglib.Objector = (*SecurityManager)(nil)
 )
 
+func classInitSecurityManagerer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapSecurityManager(obj *externglib.Object) *SecurityManager {
 	return &SecurityManager{
 		Object: obj,
 	}
 }
 
-func marshalSecurityManagerer(p uintptr) (interface{}, error) {
+func marshalSecurityManager(p uintptr) (interface{}, error) {
 	return wrapSecurityManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -51,7 +66,7 @@ func (securityManager *SecurityManager) RegisterURISchemeAsCorsEnabled(scheme st
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -72,7 +87,7 @@ func (securityManager *SecurityManager) RegisterURISchemeAsDisplayIsolated(schem
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -92,7 +107,7 @@ func (securityManager *SecurityManager) RegisterURISchemeAsEmptyDocument(scheme 
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -112,7 +127,7 @@ func (securityManager *SecurityManager) RegisterURISchemeAsLocal(scheme string) 
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -133,7 +148,7 @@ func (securityManager *SecurityManager) RegisterURISchemeAsNoAccess(scheme strin
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -154,7 +169,7 @@ func (securityManager *SecurityManager) RegisterURISchemeAsSecure(scheme string)
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -180,7 +195,7 @@ func (securityManager *SecurityManager) URISchemeIsCorsEnabled(scheme string) bo
 	var _arg1 *C.gchar                 // out
 	var _cret C.gboolean               // in
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -214,7 +229,7 @@ func (securityManager *SecurityManager) URISchemeIsDisplayIsolated(scheme string
 	var _arg1 *C.gchar                 // out
 	var _cret C.gboolean               // in
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -248,7 +263,7 @@ func (securityManager *SecurityManager) URISchemeIsEmptyDocument(scheme string) 
 	var _arg1 *C.gchar                 // out
 	var _cret C.gboolean               // in
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -281,7 +296,7 @@ func (securityManager *SecurityManager) URISchemeIsLocal(scheme string) bool {
 	var _arg1 *C.gchar                 // out
 	var _cret C.gboolean               // in
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -314,7 +329,7 @@ func (securityManager *SecurityManager) URISchemeIsNoAccess(scheme string) bool 
 	var _arg1 *C.gchar                 // out
 	var _cret C.gboolean               // in
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -347,7 +362,7 @@ func (securityManager *SecurityManager) URISchemeIsSecure(scheme string) bool {
 	var _arg1 *C.gchar                 // out
 	var _cret C.gboolean               // in
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(securityManager.Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 

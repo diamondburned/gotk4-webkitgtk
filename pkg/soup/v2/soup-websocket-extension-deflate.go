@@ -13,10 +13,17 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-websocket-extension-deflate.go.
+var GTypeWebsocketExtensionDeflate = externglib.Type(C.soup_websocket_extension_deflate_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_websocket_extension_deflate_get_type()), F: marshalWebsocketExtensionDeflater},
+		{T: GTypeWebsocketExtensionDeflate, F: marshalWebsocketExtensionDeflate},
 	})
+}
+
+// WebsocketExtensionDeflateOverrider contains methods that are overridable.
+type WebsocketExtensionDeflateOverrider interface {
 }
 
 type WebsocketExtensionDeflate struct {
@@ -28,6 +35,14 @@ var (
 	_ WebsocketExtensioner = (*WebsocketExtensionDeflate)(nil)
 )
 
+func classInitWebsocketExtensionDeflater(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapWebsocketExtensionDeflate(obj *externglib.Object) *WebsocketExtensionDeflate {
 	return &WebsocketExtensionDeflate{
 		WebsocketExtension: WebsocketExtension{
@@ -36,6 +51,6 @@ func wrapWebsocketExtensionDeflate(obj *externglib.Object) *WebsocketExtensionDe
 	}
 }
 
-func marshalWebsocketExtensionDeflater(p uintptr) (interface{}, error) {
+func marshalWebsocketExtensionDeflate(p uintptr) (interface{}, error) {
 	return wrapWebsocketExtensionDeflate(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }

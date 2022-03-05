@@ -16,10 +16,16 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitNetworkProxySettings.go.
+var (
+	GTypeNetworkProxyMode     = externglib.Type(C.webkit_network_proxy_mode_get_type())
+	GTypeNetworkProxySettings = externglib.Type(C.webkit_network_proxy_settings_get_type())
+)
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_network_proxy_mode_get_type()), F: marshalNetworkProxyMode},
-		{T: externglib.Type(C.webkit_network_proxy_settings_get_type()), F: marshalNetworkProxySettings},
+		{T: GTypeNetworkProxyMode, F: marshalNetworkProxyMode},
+		{T: GTypeNetworkProxySettings, F: marshalNetworkProxySettings},
 	})
 }
 

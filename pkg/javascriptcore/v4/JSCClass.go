@@ -14,10 +14,17 @@ import (
 // #include <jsc/jsc.h>
 import "C"
 
+// glib.Type values for JSCClass.go.
+var GTypeClass = externglib.Type(C.jsc_class_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.jsc_class_get_type()), F: marshalClasser},
+		{T: GTypeClass, F: marshalClass},
 	})
+}
+
+// ClassOverrider contains methods that are overridable.
+type ClassOverrider interface {
 }
 
 type Class struct {
@@ -29,13 +36,21 @@ var (
 	_ externglib.Objector = (*Class)(nil)
 )
 
+func classInitClasser(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapClass(obj *externglib.Object) *Class {
 	return &Class{
 		Object: obj,
 	}
 }
 
-func marshalClasser(p uintptr) (interface{}, error) {
+func marshalClass(p uintptr) (interface{}, error) {
 	return wrapClass(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -49,7 +64,7 @@ func (jscClass *Class) Name() string {
 	var _arg0 *C.JSCClass // out
 	var _cret *C.char     // in
 
-	_arg0 = (*C.JSCClass)(unsafe.Pointer(jscClass.Native()))
+	_arg0 = (*C.JSCClass)(unsafe.Pointer(externglib.InternObject(jscClass).Native()))
 
 	_cret = C.jsc_class_get_name(_arg0)
 	runtime.KeepAlive(jscClass)
@@ -71,7 +86,7 @@ func (jscClass *Class) Parent() *Class {
 	var _arg0 *C.JSCClass // out
 	var _cret *C.JSCClass // in
 
-	_arg0 = (*C.JSCClass)(unsafe.Pointer(jscClass.Native()))
+	_arg0 = (*C.JSCClass)(unsafe.Pointer(externglib.InternObject(jscClass).Native()))
 
 	_cret = C.jsc_class_get_parent(_arg0)
 	runtime.KeepAlive(jscClass)

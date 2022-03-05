@@ -14,13 +14,20 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
+// glib.Type values for soup-hsts-enforcer-db.go.
+var GTypeHSTSEnforcerDB = externglib.Type(C.soup_hsts_enforcer_db_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_hsts_enforcer_db_get_type()), F: marshalHSTSEnforcerDBer},
+		{T: GTypeHSTSEnforcerDB, F: marshalHSTSEnforcerDB},
 	})
 }
 
 const HSTS_ENFORCER_DB_FILENAME = "filename"
+
+// HSTSEnforcerDBOverrider contains methods that are overridable.
+type HSTSEnforcerDBOverrider interface {
+}
 
 type HSTSEnforcerDB struct {
 	_ [0]func() // equal guard
@@ -30,6 +37,14 @@ type HSTSEnforcerDB struct {
 var (
 	_ externglib.Objector = (*HSTSEnforcerDB)(nil)
 )
+
+func classInitHSTSEnforcerDBer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
 
 func wrapHSTSEnforcerDB(obj *externglib.Object) *HSTSEnforcerDB {
 	return &HSTSEnforcerDB{
@@ -42,7 +57,7 @@ func wrapHSTSEnforcerDB(obj *externglib.Object) *HSTSEnforcerDB {
 	}
 }
 
-func marshalHSTSEnforcerDBer(p uintptr) (interface{}, error) {
+func marshalHSTSEnforcerDB(p uintptr) (interface{}, error) {
 	return wrapHSTSEnforcerDB(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 

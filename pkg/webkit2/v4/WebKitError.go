@@ -14,15 +14,26 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitError.go.
+var (
+	GTypeDownloadError   = externglib.Type(C.webkit_download_error_get_type())
+	GTypeJavascriptError = externglib.Type(C.webkit_javascript_error_get_type())
+	GTypeNetworkError    = externglib.Type(C.webkit_network_error_get_type())
+	GTypePluginError     = externglib.Type(C.webkit_plugin_error_get_type())
+	GTypePolicyError     = externglib.Type(C.webkit_policy_error_get_type())
+	GTypePrintError      = externglib.Type(C.webkit_print_error_get_type())
+	GTypeSnapshotError   = externglib.Type(C.webkit_snapshot_error_get_type())
+)
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_download_error_get_type()), F: marshalDownloadError},
-		{T: externglib.Type(C.webkit_javascript_error_get_type()), F: marshalJavascriptError},
-		{T: externglib.Type(C.webkit_network_error_get_type()), F: marshalNetworkError},
-		{T: externglib.Type(C.webkit_plugin_error_get_type()), F: marshalPluginError},
-		{T: externglib.Type(C.webkit_policy_error_get_type()), F: marshalPolicyError},
-		{T: externglib.Type(C.webkit_print_error_get_type()), F: marshalPrintError},
-		{T: externglib.Type(C.webkit_snapshot_error_get_type()), F: marshalSnapshotError},
+		{T: GTypeDownloadError, F: marshalDownloadError},
+		{T: GTypeJavascriptError, F: marshalJavascriptError},
+		{T: GTypeNetworkError, F: marshalNetworkError},
+		{T: GTypePluginError, F: marshalPluginError},
+		{T: GTypePolicyError, F: marshalPolicyError},
+		{T: GTypePrintError, F: marshalPrintError},
+		{T: GTypeSnapshotError, F: marshalSnapshotError},
 	})
 }
 

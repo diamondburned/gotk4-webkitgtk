@@ -17,10 +17,16 @@ import (
 // #include <libsoup/soup-gnome.h>
 import "C"
 
+// glib.Type values for soupgnome.go.
+var (
+	GTypePasswordManagerGNOME = externglib.Type(C.soup_password_manager_gnome_get_type())
+	GTypeProxyResolverGNOME   = externglib.Type(C.soup_proxy_resolver_gnome_get_type())
+)
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_password_manager_gnome_get_type()), F: marshalPasswordManagerGNOMEer},
-		{T: externglib.Type(C.soup_proxy_resolver_gnome_get_type()), F: marshalProxyResolverGNOMEer},
+		{T: GTypePasswordManagerGNOME, F: marshalPasswordManagerGNOME},
+		{T: GTypeProxyResolverGNOME, F: marshalProxyResolverGNOME},
 	})
 }
 
@@ -44,7 +50,7 @@ func wrapPasswordManagerGNOME(obj *externglib.Object) *PasswordManagerGNOME {
 	}
 }
 
-func marshalPasswordManagerGNOMEer(p uintptr) (interface{}, error) {
+func marshalPasswordManagerGNOME(p uintptr) (interface{}, error) {
 	return wrapPasswordManagerGNOME(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -70,6 +76,6 @@ func wrapProxyResolverGNOME(obj *externglib.Object) *ProxyResolverGNOME {
 	}
 }
 
-func marshalProxyResolverGNOMEer(p uintptr) (interface{}, error) {
+func marshalProxyResolverGNOME(p uintptr) (interface{}, error) {
 	return wrapProxyResolverGNOME(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }

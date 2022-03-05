@@ -19,13 +19,20 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
-// void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern void _gotk4_webkit24_FaviconDatabase_ConnectFaviconChanged(gpointer, gchar*, gchar*, guintptr);
 import "C"
+
+// glib.Type values for WebKitFaviconDatabase.go.
+var (
+	GTypeFaviconDatabaseError = externglib.Type(C.webkit_favicon_database_error_get_type())
+	GTypeFaviconDatabase      = externglib.Type(C.webkit_favicon_database_get_type())
+)
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_favicon_database_error_get_type()), F: marshalFaviconDatabaseError},
-		{T: externglib.Type(C.webkit_favicon_database_get_type()), F: marshalFaviconDatabaser},
+		{T: GTypeFaviconDatabaseError, F: marshalFaviconDatabaseError},
+		{T: GTypeFaviconDatabase, F: marshalFaviconDatabase},
 	})
 }
 
@@ -62,6 +69,10 @@ func (f FaviconDatabaseError) String() string {
 	}
 }
 
+// FaviconDatabaseOverrider contains methods that are overridable.
+type FaviconDatabaseOverrider interface {
+}
+
 type FaviconDatabase struct {
 	_ [0]func() // equal guard
 	*externglib.Object
@@ -71,14 +82,44 @@ var (
 	_ externglib.Objector = (*FaviconDatabase)(nil)
 )
 
+func classInitFaviconDatabaser(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapFaviconDatabase(obj *externglib.Object) *FaviconDatabase {
 	return &FaviconDatabase{
 		Object: obj,
 	}
 }
 
-func marshalFaviconDatabaser(p uintptr) (interface{}, error) {
+func marshalFaviconDatabase(p uintptr) (interface{}, error) {
 	return wrapFaviconDatabase(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+//export _gotk4_webkit24_FaviconDatabase_ConnectFaviconChanged
+func _gotk4_webkit24_FaviconDatabase_ConnectFaviconChanged(arg0 C.gpointer, arg1 *C.gchar, arg2 *C.gchar, arg3 C.guintptr) {
+	var f func(pageUri, faviconUri string)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(pageUri, faviconUri string))
+	}
+
+	var _pageUri string    // out
+	var _faviconUri string // out
+
+	_pageUri = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
+	_faviconUri = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
+
+	f(_pageUri, _faviconUri)
 }
 
 // ConnectFaviconChanged: this signal is emitted when the favicon URI of
@@ -88,14 +129,14 @@ func marshalFaviconDatabaser(p uintptr) (interface{}, error) {
 // use the KitWebView:favicon property. See webkit_web_view_get_favicon() for
 // more details.
 func (database *FaviconDatabase) ConnectFaviconChanged(f func(pageUri, faviconUri string)) externglib.SignalHandle {
-	return database.Connect("favicon-changed", f)
+	return externglib.ConnectGeneratedClosure(database, "favicon-changed", false, unsafe.Pointer(C._gotk4_webkit24_FaviconDatabase_ConnectFaviconChanged), f)
 }
 
 // Clear clears all icons from the database.
 func (database *FaviconDatabase) Clear() {
 	var _arg0 *C.WebKitFaviconDatabase // out
 
-	_arg0 = (*C.WebKitFaviconDatabase)(unsafe.Pointer(database.Native()))
+	_arg0 = (*C.WebKitFaviconDatabase)(unsafe.Pointer(externglib.InternObject(database).Native()))
 
 	C.webkit_favicon_database_clear(_arg0)
 	runtime.KeepAlive(database)
@@ -128,7 +169,7 @@ func (database *FaviconDatabase) Favicon(ctx context.Context, pageUri string, ca
 	var _arg3 C.GAsyncReadyCallback    // out
 	var _arg4 C.gpointer
 
-	_arg0 = (*C.WebKitFaviconDatabase)(unsafe.Pointer(database.Native()))
+	_arg0 = (*C.WebKitFaviconDatabase)(unsafe.Pointer(externglib.InternObject(database).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -166,8 +207,8 @@ func (database *FaviconDatabase) FaviconFinish(result gio.AsyncResulter) (*cairo
 	var _cret *C.cairo_surface_t       // in
 	var _cerr *C.GError                // in
 
-	_arg0 = (*C.WebKitFaviconDatabase)(unsafe.Pointer(database.Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(result.Native()))
+	_arg0 = (*C.WebKitFaviconDatabase)(unsafe.Pointer(externglib.InternObject(database).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
 
 	_cret = C.webkit_favicon_database_get_favicon_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(database)
@@ -203,7 +244,7 @@ func (database *FaviconDatabase) FaviconURI(pageUri string) string {
 	var _arg1 *C.gchar                 // out
 	var _cret *C.gchar                 // in
 
-	_arg0 = (*C.WebKitFaviconDatabase)(unsafe.Pointer(database.Native()))
+	_arg0 = (*C.WebKitFaviconDatabase)(unsafe.Pointer(externglib.InternObject(database).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(pageUri)))
 	defer C.free(unsafe.Pointer(_arg1))
 

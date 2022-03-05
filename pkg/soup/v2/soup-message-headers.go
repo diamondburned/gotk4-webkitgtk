@@ -16,15 +16,23 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
-// void _gotk4_soup2_MessageHeadersForEachFunc(char*, char*, gpointer);
+// extern void _gotk4_soup2_MessageHeadersForEachFunc(char*, char*, gpointer);
 import "C"
+
+// glib.Type values for soup-message-headers.go.
+var (
+	GTypeEncoding           = externglib.Type(C.soup_encoding_get_type())
+	GTypeMessageHeadersType = externglib.Type(C.soup_message_headers_type_get_type())
+	GTypeExpectation        = externglib.Type(C.soup_expectation_get_type())
+	GTypeMessageHeaders     = externglib.Type(C.soup_message_headers_get_type())
+)
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_encoding_get_type()), F: marshalEncoding},
-		{T: externglib.Type(C.soup_message_headers_type_get_type()), F: marshalMessageHeadersType},
-		{T: externglib.Type(C.soup_expectation_get_type()), F: marshalExpectation},
-		{T: externglib.Type(C.soup_message_headers_get_type()), F: marshalMessageHeaders},
+		{T: GTypeEncoding, F: marshalEncoding},
+		{T: GTypeMessageHeadersType, F: marshalMessageHeadersType},
+		{T: GTypeExpectation, F: marshalExpectation},
+		{T: GTypeMessageHeaders, F: marshalMessageHeaders},
 	})
 }
 
@@ -155,20 +163,23 @@ func (e Expectation) Has(other Expectation) bool {
 type MessageHeadersForEachFunc func(name, value string)
 
 //export _gotk4_soup2_MessageHeadersForEachFunc
-func _gotk4_soup2_MessageHeadersForEachFunc(arg0 *C.char, arg1 *C.char, arg2 C.gpointer) {
-	v := gbox.Get(uintptr(arg2))
-	if v == nil {
-		panic(`callback not found`)
+func _gotk4_soup2_MessageHeadersForEachFunc(arg1 *C.char, arg2 *C.char, arg3 C.gpointer) {
+	var fn MessageHeadersForEachFunc
+	{
+		v := gbox.Get(uintptr(arg3))
+		if v == nil {
+			panic(`callback not found`)
+		}
+		fn = v.(MessageHeadersForEachFunc)
 	}
 
-	var name string  // out
-	var value string // out
+	var _name string  // out
+	var _value string // out
 
-	name = C.GoString((*C.gchar)(unsafe.Pointer(arg0)))
-	value = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
+	_name = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
+	_value = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
 
-	fn := v.(MessageHeadersForEachFunc)
-	fn(name, value)
+	fn(_name, _value)
 }
 
 // MessageHeaders: HTTP message headers associated with a request or response.
@@ -726,7 +737,7 @@ func (hdrs *MessageHeaders) Ranges(totalLength int64) ([]Range, bool) {
 
 	defer C.free(unsafe.Pointer(_arg2))
 	{
-		src := unsafe.Slice(_arg2, _arg3)
+		src := unsafe.Slice((*C.SoupRange)(_arg2), _arg3)
 		_ranges = make([]Range, _arg3)
 		for i := 0; i < int(_arg3); i++ {
 			_ranges[i] = *(*Range)(gextras.NewStructNative(unsafe.Pointer((&src[i]))))

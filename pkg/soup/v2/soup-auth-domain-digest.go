@@ -13,13 +13,16 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
-// char* _gotk4_soup2_AuthDomainDigestAuthCallback(SoupAuthDomain*, SoupMessage*, char*, gpointer);
+// extern char* _gotk4_soup2_AuthDomainDigestAuthCallback(SoupAuthDomain*, SoupMessage*, char*, gpointer);
 // extern void callbackDelete(gpointer);
 import "C"
 
+// glib.Type values for soup-auth-domain-digest.go.
+var GTypeAuthDomainDigest = externglib.Type(C.soup_auth_domain_digest_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_auth_domain_digest_get_type()), F: marshalAuthDomainDigester},
+		{T: GTypeAuthDomainDigest, F: marshalAuthDomainDigest},
 	})
 }
 
@@ -38,28 +41,35 @@ const AUTH_DOMAIN_DIGEST_AUTH_DATA = "auth-data"
 type AuthDomainDigestAuthCallback func(domain *AuthDomainDigest, msg *Message, username string) (utf8 string)
 
 //export _gotk4_soup2_AuthDomainDigestAuthCallback
-func _gotk4_soup2_AuthDomainDigestAuthCallback(arg0 *C.SoupAuthDomain, arg1 *C.SoupMessage, arg2 *C.char, arg3 C.gpointer) (cret *C.char) {
-	v := gbox.Get(uintptr(arg3))
-	if v == nil {
-		panic(`callback not found`)
+func _gotk4_soup2_AuthDomainDigestAuthCallback(arg1 *C.SoupAuthDomain, arg2 *C.SoupMessage, arg3 *C.char, arg4 C.gpointer) (cret *C.char) {
+	var fn AuthDomainDigestAuthCallback
+	{
+		v := gbox.Get(uintptr(arg4))
+		if v == nil {
+			panic(`callback not found`)
+		}
+		fn = v.(AuthDomainDigestAuthCallback)
 	}
 
-	var domain *AuthDomainDigest // out
-	var msg *Message             // out
-	var username string          // out
+	var _domain *AuthDomainDigest // out
+	var _msg *Message             // out
+	var _username string          // out
 
-	domain = wrapAuthDomainDigest(externglib.Take(unsafe.Pointer(arg0)))
-	msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-	username = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
+	_domain = wrapAuthDomainDigest(externglib.Take(unsafe.Pointer(arg1)))
+	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg2)))
+	_username = C.GoString((*C.gchar)(unsafe.Pointer(arg3)))
 
-	fn := v.(AuthDomainDigestAuthCallback)
-	utf8 := fn(domain, msg, username)
+	utf8 := fn(_domain, _msg, _username)
 
 	if utf8 != "" {
 		cret = (*C.char)(unsafe.Pointer(C.CString(utf8)))
 	}
 
 	return cret
+}
+
+// AuthDomainDigestOverrider contains methods that are overridable.
+type AuthDomainDigestOverrider interface {
 }
 
 type AuthDomainDigest struct {
@@ -71,6 +81,14 @@ var (
 	_ AuthDomainer = (*AuthDomainDigest)(nil)
 )
 
+func classInitAuthDomainDigester(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapAuthDomainDigest(obj *externglib.Object) *AuthDomainDigest {
 	return &AuthDomainDigest{
 		AuthDomain: AuthDomain{
@@ -79,7 +97,7 @@ func wrapAuthDomainDigest(obj *externglib.Object) *AuthDomainDigest {
 	}
 }
 
-func marshalAuthDomainDigester(p uintptr) (interface{}, error) {
+func marshalAuthDomainDigest(p uintptr) (interface{}, error) {
 	return wrapAuthDomainDigest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -102,7 +120,7 @@ func (domain *AuthDomainDigest) SetAuthCallback(callback AuthDomainDigestAuthCal
 	var _arg2 C.gpointer
 	var _arg3 C.GDestroyNotify
 
-	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(domain.Native()))
+	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(externglib.InternObject(domain).Native()))
 	_arg1 = (*[0]byte)(C._gotk4_soup2_AuthDomainDigestAuthCallback)
 	_arg2 = C.gpointer(gbox.Assign(callback))
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))

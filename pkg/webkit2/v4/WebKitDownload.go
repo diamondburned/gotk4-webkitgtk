@@ -6,24 +6,32 @@ import (
 	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
+// extern gboolean _gotk4_webkit24_DownloadClass_decide_destination(WebKitDownload*, gchar*);
+// extern gboolean _gotk4_webkit24_Download_ConnectDecideDestination(gpointer, gchar*, guintptr);
+// extern void _gotk4_webkit24_Download_ConnectCreatedDestination(gpointer, gchar*, guintptr);
+// extern void _gotk4_webkit24_Download_ConnectFailed(gpointer, GError*, guintptr);
+// extern void _gotk4_webkit24_Download_ConnectFinished(gpointer, guintptr);
+// extern void _gotk4_webkit24_Download_ConnectReceivedData(gpointer, guint64, guintptr);
 import "C"
+
+// glib.Type values for WebKitDownload.go.
+var GTypeDownload = externglib.Type(C.webkit_download_get_type())
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_download_get_type()), F: marshalDownloader},
+		{T: GTypeDownload, F: marshalDownload},
 	})
 }
 
 // DownloadOverrider contains methods that are overridable.
-//
-// As of right now, interface overriding and subclassing is not supported
-// yet, so the interface currently has no use.
 type DownloadOverrider interface {
 	// The function takes the following parameters:
 	//
@@ -41,43 +49,193 @@ var (
 	_ externglib.Objector = (*Download)(nil)
 )
 
+func classInitDownloader(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+	goval := gbox.Get(uintptr(data))
+	pclass := (*C.WebKitDownloadClass)(unsafe.Pointer(gclassPtr))
+	// gclass := (*C.GTypeClass)(unsafe.Pointer(gclassPtr))
+	// pclass := (*C.WebKitDownloadClass)(unsafe.Pointer(C.g_type_class_peek_parent(gclass)))
+
+	if _, ok := goval.(interface {
+		DecideDestination(suggestedFilename string) bool
+	}); ok {
+		pclass.decide_destination = (*[0]byte)(C._gotk4_webkit24_DownloadClass_decide_destination)
+	}
+}
+
+//export _gotk4_webkit24_DownloadClass_decide_destination
+func _gotk4_webkit24_DownloadClass_decide_destination(arg0 *C.WebKitDownload, arg1 *C.gchar) (cret C.gboolean) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface {
+		DecideDestination(suggestedFilename string) bool
+	})
+
+	var _suggestedFilename string // out
+
+	_suggestedFilename = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
+
+	ok := iface.DecideDestination(_suggestedFilename)
+
+	if ok {
+		cret = C.TRUE
+	}
+
+	return cret
+}
+
 func wrapDownload(obj *externglib.Object) *Download {
 	return &Download{
 		Object: obj,
 	}
 }
 
-func marshalDownloader(p uintptr) (interface{}, error) {
+func marshalDownload(p uintptr) (interface{}, error) {
 	return wrapDownload(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+//export _gotk4_webkit24_Download_ConnectCreatedDestination
+func _gotk4_webkit24_Download_ConnectCreatedDestination(arg0 C.gpointer, arg1 *C.gchar, arg2 C.guintptr) {
+	var f func(destination string)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(destination string))
+	}
+
+	var _destination string // out
+
+	_destination = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
+
+	f(_destination)
 }
 
 // ConnectCreatedDestination: this signal is emitted after
 // KitDownload::decide-destination and before KitDownload::received-data to
 // notify that destination file has been created successfully at destination.
 func (download *Download) ConnectCreatedDestination(f func(destination string)) externglib.SignalHandle {
-	return download.Connect("created-destination", f)
+	return externglib.ConnectGeneratedClosure(download, "created-destination", false, unsafe.Pointer(C._gotk4_webkit24_Download_ConnectCreatedDestination), f)
+}
+
+//export _gotk4_webkit24_Download_ConnectDecideDestination
+func _gotk4_webkit24_Download_ConnectDecideDestination(arg0 C.gpointer, arg1 *C.gchar, arg2 C.guintptr) (cret C.gboolean) {
+	var f func(suggestedFilename string) (ok bool)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(suggestedFilename string) (ok bool))
+	}
+
+	var _suggestedFilename string // out
+
+	_suggestedFilename = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
+
+	ok := f(_suggestedFilename)
+
+	if ok {
+		cret = C.TRUE
+	}
+
+	return cret
 }
 
 // ConnectDecideDestination: this signal is emitted after response is received
 // to decide a destination URI for the download. If this signal is not handled
 // the file will be downloaded to G_USER_DIRECTORY_DOWNLOAD directory using
 // suggested_filename.
-func (download *Download) ConnectDecideDestination(f func(suggestedFilename string) bool) externglib.SignalHandle {
-	return download.Connect("decide-destination", f)
+func (download *Download) ConnectDecideDestination(f func(suggestedFilename string) (ok bool)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(download, "decide-destination", false, unsafe.Pointer(C._gotk4_webkit24_Download_ConnectDecideDestination), f)
+}
+
+//export _gotk4_webkit24_Download_ConnectFailed
+func _gotk4_webkit24_Download_ConnectFailed(arg0 C.gpointer, arg1 *C.GError, arg2 C.guintptr) {
+	var f func(err error)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(err error))
+	}
+
+	var _err error // out
+
+	_err = gerror.Take(unsafe.Pointer(arg1))
+
+	f(_err)
+}
+
+// ConnectFailed: this signal is emitted when an error occurs during the
+// download operation. The given error, of the domain WEBKIT_DOWNLOAD_ERROR,
+// contains further details of the failure. If the download is cancelled with
+// webkit_download_cancel(), this signal is emitted with error
+// WEBKIT_DOWNLOAD_ERROR_CANCELLED_BY_USER. The download operation finishes
+// after an error and KitDownload::finished signal is emitted after this one.
+func (download *Download) ConnectFailed(f func(err error)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(download, "failed", false, unsafe.Pointer(C._gotk4_webkit24_Download_ConnectFailed), f)
+}
+
+//export _gotk4_webkit24_Download_ConnectFinished
+func _gotk4_webkit24_Download_ConnectFinished(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
 }
 
 // ConnectFinished: this signal is emitted when download finishes successfully
 // or due to an error. In case of errors KitDownload::failed signal is emitted
 // before this one.
 func (download *Download) ConnectFinished(f func()) externglib.SignalHandle {
-	return download.Connect("finished", f)
+	return externglib.ConnectGeneratedClosure(download, "finished", false, unsafe.Pointer(C._gotk4_webkit24_Download_ConnectFinished), f)
+}
+
+//export _gotk4_webkit24_Download_ConnectReceivedData
+func _gotk4_webkit24_Download_ConnectReceivedData(arg0 C.gpointer, arg1 C.guint64, arg2 C.guintptr) {
+	var f func(dataLength uint64)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(dataLength uint64))
+	}
+
+	var _dataLength uint64 // out
+
+	_dataLength = uint64(arg1)
+
+	f(_dataLength)
 }
 
 // ConnectReceivedData: this signal is emitted after response is received, every
 // time new data has been written to the destination. It's useful to know the
 // progress of the download operation.
 func (download *Download) ConnectReceivedData(f func(dataLength uint64)) externglib.SignalHandle {
-	return download.Connect("received-data", f)
+	return externglib.ConnectGeneratedClosure(download, "received-data", false, unsafe.Pointer(C._gotk4_webkit24_Download_ConnectReceivedData), f)
 }
 
 // Cancel cancels the download. When the ongoing download operation is
@@ -86,7 +244,7 @@ func (download *Download) ConnectReceivedData(f func(dataLength uint64)) externg
 func (download *Download) Cancel() {
 	var _arg0 *C.WebKitDownload // out
 
-	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
+	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(externglib.InternObject(download).Native()))
 
 	C.webkit_download_cancel(_arg0)
 	runtime.KeepAlive(download)
@@ -104,7 +262,7 @@ func (download *Download) AllowOverwrite() bool {
 	var _arg0 *C.WebKitDownload // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
+	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(externglib.InternObject(download).Native()))
 
 	_cret = C.webkit_download_get_allow_overwrite(_arg0)
 	runtime.KeepAlive(download)
@@ -130,7 +288,7 @@ func (download *Download) Destination() string {
 	var _arg0 *C.WebKitDownload // out
 	var _cret *C.gchar          // in
 
-	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
+	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(externglib.InternObject(download).Native()))
 
 	_cret = C.webkit_download_get_destination(_arg0)
 	runtime.KeepAlive(download)
@@ -154,7 +312,7 @@ func (download *Download) ElapsedTime() float64 {
 	var _arg0 *C.WebKitDownload // out
 	var _cret C.gdouble         // in
 
-	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
+	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(externglib.InternObject(download).Native()))
 
 	_cret = C.webkit_download_get_elapsed_time(_arg0)
 	runtime.KeepAlive(download)
@@ -179,7 +337,7 @@ func (download *Download) EstimatedProgress() float64 {
 	var _arg0 *C.WebKitDownload // out
 	var _cret C.gdouble         // in
 
-	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
+	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(externglib.InternObject(download).Native()))
 
 	_cret = C.webkit_download_get_estimated_progress(_arg0)
 	runtime.KeepAlive(download)
@@ -202,7 +360,7 @@ func (download *Download) ReceivedDataLength() uint64 {
 	var _arg0 *C.WebKitDownload // out
 	var _cret C.guint64         // in
 
-	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
+	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(externglib.InternObject(download).Native()))
 
 	_cret = C.webkit_download_get_received_data_length(_arg0)
 	runtime.KeepAlive(download)
@@ -224,7 +382,7 @@ func (download *Download) Request() *URIRequest {
 	var _arg0 *C.WebKitDownload   // out
 	var _cret *C.WebKitURIRequest // in
 
-	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
+	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(externglib.InternObject(download).Native()))
 
 	_cret = C.webkit_download_get_request(_arg0)
 	runtime.KeepAlive(download)
@@ -249,7 +407,7 @@ func (download *Download) Response() *URIResponse {
 	var _arg0 *C.WebKitDownload    // out
 	var _cret *C.WebKitURIResponse // in
 
-	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
+	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(externglib.InternObject(download).Native()))
 
 	_cret = C.webkit_download_get_response(_arg0)
 	runtime.KeepAlive(download)
@@ -272,7 +430,7 @@ func (download *Download) WebView() *WebView {
 	var _arg0 *C.WebKitDownload // out
 	var _cret *C.WebKitWebView  // in
 
-	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
+	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(externglib.InternObject(download).Native()))
 
 	_cret = C.webkit_download_get_web_view(_arg0)
 	runtime.KeepAlive(download)
@@ -296,7 +454,7 @@ func (download *Download) SetAllowOverwrite(allowed bool) {
 	var _arg0 *C.WebKitDownload // out
 	var _arg1 C.gboolean        // out
 
-	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
+	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(externglib.InternObject(download).Native()))
 	if allowed {
 		_arg1 = C.TRUE
 	}
@@ -326,7 +484,7 @@ func (download *Download) SetDestination(uri string) {
 	var _arg0 *C.WebKitDownload // out
 	var _arg1 *C.gchar          // out
 
-	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(download.Native()))
+	_arg0 = (*C.WebKitDownload)(unsafe.Pointer(externglib.InternObject(download).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(uri)))
 	defer C.free(unsafe.Pointer(_arg1))
 

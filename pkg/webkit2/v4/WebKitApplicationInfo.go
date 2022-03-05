@@ -15,9 +15,12 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitApplicationInfo.go.
+var GTypeApplicationInfo = externglib.Type(C.webkit_application_info_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_application_info_get_type()), F: marshalApplicationInfo},
+		{T: GTypeApplicationInfo, F: marshalApplicationInfo},
 	})
 }
 

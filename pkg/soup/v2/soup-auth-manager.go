@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
@@ -13,18 +14,20 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
+// extern void _gotk4_soup2_AuthManagerClass_authenticate(SoupAuthManager*, SoupMessage*, SoupAuth*, gboolean);
+// extern void _gotk4_soup2_AuthManager_ConnectAuthenticate(gpointer, SoupMessage*, SoupAuth*, gboolean, guintptr);
 import "C"
+
+// glib.Type values for soup-auth-manager.go.
+var GTypeAuthManager = externglib.Type(C.soup_auth_manager_get_type())
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_auth_manager_get_type()), F: marshalAuthManagerer},
+		{T: GTypeAuthManager, F: marshalAuthManager},
 	})
 }
 
 // AuthManagerOverrider contains methods that are overridable.
-//
-// As of right now, interface overriding and subclassing is not supported
-// yet, so the interface currently has no use.
 type AuthManagerOverrider interface {
 	// The function takes the following parameters:
 	//
@@ -46,6 +49,60 @@ var (
 	_ externglib.Objector = (*AuthManager)(nil)
 )
 
+func classInitAuthManagerer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+	goval := gbox.Get(uintptr(data))
+	pclass := (*C.SoupAuthManagerClass)(unsafe.Pointer(gclassPtr))
+	// gclass := (*C.GTypeClass)(unsafe.Pointer(gclassPtr))
+	// pclass := (*C.SoupAuthManagerClass)(unsafe.Pointer(C.g_type_class_peek_parent(gclass)))
+
+	if _, ok := goval.(interface {
+		Authenticate(msg *Message, auth Auther, retrying bool)
+	}); ok {
+		pclass.authenticate = (*[0]byte)(C._gotk4_soup2_AuthManagerClass_authenticate)
+	}
+}
+
+//export _gotk4_soup2_AuthManagerClass_authenticate
+func _gotk4_soup2_AuthManagerClass_authenticate(arg0 *C.SoupAuthManager, arg1 *C.SoupMessage, arg2 *C.SoupAuth, arg3 C.gboolean) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface {
+		Authenticate(msg *Message, auth Auther, retrying bool)
+	})
+
+	var _msg *Message  // out
+	var _auth Auther   // out
+	var _retrying bool // out
+
+	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
+	{
+		objptr := unsafe.Pointer(arg2)
+		if objptr == nil {
+			panic("object of type soup.Auther is nil")
+		}
+
+		object := externglib.Take(objptr)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(Auther)
+			return ok
+		})
+		rv, ok := casted.(Auther)
+		if !ok {
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.Auther")
+		}
+		_auth = rv
+	}
+	if arg3 != 0 {
+		_retrying = true
+	}
+
+	iface.Authenticate(_msg, _auth, _retrying)
+}
+
 func wrapAuthManager(obj *externglib.Object) *AuthManager {
 	return &AuthManager{
 		Object: obj,
@@ -55,24 +112,66 @@ func wrapAuthManager(obj *externglib.Object) *AuthManager {
 	}
 }
 
-func marshalAuthManagerer(p uintptr) (interface{}, error) {
+func marshalAuthManager(p uintptr) (interface{}, error) {
 	return wrapAuthManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// ConnectAuthenticate: emitted when the manager requires the application to
+//export _gotk4_soup2_AuthManager_ConnectAuthenticate
+func _gotk4_soup2_AuthManager_ConnectAuthenticate(arg0 C.gpointer, arg1 *C.SoupMessage, arg2 *C.SoupAuth, arg3 C.gboolean, arg4 C.guintptr) {
+	var f func(msg *Message, auth Auther, retrying bool)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg4))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(msg *Message, auth Auther, retrying bool))
+	}
+
+	var _msg *Message  // out
+	var _auth Auther   // out
+	var _retrying bool // out
+
+	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
+	{
+		objptr := unsafe.Pointer(arg2)
+		if objptr == nil {
+			panic("object of type soup.Auther is nil")
+		}
+
+		object := externglib.Take(objptr)
+		casted := object.WalkCast(func(obj externglib.Objector) bool {
+			_, ok := obj.(Auther)
+			return ok
+		})
+		rv, ok := casted.(Auther)
+		if !ok {
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.Auther")
+		}
+		_auth = rv
+	}
+	if arg3 != 0 {
+		_retrying = true
+	}
+
+	f(_msg, _auth, _retrying)
+}
+
+// ConnectAuthenticate is emitted when the manager requires the application to
 // provide authentication credentials.
 //
 // Session connects to this signal and emits its own Session::authenticate
 // signal when it is emitted, so you shouldn't need to use this signal directly.
-func (manager *AuthManager) ConnectAuthenticate(f func(msg Message, auth Auther, retrying bool)) externglib.SignalHandle {
-	return manager.Connect("authenticate", f)
+func (manager *AuthManager) ConnectAuthenticate(f func(msg *Message, auth Auther, retrying bool)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(manager, "authenticate", false, unsafe.Pointer(C._gotk4_soup2_AuthManager_ConnectAuthenticate), f)
 }
 
 // ClearCachedCredentials: clear all credentials cached by manager.
 func (manager *AuthManager) ClearCachedCredentials() {
 	var _arg0 *C.SoupAuthManager // out
 
-	_arg0 = (*C.SoupAuthManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.SoupAuthManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 
 	C.soup_auth_manager_clear_cached_credentials(_arg0)
 	runtime.KeepAlive(manager)
@@ -97,9 +196,9 @@ func (manager *AuthManager) UseAuth(uri *URI, auth Auther) {
 	var _arg1 *C.SoupURI         // out
 	var _arg2 *C.SoupAuth        // out
 
-	_arg0 = (*C.SoupAuthManager)(unsafe.Pointer(manager.Native()))
+	_arg0 = (*C.SoupAuthManager)(unsafe.Pointer(externglib.InternObject(manager).Native()))
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
-	_arg2 = (*C.SoupAuth)(unsafe.Pointer(auth.Native()))
+	_arg2 = (*C.SoupAuth)(unsafe.Pointer(externglib.InternObject(auth).Native()))
 
 	C.soup_auth_manager_use_auth(_arg0, _arg1, _arg2)
 	runtime.KeepAlive(manager)

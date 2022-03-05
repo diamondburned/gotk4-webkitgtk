@@ -14,10 +14,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitBackForwardListItem.go.
+var GTypeBackForwardListItem = externglib.Type(C.webkit_back_forward_list_item_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_back_forward_list_item_get_type()), F: marshalBackForwardListItemmer},
+		{T: GTypeBackForwardListItem, F: marshalBackForwardListItem},
 	})
+}
+
+// BackForwardListItemOverrider contains methods that are overridable.
+type BackForwardListItemOverrider interface {
 }
 
 type BackForwardListItem struct {
@@ -27,6 +34,14 @@ type BackForwardListItem struct {
 
 var ()
 
+func classInitBackForwardListItemmer(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapBackForwardListItem(obj *externglib.Object) *BackForwardListItem {
 	return &BackForwardListItem{
 		InitiallyUnowned: externglib.InitiallyUnowned{
@@ -35,7 +50,7 @@ func wrapBackForwardListItem(obj *externglib.Object) *BackForwardListItem {
 	}
 }
 
-func marshalBackForwardListItemmer(p uintptr) (interface{}, error) {
+func marshalBackForwardListItem(p uintptr) (interface{}, error) {
 	return wrapBackForwardListItem(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -49,7 +64,7 @@ func (listItem *BackForwardListItem) OriginalURI() string {
 	var _arg0 *C.WebKitBackForwardListItem // out
 	var _cret *C.gchar                     // in
 
-	_arg0 = (*C.WebKitBackForwardListItem)(unsafe.Pointer(listItem.Native()))
+	_arg0 = (*C.WebKitBackForwardListItem)(unsafe.Pointer(externglib.InternObject(listItem).Native()))
 
 	_cret = C.webkit_back_forward_list_item_get_original_uri(_arg0)
 	runtime.KeepAlive(listItem)
@@ -69,7 +84,7 @@ func (listItem *BackForwardListItem) Title() string {
 	var _arg0 *C.WebKitBackForwardListItem // out
 	var _cret *C.gchar                     // in
 
-	_arg0 = (*C.WebKitBackForwardListItem)(unsafe.Pointer(listItem.Native()))
+	_arg0 = (*C.WebKitBackForwardListItem)(unsafe.Pointer(externglib.InternObject(listItem).Native()))
 
 	_cret = C.webkit_back_forward_list_item_get_title(_arg0)
 	runtime.KeepAlive(listItem)
@@ -93,7 +108,7 @@ func (listItem *BackForwardListItem) URI() string {
 	var _arg0 *C.WebKitBackForwardListItem // out
 	var _cret *C.gchar                     // in
 
-	_arg0 = (*C.WebKitBackForwardListItem)(unsafe.Pointer(listItem.Native()))
+	_arg0 = (*C.WebKitBackForwardListItem)(unsafe.Pointer(externglib.InternObject(listItem).Native()))
 
 	_cret = C.webkit_back_forward_list_item_get_uri(_arg0)
 	runtime.KeepAlive(listItem)

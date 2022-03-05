@@ -14,12 +14,20 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
+// extern void _gotk4_webkit24_BackForwardList_ConnectChanged(gpointer, WebKitBackForwardListItem*, gpointer, guintptr);
 import "C"
+
+// glib.Type values for WebKitBackForwardList.go.
+var GTypeBackForwardList = externglib.Type(C.webkit_back_forward_list_get_type())
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_back_forward_list_get_type()), F: marshalBackForwardLister},
+		{T: GTypeBackForwardList, F: marshalBackForwardList},
 	})
+}
+
+// BackForwardListOverrider contains methods that are overridable.
+type BackForwardListOverrider interface {
 }
 
 type BackForwardList struct {
@@ -31,14 +39,46 @@ var (
 	_ externglib.Objector = (*BackForwardList)(nil)
 )
 
+func classInitBackForwardLister(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapBackForwardList(obj *externglib.Object) *BackForwardList {
 	return &BackForwardList{
 		Object: obj,
 	}
 }
 
-func marshalBackForwardLister(p uintptr) (interface{}, error) {
+func marshalBackForwardList(p uintptr) (interface{}, error) {
 	return wrapBackForwardList(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+//export _gotk4_webkit24_BackForwardList_ConnectChanged
+func _gotk4_webkit24_BackForwardList_ConnectChanged(arg0 C.gpointer, arg1 *C.WebKitBackForwardListItem, arg2 C.gpointer, arg3 C.guintptr) {
+	var f func(itemAdded *BackForwardListItem, itemsRemoved cgo.Handle)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(itemAdded *BackForwardListItem, itemsRemoved cgo.Handle))
+	}
+
+	var _itemAdded *BackForwardListItem // out
+	var _itemsRemoved cgo.Handle        // out
+
+	if arg1 != nil {
+		_itemAdded = wrapBackForwardListItem(externglib.Take(unsafe.Pointer(arg1)))
+	}
+	_itemsRemoved = (cgo.Handle)(unsafe.Pointer(arg2))
+
+	f(_itemAdded, _itemsRemoved)
 }
 
 // ConnectChanged: this signal is emitted when back_forward_list changes. This
@@ -46,8 +86,8 @@ func marshalBackForwardLister(p uintptr) (interface{}, error) {
 // items are removed. Note that both item_added and items_removed can NULL when
 // only the current item is updated. Items are only removed when the list is
 // cleared or the maximum items limit is reached.
-func (backForwardList *BackForwardList) ConnectChanged(f func(itemAdded BackForwardListItem, itemsRemoved cgo.Handle)) externglib.SignalHandle {
-	return backForwardList.Connect("changed", f)
+func (backForwardList *BackForwardList) ConnectChanged(f func(itemAdded *BackForwardListItem, itemsRemoved cgo.Handle)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(backForwardList, "changed", false, unsafe.Pointer(C._gotk4_webkit24_BackForwardList_ConnectChanged), f)
 }
 
 // BackItem returns the item that precedes the current item.
@@ -61,7 +101,7 @@ func (backForwardList *BackForwardList) BackItem() *BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList     // out
 	var _cret *C.WebKitBackForwardListItem // in
 
-	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(backForwardList.Native()))
+	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(externglib.InternObject(backForwardList).Native()))
 
 	_cret = C.webkit_back_forward_list_get_back_item(_arg0)
 	runtime.KeepAlive(backForwardList)
@@ -83,7 +123,7 @@ func (backForwardList *BackForwardList) BackList() []BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList // out
 	var _cret *C.GList                 // in
 
-	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(backForwardList.Native()))
+	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(externglib.InternObject(backForwardList).Native()))
 
 	_cret = C.webkit_back_forward_list_get_back_list(_arg0)
 	runtime.KeepAlive(backForwardList)
@@ -114,7 +154,7 @@ func (backForwardList *BackForwardList) BackListWithLimit(limit uint) []BackForw
 	var _arg1 C.guint                  // out
 	var _cret *C.GList                 // in
 
-	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(backForwardList.Native()))
+	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(externglib.InternObject(backForwardList).Native()))
 	_arg1 = C.guint(limit)
 
 	_cret = C.webkit_back_forward_list_get_back_list_with_limit(_arg0, _arg1)
@@ -145,7 +185,7 @@ func (backForwardList *BackForwardList) CurrentItem() *BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList     // out
 	var _cret *C.WebKitBackForwardListItem // in
 
-	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(backForwardList.Native()))
+	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(externglib.InternObject(backForwardList).Native()))
 
 	_cret = C.webkit_back_forward_list_get_current_item(_arg0)
 	runtime.KeepAlive(backForwardList)
@@ -170,7 +210,7 @@ func (backForwardList *BackForwardList) ForwardItem() *BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList     // out
 	var _cret *C.WebKitBackForwardListItem // in
 
-	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(backForwardList.Native()))
+	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(externglib.InternObject(backForwardList).Native()))
 
 	_cret = C.webkit_back_forward_list_get_forward_item(_arg0)
 	runtime.KeepAlive(backForwardList)
@@ -192,7 +232,7 @@ func (backForwardList *BackForwardList) ForwardList() []BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList // out
 	var _cret *C.GList                 // in
 
-	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(backForwardList.Native()))
+	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(externglib.InternObject(backForwardList).Native()))
 
 	_cret = C.webkit_back_forward_list_get_forward_list(_arg0)
 	runtime.KeepAlive(backForwardList)
@@ -223,7 +263,7 @@ func (backForwardList *BackForwardList) ForwardListWithLimit(limit uint) []BackF
 	var _arg1 C.guint                  // out
 	var _cret *C.GList                 // in
 
-	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(backForwardList.Native()))
+	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(externglib.InternObject(backForwardList).Native()))
 	_arg1 = C.guint(limit)
 
 	_cret = C.webkit_back_forward_list_get_forward_list_with_limit(_arg0, _arg1)
@@ -251,7 +291,7 @@ func (backForwardList *BackForwardList) Length() uint {
 	var _arg0 *C.WebKitBackForwardList // out
 	var _cret C.guint                  // in
 
-	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(backForwardList.Native()))
+	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(externglib.InternObject(backForwardList).Native()))
 
 	_cret = C.webkit_back_forward_list_get_length(_arg0)
 	runtime.KeepAlive(backForwardList)
@@ -279,7 +319,7 @@ func (backForwardList *BackForwardList) NthItem(index int) *BackForwardListItem 
 	var _arg1 C.gint                       // out
 	var _cret *C.WebKitBackForwardListItem // in
 
-	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(backForwardList.Native()))
+	_arg0 = (*C.WebKitBackForwardList)(unsafe.Pointer(externglib.InternObject(backForwardList).Native()))
 	_arg1 = C.gint(index)
 
 	_cret = C.webkit_back_forward_list_get_nth_item(_arg0, _arg1)

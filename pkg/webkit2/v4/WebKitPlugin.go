@@ -15,10 +15,17 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitPlugin.go.
+var GTypePlugin = externglib.Type(C.webkit_plugin_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_plugin_get_type()), F: marshalPluginner},
+		{T: GTypePlugin, F: marshalPlugin},
 	})
+}
+
+// PluginOverrider contains methods that are overridable.
+type PluginOverrider interface {
 }
 
 type Plugin struct {
@@ -30,13 +37,21 @@ var (
 	_ externglib.Objector = (*Plugin)(nil)
 )
 
+func classInitPluginner(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+}
+
 func wrapPlugin(obj *externglib.Object) *Plugin {
 	return &Plugin{
 		Object: obj,
 	}
 }
 
-func marshalPluginner(p uintptr) (interface{}, error) {
+func marshalPlugin(p uintptr) (interface{}, error) {
 	return wrapPlugin(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -50,7 +65,7 @@ func (plugin *Plugin) Description() string {
 	var _arg0 *C.WebKitPlugin // out
 	var _cret *C.gchar        // in
 
-	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(plugin.Native()))
+	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(externglib.InternObject(plugin).Native()))
 
 	_cret = C.webkit_plugin_get_description(_arg0)
 	runtime.KeepAlive(plugin)
@@ -75,7 +90,7 @@ func (plugin *Plugin) MIMEInfoList() []*MIMEInfo {
 	var _arg0 *C.WebKitPlugin // out
 	var _cret *C.GList        // in
 
-	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(plugin.Native()))
+	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(externglib.InternObject(plugin).Native()))
 
 	_cret = C.webkit_plugin_get_mime_info_list(_arg0)
 	runtime.KeepAlive(plugin)
@@ -110,7 +125,7 @@ func (plugin *Plugin) Name() string {
 	var _arg0 *C.WebKitPlugin // out
 	var _cret *C.gchar        // in
 
-	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(plugin.Native()))
+	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(externglib.InternObject(plugin).Native()))
 
 	_cret = C.webkit_plugin_get_name(_arg0)
 	runtime.KeepAlive(plugin)
@@ -132,7 +147,7 @@ func (plugin *Plugin) Path() string {
 	var _arg0 *C.WebKitPlugin // out
 	var _cret *C.gchar        // in
 
-	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(plugin.Native()))
+	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(externglib.InternObject(plugin).Native()))
 
 	_cret = C.webkit_plugin_get_path(_arg0)
 	runtime.KeepAlive(plugin)

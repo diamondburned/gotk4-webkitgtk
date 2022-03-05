@@ -8,6 +8,7 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v3"
@@ -16,14 +17,40 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
+// extern gboolean _gotk4_webkit24_InputMethodContextClass_filter_key_event(WebKitInputMethodContext*, GdkEventKey*);
+// extern void _gotk4_webkit24_InputMethodContextClass_committed(WebKitInputMethodContext*, char*);
+// extern void _gotk4_webkit24_InputMethodContextClass_delete_surrounding(WebKitInputMethodContext*, int, guint);
+// extern void _gotk4_webkit24_InputMethodContextClass_get_preedit(WebKitInputMethodContext*, gchar**, GList**, guint*);
+// extern void _gotk4_webkit24_InputMethodContextClass_notify_cursor_area(WebKitInputMethodContext*, int, int, int, int);
+// extern void _gotk4_webkit24_InputMethodContextClass_notify_focus_in(WebKitInputMethodContext*);
+// extern void _gotk4_webkit24_InputMethodContextClass_notify_focus_out(WebKitInputMethodContext*);
+// extern void _gotk4_webkit24_InputMethodContextClass_notify_surrounding(WebKitInputMethodContext*, gchar*, guint, guint, guint);
+// extern void _gotk4_webkit24_InputMethodContextClass_preedit_changed(WebKitInputMethodContext*);
+// extern void _gotk4_webkit24_InputMethodContextClass_preedit_finished(WebKitInputMethodContext*);
+// extern void _gotk4_webkit24_InputMethodContextClass_preedit_started(WebKitInputMethodContext*);
+// extern void _gotk4_webkit24_InputMethodContextClass_reset(WebKitInputMethodContext*);
+// extern void _gotk4_webkit24_InputMethodContextClass_set_enable_preedit(WebKitInputMethodContext*, gboolean);
+// extern void _gotk4_webkit24_InputMethodContext_ConnectCommitted(gpointer, gchar*, guintptr);
+// extern void _gotk4_webkit24_InputMethodContext_ConnectDeleteSurrounding(gpointer, gint, guint, guintptr);
+// extern void _gotk4_webkit24_InputMethodContext_ConnectPreeditChanged(gpointer, guintptr);
+// extern void _gotk4_webkit24_InputMethodContext_ConnectPreeditFinished(gpointer, guintptr);
+// extern void _gotk4_webkit24_InputMethodContext_ConnectPreeditStarted(gpointer, guintptr);
 import "C"
+
+// glib.Type values for WebKitInputMethodContext.go.
+var (
+	GTypeInputPurpose         = externglib.Type(C.webkit_input_purpose_get_type())
+	GTypeInputHints           = externglib.Type(C.webkit_input_hints_get_type())
+	GTypeInputMethodContext   = externglib.Type(C.webkit_input_method_context_get_type())
+	GTypeInputMethodUnderline = externglib.Type(C.webkit_input_method_underline_get_type())
+)
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_input_purpose_get_type()), F: marshalInputPurpose},
-		{T: externglib.Type(C.webkit_input_hints_get_type()), F: marshalInputHints},
-		{T: externglib.Type(C.webkit_input_method_context_get_type()), F: marshalInputMethodContexter},
-		{T: externglib.Type(C.webkit_input_method_underline_get_type()), F: marshalInputMethodUnderline},
+		{T: GTypeInputPurpose, F: marshalInputPurpose},
+		{T: GTypeInputHints, F: marshalInputHints},
+		{T: GTypeInputMethodContext, F: marshalInputMethodContext},
+		{T: GTypeInputMethodUnderline, F: marshalInputMethodUnderline},
 	})
 }
 
@@ -145,9 +172,6 @@ func (i InputHints) Has(other InputHints) bool {
 }
 
 // InputMethodContextOverrider contains methods that are overridable.
-//
-// As of right now, interface overriding and subclassing is not supported
-// yet, so the interface currently has no use.
 type InputMethodContextOverrider interface {
 	// The function takes the following parameters:
 	//
@@ -247,13 +271,252 @@ type InputMethodContexter interface {
 
 var _ InputMethodContexter = (*InputMethodContext)(nil)
 
+func classInitInputMethodContexter(gclassPtr, data C.gpointer) {
+	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+
+	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
+	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+
+	goval := gbox.Get(uintptr(data))
+	pclass := (*C.WebKitInputMethodContextClass)(unsafe.Pointer(gclassPtr))
+	// gclass := (*C.GTypeClass)(unsafe.Pointer(gclassPtr))
+	// pclass := (*C.WebKitInputMethodContextClass)(unsafe.Pointer(C.g_type_class_peek_parent(gclass)))
+
+	if _, ok := goval.(interface{ Committed(text string) }); ok {
+		pclass.committed = (*[0]byte)(C._gotk4_webkit24_InputMethodContextClass_committed)
+	}
+
+	if _, ok := goval.(interface{ DeleteSurrounding(offset int, nChars uint) }); ok {
+		pclass.delete_surrounding = (*[0]byte)(C._gotk4_webkit24_InputMethodContextClass_delete_surrounding)
+	}
+
+	if _, ok := goval.(interface {
+		FilterKeyEvent(keyEvent *gdk.EventKey) bool
+	}); ok {
+		pclass.filter_key_event = (*[0]byte)(C._gotk4_webkit24_InputMethodContextClass_filter_key_event)
+	}
+
+	if _, ok := goval.(interface {
+		Preedit() (string, []*InputMethodUnderline, uint)
+	}); ok {
+		pclass.get_preedit = (*[0]byte)(C._gotk4_webkit24_InputMethodContextClass_get_preedit)
+	}
+
+	if _, ok := goval.(interface{ NotifyCursorArea(x, y, width, height int) }); ok {
+		pclass.notify_cursor_area = (*[0]byte)(C._gotk4_webkit24_InputMethodContextClass_notify_cursor_area)
+	}
+
+	if _, ok := goval.(interface{ NotifyFocusIn() }); ok {
+		pclass.notify_focus_in = (*[0]byte)(C._gotk4_webkit24_InputMethodContextClass_notify_focus_in)
+	}
+
+	if _, ok := goval.(interface{ NotifyFocusOut() }); ok {
+		pclass.notify_focus_out = (*[0]byte)(C._gotk4_webkit24_InputMethodContextClass_notify_focus_out)
+	}
+
+	if _, ok := goval.(interface {
+		NotifySurrounding(text string, length, cursorIndex, selectionIndex uint)
+	}); ok {
+		pclass.notify_surrounding = (*[0]byte)(C._gotk4_webkit24_InputMethodContextClass_notify_surrounding)
+	}
+
+	if _, ok := goval.(interface{ PreeditChanged() }); ok {
+		pclass.preedit_changed = (*[0]byte)(C._gotk4_webkit24_InputMethodContextClass_preedit_changed)
+	}
+
+	if _, ok := goval.(interface{ PreeditFinished() }); ok {
+		pclass.preedit_finished = (*[0]byte)(C._gotk4_webkit24_InputMethodContextClass_preedit_finished)
+	}
+
+	if _, ok := goval.(interface{ PreeditStarted() }); ok {
+		pclass.preedit_started = (*[0]byte)(C._gotk4_webkit24_InputMethodContextClass_preedit_started)
+	}
+
+	if _, ok := goval.(interface{ Reset() }); ok {
+		pclass.reset = (*[0]byte)(C._gotk4_webkit24_InputMethodContextClass_reset)
+	}
+
+	if _, ok := goval.(interface{ SetEnablePreedit(enabled bool) }); ok {
+		pclass.set_enable_preedit = (*[0]byte)(C._gotk4_webkit24_InputMethodContextClass_set_enable_preedit)
+	}
+}
+
+//export _gotk4_webkit24_InputMethodContextClass_committed
+func _gotk4_webkit24_InputMethodContextClass_committed(arg0 *C.WebKitInputMethodContext, arg1 *C.char) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ Committed(text string) })
+
+	var _text string // out
+
+	_text = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
+
+	iface.Committed(_text)
+}
+
+//export _gotk4_webkit24_InputMethodContextClass_delete_surrounding
+func _gotk4_webkit24_InputMethodContextClass_delete_surrounding(arg0 *C.WebKitInputMethodContext, arg1 C.int, arg2 C.guint) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ DeleteSurrounding(offset int, nChars uint) })
+
+	var _offset int  // out
+	var _nChars uint // out
+
+	_offset = int(arg1)
+	_nChars = uint(arg2)
+
+	iface.DeleteSurrounding(_offset, _nChars)
+}
+
+//export _gotk4_webkit24_InputMethodContextClass_filter_key_event
+func _gotk4_webkit24_InputMethodContextClass_filter_key_event(arg0 *C.WebKitInputMethodContext, arg1 *C.GdkEventKey) (cret C.gboolean) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface {
+		FilterKeyEvent(keyEvent *gdk.EventKey) bool
+	})
+
+	var _keyEvent *gdk.EventKey // out
+
+	_keyEvent = (*gdk.EventKey)(gextras.NewStructNative(unsafe.Pointer(arg1)))
+
+	ok := iface.FilterKeyEvent(_keyEvent)
+
+	if ok {
+		cret = C.TRUE
+	}
+
+	return cret
+}
+
+//export _gotk4_webkit24_InputMethodContextClass_get_preedit
+func _gotk4_webkit24_InputMethodContextClass_get_preedit(arg0 *C.WebKitInputMethodContext, arg1 **C.gchar, arg2 **C.GList, arg3 *C.guint) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface {
+		Preedit() (string, []*InputMethodUnderline, uint)
+	})
+
+	text, underlines, cursorOffset := iface.Preedit()
+
+	if text != "" {
+		*arg1 = (*C.gchar)(unsafe.Pointer(C.CString(text)))
+	}
+	if underlines != nil {
+		for i := len(underlines) - 1; i >= 0; i-- {
+			src := underlines[i]
+			var dst *C.WebKitInputMethodUnderline // out
+			dst = (*C.WebKitInputMethodUnderline)(gextras.StructNative(unsafe.Pointer(src)))
+			*arg2 = C.g_list_prepend(*arg2, C.gpointer(unsafe.Pointer(dst)))
+		}
+	}
+	*arg3 = C.guint(cursorOffset)
+}
+
+//export _gotk4_webkit24_InputMethodContextClass_notify_cursor_area
+func _gotk4_webkit24_InputMethodContextClass_notify_cursor_area(arg0 *C.WebKitInputMethodContext, arg1 C.int, arg2 C.int, arg3 C.int, arg4 C.int) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ NotifyCursorArea(x, y, width, height int) })
+
+	var _x int      // out
+	var _y int      // out
+	var _width int  // out
+	var _height int // out
+
+	_x = int(arg1)
+	_y = int(arg2)
+	_width = int(arg3)
+	_height = int(arg4)
+
+	iface.NotifyCursorArea(_x, _y, _width, _height)
+}
+
+//export _gotk4_webkit24_InputMethodContextClass_notify_focus_in
+func _gotk4_webkit24_InputMethodContextClass_notify_focus_in(arg0 *C.WebKitInputMethodContext) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ NotifyFocusIn() })
+
+	iface.NotifyFocusIn()
+}
+
+//export _gotk4_webkit24_InputMethodContextClass_notify_focus_out
+func _gotk4_webkit24_InputMethodContextClass_notify_focus_out(arg0 *C.WebKitInputMethodContext) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ NotifyFocusOut() })
+
+	iface.NotifyFocusOut()
+}
+
+//export _gotk4_webkit24_InputMethodContextClass_notify_surrounding
+func _gotk4_webkit24_InputMethodContextClass_notify_surrounding(arg0 *C.WebKitInputMethodContext, arg1 *C.gchar, arg2 C.guint, arg3 C.guint, arg4 C.guint) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface {
+		NotifySurrounding(text string, length, cursorIndex, selectionIndex uint)
+	})
+
+	var _text string         // out
+	var _length uint         // out
+	var _cursorIndex uint    // out
+	var _selectionIndex uint // out
+
+	_text = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
+	_length = uint(arg2)
+	_cursorIndex = uint(arg3)
+	_selectionIndex = uint(arg4)
+
+	iface.NotifySurrounding(_text, _length, _cursorIndex, _selectionIndex)
+}
+
+//export _gotk4_webkit24_InputMethodContextClass_preedit_changed
+func _gotk4_webkit24_InputMethodContextClass_preedit_changed(arg0 *C.WebKitInputMethodContext) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ PreeditChanged() })
+
+	iface.PreeditChanged()
+}
+
+//export _gotk4_webkit24_InputMethodContextClass_preedit_finished
+func _gotk4_webkit24_InputMethodContextClass_preedit_finished(arg0 *C.WebKitInputMethodContext) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ PreeditFinished() })
+
+	iface.PreeditFinished()
+}
+
+//export _gotk4_webkit24_InputMethodContextClass_preedit_started
+func _gotk4_webkit24_InputMethodContextClass_preedit_started(arg0 *C.WebKitInputMethodContext) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ PreeditStarted() })
+
+	iface.PreeditStarted()
+}
+
+//export _gotk4_webkit24_InputMethodContextClass_reset
+func _gotk4_webkit24_InputMethodContextClass_reset(arg0 *C.WebKitInputMethodContext) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ Reset() })
+
+	iface.Reset()
+}
+
+//export _gotk4_webkit24_InputMethodContextClass_set_enable_preedit
+func _gotk4_webkit24_InputMethodContextClass_set_enable_preedit(arg0 *C.WebKitInputMethodContext, arg1 C.gboolean) {
+	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
+	iface := goval.(interface{ SetEnablePreedit(enabled bool) })
+
+	var _enabled bool // out
+
+	if arg1 != 0 {
+		_enabled = true
+	}
+
+	iface.SetEnablePreedit(_enabled)
+}
+
 func wrapInputMethodContext(obj *externglib.Object) *InputMethodContext {
 	return &InputMethodContext{
 		Object: obj,
 	}
 }
 
-func marshalInputMethodContexter(p uintptr) (interface{}, error) {
+func marshalInputMethodContext(p uintptr) (interface{}, error) {
 	return wrapInputMethodContext(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -266,37 +529,127 @@ func BaseInputMethodContext(obj InputMethodContexter) *InputMethodContext {
 	return obj.baseInputMethodContext()
 }
 
-// ConnectCommitted: emitted when a complete input sequence has been entered by
-// the user. This can be a single character immediately after a key press or the
-// final result of preediting.
-func (context *InputMethodContext) ConnectCommitted(f func(text string)) externglib.SignalHandle {
-	return context.Connect("committed", f)
+//export _gotk4_webkit24_InputMethodContext_ConnectCommitted
+func _gotk4_webkit24_InputMethodContext_ConnectCommitted(arg0 C.gpointer, arg1 *C.gchar, arg2 C.guintptr) {
+	var f func(text string)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(text string))
+	}
+
+	var _text string // out
+
+	_text = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
+
+	f(_text)
 }
 
-// ConnectDeleteSurrounding: emitted when the input method wants to delete the
+// ConnectCommitted is emitted when a complete input sequence has been entered
+// by the user. This can be a single character immediately after a key press or
+// the final result of preediting.
+func (context *InputMethodContext) ConnectCommitted(f func(text string)) externglib.SignalHandle {
+	return externglib.ConnectGeneratedClosure(context, "committed", false, unsafe.Pointer(C._gotk4_webkit24_InputMethodContext_ConnectCommitted), f)
+}
+
+//export _gotk4_webkit24_InputMethodContext_ConnectDeleteSurrounding
+func _gotk4_webkit24_InputMethodContext_ConnectDeleteSurrounding(arg0 C.gpointer, arg1 C.gint, arg2 C.guint, arg3 C.guintptr) {
+	var f func(offset int, nChars uint)
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(offset int, nChars uint))
+	}
+
+	var _offset int  // out
+	var _nChars uint // out
+
+	_offset = int(arg1)
+	_nChars = uint(arg2)
+
+	f(_offset, _nChars)
+}
+
+// ConnectDeleteSurrounding is emitted when the input method wants to delete the
 // context surrounding the cursor. If offset is a negative value, it means a
 // position before the cursor.
 func (context *InputMethodContext) ConnectDeleteSurrounding(f func(offset int, nChars uint)) externglib.SignalHandle {
-	return context.Connect("delete-surrounding", f)
+	return externglib.ConnectGeneratedClosure(context, "delete-surrounding", false, unsafe.Pointer(C._gotk4_webkit24_InputMethodContext_ConnectDeleteSurrounding), f)
 }
 
-// ConnectPreeditChanged: emitted whenever the preedit sequence currently being
-// entered has changed. It is also emitted at the end of a preedit sequence, in
-// which case webkit_input_method_context_get_preedit() returns the empty
-// string.
+//export _gotk4_webkit24_InputMethodContext_ConnectPreeditChanged
+func _gotk4_webkit24_InputMethodContext_ConnectPreeditChanged(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
+}
+
+// ConnectPreeditChanged is emitted whenever the preedit sequence currently
+// being entered has changed. It is also emitted at the end of a preedit
+// sequence, in which case webkit_input_method_context_get_preedit() returns the
+// empty string.
 func (context *InputMethodContext) ConnectPreeditChanged(f func()) externglib.SignalHandle {
-	return context.Connect("preedit-changed", f)
+	return externglib.ConnectGeneratedClosure(context, "preedit-changed", false, unsafe.Pointer(C._gotk4_webkit24_InputMethodContext_ConnectPreeditChanged), f)
 }
 
-// ConnectPreeditFinished: emitted when a preediting sequence has been completed
-// or canceled.
+//export _gotk4_webkit24_InputMethodContext_ConnectPreeditFinished
+func _gotk4_webkit24_InputMethodContext_ConnectPreeditFinished(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
+}
+
+// ConnectPreeditFinished is emitted when a preediting sequence has been
+// completed or canceled.
 func (context *InputMethodContext) ConnectPreeditFinished(f func()) externglib.SignalHandle {
-	return context.Connect("preedit-finished", f)
+	return externglib.ConnectGeneratedClosure(context, "preedit-finished", false, unsafe.Pointer(C._gotk4_webkit24_InputMethodContext_ConnectPreeditFinished), f)
 }
 
-// ConnectPreeditStarted: emitted when a new preediting sequence starts.
+//export _gotk4_webkit24_InputMethodContext_ConnectPreeditStarted
+func _gotk4_webkit24_InputMethodContext_ConnectPreeditStarted(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			panic("given unknown closure user_data")
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
+}
+
+// ConnectPreeditStarted is emitted when a new preediting sequence starts.
 func (context *InputMethodContext) ConnectPreeditStarted(f func()) externglib.SignalHandle {
-	return context.Connect("preedit-started", f)
+	return externglib.ConnectGeneratedClosure(context, "preedit-started", false, unsafe.Pointer(C._gotk4_webkit24_InputMethodContext_ConnectPreeditStarted), f)
 }
 
 // FilterKeyEvent: allow key_event to be handled by the input method. If TRUE is
@@ -315,7 +668,7 @@ func (context *InputMethodContext) FilterKeyEvent(keyEvent *gdk.EventKey) bool {
 	var _arg1 *C.GdkEventKey              // out
 	var _cret C.gboolean                  // in
 
-	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg1 = (*C.GdkEventKey)(gextras.StructNative(unsafe.Pointer(keyEvent)))
 
 	_cret = C.webkit_input_method_context_filter_key_event(_arg0, _arg1)
@@ -341,7 +694,7 @@ func (context *InputMethodContext) InputHints() InputHints {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _cret C.WebKitInputHints          // in
 
-	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 
 	_cret = C.webkit_input_method_context_get_input_hints(_arg0)
 	runtime.KeepAlive(context)
@@ -364,7 +717,7 @@ func (context *InputMethodContext) InputPurpose() InputPurpose {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _cret C.WebKitInputPurpose        // in
 
-	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 
 	_cret = C.webkit_input_method_context_get_input_purpose(_arg0)
 	runtime.KeepAlive(context)
@@ -394,7 +747,7 @@ func (context *InputMethodContext) Preedit() (string, []*InputMethodUnderline, u
 	var _arg2 *C.GList                    // in
 	var _arg3 C.guint                     // in
 
-	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 
 	C.webkit_input_method_context_get_preedit(_arg0, &_arg1, &_arg2, &_arg3)
 	runtime.KeepAlive(context)
@@ -438,7 +791,7 @@ func (context *InputMethodContext) NotifyCursorArea(x, y, width, height int) {
 	var _arg3 C.int                       // out
 	var _arg4 C.int                       // out
 
-	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg1 = C.int(x)
 	_arg2 = C.int(y)
 	_arg3 = C.int(width)
@@ -456,7 +809,7 @@ func (context *InputMethodContext) NotifyCursorArea(x, y, width, height int) {
 func (context *InputMethodContext) NotifyFocusIn() {
 	var _arg0 *C.WebKitInputMethodContext // out
 
-	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 
 	C.webkit_input_method_context_notify_focus_in(_arg0)
 	runtime.KeepAlive(context)
@@ -466,7 +819,7 @@ func (context *InputMethodContext) NotifyFocusIn() {
 func (context *InputMethodContext) NotifyFocusOut() {
 	var _arg0 *C.WebKitInputMethodContext // out
 
-	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 
 	C.webkit_input_method_context_notify_focus_out(_arg0)
 	runtime.KeepAlive(context)
@@ -489,7 +842,7 @@ func (context *InputMethodContext) NotifySurrounding(text string, length int, cu
 	var _arg3 C.guint                     // out
 	var _arg4 C.guint                     // out
 
-	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(text)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.int(length)
@@ -509,7 +862,7 @@ func (context *InputMethodContext) NotifySurrounding(text string, length int, cu
 func (context *InputMethodContext) Reset() {
 	var _arg0 *C.WebKitInputMethodContext // out
 
-	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 
 	C.webkit_input_method_context_reset(_arg0)
 	runtime.KeepAlive(context)
@@ -526,7 +879,7 @@ func (context *InputMethodContext) SetEnablePreedit(enabled bool) {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _arg1 C.gboolean                  // out
 
-	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -542,7 +895,7 @@ func (context *InputMethodContext) SetInputHints(hints InputHints) {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _arg1 C.WebKitInputHints          // out
 
-	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg1 = C.WebKitInputHints(hints)
 
 	C.webkit_input_method_context_set_input_hints(_arg0, _arg1)
@@ -561,7 +914,7 @@ func (context *InputMethodContext) SetInputPurpose(purpose InputPurpose) {
 	var _arg0 *C.WebKitInputMethodContext // out
 	var _arg1 C.WebKitInputPurpose        // out
 
-	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(context.Native()))
+	_arg0 = (*C.WebKitInputMethodContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
 	_arg1 = C.WebKitInputPurpose(purpose)
 
 	C.webkit_input_method_context_set_input_purpose(_arg0, _arg1)

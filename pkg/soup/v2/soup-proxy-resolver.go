@@ -17,12 +17,16 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
-// void _gotk4_soup2_ProxyResolverCallback(SoupProxyResolver*, SoupMessage*, guint, SoupAddress*, gpointer);
+// extern guint _gotk4_soup2_ProxyResolverInterface_get_proxy_sync(SoupProxyResolver*, SoupMessage*, GCancellable*, SoupAddress**);
+// extern void _gotk4_soup2_ProxyResolverCallback(SoupProxyResolver*, SoupMessage*, guint, SoupAddress*, gpointer);
 import "C"
+
+// glib.Type values for soup-proxy-resolver.go.
+var GTypeProxyResolver = externglib.Type(C.soup_proxy_resolver_get_type())
 
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.soup_proxy_resolver_get_type()), F: marshalProxyResolverer},
+		{T: GTypeProxyResolver, F: marshalProxyResolver},
 	})
 }
 
@@ -30,19 +34,23 @@ func init() {
 type ProxyResolverCallback func(proxyResolver ProxyResolverer, msg *Message, arg uint, addr *Address)
 
 //export _gotk4_soup2_ProxyResolverCallback
-func _gotk4_soup2_ProxyResolverCallback(arg0 *C.SoupProxyResolver, arg1 *C.SoupMessage, arg2 C.guint, arg3 *C.SoupAddress, arg4 C.gpointer) {
-	v := gbox.Get(uintptr(arg4))
-	if v == nil {
-		panic(`callback not found`)
+func _gotk4_soup2_ProxyResolverCallback(arg1 *C.SoupProxyResolver, arg2 *C.SoupMessage, arg3 C.guint, arg4 *C.SoupAddress, arg5 C.gpointer) {
+	var fn ProxyResolverCallback
+	{
+		v := gbox.Get(uintptr(arg5))
+		if v == nil {
+			panic(`callback not found`)
+		}
+		fn = v.(ProxyResolverCallback)
 	}
 
-	var proxyResolver ProxyResolverer // out
-	var msg *Message                  // out
-	var arg uint                      // out
-	var addr *Address                 // out
+	var _proxyResolver ProxyResolverer // out
+	var _msg *Message                  // out
+	var _arg uint                      // out
+	var _addr *Address                 // out
 
 	{
-		objptr := unsafe.Pointer(arg0)
+		objptr := unsafe.Pointer(arg1)
 		if objptr == nil {
 			panic("object of type soup.ProxyResolverer is nil")
 		}
@@ -56,46 +64,13 @@ func _gotk4_soup2_ProxyResolverCallback(arg0 *C.SoupProxyResolver, arg1 *C.SoupM
 		if !ok {
 			panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.ProxyResolverer")
 		}
-		proxyResolver = rv
+		_proxyResolver = rv
 	}
-	msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-	arg = uint(arg2)
-	addr = wrapAddress(externglib.Take(unsafe.Pointer(arg3)))
+	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg2)))
+	_arg = uint(arg3)
+	_addr = wrapAddress(externglib.Take(unsafe.Pointer(arg4)))
 
-	fn := v.(ProxyResolverCallback)
-	fn(proxyResolver, msg, arg, addr)
-}
-
-// ProxyResolverOverrider contains methods that are overridable.
-//
-// As of right now, interface overriding and subclassing is not supported
-// yet, so the interface currently has no use.
-type ProxyResolverOverrider interface {
-	// ProxyAsync: deprecated: Use SoupProxyURIResolver.get_proxy_uri_async
-	// instead.
-	//
-	// The function takes the following parameters:
-	//
-	//    - ctx (optional)
-	//    - msg
-	//    - asyncContext
-	//    - callback
-	//
-	ProxyAsync(ctx context.Context, msg *Message, asyncContext *glib.MainContext, callback ProxyResolverCallback)
-	// ProxySync: deprecated: Use SoupProxyURIResolver.get_proxy_uri_sync()
-	// instead.
-	//
-	// The function takes the following parameters:
-	//
-	//    - ctx (optional)
-	//    - msg
-	//
-	// The function returns the following values:
-	//
-	//    - addr
-	//    - guint
-	//
-	ProxySync(ctx context.Context, msg *Message) (*Address, uint)
+	fn(_proxyResolver, _msg, _arg, _addr)
 }
 
 type ProxyResolver struct {
@@ -127,7 +102,7 @@ func wrapProxyResolver(obj *externglib.Object) *ProxyResolver {
 	}
 }
 
-func marshalProxyResolverer(p uintptr) (interface{}, error) {
+func marshalProxyResolver(p uintptr) (interface{}, error) {
 	return wrapProxyResolver(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
@@ -148,13 +123,13 @@ func (proxyResolver *ProxyResolver) ProxyAsync(ctx context.Context, msg *Message
 	var _arg4 C.SoupProxyResolverCallback // out
 	var _arg5 C.gpointer
 
-	_arg0 = (*C.SoupProxyResolver)(unsafe.Pointer(proxyResolver.Native()))
+	_arg0 = (*C.SoupProxyResolver)(unsafe.Pointer(externglib.InternObject(proxyResolver).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
 		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 	_arg2 = (*C.GMainContext)(gextras.StructNative(unsafe.Pointer(asyncContext)))
 	_arg4 = (*[0]byte)(C._gotk4_soup2_ProxyResolverCallback)
 	_arg5 = C.gpointer(gbox.AssignOnce(callback))
@@ -186,13 +161,13 @@ func (proxyResolver *ProxyResolver) ProxySync(ctx context.Context, msg *Message)
 	var _arg3 *C.SoupAddress       // in
 	var _cret C.guint              // in
 
-	_arg0 = (*C.SoupProxyResolver)(unsafe.Pointer(proxyResolver.Native()))
+	_arg0 = (*C.SoupProxyResolver)(unsafe.Pointer(externglib.InternObject(proxyResolver).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
 		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(msg.Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
 
 	_cret = C.soup_proxy_resolver_get_proxy_sync(_arg0, _arg1, _arg2, &_arg3)
 	runtime.KeepAlive(proxyResolver)

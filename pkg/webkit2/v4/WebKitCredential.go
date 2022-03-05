@@ -16,10 +16,16 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for WebKitCredential.go.
+var (
+	GTypeCredentialPersistence = externglib.Type(C.webkit_credential_persistence_get_type())
+	GTypeCredential            = externglib.Type(C.webkit_credential_get_type())
+)
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_credential_persistence_get_type()), F: marshalCredentialPersistence},
-		{T: externglib.Type(C.webkit_credential_get_type()), F: marshalCredential},
+		{T: GTypeCredentialPersistence, F: marshalCredentialPersistence},
+		{T: GTypeCredential, F: marshalCredential},
 	})
 }
 

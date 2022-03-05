@@ -18,9 +18,12 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
+// glib.Type values for webkit2.go.
+var GTypeUserContentFilterError = externglib.Type(C.webkit_user_content_filter_error_get_type())
+
 func init() {
 	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: externglib.Type(C.webkit_user_content_filter_error_get_type()), F: marshalUserContentFilterError},
+		{T: GTypeUserContentFilterError, F: marshalUserContentFilterError},
 	})
 }
 
