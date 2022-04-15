@@ -3,7 +3,7 @@ module github.com/diamondburned/gotk4-webkitgtk
 go 1.17
 
 require (
-	github.com/diamondburned/gotk4 v0.0.3-0.20220305042118-cfb7981704dc
+	github.com/diamondburned/gotk4 v0.0.3-0.20220408070453-08962439fbbc
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
 
