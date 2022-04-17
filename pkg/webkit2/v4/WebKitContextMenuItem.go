@@ -284,7 +284,7 @@ func (item *ContextMenuItem) Action() *gtk.Action {
 //    - action associated to the KitContextMenuItem, or NULL if item is a
 //      separator.
 //
-func (item *ContextMenuItem) Gaction() gio.Actioner {
+func (item *ContextMenuItem) Gaction() *gio.Action {
 	var _arg0 *C.WebKitContextMenuItem // out
 	var _cret *C.GAction               // in
 
@@ -293,24 +293,13 @@ func (item *ContextMenuItem) Gaction() gio.Actioner {
 	_cret = C.webkit_context_menu_item_get_gaction(_arg0)
 	runtime.KeepAlive(item)
 
-	var _action gio.Actioner // out
+	var _action *gio.Action // out
 
 	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gio.Actioner is nil")
+		obj := externglib.Take(unsafe.Pointer(_cret))
+		_action = &gio.Action{
+			Object: obj,
 		}
-
-		object := externglib.Take(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
-			_, ok := obj.(gio.Actioner)
-			return ok
-		})
-		rv, ok := casted.(gio.Actioner)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.Actioner")
-		}
-		_action = rv
 	}
 
 	return _action

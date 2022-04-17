@@ -92,14 +92,14 @@ func NewContextMenu() *ContextMenu {
 //
 //    - contextMenu: newly created KitContextMenu object.
 //
-func NewContextMenuWithItems(items []ContextMenuItem) *ContextMenu {
+func NewContextMenuWithItems(items []*ContextMenuItem) *ContextMenu {
 	var _arg1 *C.GList             // out
 	var _cret *C.WebKitContextMenu // in
 
 	for i := len(items) - 1; i >= 0; i-- {
 		src := items[i]
 		var dst *C.WebKitContextMenuItem // out
-		dst = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject((&src)).Native()))
+		dst = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(src).Native()))
 		_arg1 = C.g_list_prepend(_arg1, C.gpointer(unsafe.Pointer(dst)))
 	}
 	defer C.g_list_free(_arg1)
@@ -191,7 +191,7 @@ func (menu *ContextMenu) ItemAtPosition(position uint) *ContextMenuItem {
 //
 //    - list of KitContextMenuItem<!-- -->s.
 //
-func (menu *ContextMenu) Items() []ContextMenuItem {
+func (menu *ContextMenu) Items() []*ContextMenuItem {
 	var _arg0 *C.WebKitContextMenu // out
 	var _cret *C.GList             // in
 
@@ -200,13 +200,13 @@ func (menu *ContextMenu) Items() []ContextMenuItem {
 	_cret = C.webkit_context_menu_get_items(_arg0)
 	runtime.KeepAlive(menu)
 
-	var _list []ContextMenuItem // out
+	var _list []*ContextMenuItem // out
 
-	_list = make([]ContextMenuItem, 0, gextras.ListSize(unsafe.Pointer(_cret)))
+	_list = make([]*ContextMenuItem, 0, gextras.ListSize(unsafe.Pointer(_cret)))
 	gextras.MoveList(unsafe.Pointer(_cret), false, func(v unsafe.Pointer) {
 		src := (*C.WebKitContextMenuItem)(v)
-		var dst ContextMenuItem // out
-		dst = *wrapContextMenuItem(externglib.Take(unsafe.Pointer(src)))
+		var dst *ContextMenuItem // out
+		dst = wrapContextMenuItem(externglib.Take(unsafe.Pointer(src)))
 		_list = append(_list, dst)
 	})
 

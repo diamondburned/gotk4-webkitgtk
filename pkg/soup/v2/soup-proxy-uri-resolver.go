@@ -72,6 +72,9 @@ func _gotk4_soup2_ProxyURIResolverCallback(arg1 *C.SoupProxyURIResolver, arg2 C.
 	fn(_resolver, _status, _proxyUri)
 }
 
+//
+// ProxyURIResolver wraps an interface. This means the user can get the
+// underlying type by calling Cast().
 type ProxyURIResolver struct {
 	_ [0]func() // equal guard
 	SessionFeature

@@ -66,7 +66,7 @@ func marshalRequestFile(p uintptr) (interface{}, error) {
 //
 //    - ret corresponding to file.
 //
-func (file *RequestFile) File() gio.Filer {
+func (file *RequestFile) File() *gio.File {
 	var _arg0 *C.SoupRequestFile // out
 	var _cret *C.GFile           // in
 
@@ -75,24 +75,13 @@ func (file *RequestFile) File() gio.Filer {
 	_cret = C.soup_request_file_get_file(_arg0)
 	runtime.KeepAlive(file)
 
-	var _ret gio.Filer // out
+	var _ret *gio.File // out
 
 	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gio.Filer is nil")
+		obj := externglib.AssumeOwnership(unsafe.Pointer(_cret))
+		_ret = &gio.File{
+			Object: obj,
 		}
-
-		object := externglib.AssumeOwnership(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
-			_, ok := obj.(gio.Filer)
-			return ok
-		})
-		rv, ok := casted.(gio.Filer)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.Filer")
-		}
-		_ret = rv
 	}
 
 	return _ret

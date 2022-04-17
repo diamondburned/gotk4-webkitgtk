@@ -1024,7 +1024,7 @@ func (session *Session) AsyncContext() *glib.MainContext {
 //
 //    - sessionFeature (optional) or NULL. The feature is owned by session.
 //
-func (session *Session) Feature(featureType externglib.Type) SessionFeaturer {
+func (session *Session) Feature(featureType externglib.Type) *SessionFeature {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 C.GType               // out
 	var _cret *C.SoupSessionFeature // in
@@ -1036,23 +1036,10 @@ func (session *Session) Feature(featureType externglib.Type) SessionFeaturer {
 	runtime.KeepAlive(session)
 	runtime.KeepAlive(featureType)
 
-	var _sessionFeature SessionFeaturer // out
+	var _sessionFeature *SessionFeature // out
 
 	if _cret != nil {
-		{
-			objptr := unsafe.Pointer(_cret)
-
-			object := externglib.Take(objptr)
-			casted := object.WalkCast(func(obj externglib.Objector) bool {
-				_, ok := obj.(SessionFeaturer)
-				return ok
-			})
-			rv, ok := casted.(SessionFeaturer)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.SessionFeaturer")
-			}
-			_sessionFeature = rv
-		}
+		_sessionFeature = wrapSessionFeature(externglib.Take(unsafe.Pointer(_cret)))
 	}
 
 	return _sessionFeature
@@ -1074,7 +1061,7 @@ func (session *Session) Feature(featureType externglib.Type) SessionFeaturer {
 //
 //    - sessionFeature (optional) or NULL. The feature is owned by session.
 //
-func (session *Session) FeatureForMessage(featureType externglib.Type, msg *Message) SessionFeaturer {
+func (session *Session) FeatureForMessage(featureType externglib.Type, msg *Message) *SessionFeature {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 C.GType               // out
 	var _arg2 *C.SoupMessage        // out
@@ -1089,23 +1076,10 @@ func (session *Session) FeatureForMessage(featureType externglib.Type, msg *Mess
 	runtime.KeepAlive(featureType)
 	runtime.KeepAlive(msg)
 
-	var _sessionFeature SessionFeaturer // out
+	var _sessionFeature *SessionFeature // out
 
 	if _cret != nil {
-		{
-			objptr := unsafe.Pointer(_cret)
-
-			object := externglib.Take(objptr)
-			casted := object.WalkCast(func(obj externglib.Objector) bool {
-				_, ok := obj.(SessionFeaturer)
-				return ok
-			})
-			rv, ok := casted.(SessionFeaturer)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.SessionFeaturer")
-			}
-			_sessionFeature = rv
-		}
+		_sessionFeature = wrapSessionFeature(externglib.Take(unsafe.Pointer(_cret)))
 	}
 
 	return _sessionFeature
@@ -1123,7 +1097,7 @@ func (session *Session) FeatureForMessage(featureType externglib.Type, msg *Mess
 //
 //    - sList: a list of features. You must free the list, but not its contents.
 //
-func (session *Session) Features(featureType externglib.Type) []SessionFeaturer {
+func (session *Session) Features(featureType externglib.Type) []*SessionFeature {
 	var _arg0 *C.SoupSession // out
 	var _arg1 C.GType        // out
 	var _cret *C.GSList      // in
@@ -1135,29 +1109,13 @@ func (session *Session) Features(featureType externglib.Type) []SessionFeaturer 
 	runtime.KeepAlive(session)
 	runtime.KeepAlive(featureType)
 
-	var _sList []SessionFeaturer // out
+	var _sList []*SessionFeature // out
 
-	_sList = make([]SessionFeaturer, 0, gextras.SListSize(unsafe.Pointer(_cret)))
+	_sList = make([]*SessionFeature, 0, gextras.SListSize(unsafe.Pointer(_cret)))
 	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
 		src := (*C.SoupSessionFeature)(v)
-		var dst SessionFeaturer // out
-		{
-			objptr := unsafe.Pointer(src)
-			if objptr == nil {
-				panic("object of type soup.SessionFeaturer is nil")
-			}
-
-			object := externglib.Take(objptr)
-			casted := object.WalkCast(func(obj externglib.Objector) bool {
-				_, ok := obj.(SessionFeaturer)
-				return ok
-			})
-			rv, ok := casted.(SessionFeaturer)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.SessionFeaturer")
-			}
-			dst = rv
-		}
+		var dst *SessionFeature // out
+		dst = wrapSessionFeature(externglib.Take(unsafe.Pointer(src)))
 		_sList = append(_sList, dst)
 	})
 

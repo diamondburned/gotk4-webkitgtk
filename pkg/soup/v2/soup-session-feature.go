@@ -100,6 +100,9 @@ type SessionFeatureOverrider interface {
 
 // SessionFeature: object that implement some sort of optional feature for
 // Session.
+//
+// SessionFeature wraps an interface. This means the user can get the
+// underlying type by calling Cast().
 type SessionFeature struct {
 	_ [0]func() // equal guard
 	*externglib.Object

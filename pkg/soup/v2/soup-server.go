@@ -891,7 +891,7 @@ func (server *Server) Listener() *Socket {
 //
 //    - sList: a list of listening sockets.
 //
-func (server *Server) Listeners() []gio.Socket {
+func (server *Server) Listeners() []*gio.Socket {
 	var _arg0 *C.SoupServer // out
 	var _cret *C.GSList     // in
 
@@ -900,15 +900,15 @@ func (server *Server) Listeners() []gio.Socket {
 	_cret = C.soup_server_get_listeners(_arg0)
 	runtime.KeepAlive(server)
 
-	var _sList []gio.Socket // out
+	var _sList []*gio.Socket // out
 
-	_sList = make([]gio.Socket, 0, gextras.SListSize(unsafe.Pointer(_cret)))
+	_sList = make([]*gio.Socket, 0, gextras.SListSize(unsafe.Pointer(_cret)))
 	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
 		src := (*C.GSocket)(v)
-		var dst gio.Socket // out
+		var dst *gio.Socket // out
 		{
 			obj := externglib.Take(unsafe.Pointer(src))
-			dst = gio.Socket{
+			dst = &gio.Socket{
 				Object: obj,
 				DatagramBased: gio.DatagramBased{
 					Object: obj,

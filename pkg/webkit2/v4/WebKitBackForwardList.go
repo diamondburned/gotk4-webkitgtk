@@ -119,7 +119,7 @@ func (backForwardList *BackForwardList) BackItem() *BackForwardListItem {
 //
 //    - list of items preceding the current item.
 //
-func (backForwardList *BackForwardList) BackList() []BackForwardListItem {
+func (backForwardList *BackForwardList) BackList() []*BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList // out
 	var _cret *C.GList                 // in
 
@@ -128,13 +128,13 @@ func (backForwardList *BackForwardList) BackList() []BackForwardListItem {
 	_cret = C.webkit_back_forward_list_get_back_list(_arg0)
 	runtime.KeepAlive(backForwardList)
 
-	var _list []BackForwardListItem // out
+	var _list []*BackForwardListItem // out
 
-	_list = make([]BackForwardListItem, 0, gextras.ListSize(unsafe.Pointer(_cret)))
+	_list = make([]*BackForwardListItem, 0, gextras.ListSize(unsafe.Pointer(_cret)))
 	gextras.MoveList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
 		src := (*C.WebKitBackForwardListItem)(v)
-		var dst BackForwardListItem // out
-		dst = *wrapBackForwardListItem(externglib.Take(unsafe.Pointer(src)))
+		var dst *BackForwardListItem // out
+		dst = wrapBackForwardListItem(externglib.Take(unsafe.Pointer(src)))
 		_list = append(_list, dst)
 	})
 
@@ -149,7 +149,7 @@ func (backForwardList *BackForwardList) BackList() []BackForwardListItem {
 //
 //    - list of items preceding the current item limited by limit.
 //
-func (backForwardList *BackForwardList) BackListWithLimit(limit uint) []BackForwardListItem {
+func (backForwardList *BackForwardList) BackListWithLimit(limit uint) []*BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList // out
 	var _arg1 C.guint                  // out
 	var _cret *C.GList                 // in
@@ -161,13 +161,13 @@ func (backForwardList *BackForwardList) BackListWithLimit(limit uint) []BackForw
 	runtime.KeepAlive(backForwardList)
 	runtime.KeepAlive(limit)
 
-	var _list []BackForwardListItem // out
+	var _list []*BackForwardListItem // out
 
-	_list = make([]BackForwardListItem, 0, gextras.ListSize(unsafe.Pointer(_cret)))
+	_list = make([]*BackForwardListItem, 0, gextras.ListSize(unsafe.Pointer(_cret)))
 	gextras.MoveList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
 		src := (*C.WebKitBackForwardListItem)(v)
-		var dst BackForwardListItem // out
-		dst = *wrapBackForwardListItem(externglib.Take(unsafe.Pointer(src)))
+		var dst *BackForwardListItem // out
+		dst = wrapBackForwardListItem(externglib.Take(unsafe.Pointer(src)))
 		_list = append(_list, dst)
 	})
 
@@ -228,7 +228,7 @@ func (backForwardList *BackForwardList) ForwardItem() *BackForwardListItem {
 //
 //    - list of items following the current item.
 //
-func (backForwardList *BackForwardList) ForwardList() []BackForwardListItem {
+func (backForwardList *BackForwardList) ForwardList() []*BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList // out
 	var _cret *C.GList                 // in
 
@@ -237,13 +237,13 @@ func (backForwardList *BackForwardList) ForwardList() []BackForwardListItem {
 	_cret = C.webkit_back_forward_list_get_forward_list(_arg0)
 	runtime.KeepAlive(backForwardList)
 
-	var _list []BackForwardListItem // out
+	var _list []*BackForwardListItem // out
 
-	_list = make([]BackForwardListItem, 0, gextras.ListSize(unsafe.Pointer(_cret)))
+	_list = make([]*BackForwardListItem, 0, gextras.ListSize(unsafe.Pointer(_cret)))
 	gextras.MoveList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
 		src := (*C.WebKitBackForwardListItem)(v)
-		var dst BackForwardListItem // out
-		dst = *wrapBackForwardListItem(externglib.Take(unsafe.Pointer(src)))
+		var dst *BackForwardListItem // out
+		dst = wrapBackForwardListItem(externglib.Take(unsafe.Pointer(src)))
 		_list = append(_list, dst)
 	})
 
@@ -258,7 +258,7 @@ func (backForwardList *BackForwardList) ForwardList() []BackForwardListItem {
 //
 //    - list of items following the current item limited by limit.
 //
-func (backForwardList *BackForwardList) ForwardListWithLimit(limit uint) []BackForwardListItem {
+func (backForwardList *BackForwardList) ForwardListWithLimit(limit uint) []*BackForwardListItem {
 	var _arg0 *C.WebKitBackForwardList // out
 	var _arg1 C.guint                  // out
 	var _cret *C.GList                 // in
@@ -270,13 +270,13 @@ func (backForwardList *BackForwardList) ForwardListWithLimit(limit uint) []BackF
 	runtime.KeepAlive(backForwardList)
 	runtime.KeepAlive(limit)
 
-	var _list []BackForwardListItem // out
+	var _list []*BackForwardListItem // out
 
-	_list = make([]BackForwardListItem, 0, gextras.ListSize(unsafe.Pointer(_cret)))
+	_list = make([]*BackForwardListItem, 0, gextras.ListSize(unsafe.Pointer(_cret)))
 	gextras.MoveList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
 		src := (*C.WebKitBackForwardListItem)(v)
-		var dst BackForwardListItem // out
-		dst = *wrapBackForwardListItem(externglib.Take(unsafe.Pointer(src)))
+		var dst *BackForwardListItem // out
+		dst = wrapBackForwardListItem(externglib.Take(unsafe.Pointer(src)))
 		_list = append(_list, dst)
 	})
 

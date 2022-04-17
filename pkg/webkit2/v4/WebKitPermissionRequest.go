@@ -33,6 +33,9 @@ type PermissionRequestOverrider interface {
 	Deny()
 }
 
+//
+// PermissionRequest wraps an interface. This means the user can get the
+// underlying type by calling Cast().
 type PermissionRequest struct {
 	_ [0]func() // equal guard
 	*externglib.Object

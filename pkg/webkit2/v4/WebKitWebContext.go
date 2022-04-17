@@ -757,7 +757,7 @@ func (context *WebContext) Plugins(ctx context.Context, callback gio.AsyncReadyC
 //    - list of KitPlugin. You must free the #GList with g_list_free() and unref
 //      the KitPlugin<!-- -->s with g_object_unref() when you're done with them.
 //
-func (context *WebContext) PluginsFinish(result gio.AsyncResulter) ([]Plugin, error) {
+func (context *WebContext) PluginsFinish(result gio.AsyncResulter) ([]*Plugin, error) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 *C.GAsyncResult     // out
 	var _cret *C.GList            // in
@@ -770,14 +770,14 @@ func (context *WebContext) PluginsFinish(result gio.AsyncResulter) ([]Plugin, er
 	runtime.KeepAlive(context)
 	runtime.KeepAlive(result)
 
-	var _list []Plugin // out
-	var _goerr error   // out
+	var _list []*Plugin // out
+	var _goerr error    // out
 
-	_list = make([]Plugin, 0, gextras.ListSize(unsafe.Pointer(_cret)))
+	_list = make([]*Plugin, 0, gextras.ListSize(unsafe.Pointer(_cret)))
 	gextras.MoveList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
 		src := (*C.WebKitPlugin)(v)
-		var dst Plugin // out
-		dst = *wrapPlugin(externglib.AssumeOwnership(unsafe.Pointer(src)))
+		var dst *Plugin // out
+		dst = wrapPlugin(externglib.AssumeOwnership(unsafe.Pointer(src)))
 		_list = append(_list, dst)
 	})
 	if _cerr != nil {
