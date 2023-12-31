@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"sort"
 	"sync"
 
 	"github.com/diamondburned/gotk4/gir"
@@ -131,7 +132,17 @@ func GeneratePackages(gen *girgen.Generator, dst string, pkgs []gendata.Package)
 
 		repo := repos.FromPkg(pkg.PkgName)
 		if repo == nil {
-			return []error{fmt.Errorf("package %q not found", pkg.PkgName)}
+			mPkgs := map[string]interface{}{}
+			for _, p := range repos {
+				mPkgs[p.Pkg] = nil
+			}
+			pkgs := []string{}
+			for p := range mPkgs {
+				pkgs = append(pkgs, p)
+			}
+			sort.Strings(pkgs)
+
+			return []error{fmt.Errorf("package %q not found in %v", pkg.PkgName, pkgs)}
 		}
 
 		for _, namespace := range repo.Namespaces {
