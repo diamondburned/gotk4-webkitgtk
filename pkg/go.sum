@@ -1,11 +1,6 @@
-github.com/diamondburned/gotk4/pkg v0.0.0-20220302061730-9d9e139e9d05 h1:piwEc/EzxxMBZrXHBIe4Q3HjUDZKGAiiCMY7s9r5cqQ=
-github.com/diamondburned/gotk4/pkg v0.0.0-20220302061730-9d9e139e9d05/go.mod h1:dJ2gfR0gvBsGg4IteP8aMBq/U5Q9boDw0DP7kAjXTwM=
-github.com/diamondburned/gotk4/pkg v0.0.0-20220408070453-08962439fbbc h1:BkDOBlc7okNAJL5KYPXD7ZB4pB3x23XeCh79wmVC5x8=
-github.com/diamondburned/gotk4/pkg v0.0.0-20220408070453-08962439fbbc/go.mod h1:rLH6FHos690jFgAM/GYEpMykuE/9NmN6zOvFlr8JTvE=
-github.com/diamondburned/gotk4/pkg v0.0.0-20220417091308-856167c02355 h1:5J/EC+03IaQPbg8llTadKW7e+hNWBaY/eZXm5cXPTas=
-github.com/diamondburned/gotk4/pkg v0.0.0-20220417091308-856167c02355/go.mod h1:rLH6FHos690jFgAM/GYEpMykuE/9NmN6zOvFlr8JTvE=
-go4.org/unsafe/assume-no-moving-gc v0.0.0-20201222180813-1025295fd063 h1:1tk03FUNpulq2cuWpXZWj649rwJpk0d20rxWiopKRmc=
-go4.org/unsafe/assume-no-moving-gc v0.0.0-20201222180813-1025295fd063/go.mod h1:FftLjUGFEDu5k8lt0ddY+HcrH/qU/0qk+H8j9/nTl3E=
-go4.org/unsafe/assume-no-moving-gc v0.0.0-20211027215541-db492cf91b37/go.mod h1:FftLjUGFEDu5k8lt0ddY+HcrH/qU/0qk+H8j9/nTl3E=
+github.com/diamondburned/gotk4/pkg v0.1.0 h1:/KOEcSgH2XNtwl/oZ8rFUpyl0p82apN7PK5O6yZUIYk=
+github.com/diamondburned/gotk4/pkg v0.1.0/go.mod h1:rffNmHJknEj3Izr7P6x0F536G4fMsD5mgLjnNzyI9To=
+go4.org/unsafe/assume-no-moving-gc v0.0.0-20231121144256-b99613f794b6 h1:lGdhQUN/cnWdSH3291CUuxSEqc+AsGTiDxPP3r2J0l4=
+go4.org/unsafe/assume-no-moving-gc v0.0.0-20231121144256-b99613f794b6/go.mod h1:FftLjUGFEDu5k8lt0ddY+HcrH/qU/0qk+H8j9/nTl3E=
 golang.org/x/sync v0.0.0-20210220032951-036812b2e83c h1:5KslGYwFpkhGh+Q16bwMP3cOontH8FOep7tGV86Y7SQ=
 golang.org/x/sync v0.0.0-20210220032951-036812b2e83c/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=

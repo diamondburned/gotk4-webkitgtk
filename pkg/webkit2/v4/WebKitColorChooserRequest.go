@@ -7,7 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v3"
 )
 
@@ -17,91 +17,109 @@ import (
 // extern void _gotk4_webkit24_ColorChooserRequest_ConnectFinished(gpointer, guintptr);
 import "C"
 
-// glib.Type values for WebKitColorChooserRequest.go.
-var GTypeColorChooserRequest = externglib.Type(C.webkit_color_chooser_request_get_type())
+// GType values.
+var (
+	GTypeColorChooserRequest = coreglib.Type(C.webkit_color_chooser_request_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeColorChooserRequest, F: marshalColorChooserRequest},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeColorChooserRequest, F: marshalColorChooserRequest},
 	})
 }
 
-// ColorChooserRequestOverrider contains methods that are overridable.
-type ColorChooserRequestOverrider interface {
+// ColorChooserRequestOverrides contains methods that are overridable.
+type ColorChooserRequestOverrides struct {
 }
 
+func defaultColorChooserRequestOverrides(v *ColorChooserRequest) ColorChooserRequestOverrides {
+	return ColorChooserRequestOverrides{}
+}
+
+// ColorChooserRequest: request to open a color chooser.
+//
+// Whenever the user interacts with an <input type='color' /> HTML element,
+// WebKit will need to show a dialog to choose a color. For that to happen in
+// a general way, instead of just opening a ColorChooser (which might be not
+// desirable in some cases, which could prefer to use their own color chooser
+// dialog), WebKit will fire the KitWebView::run-color-chooser signal with a
+// KitColorChooserRequest object, which will allow the client application to
+// specify the color to be selected, to inspect the details of the request (e.g.
+// to get initial color) and to cancel the request, in case nothing was
+// selected.
+//
+// In case the client application does not wish to handle this signal,
+// WebKit will provide a default handler which will asynchronously run a regular
+// ColorChooserDialog for the user to interact with.
 type ColorChooserRequest struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 }
 
 var (
-	_ externglib.Objector = (*ColorChooserRequest)(nil)
+	_ coreglib.Objector = (*ColorChooserRequest)(nil)
 )
 
-func classInitColorChooserRequester(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*ColorChooserRequest, *ColorChooserRequestClass, ColorChooserRequestOverrides](
+		GTypeColorChooserRequest,
+		initColorChooserRequestClass,
+		wrapColorChooserRequest,
+		defaultColorChooserRequestOverrides,
+	)
 }
 
-func wrapColorChooserRequest(obj *externglib.Object) *ColorChooserRequest {
+func initColorChooserRequestClass(gclass unsafe.Pointer, overrides ColorChooserRequestOverrides, classInitFunc func(*ColorChooserRequestClass)) {
+	if classInitFunc != nil {
+		class := (*ColorChooserRequestClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapColorChooserRequest(obj *coreglib.Object) *ColorChooserRequest {
 	return &ColorChooserRequest{
 		Object: obj,
 	}
 }
 
 func marshalColorChooserRequest(p uintptr) (interface{}, error) {
-	return wrapColorChooserRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapColorChooserRequest(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-//export _gotk4_webkit24_ColorChooserRequest_ConnectFinished
-func _gotk4_webkit24_ColorChooserRequest_ConnectFinished(arg0 C.gpointer, arg1 C.guintptr) {
-	var f func()
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func())
-	}
-
-	f()
-}
-
-// ConnectFinished is emitted when the request finishes. This signal can be
-// emitted because the user completed the request calling
+// ConnectFinished is emitted when the request finishes. This signal
+// can be emitted because the user completed the request calling
 // webkit_color_chooser_request_finish(), or cancelled it with
 // webkit_color_chooser_request_cancel() or because the color input element is
 // removed from the DOM.
-func (request *ColorChooserRequest) ConnectFinished(f func()) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(request, "finished", false, unsafe.Pointer(C._gotk4_webkit24_ColorChooserRequest_ConnectFinished), f)
+func (request *ColorChooserRequest) ConnectFinished(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(request, "finished", false, unsafe.Pointer(C._gotk4_webkit24_ColorChooserRequest_ConnectFinished), f)
 }
 
-// Cancel cancels request and the input element changes to use the initial color
-// it has before the request started. The signal
-// KitColorChooserRequest::finished is emitted to notify that the request has
-// finished.
+// Cancel cancels request and the input element changes to use the initial
+// color.
+//
+// Cancels request and the input element changes to use the initial color it has
+// before the request started. The signal KitColorChooserRequest::finished is
+// emitted to notify that the request has finished.
 func (request *ColorChooserRequest) Cancel() {
 	var _arg0 *C.WebKitColorChooserRequest // out
 
-	_arg0 = (*C.WebKitColorChooserRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitColorChooserRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	C.webkit_color_chooser_request_cancel(_arg0)
 	runtime.KeepAlive(request)
 }
 
 // Finish finishes request and the input element keeps the current value of
+// KitColorChooserRequest:rgba.
+//
+// Finishes request and the input element keeps the current value of
 // KitColorChooserRequest:rgba. The signal KitColorChooserRequest::finished is
 // emitted to notify that the request has finished.
 func (request *ColorChooserRequest) Finish() {
 	var _arg0 *C.WebKitColorChooserRequest // out
 
-	_arg0 = (*C.WebKitColorChooserRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitColorChooserRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	C.webkit_color_chooser_request_finish(_arg0)
 	runtime.KeepAlive(request)
@@ -111,13 +129,13 @@ func (request *ColorChooserRequest) Finish() {
 //
 // The function returns the following values:
 //
-//    - rect to fill in with the element area.
+//   - rect to fill in with the element area.
 //
 func (request *ColorChooserRequest) ElementRectangle() *gdk.Rectangle {
 	var _arg0 *C.WebKitColorChooserRequest // out
 	var _arg1 C.GdkRectangle               // in
 
-	_arg0 = (*C.WebKitColorChooserRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitColorChooserRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	C.webkit_color_chooser_request_get_element_rectangle(_arg0, &_arg1)
 	runtime.KeepAlive(request)
@@ -133,13 +151,13 @@ func (request *ColorChooserRequest) ElementRectangle() *gdk.Rectangle {
 //
 // The function returns the following values:
 //
-//    - rgba to fill in with the current color.
+//   - rgba to fill in with the current color.
 //
 func (request *ColorChooserRequest) RGBA() *gdk.RGBA {
 	var _arg0 *C.WebKitColorChooserRequest // out
 	var _arg1 C.GdkRGBA                    // in
 
-	_arg0 = (*C.WebKitColorChooserRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitColorChooserRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	C.webkit_color_chooser_request_get_rgba(_arg0, &_arg1)
 	runtime.KeepAlive(request)
@@ -155,16 +173,27 @@ func (request *ColorChooserRequest) RGBA() *gdk.RGBA {
 //
 // The function takes the following parameters:
 //
-//    - rgba: pointer RGBA.
+//   - rgba: pointer RGBA.
 //
 func (request *ColorChooserRequest) SetRGBA(rgba *gdk.RGBA) {
 	var _arg0 *C.WebKitColorChooserRequest // out
 	var _arg1 *C.GdkRGBA                   // out
 
-	_arg0 = (*C.WebKitColorChooserRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitColorChooserRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 	_arg1 = (*C.GdkRGBA)(gextras.StructNative(unsafe.Pointer(rgba)))
 
 	C.webkit_color_chooser_request_set_rgba(_arg0, _arg1)
 	runtime.KeepAlive(request)
 	runtime.KeepAlive(rgba)
+}
+
+// ColorChooserRequestClass: instance of this type is always passed by
+// reference.
+type ColorChooserRequestClass struct {
+	*colorChooserRequestClass
+}
+
+// colorChooserRequestClass is the struct that's finalized.
+type colorChooserRequestClass struct {
+	native *C.WebKitColorChooserRequestClass
 }

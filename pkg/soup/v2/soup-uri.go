@@ -7,7 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -15,12 +15,14 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup-uri.go.
-var GTypeURI = externglib.Type(C.soup_uri_get_type())
+// GType values.
+var (
+	GTypeURI = coreglib.Type(C.soup_uri_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeURI, F: marshalURI},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeURI, F: marshalURI},
 	})
 }
 
@@ -29,9 +31,9 @@ func init() {
 // URIs internally; You can use SOUP_URI_VALID_FOR_HTTP() to test if a URI is a
 // valid HTTP URI.
 //
-// scheme will always be set in any URI. It is an interned string and is always
-// all lowercase. (If you parse a URI with a non-lowercase scheme, it will be
-// converted to lowercase.) The macros SOUP_URI_SCHEME_HTTP and
+// scheme will always be set in any URI. It is an interned string and is
+// always all lowercase. (If you parse a URI with a non-lowercase scheme,
+// it will be converted to lowercase.) The macros SOUP_URI_SCHEME_HTTP and
 // SOUP_URI_SCHEME_HTTPS provide the interned values for "http" and "https" and
 // can be compared against URI scheme values.
 //
@@ -40,11 +42,11 @@ func init() {
 // password is not included in the output of soup_uri_to_string(). libsoup does
 // not normally use these fields; authentication is handled via Session signals.
 //
-// host contains the hostname, and port the port specified in the URI. If the
-// URI doesn't contain a hostname, host will be NULL, and if it doesn't specify
-// a port, port may be 0. However, for "http" and "https" URIs, host is
-// guaranteed to be non-NULL (trying to parse an http URI with no host will
-// return NULL), and port will always be non-0 (because libsoup knows the
+// host contains the hostname, and port the port specified in the URI.
+// If the URI doesn't contain a hostname, host will be NULL, and if it doesn't
+// specify a port, port may be 0. However, for "http" and "https" URIs,
+// host is guaranteed to be non-NULL (trying to parse an http URI with no host
+// will return NULL), and port will always be non-0 (because libsoup knows the
 // default value to use when it is not specified in the URI).
 //
 // path is always non-NULL. For http/https URIs, path will never be an empty
@@ -72,7 +74,7 @@ type urI struct {
 }
 
 func marshalURI(p uintptr) (interface{}, error) {
-	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	b := coreglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
 	return &URI{&urI{(*C.SoupURI)(b)}}, nil
 }
 
@@ -135,7 +137,7 @@ func NewURIWithBase(base *URI, uriString string) *URI {
 //
 // The function returns the following values:
 //
-//    - urI: copy of uri, which must be freed with soup_uri_free().
+//   - urI: copy of uri, which must be freed with soup_uri_free().
 //
 func (uri *URI) Copy() *URI {
 	var _arg0 *C.SoupURI // out
@@ -163,7 +165,7 @@ func (uri *URI) Copy() *URI {
 //
 // The function returns the following values:
 //
-//    - urI: new URI.
+//   - urI: new URI.
 //
 func (uri *URI) CopyHost() *URI {
 	var _arg0 *C.SoupURI // out
@@ -191,11 +193,11 @@ func (uri *URI) CopyHost() *URI {
 //
 // The function takes the following parameters:
 //
-//    - uri2: another URI.
+//   - uri2: another URI.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE or FALSE.
+//   - ok: TRUE or FALSE.
 //
 func (uri1 *URI) Equal(uri2 *URI) bool {
 	var _arg0 *C.SoupURI // out
@@ -222,7 +224,7 @@ func (uri1 *URI) Equal(uri2 *URI) bool {
 //
 // The function returns the following values:
 //
-//    - utf8 uri's fragment.
+//   - utf8 uri's fragment.
 //
 func (uri *URI) Fragment() string {
 	var _arg0 *C.SoupURI // out
@@ -244,7 +246,7 @@ func (uri *URI) Fragment() string {
 //
 // The function returns the following values:
 //
-//    - utf8 uri's host.
+//   - utf8 uri's host.
 //
 func (uri *URI) Host() string {
 	var _arg0 *C.SoupURI // out
@@ -266,7 +268,7 @@ func (uri *URI) Host() string {
 //
 // The function returns the following values:
 //
-//    - utf8 uri's password.
+//   - utf8 uri's password.
 //
 func (uri *URI) Password() string {
 	var _arg0 *C.SoupURI // out
@@ -288,7 +290,7 @@ func (uri *URI) Password() string {
 //
 // The function returns the following values:
 //
-//    - utf8 uri's path.
+//   - utf8 uri's path.
 //
 func (uri *URI) Path() string {
 	var _arg0 *C.SoupURI // out
@@ -310,7 +312,7 @@ func (uri *URI) Path() string {
 //
 // The function returns the following values:
 //
-//    - guint uri's port.
+//   - guint uri's port.
 //
 func (uri *URI) Port() uint {
 	var _arg0 *C.SoupURI // out
@@ -332,7 +334,7 @@ func (uri *URI) Port() uint {
 //
 // The function returns the following values:
 //
-//    - utf8 uri's query.
+//   - utf8 uri's query.
 //
 func (uri *URI) Query() string {
 	var _arg0 *C.SoupURI // out
@@ -354,7 +356,7 @@ func (uri *URI) Query() string {
 //
 // The function returns the following values:
 //
-//    - utf8 uri's scheme.
+//   - utf8 uri's scheme.
 //
 func (uri *URI) Scheme() string {
 	var _arg0 *C.SoupURI // out
@@ -376,7 +378,7 @@ func (uri *URI) Scheme() string {
 //
 // The function returns the following values:
 //
-//    - utf8 uri's user.
+//   - utf8 uri's user.
 //
 func (uri *URI) User() string {
 	var _arg0 *C.SoupURI // out
@@ -398,19 +400,19 @@ func (uri *URI) User() string {
 //
 // The function takes the following parameters:
 //
-//    - v2 with a non-NULL host member.
+//   - v2 with a non-NULL host member.
 //
 // The function returns the following values:
 //
-//    - ok: whether or not the URIs are equal in scheme, host, and port.
+//   - ok: whether or not the URIs are equal in scheme, host, and port.
 //
 func (v1 *URI) HostEqual(v2 *URI) bool {
 	var _arg0 C.gconstpointer // out
 	var _arg1 C.gconstpointer // out
 	var _cret C.gboolean      // in
 
-	_arg0 = C.gconstpointer(gextras.StructNative(unsafe.Pointer(v1)))
-	_arg1 = C.gconstpointer(gextras.StructNative(unsafe.Pointer(v2)))
+	_arg0 = *(*C.gconstpointer)(gextras.StructNative(unsafe.Pointer(v1)))
+	_arg1 = *(*C.gconstpointer)(gextras.StructNative(unsafe.Pointer(v2)))
 
 	_cret = C.soup_uri_host_equal(_arg0, _arg1)
 	runtime.KeepAlive(v1)
@@ -429,13 +431,13 @@ func (v1 *URI) HostEqual(v2 *URI) bool {
 //
 // The function returns the following values:
 //
-//    - guint: hash.
+//   - guint: hash.
 //
 func (key *URI) HostHash() uint {
 	var _arg0 C.gconstpointer // out
 	var _cret C.guint         // in
 
-	_arg0 = C.gconstpointer(gextras.StructNative(unsafe.Pointer(key)))
+	_arg0 = *(*C.gconstpointer)(gextras.StructNative(unsafe.Pointer(key)))
 
 	_cret = C.soup_uri_host_hash(_arg0)
 	runtime.KeepAlive(key)
@@ -451,7 +453,7 @@ func (key *URI) HostHash() uint {
 //
 // The function takes the following parameters:
 //
-//    - fragment (optional): fragment.
+//   - fragment (optional): fragment.
 //
 func (uri *URI) SetFragment(fragment string) {
 	var _arg0 *C.SoupURI // out
@@ -470,15 +472,15 @@ func (uri *URI) SetFragment(fragment string) {
 
 // SetHost sets uri's host to host.
 //
-// If host is an IPv6 IP address, it should not include the brackets required by
-// the URI syntax; they will be added automatically when converting uri to a
+// If host is an IPv6 IP address, it should not include the brackets required
+// by the URI syntax; they will be added automatically when converting uri to a
 // string.
 //
 // http and https URIs should not have a NULL host.
 //
 // The function takes the following parameters:
 //
-//    - host (optional): hostname or IP address, or NULL.
+//   - host (optional): hostname or IP address, or NULL.
 //
 func (uri *URI) SetHost(host string) {
 	var _arg0 *C.SoupURI // out
@@ -499,7 +501,7 @@ func (uri *URI) SetHost(host string) {
 //
 // The function takes the following parameters:
 //
-//    - password (optional): password, or NULL.
+//   - password (optional): password, or NULL.
 //
 func (uri *URI) SetPassword(password string) {
 	var _arg0 *C.SoupURI // out
@@ -520,7 +522,7 @@ func (uri *URI) SetPassword(password string) {
 //
 // The function takes the following parameters:
 //
-//    - path: non-NULL path.
+//   - path: non-NULL path.
 //
 func (uri *URI) SetPath(path string) {
 	var _arg0 *C.SoupURI // out
@@ -540,7 +542,7 @@ func (uri *URI) SetPath(path string) {
 //
 // The function takes the following parameters:
 //
-//    - port: port, or 0.
+//   - port: port, or 0.
 //
 func (uri *URI) SetPort(port uint) {
 	var _arg0 *C.SoupURI // out
@@ -558,7 +560,7 @@ func (uri *URI) SetPort(port uint) {
 //
 // The function takes the following parameters:
 //
-//    - query (optional): query.
+//   - query (optional): query.
 //
 func (uri *URI) SetQuery(query string) {
 	var _arg0 *C.SoupURI // out
@@ -580,7 +582,7 @@ func (uri *URI) SetQuery(query string) {
 //
 // The function takes the following parameters:
 //
-//    - form containing HTML form information.
+//   - form containing HTML form information.
 //
 func (uri *URI) SetQueryFromForm(form map[string]string) {
 	var _arg0 *C.SoupURI    // out
@@ -609,7 +611,7 @@ func (uri *URI) SetQueryFromForm(form map[string]string) {
 //
 // The function takes the following parameters:
 //
-//    - scheme: URI scheme.
+//   - scheme: URI scheme.
 //
 func (uri *URI) SetScheme(scheme string) {
 	var _arg0 *C.SoupURI // out
@@ -628,7 +630,7 @@ func (uri *URI) SetScheme(scheme string) {
 //
 // The function takes the following parameters:
 //
-//    - user (optional): username, or NULL.
+//   - user (optional): username, or NULL.
 //
 func (uri *URI) SetUser(user string) {
 	var _arg0 *C.SoupURI // out
@@ -655,11 +657,11 @@ func (uri *URI) SetUser(user string) {
 //
 // The function takes the following parameters:
 //
-//    - justPathAndQuery: if TRUE, output just the path and query portions.
+//   - justPathAndQuery: if TRUE, output just the path and query portions.
 //
 // The function returns the following values:
 //
-//    - utf8: string representing uri, which the caller must free.
+//   - utf8: string representing uri, which the caller must free.
 //
 func (uri *URI) String(justPathAndQuery bool) string {
 	var _arg0 *C.SoupURI // out
@@ -683,13 +685,13 @@ func (uri *URI) String(justPathAndQuery bool) string {
 	return _utf8
 }
 
-// UsesDefaultPort tests if uri uses the default port for its scheme. (Eg, 80
-// for http.) (This only works for http, https and ftp; libsoup does not know
+// UsesDefaultPort tests if uri uses the default port for its scheme. (Eg,
+// 80 for http.) (This only works for http, https and ftp; libsoup does not know
 // the default ports of other protocols.).
 //
 // The function returns the following values:
 //
-//    - ok: TRUE or FALSE.
+//   - ok: TRUE or FALSE.
 //
 func (uri *URI) UsesDefaultPort() bool {
 	var _arg0 *C.SoupURI // out
@@ -717,11 +719,11 @@ func (uri *URI) UsesDefaultPort() bool {
 //
 // The function takes the following parameters:
 //
-//    - part: URI part.
+//   - part: URI part.
 //
 // The function returns the following values:
 //
-//    - utf8: decoded URI part.
+//   - utf8: decoded URI part.
 //
 func URIDecode(part string) string {
 	var _arg1 *C.char // out
@@ -746,13 +748,13 @@ func URIDecode(part string) string {
 //
 // The function takes the following parameters:
 //
-//    - part: URI part.
-//    - escapeExtra (optional): additional reserved characters to escape (or
-//      NULL).
+//   - part: URI part.
+//   - escapeExtra (optional): additional reserved characters to escape (or
+//     NULL).
 //
 // The function returns the following values:
 //
-//    - utf8: encoded URI part.
+//   - utf8: encoded URI part.
 //
 func URIEncode(part, escapeExtra string) string {
 	var _arg1 *C.char // out
@@ -778,15 +780,15 @@ func URIEncode(part, escapeExtra string) string {
 	return _utf8
 }
 
-// URINormalize: %<!-- -->-decodes any "unreserved" characters (or characters in
-// unescape_extra) in part, and %<!-- -->-encodes any non-ASCII characters,
+// URINormalize: %<!-- -->-decodes any "unreserved" characters (or characters
+// in unescape_extra) in part, and %<!-- -->-encodes any non-ASCII characters,
 // spaces, and non-printing characters in part.
 //
 // "Unreserved" characters are those that are not allowed to be used for
 // punctuation according to the URI spec. For example, letters are unreserved,
 // so soup_uri_normalize() will turn <literal>http://example.com/foo/b%<!--
-// -->61r</literal> into <literal>http://example.com/foo/bar</literal>, which is
-// guaranteed to mean the same thing. However, "/" is "reserved", so
+// -->61r</literal> into <literal>http://example.com/foo/bar</literal>,
+// which is guaranteed to mean the same thing. However, "/" is "reserved", so
 // <literal>http://example.com/foo%<!-- -->2Fbar</literal> would not be changed,
 // because it might mean something different to the server.
 //
@@ -796,12 +798,12 @@ func URIEncode(part, escapeExtra string) string {
 //
 // The function takes the following parameters:
 //
-//    - part: URI part.
-//    - unescapeExtra (optional): reserved characters to unescape (or NULL).
+//   - part: URI part.
+//   - unescapeExtra (optional): reserved characters to unescape (or NULL).
 //
 // The function returns the following values:
 //
-//    - utf8: normalized URI part.
+//   - utf8: normalized URI part.
 //
 func URINormalize(part, unescapeExtra string) string {
 	var _arg1 *C.char // out

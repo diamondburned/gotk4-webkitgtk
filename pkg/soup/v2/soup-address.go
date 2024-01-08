@@ -11,7 +11,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
@@ -22,16 +22,16 @@ import (
 // extern void _gotk4_soup2_AddressCallback(SoupAddress*, guint, gpointer);
 import "C"
 
-// glib.Type values for soup-address.go.
+// GType values.
 var (
-	GTypeAddressFamily = externglib.Type(C.soup_address_family_get_type())
-	GTypeAddress       = externglib.Type(C.soup_address_get_type())
+	GTypeAddressFamily = coreglib.Type(C.soup_address_family_get_type())
+	GTypeAddress       = coreglib.Type(C.soup_address_get_type())
 )
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeAddressFamily, F: marshalAddressFamily},
-		{T: GTypeAddress, F: marshalAddress},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeAddressFamily, F: marshalAddressFamily},
+		coreglib.TypeMarshaler{T: GTypeAddress, F: marshalAddress},
 	})
 }
 
@@ -76,7 +76,7 @@ const (
 )
 
 func marshalAddressFamily(p uintptr) (interface{}, error) {
-	return AddressFamily(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return AddressFamily(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for AddressFamily.
@@ -96,50 +96,42 @@ func (a AddressFamily) String() string {
 // AddressCallback: callback function passed to soup_address_resolve_async().
 type AddressCallback func(addr *Address, status uint)
 
-//export _gotk4_soup2_AddressCallback
-func _gotk4_soup2_AddressCallback(arg1 *C.SoupAddress, arg2 C.guint, arg3 C.gpointer) {
-	var fn AddressCallback
-	{
-		v := gbox.Get(uintptr(arg3))
-		if v == nil {
-			panic(`callback not found`)
-		}
-		fn = v.(AddressCallback)
-	}
-
-	var _addr *Address // out
-	var _status uint   // out
-
-	_addr = wrapAddress(externglib.Take(unsafe.Pointer(arg1)))
-	_status = uint(arg2)
-
-	fn(_addr, _status)
+// AddressOverrides contains methods that are overridable.
+type AddressOverrides struct {
 }
 
-// AddressOverrider contains methods that are overridable.
-type AddressOverrider interface {
+func defaultAddressOverrides(v *Address) AddressOverrides {
+	return AddressOverrides{}
 }
 
 type Address struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 
 	gio.SocketConnectable
 }
 
 var (
-	_ externglib.Objector = (*Address)(nil)
+	_ coreglib.Objector = (*Address)(nil)
 )
 
-func classInitAddresser(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*Address, *AddressClass, AddressOverrides](
+		GTypeAddress,
+		initAddressClass,
+		wrapAddress,
+		defaultAddressOverrides,
+	)
 }
 
-func wrapAddress(obj *externglib.Object) *Address {
+func initAddressClass(gclass unsafe.Pointer, overrides AddressOverrides, classInitFunc func(*AddressClass)) {
+	if classInitFunc != nil {
+		class := (*AddressClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapAddress(obj *coreglib.Object) *Address {
 	return &Address{
 		Object: obj,
 		SocketConnectable: gio.SocketConnectable{
@@ -149,7 +141,7 @@ func wrapAddress(obj *externglib.Object) *Address {
 }
 
 func marshalAddress(p uintptr) (interface{}, error) {
-	return wrapAddress(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapAddress(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewAddress creates a Address from name and port. The Address's IP address may
@@ -158,12 +150,12 @@ func marshalAddress(p uintptr) (interface{}, error) {
 //
 // The function takes the following parameters:
 //
-//    - name or physical address.
-//    - port number.
+//   - name or physical address.
+//   - port number.
 //
 // The function returns the following values:
 //
-//    - address: Address.
+//   - address: Address.
 //
 func NewAddress(name string, port uint) *Address {
 	var _arg1 *C.char        // out
@@ -180,23 +172,23 @@ func NewAddress(name string, port uint) *Address {
 
 	var _address *Address // out
 
-	_address = wrapAddress(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_address = wrapAddress(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _address
 }
 
-// NewAddressAny returns a Address corresponding to the "any" address for family
-// (or NULL if family isn't supported), suitable for using as a listening
+// NewAddressAny returns a Address corresponding to the "any" address for
+// family (or NULL if family isn't supported), suitable for using as a listening
 // Socket.
 //
 // The function takes the following parameters:
 //
-//    - family address family.
-//    - port number (usually SOUP_ADDRESS_ANY_PORT).
+//   - family address family.
+//   - port number (usually SOUP_ADDRESS_ANY_PORT).
 //
 // The function returns the following values:
 //
-//    - address (optional): new Address.
+//   - address (optional): new Address.
 //
 func NewAddressAny(family AddressFamily, port uint) *Address {
 	var _arg1 C.SoupAddressFamily // out
@@ -213,7 +205,7 @@ func NewAddressAny(family AddressFamily, port uint) *Address {
 	var _address *Address // out
 
 	if _cret != nil {
-		_address = wrapAddress(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+		_address = wrapAddress(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 	}
 
 	return _address
@@ -223,9 +215,9 @@ func NewAddressAny(family AddressFamily, port uint) *Address {
 // be used with soup_address_hash_by_ip() to create a Table that hashes on IP
 // address.
 //
-// This would be used to distinguish hosts in situations where different virtual
-// hosts on the same IP address should be considered the same. Eg, if
-// "www.example.com" and "www.example.net" have the same IP address, then a
+// This would be used to distinguish hosts in situations where different
+// virtual hosts on the same IP address should be considered the same. Eg,
+// if "www.example.com" and "www.example.net" have the same IP address, then a
 // single connection can be used to talk to either of them.
 //
 // See also soup_address_equal_by_name(), which compares by name rather than by
@@ -233,19 +225,19 @@ func NewAddressAny(family AddressFamily, port uint) *Address {
 //
 // The function takes the following parameters:
 //
-//    - addr2: another Address with a resolved IP address.
+//   - addr2: another Address with a resolved IP address.
 //
 // The function returns the following values:
 //
-//    - ok: whether or not addr1 and addr2 have the same IP address.
+//   - ok: whether or not addr1 and addr2 have the same IP address.
 //
 func (addr1 *Address) EqualByIP(addr2 *Address) bool {
 	var _arg0 C.gconstpointer // out
 	var _arg1 C.gconstpointer // out
 	var _cret C.gboolean      // in
 
-	_arg0 = C.gconstpointer(unsafe.Pointer(externglib.InternObject(addr1).Native()))
-	_arg1 = C.gconstpointer(unsafe.Pointer(externglib.InternObject(addr2).Native()))
+	_arg0 = *(*C.gconstpointer)(unsafe.Pointer(coreglib.InternObject(addr1).Native()))
+	_arg1 = *(*C.gconstpointer)(unsafe.Pointer(coreglib.InternObject(addr2).Native()))
 
 	_cret = C.soup_address_equal_by_ip(_arg0, _arg1)
 	runtime.KeepAlive(addr1)
@@ -260,17 +252,17 @@ func (addr1 *Address) EqualByIP(addr2 *Address) bool {
 	return _ok
 }
 
-// EqualByName tests if addr1 and addr2 have the same "name". This method can be
-// used with soup_address_hash_by_name() to create a Table that hashes on
+// EqualByName tests if addr1 and addr2 have the same "name". This method can
+// be used with soup_address_hash_by_name() to create a Table that hashes on
 // address "names".
 //
 // Comparing by name normally means comparing the addresses by their hostnames.
-// But if the address was originally created using an IP address literal, then
-// it will be compared by that instead.
+// But if the address was originally created using an IP address literal,
+// then it will be compared by that instead.
 //
 // In particular, if "www.example.com" has the IP address 10.0.0.1, and addr1
-// was created with the name "www.example.com" and addr2 was created with the
-// name "10.0.0.1", then they will compare as unequal for purposes of
+// was created with the name "www.example.com" and addr2 was created with
+// the name "10.0.0.1", then they will compare as unequal for purposes of
 // soup_address_equal_by_name().
 //
 // This would be used to distinguish hosts in situations where different virtual
@@ -283,19 +275,19 @@ func (addr1 *Address) EqualByIP(addr2 *Address) bool {
 //
 // The function takes the following parameters:
 //
-//    - addr2: another Address with a resolved name.
+//   - addr2: another Address with a resolved name.
 //
 // The function returns the following values:
 //
-//    - ok: whether or not addr1 and addr2 have the same name.
+//   - ok: whether or not addr1 and addr2 have the same name.
 //
 func (addr1 *Address) EqualByName(addr2 *Address) bool {
 	var _arg0 C.gconstpointer // out
 	var _arg1 C.gconstpointer // out
 	var _cret C.gboolean      // in
 
-	_arg0 = C.gconstpointer(unsafe.Pointer(externglib.InternObject(addr1).Native()))
-	_arg1 = C.gconstpointer(unsafe.Pointer(externglib.InternObject(addr2).Native()))
+	_arg0 = *(*C.gconstpointer)(unsafe.Pointer(coreglib.InternObject(addr1).Native()))
+	_arg1 = *(*C.gconstpointer)(unsafe.Pointer(coreglib.InternObject(addr2).Native()))
 
 	_cret = C.soup_address_equal_by_name(_arg0, _arg1)
 	runtime.KeepAlive(addr1)
@@ -315,13 +307,13 @@ func (addr1 *Address) EqualByName(addr2 *Address) bool {
 //
 // The function returns the following values:
 //
-//    - socketAddress: new Address.
+//   - socketAddress: new Address.
 //
 func (addr *Address) Gsockaddr() gio.SocketAddresser {
 	var _arg0 *C.SoupAddress    // out
 	var _cret *C.GSocketAddress // in
 
-	_arg0 = (*C.SoupAddress)(unsafe.Pointer(externglib.InternObject(addr).Native()))
+	_arg0 = (*C.SoupAddress)(unsafe.Pointer(coreglib.InternObject(addr).Native()))
 
 	_cret = C.soup_address_get_gsockaddr(_arg0)
 	runtime.KeepAlive(addr)
@@ -334,8 +326,8 @@ func (addr *Address) Gsockaddr() gio.SocketAddresser {
 			panic("object of type gio.SocketAddresser is nil")
 		}
 
-		object := externglib.AssumeOwnership(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
+		object := coreglib.AssumeOwnership(objptr)
+		casted := object.WalkCast(func(obj coreglib.Objector) bool {
 			_, ok := obj.(gio.SocketAddresser)
 			return ok
 		})
@@ -351,20 +343,20 @@ func (addr *Address) Gsockaddr() gio.SocketAddresser {
 
 // Name returns the hostname associated with addr.
 //
-// This method is not thread-safe; if you call it while addr is being resolved
-// in another thread, it may return garbage. You can use
+// This method is not thread-safe; if you call it while addr is being
+// resolved in another thread, it may return garbage. You can use
 // soup_address_is_resolved() to safely test whether or not an address is
 // resolved before fetching its name or address.
 //
 // The function returns the following values:
 //
-//    - utf8 (optional): hostname, or NULL if it is not known.
+//   - utf8 (optional): hostname, or NULL if it is not known.
 //
 func (addr *Address) Name() string {
 	var _arg0 *C.SoupAddress // out
 	var _cret *C.char        // in
 
-	_arg0 = (*C.SoupAddress)(unsafe.Pointer(externglib.InternObject(addr).Native()))
+	_arg0 = (*C.SoupAddress)(unsafe.Pointer(coreglib.InternObject(addr).Native()))
 
 	_cret = C.soup_address_get_name(_arg0)
 	runtime.KeepAlive(addr)
@@ -381,20 +373,20 @@ func (addr *Address) Name() string {
 // Physical returns the physical address associated with addr as a string. (Eg,
 // "127.0.0.1"). If the address is not yet known, returns NULL.
 //
-// This method is not thread-safe; if you call it while addr is being resolved
-// in another thread, it may return garbage. You can use
+// This method is not thread-safe; if you call it while addr is being
+// resolved in another thread, it may return garbage. You can use
 // soup_address_is_resolved() to safely test whether or not an address is
 // resolved before fetching its name or address.
 //
 // The function returns the following values:
 //
-//    - utf8 (optional): physical address, or NULL.
+//   - utf8 (optional): physical address, or NULL.
 //
 func (addr *Address) Physical() string {
 	var _arg0 *C.SoupAddress // out
 	var _cret *C.char        // in
 
-	_arg0 = (*C.SoupAddress)(unsafe.Pointer(externglib.InternObject(addr).Native()))
+	_arg0 = (*C.SoupAddress)(unsafe.Pointer(coreglib.InternObject(addr).Native()))
 
 	_cret = C.soup_address_get_physical(_arg0)
 	runtime.KeepAlive(addr)
@@ -412,13 +404,13 @@ func (addr *Address) Physical() string {
 //
 // The function returns the following values:
 //
-//    - guint: port.
+//   - guint: port.
 //
 func (addr *Address) Port() uint {
 	var _arg0 *C.SoupAddress // out
 	var _cret C.guint        // in
 
-	_arg0 = (*C.SoupAddress)(unsafe.Pointer(externglib.InternObject(addr).Native()))
+	_arg0 = (*C.SoupAddress)(unsafe.Pointer(coreglib.InternObject(addr).Native()))
 
 	_cret = C.soup_address_get_port(_arg0)
 	runtime.KeepAlive(addr)
@@ -435,13 +427,13 @@ func (addr *Address) Port() uint {
 //
 // The function returns the following values:
 //
-//    - guint: IP-based hash value for addr.
+//   - guint: IP-based hash value for addr.
 //
 func (addr *Address) HashByIP() uint {
 	var _arg0 C.gconstpointer // out
 	var _cret C.guint         // in
 
-	_arg0 = C.gconstpointer(unsafe.Pointer(externglib.InternObject(addr).Native()))
+	_arg0 = *(*C.gconstpointer)(unsafe.Pointer(coreglib.InternObject(addr).Native()))
 
 	_cret = C.soup_address_hash_by_ip(_arg0)
 	runtime.KeepAlive(addr)
@@ -458,13 +450,13 @@ func (addr *Address) HashByIP() uint {
 //
 // The function returns the following values:
 //
-//    - guint: named-based hash value for addr.
+//   - guint: named-based hash value for addr.
 //
 func (addr *Address) HashByName() uint {
 	var _arg0 C.gconstpointer // out
 	var _cret C.guint         // in
 
-	_arg0 = C.gconstpointer(unsafe.Pointer(externglib.InternObject(addr).Native()))
+	_arg0 = *(*C.gconstpointer)(unsafe.Pointer(coreglib.InternObject(addr).Native()))
 
 	_cret = C.soup_address_hash_by_name(_arg0)
 	runtime.KeepAlive(addr)
@@ -482,13 +474,13 @@ func (addr *Address) HashByName() uint {
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if addr has been resolved.
+//   - ok: TRUE if addr has been resolved.
 //
 func (addr *Address) IsResolved() bool {
 	var _arg0 *C.SoupAddress // out
 	var _cret C.gboolean     // in
 
-	_arg0 = (*C.SoupAddress)(unsafe.Pointer(externglib.InternObject(addr).Native()))
+	_arg0 = (*C.SoupAddress)(unsafe.Pointer(coreglib.InternObject(addr).Native()))
 
 	_cret = C.soup_address_is_resolved(_arg0)
 	runtime.KeepAlive(addr)
@@ -509,17 +501,17 @@ func (addr *Address) IsResolved() bool {
 // If cancellable is non-NULL, it can be used to cancel the resolution. callback
 // will still be invoked in this case, with a status of SOUP_STATUS_CANCELLED.
 //
-// It is safe to call this more than once on a given address, from the same
-// thread, with the same async_context (and doing so will not result in
-// redundant DNS queries being made). But it is not safe to call from multiple
-// threads, or with different async_contexts, or mixed with calls to
+// It is safe to call this more than once on a given address, from the
+// same thread, with the same async_context (and doing so will not result
+// in redundant DNS queries being made). But it is not safe to call from
+// multiple threads, or with different async_contexts, or mixed with calls to
 // soup_address_resolve_sync().
 //
 // The function takes the following parameters:
 //
-//    - ctx (optional) object, or NULL.
-//    - asyncContext (optional) to call callback from.
-//    - callback to call with the result.
+//   - ctx (optional) object, or NULL.
+//   - asyncContext (optional) to call callback from.
+//   - callback to call with the result.
 //
 func (addr *Address) ResolveAsync(ctx context.Context, asyncContext *glib.MainContext, callback AddressCallback) {
 	var _arg0 *C.SoupAddress        // out
@@ -528,7 +520,7 @@ func (addr *Address) ResolveAsync(ctx context.Context, asyncContext *glib.MainCo
 	var _arg3 C.SoupAddressCallback // out
 	var _arg4 C.gpointer
 
-	_arg0 = (*C.SoupAddress)(unsafe.Pointer(externglib.InternObject(addr).Native()))
+	_arg0 = (*C.SoupAddress)(unsafe.Pointer(coreglib.InternObject(addr).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -554,25 +546,25 @@ func (addr *Address) ResolveAsync(ctx context.Context, asyncContext *glib.MainCo
 // soup_address_resolve_sync() will then return a status of
 // SOUP_STATUS_CANCELLED.
 //
-// It is safe to call this more than once, even from different threads, but it
-// is not safe to mix calls to soup_address_resolve_sync() with calls to
+// It is safe to call this more than once, even from different threads,
+// but it is not safe to mix calls to soup_address_resolve_sync() with calls to
 // soup_address_resolve_async() on the same address.
 //
 // The function takes the following parameters:
 //
-//    - ctx (optional) object, or NULL.
+//   - ctx (optional) object, or NULL.
 //
 // The function returns the following values:
 //
-//    - guint: SOUP_STATUS_OK, SOUP_STATUS_CANT_RESOLVE, or
-//      SOUP_STATUS_CANCELLED.
+//   - guint: SOUP_STATUS_OK, SOUP_STATUS_CANT_RESOLVE, or
+//     SOUP_STATUS_CANCELLED.
 //
 func (addr *Address) ResolveSync(ctx context.Context) uint {
 	var _arg0 *C.SoupAddress  // out
 	var _arg1 *C.GCancellable // out
 	var _cret C.guint         // in
 
-	_arg0 = (*C.SoupAddress)(unsafe.Pointer(externglib.InternObject(addr).Native()))
+	_arg0 = (*C.SoupAddress)(unsafe.Pointer(coreglib.InternObject(addr).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -588,4 +580,14 @@ func (addr *Address) ResolveSync(ctx context.Context) uint {
 	_guint = uint(_cret)
 
 	return _guint
+}
+
+// AddressClass: instance of this type is always passed by reference.
+type AddressClass struct {
+	*addressClass
+}
+
+// addressClass is the struct that's finalized.
+type addressClass struct {
+	native *C.SoupAddressClass
 }

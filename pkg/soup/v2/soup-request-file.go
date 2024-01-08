@@ -6,7 +6,8 @@ import (
 	"runtime"
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
@@ -15,17 +16,23 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup-request-file.go.
-var GTypeRequestFile = externglib.Type(C.soup_request_file_get_type())
+// GType values.
+var (
+	GTypeRequestFile = coreglib.Type(C.soup_request_file_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeRequestFile, F: marshalRequestFile},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeRequestFile, F: marshalRequestFile},
 	})
 }
 
-// RequestFileOverrider contains methods that are overridable.
-type RequestFileOverrider interface {
+// RequestFileOverrides contains methods that are overridable.
+type RequestFileOverrides struct {
+}
+
+func defaultRequestFileOverrides(v *RequestFile) RequestFileOverrides {
+	return RequestFileOverrides{}
 }
 
 type RequestFile struct {
@@ -34,18 +41,26 @@ type RequestFile struct {
 }
 
 var (
-	_ externglib.Objector = (*RequestFile)(nil)
+	_ coreglib.Objector = (*RequestFile)(nil)
 )
 
-func classInitRequestFiler(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*RequestFile, *RequestFileClass, RequestFileOverrides](
+		GTypeRequestFile,
+		initRequestFileClass,
+		wrapRequestFile,
+		defaultRequestFileOverrides,
+	)
 }
 
-func wrapRequestFile(obj *externglib.Object) *RequestFile {
+func initRequestFileClass(gclass unsafe.Pointer, overrides RequestFileOverrides, classInitFunc func(*RequestFileClass)) {
+	if classInitFunc != nil {
+		class := (*RequestFileClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapRequestFile(obj *coreglib.Object) *RequestFile {
 	return &RequestFile{
 		Request: Request{
 			Object: obj,
@@ -57,20 +72,20 @@ func wrapRequestFile(obj *externglib.Object) *RequestFile {
 }
 
 func marshalRequestFile(p uintptr) (interface{}, error) {
-	return wrapRequestFile(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapRequestFile(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // File gets a #GFile corresponding to file's URI.
 //
 // The function returns the following values:
 //
-//    - ret corresponding to file.
+//   - ret corresponding to file.
 //
 func (file *RequestFile) File() *gio.File {
 	var _arg0 *C.SoupRequestFile // out
 	var _cret *C.GFile           // in
 
-	_arg0 = (*C.SoupRequestFile)(unsafe.Pointer(externglib.InternObject(file).Native()))
+	_arg0 = (*C.SoupRequestFile)(unsafe.Pointer(coreglib.InternObject(file).Native()))
 
 	_cret = C.soup_request_file_get_file(_arg0)
 	runtime.KeepAlive(file)
@@ -78,11 +93,28 @@ func (file *RequestFile) File() *gio.File {
 	var _ret *gio.File // out
 
 	{
-		obj := externglib.AssumeOwnership(unsafe.Pointer(_cret))
+		obj := coreglib.AssumeOwnership(unsafe.Pointer(_cret))
 		_ret = &gio.File{
 			Object: obj,
 		}
 	}
 
 	return _ret
+}
+
+// RequestFileClass: instance of this type is always passed by reference.
+type RequestFileClass struct {
+	*requestFileClass
+}
+
+// requestFileClass is the struct that's finalized.
+type requestFileClass struct {
+	native *C.SoupRequestFileClass
+}
+
+func (r *RequestFileClass) Parent() *RequestClass {
+	valptr := &r.native.parent
+	var _v *RequestClass // out
+	_v = (*RequestClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
+	return _v
 }

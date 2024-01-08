@@ -4,12 +4,9 @@ package soup
 
 import (
 	"fmt"
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gerror"
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
@@ -18,12 +15,14 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup-xmlrpc.go.
-var GTypeXMLRPCFault = externglib.Type(C.soup_xmlrpc_fault_get_type())
+// GType values.
+var (
+	GTypeXMLRPCFault = coreglib.Type(C.soup_xmlrpc_fault_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeXMLRPCFault, F: marshalXMLRPCFault},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeXMLRPCFault, F: marshalXMLRPCFault},
 	})
 }
 
@@ -61,7 +60,7 @@ const (
 )
 
 func marshalXMLRPCFault(p uintptr) (interface{}, error) {
-	return XMLRPCFault(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return XMLRPCFault(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for XMLRPCFault.
@@ -102,320 +101,8 @@ func XMLRPCFaultQuark() glib.Quark {
 	var _quark glib.Quark // out
 
 	_quark = uint32(_cret)
+	type _ = glib.Quark
+	type _ = uint32
 
 	return _quark
-}
-
-// XmlrpcBuildRequest: this creates an XML-RPC methodCall and returns it as a
-// string. This is the low-level method that soup_xmlrpc_message_new() is built
-// on.
-//
-// params is a #GVariant tuple representing the method parameters.
-//
-// Serialization details: - "a{s*}" and "{s*}" are serialized as &lt;struct&gt;
-// - "ay" is serialized as &lt;base64&gt; - Other arrays and tuples are
-// serialized as &lt;array&gt; - booleans are serialized as &lt;boolean&gt; -
-// byte, int16, uint16 and int32 are serialized as &lt;int&gt; - uint32 and
-// int64 are serialized as the nonstandard &lt;i8&gt; type - doubles are
-// serialized as &lt;double&gt; - Strings are serialized as &lt;string&gt; -
-// Variants (i.e. "v" type) are unwrapped and their child is serialized. -
-// #GVariants created by soup_xmlrpc_variant_new_datetime() are serialized as
-// &lt;dateTime.iso8601&gt; - Other types are not supported and will return NULL
-// and set error. This notably includes: object-paths, signatures, uint64,
-// handles, maybes and dictionaries with non-string keys.
-//
-// If params is floating, it is consumed.
-//
-// The function takes the following parameters:
-//
-//    - methodName: name of the XML-RPC method.
-//    - params: #GVariant tuple.
-//
-// The function returns the following values:
-//
-//    - utf8: text of the methodCall, or NULL on error.
-//
-func XmlrpcBuildRequest(methodName string, params *glib.Variant) (string, error) {
-	var _arg1 *C.char     // out
-	var _arg2 *C.GVariant // out
-	var _cret *C.char     // in
-	var _cerr *C.GError   // in
-
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(methodName)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(params)))
-
-	_cret = C.soup_xmlrpc_build_request(_arg1, _arg2, &_cerr)
-	runtime.KeepAlive(methodName)
-	runtime.KeepAlive(params)
-
-	var _utf8 string // out
-	var _goerr error // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	defer C.free(unsafe.Pointer(_cret))
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _utf8, _goerr
-}
-
-// XmlrpcBuildResponse: this creates a (successful) XML-RPC methodResponse and
-// returns it as a string. To create a fault response, use
-// soup_xmlrpc_build_fault(). This is the low-level method that
-// soup_xmlrpc_message_set_response() is built on.
-//
-// See soup_xmlrpc_build_request() for serialization details, but note that
-// since a method can only have a single return value, value should not be a
-// tuple here (unless the return value is an array).
-//
-// If value is floating, it is consumed.
-//
-// The function takes the following parameters:
-//
-//    - value: return value.
-//
-// The function returns the following values:
-//
-//    - utf8: text of the methodResponse, or NULL on error.
-//
-func XmlrpcBuildResponse(value *glib.Variant) (string, error) {
-	var _arg1 *C.GVariant // out
-	var _cret *C.char     // in
-	var _cerr *C.GError   // in
-
-	_arg1 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(value)))
-
-	_cret = C.soup_xmlrpc_build_response(_arg1, &_cerr)
-	runtime.KeepAlive(value)
-
-	var _utf8 string // out
-	var _goerr error // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	defer C.free(unsafe.Pointer(_cret))
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _utf8, _goerr
-}
-
-// NewXmlrpcMessage creates an XML-RPC methodCall and returns a Message, ready
-// to send, for that method call.
-//
-// See soup_xmlrpc_build_request() for serialization details.
-//
-// If params is floating, it is consumed.
-//
-// The function takes the following parameters:
-//
-//    - uri: URI of the XML-RPC service.
-//    - methodName: name of the XML-RPC method to invoke at uri.
-//    - params: #GVariant tuple.
-//
-// The function returns the following values:
-//
-//    - message encoding the indicated XML-RPC request, or NULL on error.
-//
-func NewXmlrpcMessage(uri, methodName string, params *glib.Variant) (*Message, error) {
-	var _arg1 *C.char        // out
-	var _arg2 *C.char        // out
-	var _arg3 *C.GVariant    // out
-	var _cret *C.SoupMessage // in
-	var _cerr *C.GError      // in
-
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(uri)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.char)(unsafe.Pointer(C.CString(methodName)))
-	defer C.free(unsafe.Pointer(_arg2))
-	_arg3 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(params)))
-
-	_cret = C.soup_xmlrpc_message_new(_arg1, _arg2, _arg3, &_cerr)
-	runtime.KeepAlive(uri)
-	runtime.KeepAlive(methodName)
-	runtime.KeepAlive(params)
-
-	var _message *Message // out
-	var _goerr error      // out
-
-	_message = wrapMessage(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _message, _goerr
-}
-
-// XmlrpcMessageSetResponse sets the status code and response body of msg to
-// indicate a successful XML-RPC call, with a return value given by value. To
-// set a fault response, use soup_xmlrpc_message_set_fault().
-//
-// See soup_xmlrpc_build_request() for serialization details.
-//
-// If value is floating, it is consumed.
-//
-// The function takes the following parameters:
-//
-//    - msg: XML-RPC request.
-//    - value: #GVariant.
-//
-func XmlrpcMessageSetResponse(msg *Message, value *glib.Variant) error {
-	var _arg1 *C.SoupMessage // out
-	var _arg2 *C.GVariant    // out
-	var _cerr *C.GError      // in
-
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
-	_arg2 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(value)))
-
-	C.soup_xmlrpc_message_set_response(_arg1, _arg2, &_cerr)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(value)
-
-	var _goerr error // out
-
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _goerr
-}
-
-// XmlrpcParseResponse parses method_response and returns the return value. If
-// method_response is a fault, NULL is returned, and error will be set to an
-// error in the SOUP_XMLRPC_FAULT domain, with the error code containing the
-// fault code, and the error message containing the fault string. If
-// method_response cannot be parsed, NULL is returned, and error will be set to
-// an error in the SOUP_XMLRPC_ERROR domain.
-//
-// See soup_xmlrpc_params_parse() for deserialization details.
-//
-// The function takes the following parameters:
-//
-//    - methodResponse: XML-RPC methodResponse string.
-//    - length of method_response, or -1 if it is NUL-terminated.
-//    - signature (optional): valid #GVariant type string, or NULL.
-//
-// The function returns the following values:
-//
-//    - variant: new (non-floating) #GVariant, or NULL.
-//
-func XmlrpcParseResponse(methodResponse string, length int, signature string) (*glib.Variant, error) {
-	var _arg1 *C.char     // out
-	var _arg2 C.int       // out
-	var _arg3 *C.char     // out
-	var _cret *C.GVariant // in
-	var _cerr *C.GError   // in
-
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(methodResponse)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = C.int(length)
-	if signature != "" {
-		_arg3 = (*C.char)(unsafe.Pointer(C.CString(signature)))
-		defer C.free(unsafe.Pointer(_arg3))
-	}
-
-	_cret = C.soup_xmlrpc_parse_response(_arg1, _arg2, _arg3, &_cerr)
-	runtime.KeepAlive(methodResponse)
-	runtime.KeepAlive(length)
-	runtime.KeepAlive(signature)
-
-	var _variant *glib.Variant // out
-	var _goerr error           // out
-
-	_variant = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_variant)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_variant_unref((*C.GVariant)(intern.C))
-		},
-	)
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _variant, _goerr
-}
-
-// XmlrpcVariantGetDatetime: get the Date from special #GVariant created by
-// soup_xmlrpc_variant_new_datetime() or by parsing a &lt;dateTime.iso8601&gt;
-// node. See soup_xmlrpc_params_parse().
-//
-// If variant does not contain a datetime it will return an error but it is not
-// considered a programmer error because it generally means parameters received
-// are not in the expected type.
-//
-// The function takes the following parameters:
-//
-//    - variant: #GVariant.
-//
-// The function returns the following values:
-//
-//    - date: new Date, or NULL on error.
-//
-func XmlrpcVariantGetDatetime(variant *glib.Variant) (*Date, error) {
-	var _arg1 *C.GVariant // out
-	var _cret *C.SoupDate // in
-	var _cerr *C.GError   // in
-
-	_arg1 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(variant)))
-
-	_cret = C.soup_xmlrpc_variant_get_datetime(_arg1, &_cerr)
-	runtime.KeepAlive(variant)
-
-	var _date *Date  // out
-	var _goerr error // out
-
-	_date = (*Date)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_date)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.soup_date_free((*C.SoupDate)(intern.C))
-		},
-	)
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _date, _goerr
-}
-
-// XmlrpcVariantNewDatetime: construct a special #GVariant used to serialize a
-// &lt;dateTime.iso8601&gt; node. See soup_xmlrpc_build_request().
-//
-// The actual type of the returned #GVariant is unspecified and "v" or "*"
-// should be used in variant format strings. For example:
-// <informalexample><programlisting> args = g_variant_new ("(v)",
-// soup_xmlrpc_variant_new_datetime (date));
-// </programlisting></informalexample>.
-//
-// The function takes the following parameters:
-//
-//    - date: Date.
-//
-// The function returns the following values:
-//
-//    - variant: floating #GVariant.
-//
-func XmlrpcVariantNewDatetime(date *Date) *glib.Variant {
-	var _arg1 *C.SoupDate // out
-	var _cret *C.GVariant // in
-
-	_arg1 = (*C.SoupDate)(gextras.StructNative(unsafe.Pointer(date)))
-
-	_cret = C.soup_xmlrpc_variant_new_datetime(_arg1)
-	runtime.KeepAlive(date)
-
-	var _variant *glib.Variant // out
-
-	_variant = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_variant)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_variant_unref((*C.GVariant)(intern.C))
-		},
-	)
-
-	return _variant
 }

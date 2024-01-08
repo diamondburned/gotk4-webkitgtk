@@ -6,7 +6,8 @@ import (
 	"runtime"
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -14,26 +15,42 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitPolicyDecision.go.
-var GTypePolicyDecision = externglib.Type(C.webkit_policy_decision_get_type())
+// GType values.
+var (
+	GTypePolicyDecision = coreglib.Type(C.webkit_policy_decision_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypePolicyDecision, F: marshalPolicyDecision},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypePolicyDecision, F: marshalPolicyDecision},
 	})
 }
 
-// PolicyDecisionOverrider contains methods that are overridable.
-type PolicyDecisionOverrider interface {
+// PolicyDecisionOverrides contains methods that are overridable.
+type PolicyDecisionOverrides struct {
 }
 
+func defaultPolicyDecisionOverrides(v *PolicyDecision) PolicyDecisionOverrides {
+	return PolicyDecisionOverrides{}
+}
+
+// PolicyDecision: pending policy decision.
+//
+// Often WebKit allows the client to decide the policy for certain operations.
+// For instance, a client may want to open a link in a new tab, block a
+// navigation entirely, query the user or trigger a download instead of a
+// navigation. In these cases WebKit will fire the KitWebView::decide-policy
+// signal with a KitPolicyDecision object. If the signal handler does nothing,
+// WebKit will act as if webkit_policy_decision_use() was called as soon as
+// signal handling completes. To make a policy decision asynchronously, simply
+// increment the reference count of the KitPolicyDecision object.
 type PolicyDecision struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 }
 
 var (
-	_ externglib.Objector = (*PolicyDecision)(nil)
+	_ coreglib.Objector = (*PolicyDecision)(nil)
 )
 
 // PolicyDecisioner describes types inherited from class PolicyDecision.
@@ -41,28 +58,36 @@ var (
 // To get the original type, the caller must assert this to an interface or
 // another type.
 type PolicyDecisioner interface {
-	externglib.Objector
+	coreglib.Objector
 	basePolicyDecision() *PolicyDecision
 }
 
 var _ PolicyDecisioner = (*PolicyDecision)(nil)
 
-func classInitPolicyDecisioner(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*PolicyDecision, *PolicyDecisionClass, PolicyDecisionOverrides](
+		GTypePolicyDecision,
+		initPolicyDecisionClass,
+		wrapPolicyDecision,
+		defaultPolicyDecisionOverrides,
+	)
 }
 
-func wrapPolicyDecision(obj *externglib.Object) *PolicyDecision {
+func initPolicyDecisionClass(gclass unsafe.Pointer, overrides PolicyDecisionOverrides, classInitFunc func(*PolicyDecisionClass)) {
+	if classInitFunc != nil {
+		class := (*PolicyDecisionClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapPolicyDecision(obj *coreglib.Object) *PolicyDecision {
 	return &PolicyDecision{
 		Object: obj,
 	}
 }
 
 func marshalPolicyDecision(p uintptr) (interface{}, error) {
-	return wrapPolicyDecision(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapPolicyDecision(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 func (decision *PolicyDecision) basePolicyDecision() *PolicyDecision {
@@ -78,18 +103,20 @@ func BasePolicyDecision(obj PolicyDecisioner) *PolicyDecision {
 func (decision *PolicyDecision) Download() {
 	var _arg0 *C.WebKitPolicyDecision // out
 
-	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
+	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(coreglib.InternObject(decision).Native()))
 
 	C.webkit_policy_decision_download(_arg0)
 	runtime.KeepAlive(decision)
 }
 
+// Ignore this would cancel the request.
+//
 // Ignore the action which triggered this decision. For instance, for a
 // KitResponsePolicyDecision, this would cancel the request.
 func (decision *PolicyDecision) Ignore() {
 	var _arg0 *C.WebKitPolicyDecision // out
 
-	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
+	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(coreglib.InternObject(decision).Native()))
 
 	C.webkit_policy_decision_ignore(_arg0)
 	runtime.KeepAlive(decision)
@@ -99,15 +126,18 @@ func (decision *PolicyDecision) Ignore() {
 func (decision *PolicyDecision) Use() {
 	var _arg0 *C.WebKitPolicyDecision // out
 
-	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
+	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(coreglib.InternObject(decision).Native()))
 
 	C.webkit_policy_decision_use(_arg0)
 	runtime.KeepAlive(decision)
 }
 
-// UseWithPolicies: accept the navigation action which triggered this decision,
-// and continue with policies affecting all subsequent loads of resources in the
-// origin associated with the accepted navigation action.
+// UseWithPolicies: accept the navigation action and continue with provided
+// policies.
+//
+// Accept the navigation action which triggered this decision, and continue with
+// policies affecting all subsequent loads of resources in the origin associated
+// with the accepted navigation action.
 //
 // For example, a navigation decision to a video sharing website may be accepted
 // under the priviso no movies are allowed to autoplay. The autoplay policy in
@@ -115,16 +145,26 @@ func (decision *PolicyDecision) Use() {
 //
 // The function takes the following parameters:
 //
-//    - policies: KitWebsitePolicies.
+//   - policies: KitWebsitePolicies.
 //
 func (decision *PolicyDecision) UseWithPolicies(policies *WebsitePolicies) {
 	var _arg0 *C.WebKitPolicyDecision  // out
 	var _arg1 *C.WebKitWebsitePolicies // out
 
-	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
-	_arg1 = (*C.WebKitWebsitePolicies)(unsafe.Pointer(externglib.InternObject(policies).Native()))
+	_arg0 = (*C.WebKitPolicyDecision)(unsafe.Pointer(coreglib.InternObject(decision).Native()))
+	_arg1 = (*C.WebKitWebsitePolicies)(unsafe.Pointer(coreglib.InternObject(policies).Native()))
 
 	C.webkit_policy_decision_use_with_policies(_arg0, _arg1)
 	runtime.KeepAlive(decision)
 	runtime.KeepAlive(policies)
+}
+
+// PolicyDecisionClass: instance of this type is always passed by reference.
+type PolicyDecisionClass struct {
+	*policyDecisionClass
+}
+
+// policyDecisionClass is the struct that's finalized.
+type policyDecisionClass struct {
+	native *C.WebKitPolicyDecisionClass
 }

@@ -5,7 +5,8 @@ package soup
 import (
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -13,17 +14,23 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup-websocket-extension-deflate.go.
-var GTypeWebsocketExtensionDeflate = externglib.Type(C.soup_websocket_extension_deflate_get_type())
+// GType values.
+var (
+	GTypeWebsocketExtensionDeflate = coreglib.Type(C.soup_websocket_extension_deflate_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeWebsocketExtensionDeflate, F: marshalWebsocketExtensionDeflate},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeWebsocketExtensionDeflate, F: marshalWebsocketExtensionDeflate},
 	})
 }
 
-// WebsocketExtensionDeflateOverrider contains methods that are overridable.
-type WebsocketExtensionDeflateOverrider interface {
+// WebsocketExtensionDeflateOverrides contains methods that are overridable.
+type WebsocketExtensionDeflateOverrides struct {
+}
+
+func defaultWebsocketExtensionDeflateOverrides(v *WebsocketExtensionDeflate) WebsocketExtensionDeflateOverrides {
+	return WebsocketExtensionDeflateOverrides{}
 }
 
 type WebsocketExtensionDeflate struct {
@@ -35,15 +42,23 @@ var (
 	_ WebsocketExtensioner = (*WebsocketExtensionDeflate)(nil)
 )
 
-func classInitWebsocketExtensionDeflater(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*WebsocketExtensionDeflate, *WebsocketExtensionDeflateClass, WebsocketExtensionDeflateOverrides](
+		GTypeWebsocketExtensionDeflate,
+		initWebsocketExtensionDeflateClass,
+		wrapWebsocketExtensionDeflate,
+		defaultWebsocketExtensionDeflateOverrides,
+	)
 }
 
-func wrapWebsocketExtensionDeflate(obj *externglib.Object) *WebsocketExtensionDeflate {
+func initWebsocketExtensionDeflateClass(gclass unsafe.Pointer, overrides WebsocketExtensionDeflateOverrides, classInitFunc func(*WebsocketExtensionDeflateClass)) {
+	if classInitFunc != nil {
+		class := (*WebsocketExtensionDeflateClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapWebsocketExtensionDeflate(obj *coreglib.Object) *WebsocketExtensionDeflate {
 	return &WebsocketExtensionDeflate{
 		WebsocketExtension: WebsocketExtension{
 			Object: obj,
@@ -52,5 +67,23 @@ func wrapWebsocketExtensionDeflate(obj *externglib.Object) *WebsocketExtensionDe
 }
 
 func marshalWebsocketExtensionDeflate(p uintptr) (interface{}, error) {
-	return wrapWebsocketExtensionDeflate(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapWebsocketExtensionDeflate(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+// WebsocketExtensionDeflateClass: instance of this type is always passed by
+// reference.
+type WebsocketExtensionDeflateClass struct {
+	*websocketExtensionDeflateClass
+}
+
+// websocketExtensionDeflateClass is the struct that's finalized.
+type websocketExtensionDeflateClass struct {
+	native *C.SoupWebsocketExtensionDeflateClass
+}
+
+func (w *WebsocketExtensionDeflateClass) ParentClass() *WebsocketExtensionClass {
+	valptr := &w.native.parent_class
+	var _v *WebsocketExtensionClass // out
+	_v = (*WebsocketExtensionClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
+	return _v
 }

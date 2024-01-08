@@ -8,7 +8,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -16,16 +16,16 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitScriptDialog.go.
+// GType values.
 var (
-	GTypeScriptDialogType = externglib.Type(C.webkit_script_dialog_type_get_type())
-	GTypeScriptDialog     = externglib.Type(C.webkit_script_dialog_get_type())
+	GTypeScriptDialogType = coreglib.Type(C.webkit_script_dialog_type_get_type())
+	GTypeScriptDialog     = coreglib.Type(C.webkit_script_dialog_get_type())
 )
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeScriptDialogType, F: marshalScriptDialogType},
-		{T: GTypeScriptDialog, F: marshalScriptDialog},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeScriptDialogType, F: marshalScriptDialogType},
+		coreglib.TypeMarshaler{T: GTypeScriptDialog, F: marshalScriptDialog},
 	})
 }
 
@@ -49,7 +49,7 @@ const (
 )
 
 func marshalScriptDialogType(p uintptr) (interface{}, error) {
-	return ScriptDialogType(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return ScriptDialogType(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for ScriptDialogType.
@@ -68,7 +68,9 @@ func (s ScriptDialogType) String() string {
 	}
 }
 
-// ScriptDialog: instance of this type is always passed by reference.
+// ScriptDialog carries details to be shown in user-facing dialogs.
+//
+// An instance of this type is always passed by reference.
 type ScriptDialog struct {
 	*scriptDialog
 }
@@ -79,15 +81,16 @@ type scriptDialog struct {
 }
 
 func marshalScriptDialog(p uintptr) (interface{}, error) {
-	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	b := coreglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
 	return &ScriptDialog{&scriptDialog{(*C.WebKitScriptDialog)(b)}}, nil
 }
 
-// Close dialog. When handling a KitScriptDialog asynchronously
-// (webkit_script_dialog_ref() was called in KitWebView::script-dialog
-// callback), this function needs to be called to notify that we are done with
-// the script dialog. The dialog will be closed on destruction if this function
-// hasn't been called before.
+// Close dialog.
+//
+// When handling a KitScriptDialog asynchronously (webkit_script_dialog_ref()
+// was called in KitWebView::script-dialog callback), this function needs to be
+// called to notify that we are done with the script dialog. The dialog will be
+// closed on destruction if this function hasn't been called before.
 func (dialog *ScriptDialog) Close() {
 	var _arg0 *C.WebKitScriptDialog // out
 
@@ -97,7 +100,9 @@ func (dialog *ScriptDialog) Close() {
 	runtime.KeepAlive(dialog)
 }
 
-// ConfirmSetConfirmed: this method is used for WEBKIT_SCRIPT_DIALOG_CONFIRM and
+// ConfirmSetConfirmed: set whether the user confirmed the dialog.
+//
+// This method is used for WEBKIT_SCRIPT_DIALOG_CONFIRM and
 // WEBKIT_SCRIPT_DIALOG_BEFORE_UNLOAD_CONFIRM dialogs when
 // KitWebView::script-dialog signal is emitted to set whether the user confirmed
 // the dialog or not. The default implementation of KitWebView::script-dialog
@@ -107,7 +112,7 @@ func (dialog *ScriptDialog) Close() {
 //
 // The function takes the following parameters:
 //
-//    - confirmed: whether user confirmed the dialog.
+//   - confirmed: whether user confirmed the dialog.
 //
 func (dialog *ScriptDialog) ConfirmSetConfirmed(confirmed bool) {
 	var _arg0 *C.WebKitScriptDialog // out
@@ -127,7 +132,7 @@ func (dialog *ScriptDialog) ConfirmSetConfirmed(confirmed bool) {
 //
 // The function returns the following values:
 //
-//    - scriptDialogType of dialog.
+//   - scriptDialogType of dialog.
 //
 func (dialog *ScriptDialog) DialogType() ScriptDialogType {
 	var _arg0 *C.WebKitScriptDialog    // out
@@ -149,7 +154,7 @@ func (dialog *ScriptDialog) DialogType() ScriptDialogType {
 //
 // The function returns the following values:
 //
-//    - utf8: message of dialog.
+//   - utf8: message of dialog.
 //
 func (dialog *ScriptDialog) Message() string {
 	var _arg0 *C.WebKitScriptDialog // out
@@ -168,12 +173,14 @@ func (dialog *ScriptDialog) Message() string {
 }
 
 // PromptGetDefaultText: get the default text of a KitScriptDialog of type
-// WEBKIT_SCRIPT_DIALOG_PROMPT. It's an error to use this method with a
-// KitScriptDialog that is not of type WEBKIT_SCRIPT_DIALOG_PROMPT.
+// WEBKIT_SCRIPT_DIALOG_PROMPT.
+//
+// It's an error to use this method with a KitScriptDialog that is not of type
+// WEBKIT_SCRIPT_DIALOG_PROMPT.
 //
 // The function returns the following values:
 //
-//    - utf8: default text of dialog.
+//   - utf8: default text of dialog.
 //
 func (dialog *ScriptDialog) PromptGetDefaultText() string {
 	var _arg0 *C.WebKitScriptDialog // out
@@ -191,16 +198,18 @@ func (dialog *ScriptDialog) PromptGetDefaultText() string {
 	return _utf8
 }
 
-// PromptSetText: this method is used for WEBKIT_SCRIPT_DIALOG_PROMPT dialogs
-// when KitWebView::script-dialog signal is emitted to set the text entered by
-// the user. The default implementation of KitWebView::script-dialog signal sets
+// PromptSetText: set the text entered by the user in the dialog.
+//
+// This method is used for WEBKIT_SCRIPT_DIALOG_PROMPT dialogs when
+// KitWebView::script-dialog signal is emitted to set the text entered by the
+// user. The default implementation of KitWebView::script-dialog signal sets
 // the text of the entry form when OK button is clicked, otherwise NULL is set.
 // It's an error to use this method with a KitScriptDialog that is not of type
 // WEBKIT_SCRIPT_DIALOG_PROMPT.
 //
 // The function takes the following parameters:
 //
-//    - text to set.
+//   - text to set.
 //
 func (dialog *ScriptDialog) PromptSetText(text string) {
 	var _arg0 *C.WebKitScriptDialog // out

@@ -3,116 +3,82 @@
 package soup
 
 import (
-	"fmt"
 	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gbox"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
 // extern SoupCacheability _gotk4_soup2_CacheClass_get_cacheability(SoupCache*, SoupMessage*);
+// SoupCacheability _gotk4_soup2_Cache_virtual_get_cacheability(void* fnptr, SoupCache* arg0, SoupMessage* arg1) {
+//   return ((SoupCacheability (*)(SoupCache*, SoupMessage*))(fnptr))(arg0, arg1);
+// };
 import "C"
 
-// glib.Type values for soup-cache.go.
+// GType values.
 var (
-	GTypeCacheType = externglib.Type(C.soup_cache_type_get_type())
-	GTypeCache     = externglib.Type(C.soup_cache_get_type())
+	GTypeCache = coreglib.Type(C.soup_cache_get_type())
 )
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeCacheType, F: marshalCacheType},
-		{T: GTypeCache, F: marshalCache},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeCache, F: marshalCache},
 	})
 }
 
-// CacheType: type of cache; this affects what kinds of responses will be saved.
-type CacheType C.gint
-
-const (
-	// CacheSingleUser: single-user cache.
-	CacheSingleUser CacheType = iota
-	// CacheShared: shared cache.
-	CacheShared
-)
-
-func marshalCacheType(p uintptr) (interface{}, error) {
-	return CacheType(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
-}
-
-// String returns the name in string for CacheType.
-func (c CacheType) String() string {
-	switch c {
-	case CacheSingleUser:
-		return "SingleUser"
-	case CacheShared:
-		return "Shared"
-	default:
-		return fmt.Sprintf("CacheType(%d)", c)
-	}
-}
-
-// CacheOverrider contains methods that are overridable.
-type CacheOverrider interface {
+// CacheOverrides contains methods that are overridable.
+type CacheOverrides struct {
 	// The function takes the following parameters:
 	//
 	// The function returns the following values:
 	//
-	Cacheability(msg *Message) Cacheability
+	Cacheability func(msg *Message) Cacheability
+}
+
+func defaultCacheOverrides(v *Cache) CacheOverrides {
+	return CacheOverrides{
+		Cacheability: v.cacheability,
+	}
 }
 
 type Cache struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 
 	SessionFeature
 }
 
 var (
-	_ externglib.Objector = (*Cache)(nil)
+	_ coreglib.Objector = (*Cache)(nil)
 )
 
-func classInitCacher(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+func init() {
+	coreglib.RegisterClassInfo[*Cache, *CacheClass, CacheOverrides](
+		GTypeCache,
+		initCacheClass,
+		wrapCache,
+		defaultCacheOverrides,
+	)
+}
 
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+func initCacheClass(gclass unsafe.Pointer, overrides CacheOverrides, classInitFunc func(*CacheClass)) {
+	pclass := (*C.SoupCacheClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeCache))))
 
-	goval := gbox.Get(uintptr(data))
-	pclass := (*C.SoupCacheClass)(unsafe.Pointer(gclassPtr))
-	// gclass := (*C.GTypeClass)(unsafe.Pointer(gclassPtr))
-	// pclass := (*C.SoupCacheClass)(unsafe.Pointer(C.g_type_class_peek_parent(gclass)))
-
-	if _, ok := goval.(interface {
-		Cacheability(msg *Message) Cacheability
-	}); ok {
+	if overrides.Cacheability != nil {
 		pclass.get_cacheability = (*[0]byte)(C._gotk4_soup2_CacheClass_get_cacheability)
+	}
+
+	if classInitFunc != nil {
+		class := (*CacheClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
 	}
 }
 
-//export _gotk4_soup2_CacheClass_get_cacheability
-func _gotk4_soup2_CacheClass_get_cacheability(arg0 *C.SoupCache, arg1 *C.SoupMessage) (cret C.SoupCacheability) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		Cacheability(msg *Message) Cacheability
-	})
-
-	var _msg *Message // out
-
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-
-	cacheability := iface.Cacheability(_msg)
-
-	cret = C.SoupCacheability(cacheability)
-
-	return cret
-}
-
-func wrapCache(obj *externglib.Object) *Cache {
+func wrapCache(obj *coreglib.Object) *Cache {
 	return &Cache{
 		Object: obj,
 		SessionFeature: SessionFeature{
@@ -122,22 +88,22 @@ func wrapCache(obj *externglib.Object) *Cache {
 }
 
 func marshalCache(p uintptr) (interface{}, error) {
-	return wrapCache(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapCache(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewCache creates a new Cache.
 //
 // The function takes the following parameters:
 //
-//    - cacheDir (optional): directory to store the cached data, or NULL to use
-//      the default one. Note that since the cache isn't safe to access for
-//      multiple processes at once, and the default directory isn't namespaced by
-//      process, clients are strongly discouraged from passing NULL.
-//    - cacheType of the cache.
+//   - cacheDir (optional): directory to store the cached data, or NULL to
+//     use the default one. Note that since the cache isn't safe to access for
+//     multiple processes at once, and the default directory isn't namespaced by
+//     process, clients are strongly discouraged from passing NULL.
+//   - cacheType of the cache.
 //
 // The function returns the following values:
 //
-//    - cache: new Cache.
+//   - cache: new Cache.
 //
 func NewCache(cacheDir string, cacheType CacheType) *Cache {
 	var _arg1 *C.char         // out
@@ -156,7 +122,7 @@ func NewCache(cacheDir string, cacheType CacheType) *Cache {
 
 	var _cache *Cache // out
 
-	_cache = wrapCache(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_cache = wrapCache(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _cache
 }
@@ -165,7 +131,7 @@ func NewCache(cacheDir string, cacheType CacheType) *Cache {
 func (cache *Cache) Clear() {
 	var _arg0 *C.SoupCache // out
 
-	_arg0 = (*C.SoupCache)(unsafe.Pointer(externglib.InternObject(cache).Native()))
+	_arg0 = (*C.SoupCache)(unsafe.Pointer(coreglib.InternObject(cache).Native()))
 
 	C.soup_cache_clear(_arg0)
 	runtime.KeepAlive(cache)
@@ -180,7 +146,7 @@ func (cache *Cache) Clear() {
 func (cache *Cache) Dump() {
 	var _arg0 *C.SoupCache // out
 
-	_arg0 = (*C.SoupCache)(unsafe.Pointer(externglib.InternObject(cache).Native()))
+	_arg0 = (*C.SoupCache)(unsafe.Pointer(coreglib.InternObject(cache).Native()))
 
 	C.soup_cache_dump(_arg0)
 	runtime.KeepAlive(cache)
@@ -194,7 +160,7 @@ func (cache *Cache) Dump() {
 func (cache *Cache) Flush() {
 	var _arg0 *C.SoupCache // out
 
-	_arg0 = (*C.SoupCache)(unsafe.Pointer(externglib.InternObject(cache).Native()))
+	_arg0 = (*C.SoupCache)(unsafe.Pointer(coreglib.InternObject(cache).Native()))
 
 	C.soup_cache_flush(_arg0)
 	runtime.KeepAlive(cache)
@@ -204,13 +170,13 @@ func (cache *Cache) Flush() {
 //
 // The function returns the following values:
 //
-//    - guint: maximum size of the cache, in bytes.
+//   - guint: maximum size of the cache, in bytes.
 //
 func (cache *Cache) MaxSize() uint {
 	var _arg0 *C.SoupCache // out
 	var _cret C.guint      // in
 
-	_arg0 = (*C.SoupCache)(unsafe.Pointer(externglib.InternObject(cache).Native()))
+	_arg0 = (*C.SoupCache)(unsafe.Pointer(coreglib.InternObject(cache).Native()))
 
 	_cret = C.soup_cache_get_max_size(_arg0)
 	runtime.KeepAlive(cache)
@@ -226,7 +192,7 @@ func (cache *Cache) MaxSize() uint {
 func (cache *Cache) Load() {
 	var _arg0 *C.SoupCache // out
 
-	_arg0 = (*C.SoupCache)(unsafe.Pointer(externglib.InternObject(cache).Native()))
+	_arg0 = (*C.SoupCache)(unsafe.Pointer(coreglib.InternObject(cache).Native()))
 
 	C.soup_cache_load(_arg0)
 	runtime.KeepAlive(cache)
@@ -236,16 +202,52 @@ func (cache *Cache) Load() {
 //
 // The function takes the following parameters:
 //
-//    - maxSize: maximum size of the cache, in bytes.
+//   - maxSize: maximum size of the cache, in bytes.
 //
 func (cache *Cache) SetMaxSize(maxSize uint) {
 	var _arg0 *C.SoupCache // out
 	var _arg1 C.guint      // out
 
-	_arg0 = (*C.SoupCache)(unsafe.Pointer(externglib.InternObject(cache).Native()))
+	_arg0 = (*C.SoupCache)(unsafe.Pointer(coreglib.InternObject(cache).Native()))
 	_arg1 = C.guint(maxSize)
 
 	C.soup_cache_set_max_size(_arg0, _arg1)
 	runtime.KeepAlive(cache)
 	runtime.KeepAlive(maxSize)
+}
+
+// The function takes the following parameters:
+//
+// The function returns the following values:
+//
+func (cache *Cache) cacheability(msg *Message) Cacheability {
+	gclass := (*C.SoupCacheClass)(coreglib.PeekParentClass(cache))
+	fnarg := gclass.get_cacheability
+
+	var _arg0 *C.SoupCache       // out
+	var _arg1 *C.SoupMessage     // out
+	var _cret C.SoupCacheability // in
+
+	_arg0 = (*C.SoupCache)(unsafe.Pointer(coreglib.InternObject(cache).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+
+	_cret = C._gotk4_soup2_Cache_virtual_get_cacheability(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(cache)
+	runtime.KeepAlive(msg)
+
+	var _cacheability Cacheability // out
+
+	_cacheability = Cacheability(_cret)
+
+	return _cacheability
+}
+
+// CacheClass: instance of this type is always passed by reference.
+type CacheClass struct {
+	*cacheClass
+}
+
+// cacheClass is the struct that's finalized.
+type cacheClass struct {
+	native *C.SoupCacheClass
 }

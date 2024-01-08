@@ -5,68 +5,96 @@ package soup
 import (
 	"fmt"
 	"runtime"
-	"runtime/cgo"
 	"strings"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
-// extern SoupBuffer* _gotk4_soup2_ChunkAllocator(SoupMessage*, gsize, gpointer);
-// extern void _gotk4_soup2_MessageClass_finished(SoupMessage*);
-// extern void _gotk4_soup2_MessageClass_got_body(SoupMessage*);
-// extern void _gotk4_soup2_MessageClass_got_chunk(SoupMessage*, SoupBuffer*);
-// extern void _gotk4_soup2_MessageClass_got_headers(SoupMessage*);
-// extern void _gotk4_soup2_MessageClass_got_informational(SoupMessage*);
-// extern void _gotk4_soup2_MessageClass_restarted(SoupMessage*);
-// extern void _gotk4_soup2_MessageClass_starting(SoupMessage*);
-// extern void _gotk4_soup2_MessageClass_wrote_body(SoupMessage*);
-// extern void _gotk4_soup2_MessageClass_wrote_chunk(SoupMessage*);
-// extern void _gotk4_soup2_MessageClass_wrote_headers(SoupMessage*);
-// extern void _gotk4_soup2_MessageClass_wrote_informational(SoupMessage*);
-// extern void _gotk4_soup2_Message_ConnectContentSniffed(gpointer, gchar*, GHashTable*, guintptr);
-// extern void _gotk4_soup2_Message_ConnectFinished(gpointer, guintptr);
-// extern void _gotk4_soup2_Message_ConnectGotBody(gpointer, guintptr);
-// extern void _gotk4_soup2_Message_ConnectGotChunk(gpointer, SoupBuffer*, guintptr);
-// extern void _gotk4_soup2_Message_ConnectGotHeaders(gpointer, guintptr);
-// extern void _gotk4_soup2_Message_ConnectGotInformational(gpointer, guintptr);
-// extern void _gotk4_soup2_Message_ConnectNetworkEvent(gpointer, GSocketClientEvent, GIOStream*, guintptr);
-// extern void _gotk4_soup2_Message_ConnectRestarted(gpointer, guintptr);
-// extern void _gotk4_soup2_Message_ConnectStarting(gpointer, guintptr);
-// extern void _gotk4_soup2_Message_ConnectWroteBody(gpointer, guintptr);
-// extern void _gotk4_soup2_Message_ConnectWroteBodyData(gpointer, SoupBuffer*, guintptr);
-// extern void _gotk4_soup2_Message_ConnectWroteChunk(gpointer, guintptr);
-// extern void _gotk4_soup2_Message_ConnectWroteHeaders(gpointer, guintptr);
-// extern void _gotk4_soup2_Message_ConnectWroteInformational(gpointer, guintptr);
 // extern void callbackDelete(gpointer);
+// extern void _gotk4_soup2_Message_ConnectWroteInformational(gpointer, guintptr);
+// extern void _gotk4_soup2_Message_ConnectWroteHeaders(gpointer, guintptr);
+// extern void _gotk4_soup2_Message_ConnectWroteChunk(gpointer, guintptr);
+// extern void _gotk4_soup2_Message_ConnectWroteBodyData(gpointer, SoupBuffer*, guintptr);
+// extern void _gotk4_soup2_Message_ConnectWroteBody(gpointer, guintptr);
+// extern void _gotk4_soup2_Message_ConnectStarting(gpointer, guintptr);
+// extern void _gotk4_soup2_Message_ConnectRestarted(gpointer, guintptr);
+// extern void _gotk4_soup2_Message_ConnectNetworkEvent(gpointer, GSocketClientEvent, GIOStream*, guintptr);
+// extern void _gotk4_soup2_Message_ConnectGotInformational(gpointer, guintptr);
+// extern void _gotk4_soup2_Message_ConnectGotHeaders(gpointer, guintptr);
+// extern void _gotk4_soup2_Message_ConnectGotChunk(gpointer, SoupBuffer*, guintptr);
+// extern void _gotk4_soup2_Message_ConnectGotBody(gpointer, guintptr);
+// extern void _gotk4_soup2_Message_ConnectFinished(gpointer, guintptr);
+// extern void _gotk4_soup2_Message_ConnectContentSniffed(gpointer, gchar*, GHashTable*, guintptr);
+// extern void _gotk4_soup2_MessageClass_wrote_informational(SoupMessage*);
+// extern void _gotk4_soup2_MessageClass_wrote_headers(SoupMessage*);
+// extern void _gotk4_soup2_MessageClass_wrote_chunk(SoupMessage*);
+// extern void _gotk4_soup2_MessageClass_wrote_body(SoupMessage*);
+// extern void _gotk4_soup2_MessageClass_starting(SoupMessage*);
+// extern void _gotk4_soup2_MessageClass_restarted(SoupMessage*);
+// extern void _gotk4_soup2_MessageClass_got_informational(SoupMessage*);
+// extern void _gotk4_soup2_MessageClass_got_headers(SoupMessage*);
+// extern void _gotk4_soup2_MessageClass_got_chunk(SoupMessage*, SoupBuffer*);
+// extern void _gotk4_soup2_MessageClass_got_body(SoupMessage*);
+// extern void _gotk4_soup2_MessageClass_finished(SoupMessage*);
+// extern SoupBuffer* _gotk4_soup2_ChunkAllocator(SoupMessage*, gsize, gpointer);
+// void _gotk4_soup2_Message_virtual_finished(void* fnptr, SoupMessage* arg0) {
+//   ((void (*)(SoupMessage*))(fnptr))(arg0);
+// };
+// void _gotk4_soup2_Message_virtual_got_body(void* fnptr, SoupMessage* arg0) {
+//   ((void (*)(SoupMessage*))(fnptr))(arg0);
+// };
+// void _gotk4_soup2_Message_virtual_got_chunk(void* fnptr, SoupMessage* arg0, SoupBuffer* arg1) {
+//   ((void (*)(SoupMessage*, SoupBuffer*))(fnptr))(arg0, arg1);
+// };
+// void _gotk4_soup2_Message_virtual_got_headers(void* fnptr, SoupMessage* arg0) {
+//   ((void (*)(SoupMessage*))(fnptr))(arg0);
+// };
+// void _gotk4_soup2_Message_virtual_got_informational(void* fnptr, SoupMessage* arg0) {
+//   ((void (*)(SoupMessage*))(fnptr))(arg0);
+// };
+// void _gotk4_soup2_Message_virtual_restarted(void* fnptr, SoupMessage* arg0) {
+//   ((void (*)(SoupMessage*))(fnptr))(arg0);
+// };
+// void _gotk4_soup2_Message_virtual_starting(void* fnptr, SoupMessage* arg0) {
+//   ((void (*)(SoupMessage*))(fnptr))(arg0);
+// };
+// void _gotk4_soup2_Message_virtual_wrote_body(void* fnptr, SoupMessage* arg0) {
+//   ((void (*)(SoupMessage*))(fnptr))(arg0);
+// };
+// void _gotk4_soup2_Message_virtual_wrote_chunk(void* fnptr, SoupMessage* arg0) {
+//   ((void (*)(SoupMessage*))(fnptr))(arg0);
+// };
+// void _gotk4_soup2_Message_virtual_wrote_headers(void* fnptr, SoupMessage* arg0) {
+//   ((void (*)(SoupMessage*))(fnptr))(arg0);
+// };
+// void _gotk4_soup2_Message_virtual_wrote_informational(void* fnptr, SoupMessage* arg0) {
+//   ((void (*)(SoupMessage*))(fnptr))(arg0);
+// };
 import "C"
 
-// glib.Type values for soup-message.go.
+// GType values.
 var (
-	GTypeHTTPVersion     = externglib.Type(C.soup_http_version_get_type())
-	GTypeMessagePriority = externglib.Type(C.soup_message_priority_get_type())
-	GTypeMessageFlags    = externglib.Type(C.soup_message_flags_get_type())
-	GTypeMessage         = externglib.Type(C.soup_message_get_type())
+	GTypeHTTPVersion     = coreglib.Type(C.soup_http_version_get_type())
+	GTypeMessagePriority = coreglib.Type(C.soup_message_priority_get_type())
+	GTypeMessageFlags    = coreglib.Type(C.soup_message_flags_get_type())
+	GTypeMessage         = coreglib.Type(C.soup_message_get_type())
 )
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeHTTPVersion, F: marshalHTTPVersion},
-		{T: GTypeMessagePriority, F: marshalMessagePriority},
-		{T: GTypeMessageFlags, F: marshalMessageFlags},
-		{T: GTypeMessage, F: marshalMessage},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeHTTPVersion, F: marshalHTTPVersion},
+		coreglib.TypeMarshaler{T: GTypeMessagePriority, F: marshalMessagePriority},
+		coreglib.TypeMarshaler{T: GTypeMessageFlags, F: marshalMessageFlags},
+		coreglib.TypeMarshaler{T: GTypeMessage, F: marshalMessage},
 	})
 }
-
-// MESSAGE_FIRST_PARTY alias for the Message:first-party property. (The URI
-// loaded in the application when the message was queued.).
-const MESSAGE_FIRST_PARTY = "first-party"
 
 // MESSAGE_FLAGS alias for the Message:flags property. (The message's
 // MessageFlags.).
@@ -81,10 +109,6 @@ const MESSAGE_IS_TOP_LEVEL_NAVIGATION = "is-top-level-navigation"
 // method.).
 const MESSAGE_METHOD = "method"
 
-// MESSAGE_PRIORITY sets the priority of the Message. See
-// soup_message_set_priority() for further details.
-const MESSAGE_PRIORITY = "priority"
-
 // MESSAGE_REASON_PHRASE alias for the Message:reason-phrase property. (The
 // message's HTTP response reason phrase.).
 const MESSAGE_REASON_PHRASE = "reason-phrase"
@@ -93,21 +117,13 @@ const MESSAGE_REASON_PHRASE = "reason-phrase"
 // message's HTTP request body.).
 const MESSAGE_REQUEST_BODY = "request-body"
 
-// MESSAGE_REQUEST_BODY_DATA alias for the Message:request-body-data property.
-// (The message's HTTP request body, as a #GBytes.).
-const MESSAGE_REQUEST_BODY_DATA = "request-body-data"
-
-// MESSAGE_REQUEST_HEADERS alias for the Message:request-headers property. (The
-// message's HTTP request headers.).
+// MESSAGE_REQUEST_HEADERS alias for the Message:request-headers property.
+// (The message's HTTP request headers.).
 const MESSAGE_REQUEST_HEADERS = "request-headers"
 
 // MESSAGE_RESPONSE_BODY alias for the Message:response-body property. (The
 // message's HTTP response body.).
 const MESSAGE_RESPONSE_BODY = "response-body"
-
-// MESSAGE_RESPONSE_BODY_DATA alias for the Message:response-body-data property.
-// (The message's HTTP response body, as a #GBytes.).
-const MESSAGE_RESPONSE_BODY_DATA = "response-body-data"
 
 // MESSAGE_RESPONSE_HEADERS alias for the Message:response-headers property.
 // (The message's HTTP response headers.).
@@ -121,14 +137,6 @@ const MESSAGE_SITE_FOR_COOKIES = "site-for-cookies"
 // MESSAGE_STATUS_CODE alias for the Message:status-code property. (The
 // message's HTTP response status code.).
 const MESSAGE_STATUS_CODE = "status-code"
-
-// MESSAGE_TLS_CERTIFICATE alias for the Message:tls-certificate property. (The
-// TLS certificate associated with the message, if any.).
-const MESSAGE_TLS_CERTIFICATE = "tls-certificate"
-
-// MESSAGE_TLS_ERRORS alias for the Message:tls-errors property. (The
-// verification errors on Message:tls-certificate.).
-const MESSAGE_TLS_ERRORS = "tls-errors"
 
 // MESSAGE_URI alias for the Message:uri property. (The message's URI.).
 const MESSAGE_URI = "uri"
@@ -144,7 +152,7 @@ const (
 )
 
 func marshalHTTPVersion(p uintptr) (interface{}, error) {
-	return HTTPVersion(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return HTTPVersion(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for HTTPVersion.
@@ -182,7 +190,7 @@ const (
 )
 
 func marshalMessagePriority(p uintptr) (interface{}, error) {
-	return MessagePriority(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return MessagePriority(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for MessagePriority.
@@ -241,19 +249,19 @@ const (
 	// has been reached. If a dedicated connection is eventually created for
 	// this message, it will be dropped when the message finishes. Since 2.50.
 	MessageIgnoreConnectionLimits MessageFlags = 0b100000000
-	// MessageDoNotUseAuthCache should not use the credentials cache for this
-	// message, neither to use cached credentials to automatically authenticate
-	// this message nor to cache the credentials after the message is
-	// successfully authenticated. This applies to both server and proxy
-	// authentication. Note that Session::authenticate signal will be emitted,
-	// if you want to disable authentication for a message use
+	// MessageDoNotUseAuthCache should not use the credentials cache for
+	// this message, neither to use cached credentials to automatically
+	// authenticate this message nor to cache the credentials after the
+	// message is successfully authenticated. This applies to both server
+	// and proxy authentication. Note that Session::authenticate signal will
+	// be emitted, if you want to disable authentication for a message use
 	// soup_message_disable_feature() passing UP_TYPE_AUTH_MANAGER instead.
 	// Since 2.58.
 	MessageDoNotUseAuthCache MessageFlags = 0b1000000000
 )
 
 func marshalMessageFlags(p uintptr) (interface{}, error) {
-	return MessageFlags(externglib.ValueFromNative(unsafe.Pointer(p)).Flags()), nil
+	return MessageFlags(coreglib.ValueFromNative(unsafe.Pointer(p)).Flags()), nil
 }
 
 // String returns the names in string for MessageFlags.
@@ -308,8 +316,8 @@ func (m MessageFlags) Has(other MessageFlags) bool {
 // data off the network into.
 //
 // If max_len is non-0, it indicates the maximum number of bytes that could be
-// read, based on what is known about the message size. Note that this might be
-// a very large number, and you should not simply try to allocate that many
+// read, based on what is known about the message size. Note that this might
+// be a very large number, and you should not simply try to allocate that many
 // bytes blindly. If max_len is 0, that means that libsoup does not know how
 // many bytes remain to be read, and the allocator should return a buffer of a
 // size that it finds convenient.
@@ -321,48 +329,37 @@ func (m MessageFlags) Has(other MessageFlags) bool {
 // Deprecated: Use Request if you want to read into your own buffers.
 type ChunkAllocator func(msg *Message, maxLen uint) (buffer *Buffer)
 
-//export _gotk4_soup2_ChunkAllocator
-func _gotk4_soup2_ChunkAllocator(arg1 *C.SoupMessage, arg2 C.gsize, arg3 C.gpointer) (cret *C.SoupBuffer) {
-	var fn ChunkAllocator
-	{
-		v := gbox.Get(uintptr(arg3))
-		if v == nil {
-			panic(`callback not found`)
-		}
-		fn = v.(ChunkAllocator)
-	}
-
-	var _msg *Message // out
-	var _maxLen uint  // out
-
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-	_maxLen = uint(arg2)
-
-	buffer := fn(_msg, _maxLen)
-
-	if buffer != nil {
-		cret = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(buffer)))
-		runtime.SetFinalizer(gextras.StructIntern(unsafe.Pointer(buffer)), nil)
-	}
-
-	return cret
-}
-
-// MessageOverrider contains methods that are overridable.
-type MessageOverrider interface {
-	Finished()
-	GotBody()
+// MessageOverrides contains methods that are overridable.
+type MessageOverrides struct {
+	Finished func()
+	GotBody  func()
 	// The function takes the following parameters:
 	//
-	GotChunk(chunk *Buffer)
-	GotHeaders()
-	GotInformational()
-	Restarted()
-	Starting()
-	WroteBody()
-	WroteChunk()
-	WroteHeaders()
-	WroteInformational()
+	GotChunk           func(chunk *Buffer)
+	GotHeaders         func()
+	GotInformational   func()
+	Restarted          func()
+	Starting           func()
+	WroteBody          func()
+	WroteChunk         func()
+	WroteHeaders       func()
+	WroteInformational func()
+}
+
+func defaultMessageOverrides(v *Message) MessageOverrides {
+	return MessageOverrides{
+		Finished:           v.finished,
+		GotBody:            v.gotBody,
+		GotChunk:           v.gotChunk,
+		GotHeaders:         v.gotHeaders,
+		GotInformational:   v.gotInformational,
+		Restarted:          v.restarted,
+		Starting:           v.starting,
+		WroteBody:          v.wroteBody,
+		WroteChunk:         v.wroteChunk,
+		WroteHeaders:       v.wroteHeaders,
+		WroteInformational: v.wroteInformational,
+	}
 }
 
 // Message represents an HTTP message being sent or received.
@@ -379,311 +376,142 @@ type MessageOverrider interface {
 // As described in the MessageBody documentation, the request_body and
 // response_body <literal>data</literal> fields will not necessarily be filled
 // in at all times. When the body fields are filled in, they will be terminated
-// with a '\0' byte (which is not included in the <literal>length</literal>), so
-// you can use them as ordinary C strings (assuming that you know that the body
-// doesn't have any other '\0' bytes).
+// with a '\0' byte (which is not included in the <literal>length</literal>),
+// so you can use them as ordinary C strings (assuming that you know that the
+// body doesn't have any other '\0' bytes).
 //
-// For a client-side Message, request_body's <literal>data</literal> is usually
-// filled in right before libsoup writes the request to the network, but you
-// should not count on this; use soup_message_body_flatten() if you want to
-// ensure that <literal>data</literal> is filled in. If you are not using
+// For a client-side Message, request_body's <literal>data</literal> is
+// usually filled in right before libsoup writes the request to the network,
+// but you should not count on this; use soup_message_body_flatten() if you want
+// to ensure that <literal>data</literal> is filled in. If you are not using
 // Request to read the response, then response_body's <literal>data</literal>
-// will be filled in before Message::finished is emitted. (If you are using
-// Request, then the message body is not accumulated by default, so
-// response_body's <literal>data</literal> will always be NULL.)
+// will be filled in before Message::finished is emitted. (If you are
+// using Request, then the message body is not accumulated by default,
+// so response_body's <literal>data</literal> will always be NULL.)
 //
 // For a server-side Message, request_body's data will be filled in before
 // Message::got_body is emitted.
 //
 // To prevent the data field from being filled in at all (eg, if you are
-// handling the data from a Message::got_chunk, and so don't need to see it all
-// at the end), call soup_message_body_set_accumulate() on response_body or
+// handling the data from a Message::got_chunk, and so don't need to see it
+// all at the end), call soup_message_body_set_accumulate() on response_body or
 // request_body as appropriate, passing FALSE.
 type Message struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 }
 
 var (
-	_ externglib.Objector = (*Message)(nil)
+	_ coreglib.Objector = (*Message)(nil)
 )
 
-func classInitMessager(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+func init() {
+	coreglib.RegisterClassInfo[*Message, *MessageClass, MessageOverrides](
+		GTypeMessage,
+		initMessageClass,
+		wrapMessage,
+		defaultMessageOverrides,
+	)
+}
 
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+func initMessageClass(gclass unsafe.Pointer, overrides MessageOverrides, classInitFunc func(*MessageClass)) {
+	pclass := (*C.SoupMessageClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeMessage))))
 
-	goval := gbox.Get(uintptr(data))
-	pclass := (*C.SoupMessageClass)(unsafe.Pointer(gclassPtr))
-	// gclass := (*C.GTypeClass)(unsafe.Pointer(gclassPtr))
-	// pclass := (*C.SoupMessageClass)(unsafe.Pointer(C.g_type_class_peek_parent(gclass)))
-
-	if _, ok := goval.(interface{ Finished() }); ok {
+	if overrides.Finished != nil {
 		pclass.finished = (*[0]byte)(C._gotk4_soup2_MessageClass_finished)
 	}
 
-	if _, ok := goval.(interface{ GotBody() }); ok {
+	if overrides.GotBody != nil {
 		pclass.got_body = (*[0]byte)(C._gotk4_soup2_MessageClass_got_body)
 	}
 
-	if _, ok := goval.(interface{ GotChunk(chunk *Buffer) }); ok {
+	if overrides.GotChunk != nil {
 		pclass.got_chunk = (*[0]byte)(C._gotk4_soup2_MessageClass_got_chunk)
 	}
 
-	if _, ok := goval.(interface{ GotHeaders() }); ok {
+	if overrides.GotHeaders != nil {
 		pclass.got_headers = (*[0]byte)(C._gotk4_soup2_MessageClass_got_headers)
 	}
 
-	if _, ok := goval.(interface{ GotInformational() }); ok {
+	if overrides.GotInformational != nil {
 		pclass.got_informational = (*[0]byte)(C._gotk4_soup2_MessageClass_got_informational)
 	}
 
-	if _, ok := goval.(interface{ Restarted() }); ok {
+	if overrides.Restarted != nil {
 		pclass.restarted = (*[0]byte)(C._gotk4_soup2_MessageClass_restarted)
 	}
 
-	if _, ok := goval.(interface{ Starting() }); ok {
+	if overrides.Starting != nil {
 		pclass.starting = (*[0]byte)(C._gotk4_soup2_MessageClass_starting)
 	}
 
-	if _, ok := goval.(interface{ WroteBody() }); ok {
+	if overrides.WroteBody != nil {
 		pclass.wrote_body = (*[0]byte)(C._gotk4_soup2_MessageClass_wrote_body)
 	}
 
-	if _, ok := goval.(interface{ WroteChunk() }); ok {
+	if overrides.WroteChunk != nil {
 		pclass.wrote_chunk = (*[0]byte)(C._gotk4_soup2_MessageClass_wrote_chunk)
 	}
 
-	if _, ok := goval.(interface{ WroteHeaders() }); ok {
+	if overrides.WroteHeaders != nil {
 		pclass.wrote_headers = (*[0]byte)(C._gotk4_soup2_MessageClass_wrote_headers)
 	}
 
-	if _, ok := goval.(interface{ WroteInformational() }); ok {
+	if overrides.WroteInformational != nil {
 		pclass.wrote_informational = (*[0]byte)(C._gotk4_soup2_MessageClass_wrote_informational)
+	}
+
+	if classInitFunc != nil {
+		class := (*MessageClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
 	}
 }
 
-//export _gotk4_soup2_MessageClass_finished
-func _gotk4_soup2_MessageClass_finished(arg0 *C.SoupMessage) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ Finished() })
-
-	iface.Finished()
-}
-
-//export _gotk4_soup2_MessageClass_got_body
-func _gotk4_soup2_MessageClass_got_body(arg0 *C.SoupMessage) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ GotBody() })
-
-	iface.GotBody()
-}
-
-//export _gotk4_soup2_MessageClass_got_chunk
-func _gotk4_soup2_MessageClass_got_chunk(arg0 *C.SoupMessage, arg1 *C.SoupBuffer) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ GotChunk(chunk *Buffer) })
-
-	var _chunk *Buffer // out
-
-	_chunk = (*Buffer)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-
-	iface.GotChunk(_chunk)
-}
-
-//export _gotk4_soup2_MessageClass_got_headers
-func _gotk4_soup2_MessageClass_got_headers(arg0 *C.SoupMessage) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ GotHeaders() })
-
-	iface.GotHeaders()
-}
-
-//export _gotk4_soup2_MessageClass_got_informational
-func _gotk4_soup2_MessageClass_got_informational(arg0 *C.SoupMessage) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ GotInformational() })
-
-	iface.GotInformational()
-}
-
-//export _gotk4_soup2_MessageClass_restarted
-func _gotk4_soup2_MessageClass_restarted(arg0 *C.SoupMessage) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ Restarted() })
-
-	iface.Restarted()
-}
-
-//export _gotk4_soup2_MessageClass_starting
-func _gotk4_soup2_MessageClass_starting(arg0 *C.SoupMessage) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ Starting() })
-
-	iface.Starting()
-}
-
-//export _gotk4_soup2_MessageClass_wrote_body
-func _gotk4_soup2_MessageClass_wrote_body(arg0 *C.SoupMessage) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ WroteBody() })
-
-	iface.WroteBody()
-}
-
-//export _gotk4_soup2_MessageClass_wrote_chunk
-func _gotk4_soup2_MessageClass_wrote_chunk(arg0 *C.SoupMessage) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ WroteChunk() })
-
-	iface.WroteChunk()
-}
-
-//export _gotk4_soup2_MessageClass_wrote_headers
-func _gotk4_soup2_MessageClass_wrote_headers(arg0 *C.SoupMessage) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ WroteHeaders() })
-
-	iface.WroteHeaders()
-}
-
-//export _gotk4_soup2_MessageClass_wrote_informational
-func _gotk4_soup2_MessageClass_wrote_informational(arg0 *C.SoupMessage) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ WroteInformational() })
-
-	iface.WroteInformational()
-}
-
-func wrapMessage(obj *externglib.Object) *Message {
+func wrapMessage(obj *coreglib.Object) *Message {
 	return &Message{
 		Object: obj,
 	}
 }
 
 func marshalMessage(p uintptr) (interface{}, error) {
-	return wrapMessage(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapMessage(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-//export _gotk4_soup2_Message_ConnectContentSniffed
-func _gotk4_soup2_Message_ConnectContentSniffed(arg0 C.gpointer, arg1 *C.gchar, arg2 *C.GHashTable, arg3 C.guintptr) {
-	var f func(typ string, params map[string]string)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(typ string, params map[string]string))
-	}
-
-	var _typ string               // out
-	var _params map[string]string // out
-
-	_typ = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
-	_params = make(map[string]string, gextras.HashTableSize(unsafe.Pointer(arg2)))
-	gextras.MoveHashTable(unsafe.Pointer(arg2), false, func(k, v unsafe.Pointer) {
-		ksrc := *(**C.gchar)(k)
-		vsrc := *(**C.gchar)(v)
-		var kdst string // out
-		var vdst string // out
-		kdst = C.GoString((*C.gchar)(unsafe.Pointer(ksrc)))
-		vdst = C.GoString((*C.gchar)(unsafe.Pointer(vsrc)))
-		_params[kdst] = vdst
-	})
-
-	f(_typ, _params)
-}
-
-// ConnectContentSniffed: this signal is emitted after Message::got-headers, and
-// before the first Message::got-chunk. If content sniffing is disabled, or no
-// content sniffing will be performed, due to the sniffer deciding to trust the
-// Content-Type sent by the server, this signal is emitted immediately after
-// Message::got-headers, and type is NULL.
+// ConnectContentSniffed: this signal is emitted after Message::got-headers,
+// and before the first Message::got-chunk. If content sniffing is disabled,
+// or no content sniffing will be performed, due to the sniffer deciding to
+// trust the Content-Type sent by the server, this signal is emitted immediately
+// after Message::got-headers, and type is NULL.
 //
 // If the ContentSniffer feature is enabled, and the sniffer decided to perform
-// sniffing, the first Message::got-chunk emission may be delayed, so that the
-// sniffer has enough data to correctly sniff the content. It notified the
+// sniffing, the first Message::got-chunk emission may be delayed, so that
+// the sniffer has enough data to correctly sniff the content. It notified the
 // library user that the content has been sniffed, and allows it to change the
 // header contents in the message, if desired.
 //
 // After this signal is emitted, the data that was spooled so that sniffing
 // could be done is delivered on the first emission of Message::got-chunk.
-func (msg *Message) ConnectContentSniffed(f func(typ string, params map[string]string)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(msg, "content-sniffed", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectContentSniffed), f)
-}
-
-//export _gotk4_soup2_Message_ConnectFinished
-func _gotk4_soup2_Message_ConnectFinished(arg0 C.gpointer, arg1 C.guintptr) {
-	var f func()
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func())
-	}
-
-	f()
+func (msg *Message) ConnectContentSniffed(f func(typ string, params map[string]string)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(msg, "content-sniffed", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectContentSniffed), f)
 }
 
 // ConnectFinished is emitted when all HTTP processing is finished for a
 // message. (After Message::got_body for client-side messages, or after
 // Message::wrote_body for server-side messages.).
-func (msg *Message) ConnectFinished(f func()) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(msg, "finished", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectFinished), f)
+func (msg *Message) ConnectFinished(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(msg, "finished", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectFinished), f)
 }
 
-//export _gotk4_soup2_Message_ConnectGotBody
-func _gotk4_soup2_Message_ConnectGotBody(arg0 C.gpointer, arg1 C.guintptr) {
-	var f func()
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func())
-	}
-
-	f()
-}
-
-// ConnectGotBody is emitted after receiving the complete message body. (For a
-// server-side message, this means it has received the request body. For a
-// client-side message, this means it has received the response body and is
-// nearly done with the message.)
+// ConnectGotBody is emitted after receiving the complete message body.
+// (For a server-side message, this means it has received the request body.
+// For a client-side message, this means it has received the response body and
+// is nearly done with the message.)
 //
 // See also soup_message_add_header_handler() and
 // soup_message_add_status_code_handler(), which can be used to connect to a
 // subset of emissions of this signal.
-func (msg *Message) ConnectGotBody(f func()) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(msg, "got-body", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectGotBody), f)
-}
-
-//export _gotk4_soup2_Message_ConnectGotChunk
-func _gotk4_soup2_Message_ConnectGotChunk(arg0 C.gpointer, arg1 *C.SoupBuffer, arg2 C.guintptr) {
-	var f func(chunk *Buffer)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(chunk *Buffer))
-	}
-
-	var _chunk *Buffer // out
-
-	_chunk = (*Buffer)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-
-	f(_chunk)
+func (msg *Message) ConnectGotBody(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(msg, "got-body", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectGotBody), f)
 }
 
 // ConnectGotChunk is emitted after receiving a chunk of a message body. Note
@@ -693,24 +521,8 @@ func _gotk4_soup2_Message_ConnectGotChunk(arg0 C.gpointer, arg1 *C.SoupBuffer, a
 // If you cancel or requeue msg while processing this signal, then the current
 // HTTP I/O will be stopped after this signal emission finished, and msg's
 // connection will be closed.
-func (msg *Message) ConnectGotChunk(f func(chunk *Buffer)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(msg, "got-chunk", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectGotChunk), f)
-}
-
-//export _gotk4_soup2_Message_ConnectGotHeaders
-func _gotk4_soup2_Message_ConnectGotHeaders(arg0 C.gpointer, arg1 C.guintptr) {
-	var f func()
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func())
-	}
-
-	f()
+func (msg *Message) ConnectGotChunk(f func(chunk *Buffer)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(msg, "got-chunk", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectGotChunk), f)
 }
 
 // ConnectGotHeaders is emitted after receiving all message headers for a
@@ -728,74 +540,20 @@ func _gotk4_soup2_Message_ConnectGotHeaders(arg0 C.gpointer, arg1 C.guintptr) {
 // handling authentication or redirection--it is usually better to requeue it
 // from a Message::got_body handler rather than a Message::got_headers handler,
 // so that the existing HTTP connection can be reused.).
-func (msg *Message) ConnectGotHeaders(f func()) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(msg, "got-headers", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectGotHeaders), f)
-}
-
-//export _gotk4_soup2_Message_ConnectGotInformational
-func _gotk4_soup2_Message_ConnectGotInformational(arg0 C.gpointer, arg1 C.guintptr) {
-	var f func()
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func())
-	}
-
-	f()
+func (msg *Message) ConnectGotHeaders(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(msg, "got-headers", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectGotHeaders), f)
 }
 
 // ConnectGotInformational is emitted after receiving a 1xx (Informational)
-// response for a (client-side) message. The response_headers will be filled in
-// with the headers associated with the informational response; however, those
-// header values will be erased after this signal is done.
+// response for a (client-side) message. The response_headers will be filled
+// in with the headers associated with the informational response; however,
+// those header values will be erased after this signal is done.
 //
 // If you cancel or requeue msg while processing this signal, then the current
 // HTTP I/O will be stopped after this signal emission finished, and msg's
 // connection will be closed.
-func (msg *Message) ConnectGotInformational(f func()) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(msg, "got-informational", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectGotInformational), f)
-}
-
-//export _gotk4_soup2_Message_ConnectNetworkEvent
-func _gotk4_soup2_Message_ConnectNetworkEvent(arg0 C.gpointer, arg1 C.GSocketClientEvent, arg2 *C.GIOStream, arg3 C.guintptr) {
-	var f func(event gio.SocketClientEvent, connection gio.IOStreamer)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(event gio.SocketClientEvent, connection gio.IOStreamer))
-	}
-
-	var _event gio.SocketClientEvent // out
-	var _connection gio.IOStreamer   // out
-
-	_event = gio.SocketClientEvent(arg1)
-	{
-		objptr := unsafe.Pointer(arg2)
-		if objptr == nil {
-			panic("object of type gio.IOStreamer is nil")
-		}
-
-		object := externglib.Take(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
-			_, ok := obj.(gio.IOStreamer)
-			return ok
-		})
-		rv, ok := casted.(gio.IOStreamer)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.IOStreamer")
-		}
-		_connection = rv
-	}
-
-	f(_event, _connection)
+func (msg *Message) ConnectGotInformational(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(msg, "got-informational", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectGotInformational), f)
 }
 
 // ConnectNetworkEvent is emitted to indicate that some network-related event
@@ -807,68 +565,20 @@ func _gotk4_soup2_Message_ConnectNetworkEvent(arg0 C.gpointer, arg1 C.GSocketCli
 //
 // See Client::event for more information on what the different values of event
 // correspond to, and what connection will be in each case.
-func (msg *Message) ConnectNetworkEvent(f func(event gio.SocketClientEvent, connection gio.IOStreamer)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(msg, "network-event", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectNetworkEvent), f)
+func (msg *Message) ConnectNetworkEvent(f func(event gio.SocketClientEvent, connection gio.IOStreamer)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(msg, "network-event", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectNetworkEvent), f)
 }
 
-//export _gotk4_soup2_Message_ConnectRestarted
-func _gotk4_soup2_Message_ConnectRestarted(arg0 C.gpointer, arg1 C.guintptr) {
-	var f func()
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func())
-	}
-
-	f()
-}
-
-// ConnectRestarted is emitted when a request that was already sent once is now
-// being sent again (eg, because the first attempt received a redirection
+// ConnectRestarted is emitted when a request that was already sent once is
+// now being sent again (eg, because the first attempt received a redirection
 // response, or because we needed to use authentication).
-func (msg *Message) ConnectRestarted(f func()) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(msg, "restarted", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectRestarted), f)
-}
-
-//export _gotk4_soup2_Message_ConnectStarting
-func _gotk4_soup2_Message_ConnectStarting(arg0 C.gpointer, arg1 C.guintptr) {
-	var f func()
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func())
-	}
-
-	f()
+func (msg *Message) ConnectRestarted(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(msg, "restarted", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectRestarted), f)
 }
 
 // ConnectStarting is emitted just before a message is sent.
-func (msg *Message) ConnectStarting(f func()) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(msg, "starting", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectStarting), f)
-}
-
-//export _gotk4_soup2_Message_ConnectWroteBody
-func _gotk4_soup2_Message_ConnectWroteBody(arg0 C.gpointer, arg1 C.guintptr) {
-	var f func()
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func())
-	}
-
-	f()
+func (msg *Message) ConnectStarting(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(msg, "starting", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectStarting), f)
 }
 
 // ConnectWroteBody is emitted immediately after writing the complete body for a
@@ -876,28 +586,8 @@ func _gotk4_soup2_Message_ConnectWroteBody(arg0 C.gpointer, arg1 C.guintptr) {
 // and is now waiting for the response from the server. For a server-side
 // message, this means that libsoup has finished writing the response and is
 // nearly done with the message.).
-func (msg *Message) ConnectWroteBody(f func()) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(msg, "wrote-body", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectWroteBody), f)
-}
-
-//export _gotk4_soup2_Message_ConnectWroteBodyData
-func _gotk4_soup2_Message_ConnectWroteBodyData(arg0 C.gpointer, arg1 *C.SoupBuffer, arg2 C.guintptr) {
-	var f func(chunk *Buffer)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(chunk *Buffer))
-	}
-
-	var _chunk *Buffer // out
-
-	_chunk = (*Buffer)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-
-	f(_chunk)
+func (msg *Message) ConnectWroteBody(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(msg, "wrote-body", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectWroteBody), f)
 }
 
 // ConnectWroteBodyData is emitted immediately after writing a portion of the
@@ -905,24 +595,8 @@ func _gotk4_soup2_Message_ConnectWroteBodyData(arg0 C.gpointer, arg1 *C.SoupBuff
 //
 // Unlike Message::wrote_chunk, this is emitted after every successful write()
 // call, not only after finishing a complete "chunk".
-func (msg *Message) ConnectWroteBodyData(f func(chunk *Buffer)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(msg, "wrote-body-data", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectWroteBodyData), f)
-}
-
-//export _gotk4_soup2_Message_ConnectWroteChunk
-func _gotk4_soup2_Message_ConnectWroteChunk(arg0 C.gpointer, arg1 C.guintptr) {
-	var f func()
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func())
-	}
-
-	f()
+func (msg *Message) ConnectWroteBodyData(f func(chunk *Buffer)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(msg, "wrote-body-data", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectWroteBodyData), f)
 }
 
 // ConnectWroteChunk is emitted immediately after writing a body chunk for a
@@ -932,66 +606,34 @@ func _gotk4_soup2_Message_ConnectWroteChunk(arg0 C.gpointer, arg1 C.guintptr) {
 // only when a complete chunk (added with soup_message_body_append() or
 // soup_message_body_append_buffer()) has been written. To get more useful
 // continuous progress information, use Message::wrote_body_data.
-func (msg *Message) ConnectWroteChunk(f func()) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(msg, "wrote-chunk", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectWroteChunk), f)
+func (msg *Message) ConnectWroteChunk(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(msg, "wrote-chunk", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectWroteChunk), f)
 }
 
-//export _gotk4_soup2_Message_ConnectWroteHeaders
-func _gotk4_soup2_Message_ConnectWroteHeaders(arg0 C.gpointer, arg1 C.guintptr) {
-	var f func()
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func())
-	}
-
-	f()
-}
-
-// ConnectWroteHeaders is emitted immediately after writing the headers for a
-// message. (For a client-side message, this is after writing the request
+// ConnectWroteHeaders is emitted immediately after writing the headers for
+// a message. (For a client-side message, this is after writing the request
 // headers; for a server-side message, it is after writing the response
 // headers.).
-func (msg *Message) ConnectWroteHeaders(f func()) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(msg, "wrote-headers", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectWroteHeaders), f)
-}
-
-//export _gotk4_soup2_Message_ConnectWroteInformational
-func _gotk4_soup2_Message_ConnectWroteInformational(arg0 C.gpointer, arg1 C.guintptr) {
-	var f func()
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func())
-	}
-
-	f()
+func (msg *Message) ConnectWroteHeaders(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(msg, "wrote-headers", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectWroteHeaders), f)
 }
 
 // ConnectWroteInformational is emitted immediately after writing a 1xx
 // (Informational) response for a (server-side) message.
-func (msg *Message) ConnectWroteInformational(f func()) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(msg, "wrote-informational", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectWroteInformational), f)
+func (msg *Message) ConnectWroteInformational(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(msg, "wrote-informational", false, unsafe.Pointer(C._gotk4_soup2_Message_ConnectWroteInformational), f)
 }
 
 // NewMessage creates a new empty Message, which will connect to uri.
 //
 // The function takes the following parameters:
 //
-//    - method: HTTP method for the created request.
-//    - uriString: destination endpoint (as a string).
+//   - method: HTTP method for the created request.
+//   - uriString: destination endpoint (as a string).
 //
 // The function returns the following values:
 //
-//    - message (optional): new Message (or NULL if uri could not be parsed).
+//   - message (optional): new Message (or NULL if uri could not be parsed).
 //
 func NewMessage(method, uriString string) *Message {
 	var _arg1 *C.char        // out
@@ -1010,7 +652,7 @@ func NewMessage(method, uriString string) *Message {
 	var _message *Message // out
 
 	if _cret != nil {
-		_message = wrapMessage(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+		_message = wrapMessage(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 	}
 
 	return _message
@@ -1020,12 +662,12 @@ func NewMessage(method, uriString string) *Message {
 //
 // The function takes the following parameters:
 //
-//    - method: HTTP method for the created request.
-//    - uri: destination endpoint (as a URI).
+//   - method: HTTP method for the created request.
+//   - uri: destination endpoint (as a URI).
 //
 // The function returns the following values:
 //
-//    - message: new Message.
+//   - message: new Message.
 //
 func NewMessageFromURI(method string, uri *URI) *Message {
 	var _arg1 *C.char        // out
@@ -1042,22 +684,22 @@ func NewMessageFromURI(method string, uri *URI) *Message {
 
 	var _message *Message // out
 
-	_message = wrapMessage(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_message = wrapMessage(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _message
 }
 
 // The function takes the following parameters:
 //
-//    - contentType
-//    - params
+//   - contentType
+//   - params
 //
-func (msg *Message) ContentSniffed(contentType string, params map[cgo.Handle]cgo.Handle) {
+func (msg *Message) ContentSniffed(contentType string, params map[unsafe.Pointer]unsafe.Pointer) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 *C.char        // out
 	var _arg2 *C.GHashTable  // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(contentType)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.g_hash_table_new_full(nil, nil, (*[0]byte)(C.free), (*[0]byte)(C.free))
@@ -1076,8 +718,8 @@ func (msg *Message) ContentSniffed(contentType string, params map[cgo.Handle]cgo
 	runtime.KeepAlive(params)
 }
 
-// DisableFeature: this disables the actions of SessionFeature<!-- -->s with the
-// given feature_type (or a subclass of that type) on msg, so that msg is
+// DisableFeature: this disables the actions of SessionFeature<!-- -->s with
+// the given feature_type (or a subclass of that type) on msg, so that msg is
 // processed as though the feature(s) hadn't been added to the session. Eg,
 // passing UP_TYPE_CONTENT_SNIFFER for feature_type will disable Content-Type
 // sniffing on the message.
@@ -1088,13 +730,13 @@ func (msg *Message) ContentSniffed(contentType string, params map[cgo.Handle]cgo
 //
 // The function takes the following parameters:
 //
-//    - featureType of a SessionFeature.
+//   - featureType of a SessionFeature.
 //
-func (msg *Message) DisableFeature(featureType externglib.Type) {
+func (msg *Message) DisableFeature(featureType coreglib.Type) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.GType        // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg1 = C.GType(featureType)
 
 	C.soup_message_disable_feature(_arg0, _arg1)
@@ -1105,32 +747,32 @@ func (msg *Message) DisableFeature(featureType externglib.Type) {
 func (msg *Message) Finished() {
 	var _arg0 *C.SoupMessage // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	C.soup_message_finished(_arg0)
 	runtime.KeepAlive(msg)
 }
 
-// Address gets the address msg's URI points to. After first setting the URI on
-// a message, this will be unresolved, although the message's session will
+// Address gets the address msg's URI points to. After first setting the URI
+// on a message, this will be unresolved, although the message's session will
 // resolve it before sending the message.
 //
 // The function returns the following values:
 //
-//    - address msg's URI points to.
+//   - address msg's URI points to.
 //
 func (msg *Message) Address() *Address {
 	var _arg0 *C.SoupMessage // out
 	var _cret *C.SoupAddress // in
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_message_get_address(_arg0)
 	runtime.KeepAlive(msg)
 
 	var _address *Address // out
 
-	_address = wrapAddress(externglib.Take(unsafe.Pointer(_cret)))
+	_address = wrapAddress(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _address
 }
@@ -1139,13 +781,13 @@ func (msg *Message) Address() *Address {
 //
 // The function returns the following values:
 //
-//    - urI msg's first party URI.
+//   - urI msg's first party URI.
 //
 func (msg *Message) FirstParty() *URI {
 	var _arg0 *C.SoupMessage // out
 	var _cret *C.SoupURI     // in
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_message_get_first_party(_arg0)
 	runtime.KeepAlive(msg)
@@ -1161,13 +803,13 @@ func (msg *Message) FirstParty() *URI {
 //
 // The function returns the following values:
 //
-//    - messageFlags: flags.
+//   - messageFlags: flags.
 //
 func (msg *Message) Flags() MessageFlags {
 	var _arg0 *C.SoupMessage     // out
 	var _cret C.SoupMessageFlags // in
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_message_get_flags(_arg0)
 	runtime.KeepAlive(msg)
@@ -1184,13 +826,13 @@ func (msg *Message) Flags() MessageFlags {
 //
 // The function returns the following values:
 //
-//    - httpVersion: HTTP version.
+//   - httpVersion: HTTP version.
 //
 func (msg *Message) HTTPVersion() HTTPVersion {
 	var _arg0 *C.SoupMessage    // out
 	var _cret C.SoupHTTPVersion // in
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_message_get_http_version(_arg0)
 	runtime.KeepAlive(msg)
@@ -1212,9 +854,9 @@ func (msg *Message) HTTPVersion() HTTPVersion {
 //
 // The function returns the following values:
 //
-//    - certificate msg's TLS certificate.
-//    - errors: verification status of certificate.
-//    - ok: TRUE if msg used/attempted https, FALSE if not.
+//   - certificate msg's TLS certificate.
+//   - errors: verification status of certificate.
+//   - ok: TRUE if msg used/attempted https, FALSE if not.
 //
 func (msg *Message) HTTPSStatus() (gio.TLSCertificater, gio.TLSCertificateFlags, bool) {
 	var _arg0 *C.SoupMessage         // out
@@ -1222,7 +864,7 @@ func (msg *Message) HTTPSStatus() (gio.TLSCertificater, gio.TLSCertificateFlags,
 	var _arg2 C.GTlsCertificateFlags // in
 	var _cret C.gboolean             // in
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_message_get_https_status(_arg0, &_arg1, &_arg2)
 	runtime.KeepAlive(msg)
@@ -1237,8 +879,8 @@ func (msg *Message) HTTPSStatus() (gio.TLSCertificater, gio.TLSCertificateFlags,
 			panic("object of type gio.TLSCertificater is nil")
 		}
 
-		object := externglib.Take(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
+		object := coreglib.Take(objptr)
+		casted := object.WalkCast(func(obj coreglib.Objector) bool {
 			_, ok := obj.(gio.TLSCertificater)
 			return ok
 		})
@@ -1262,7 +904,7 @@ func (msg *Message) IsTopLevelNavigation() bool {
 	var _arg0 *C.SoupMessage // out
 	var _cret C.gboolean     // in
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_message_get_is_top_level_navigation(_arg0)
 	runtime.KeepAlive(msg)
@@ -1281,13 +923,13 @@ func (msg *Message) IsTopLevelNavigation() bool {
 //
 // The function returns the following values:
 //
-//    - messagePriority: priority of the message.
+//   - messagePriority: priority of the message.
 //
 func (msg *Message) Priority() MessagePriority {
 	var _arg0 *C.SoupMessage        // out
 	var _cret C.SoupMessagePriority // in
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_message_get_priority(_arg0)
 	runtime.KeepAlive(msg)
@@ -1303,13 +945,13 @@ func (msg *Message) Priority() MessagePriority {
 //
 // The function returns the following values:
 //
-//    - urI msg's site for cookies URI.
+//   - urI msg's site for cookies URI.
 //
 func (msg *Message) SiteForCookies() *URI {
 	var _arg0 *C.SoupMessage // out
 	var _cret *C.SoupURI     // in
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_message_get_site_for_cookies(_arg0)
 	runtime.KeepAlive(msg)
@@ -1326,20 +968,20 @@ func (msg *Message) SiteForCookies() *URI {
 //
 // The function returns the following values:
 //
-//    - request msg's associated Request.
+//   - request msg's associated Request.
 //
 func (msg *Message) SoupRequest() *Request {
 	var _arg0 *C.SoupMessage // out
 	var _cret *C.SoupRequest // in
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_message_get_soup_request(_arg0)
 	runtime.KeepAlive(msg)
 
 	var _request *Request // out
 
-	_request = wrapRequest(externglib.Take(unsafe.Pointer(_cret)))
+	_request = wrapRequest(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _request
 }
@@ -1348,13 +990,13 @@ func (msg *Message) SoupRequest() *Request {
 //
 // The function returns the following values:
 //
-//    - urI: URI msg is targeted for.
+//   - urI: URI msg is targeted for.
 //
 func (msg *Message) URI() *URI {
 	var _arg0 *C.SoupMessage // out
 	var _cret *C.SoupURI     // in
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_message_get_uri(_arg0)
 	runtime.KeepAlive(msg)
@@ -1369,7 +1011,7 @@ func (msg *Message) URI() *URI {
 func (msg *Message) GotBody() {
 	var _arg0 *C.SoupMessage // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	C.soup_message_got_body(_arg0)
 	runtime.KeepAlive(msg)
@@ -1381,7 +1023,7 @@ func (msg *Message) GotChunk(chunk *Buffer) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 *C.SoupBuffer  // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg1 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(chunk)))
 
 	C.soup_message_got_chunk(_arg0, _arg1)
@@ -1392,7 +1034,7 @@ func (msg *Message) GotChunk(chunk *Buffer) {
 func (msg *Message) GotHeaders() {
 	var _arg0 *C.SoupMessage // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	C.soup_message_got_headers(_arg0)
 	runtime.KeepAlive(msg)
@@ -1401,7 +1043,7 @@ func (msg *Message) GotHeaders() {
 func (msg *Message) GotInformational() {
 	var _arg0 *C.SoupMessage // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	C.soup_message_got_informational(_arg0)
 	runtime.KeepAlive(msg)
@@ -1413,18 +1055,18 @@ func (msg *Message) GotInformational() {
 //
 // The function takes the following parameters:
 //
-//    - featureType of a SessionFeature.
+//   - featureType of a SessionFeature.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if feature is disabled, or FALSE otherwise.
+//   - ok: TRUE if feature is disabled, or FALSE otherwise.
 //
-func (msg *Message) IsFeatureDisabled(featureType externglib.Type) bool {
+func (msg *Message) IsFeatureDisabled(featureType coreglib.Type) bool {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.GType        // out
 	var _cret C.gboolean     // in
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg1 = C.GType(featureType)
 
 	_cret = C.soup_message_is_feature_disabled(_arg0, _arg1)
@@ -1446,13 +1088,13 @@ func (msg *Message) IsFeatureDisabled(featureType externglib.Type) bool {
 //
 // The function returns the following values:
 //
-//    - ok: TRUE or FALSE.
+//   - ok: TRUE or FALSE.
 //
 func (msg *Message) IsKeepalive() bool {
 	var _arg0 *C.SoupMessage // out
 	var _cret C.gboolean     // in
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_message_is_keepalive(_arg0)
 	runtime.KeepAlive(msg)
@@ -1469,7 +1111,7 @@ func (msg *Message) IsKeepalive() bool {
 func (msg *Message) Restarted() {
 	var _arg0 *C.SoupMessage // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	C.soup_message_restarted(_arg0)
 	runtime.KeepAlive(msg)
@@ -1477,15 +1119,15 @@ func (msg *Message) Restarted() {
 
 // SetChunkAllocator sets an alternate chunk-allocation function to use when
 // reading msg's body when using the traditional (ie, non-Request<!-- -->-based)
-// API. Every time data is available to read, libsoup will call allocator, which
-// should return a Buffer. (See ChunkAllocator for additional details.) Libsoup
-// will then read data from the network into that buffer, and update the
+// API. Every time data is available to read, libsoup will call allocator,
+// which should return a Buffer. (See ChunkAllocator for additional details.)
+// Libsoup will then read data from the network into that buffer, and update the
 // buffer's <literal>length</literal> to indicate how much data it read.
 //
 // Generally, a custom chunk allocator would be used in conjunction with
-// soup_message_body_set_accumulate() FALSE and Message::got_chunk, as part of a
-// strategy to avoid unnecessary copying of data. However, you cannot assume
-// that every call to the allocator will be followed by a call to your
+// soup_message_body_set_accumulate() FALSE and Message::got_chunk, as part
+// of a strategy to avoid unnecessary copying of data. However, you cannot
+// assume that every call to the allocator will be followed by a call to your
 // Message::got_chunk handler; if an I/O error occurs, then the buffer will be
 // unreffed without ever having been used. If your buffer-allocation strategy
 // requires special cleanup, use soup_buffer_new_with_owner() rather than doing
@@ -1504,7 +1146,7 @@ func (msg *Message) Restarted() {
 //
 // The function takes the following parameters:
 //
-//    - allocator: chunk allocator callback.
+//   - allocator: chunk allocator callback.
 //
 func (msg *Message) SetChunkAllocator(allocator ChunkAllocator) {
 	var _arg0 *C.SoupMessage       // out
@@ -1512,7 +1154,7 @@ func (msg *Message) SetChunkAllocator(allocator ChunkAllocator) {
 	var _arg2 C.gpointer
 	var _arg3 C.GDestroyNotify
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg1 = (*[0]byte)(C._gotk4_soup2_ChunkAllocator)
 	_arg2 = C.gpointer(gbox.Assign(allocator))
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
@@ -1522,19 +1164,19 @@ func (msg *Message) SetChunkAllocator(allocator ChunkAllocator) {
 	runtime.KeepAlive(allocator)
 }
 
-// SetFirstParty sets first_party as the main document URI for msg. For details
-// of when and how this is used refer to the documentation for
+// SetFirstParty sets first_party as the main document URI for msg.
+// For details of when and how this is used refer to the documentation for
 // CookieJarAcceptPolicy.
 //
 // The function takes the following parameters:
 //
-//    - firstParty for the msg's first party.
+//   - firstParty for the msg's first party.
 //
 func (msg *Message) SetFirstParty(firstParty *URI) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 *C.SoupURI     // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(firstParty)))
 
 	C.soup_message_set_first_party(_arg0, _arg1)
@@ -1546,13 +1188,13 @@ func (msg *Message) SetFirstParty(firstParty *URI) {
 //
 // The function takes the following parameters:
 //
-//    - flags: set of MessageFlags values.
+//   - flags: set of MessageFlags values.
 //
 func (msg *Message) SetFlags(flags MessageFlags) {
 	var _arg0 *C.SoupMessage     // out
 	var _arg1 C.SoupMessageFlags // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg1 = C.SoupMessageFlags(flags)
 
 	C.soup_message_set_flags(_arg0, _arg1)
@@ -1566,13 +1208,13 @@ func (msg *Message) SetFlags(flags MessageFlags) {
 //
 // The function takes the following parameters:
 //
-//    - version: HTTP version.
+//   - version: HTTP version.
 //
 func (msg *Message) SetHTTPVersion(version HTTPVersion) {
 	var _arg0 *C.SoupMessage    // out
 	var _arg1 C.SoupHTTPVersion // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg1 = C.SoupHTTPVersion(version)
 
 	C.soup_message_set_http_version(_arg0, _arg1)
@@ -1586,14 +1228,14 @@ func (msg *Message) SetHTTPVersion(version HTTPVersion) {
 //
 // The function takes the following parameters:
 //
-//    - isTopLevelNavigation: if TRUE indicate the current request is a top-level
-//      navigation.
+//   - isTopLevelNavigation: if TRUE indicate the current request is a top-level
+//     navigation.
 //
 func (msg *Message) SetIsTopLevelNavigation(isTopLevelNavigation bool) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.gboolean     // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	if isTopLevelNavigation {
 		_arg1 = C.TRUE
 	}
@@ -1617,13 +1259,13 @@ func (msg *Message) SetIsTopLevelNavigation(isTopLevelNavigation bool) {
 //
 // The function takes the following parameters:
 //
-//    - priority: MessagePriority.
+//   - priority: MessagePriority.
 //
 func (msg *Message) SetPriority(priority MessagePriority) {
 	var _arg0 *C.SoupMessage        // out
 	var _arg1 C.SoupMessagePriority // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg1 = C.SoupMessagePriority(priority)
 
 	C.soup_message_set_priority(_arg0, _arg1)
@@ -1641,15 +1283,15 @@ func (msg *Message) SetPriority(priority MessagePriority) {
 //
 // The function takes the following parameters:
 //
-//    - statusCode: 3xx status code.
-//    - redirectUri: URI to redirect msg to.
+//   - statusCode: 3xx status code.
+//   - redirectUri: URI to redirect msg to.
 //
 func (msg *Message) SetRedirect(statusCode uint, redirectUri string) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.guint        // out
 	var _arg2 *C.char        // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg1 = C.guint(statusCode)
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(redirectUri)))
 	defer C.free(unsafe.Pointer(_arg2))
@@ -1660,15 +1302,15 @@ func (msg *Message) SetRedirect(statusCode uint, redirectUri string) {
 	runtime.KeepAlive(redirectUri)
 }
 
-// SetRequest: convenience function to set the request body of a Message. If
-// content_type is NULL, the request body must be empty as well.
+// SetRequest: convenience function to set the request body of a Message.
+// If content_type is NULL, the request body must be empty as well.
 //
 // The function takes the following parameters:
 //
-//    - contentType (optional): MIME Content-Type of the body.
-//    - reqUse describing how to handle req_body.
-//    - reqBody (optional): a data buffer containing the body of the message
-//      request.
+//   - contentType (optional): MIME Content-Type of the body.
+//   - reqUse describing how to handle req_body.
+//   - reqBody (optional): a data buffer containing the body of the message
+//     request.
 //
 func (msg *Message) SetRequest(contentType string, reqUse MemoryUse, reqBody string) {
 	var _arg0 *C.SoupMessage  // out
@@ -1677,7 +1319,7 @@ func (msg *Message) SetRequest(contentType string, reqUse MemoryUse, reqBody str
 	var _arg3 *C.char         // out
 	var _arg4 C.gsize
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	if contentType != "" {
 		_arg1 = (*C.char)(unsafe.Pointer(C.CString(contentType)))
 		defer C.free(unsafe.Pointer(_arg1))
@@ -1695,15 +1337,15 @@ func (msg *Message) SetRequest(contentType string, reqUse MemoryUse, reqBody str
 	runtime.KeepAlive(reqBody)
 }
 
-// SetResponse: convenience function to set the response body of a Message. If
-// content_type is NULL, the response body must be empty as well.
+// SetResponse: convenience function to set the response body of a Message.
+// If content_type is NULL, the response body must be empty as well.
 //
 // The function takes the following parameters:
 //
-//    - contentType (optional): MIME Content-Type of the body.
-//    - respUse describing how to handle resp_body.
-//    - respBody (optional): a data buffer containing the body of the message
-//      response.
+//   - contentType (optional): MIME Content-Type of the body.
+//   - respUse describing how to handle resp_body.
+//   - respBody (optional): a data buffer containing the body of the message
+//     response.
 //
 func (msg *Message) SetResponse(contentType string, respUse MemoryUse, respBody string) {
 	var _arg0 *C.SoupMessage  // out
@@ -1712,7 +1354,7 @@ func (msg *Message) SetResponse(contentType string, respUse MemoryUse, respBody 
 	var _arg3 *C.char         // out
 	var _arg4 C.gsize
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	if contentType != "" {
 		_arg1 = (*C.char)(unsafe.Pointer(C.CString(contentType)))
 		defer C.free(unsafe.Pointer(_arg1))
@@ -1744,13 +1386,13 @@ func (msg *Message) SetResponse(contentType string, respUse MemoryUse, respBody 
 //
 // The function takes the following parameters:
 //
-//    - siteForCookies (optional) for the msg's site for cookies.
+//   - siteForCookies (optional) for the msg's site for cookies.
 //
 func (msg *Message) SetSiteForCookies(siteForCookies *URI) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 *C.SoupURI     // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	if siteForCookies != nil {
 		_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(siteForCookies)))
 	}
@@ -1765,13 +1407,13 @@ func (msg *Message) SetSiteForCookies(siteForCookies *URI) {
 //
 // The function takes the following parameters:
 //
-//    - statusCode: HTTP status code.
+//   - statusCode: HTTP status code.
 //
 func (msg *Message) SetStatus(statusCode uint) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.guint        // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg1 = C.guint(statusCode)
 
 	C.soup_message_set_status(_arg0, _arg1)
@@ -1783,15 +1425,15 @@ func (msg *Message) SetStatus(statusCode uint) {
 //
 // The function takes the following parameters:
 //
-//    - statusCode: HTTP status code.
-//    - reasonPhrase: description of the status.
+//   - statusCode: HTTP status code.
+//   - reasonPhrase: description of the status.
 //
 func (msg *Message) SetStatusFull(statusCode uint, reasonPhrase string) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 C.guint        // out
 	var _arg2 *C.char        // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg1 = C.guint(statusCode)
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(reasonPhrase)))
 	defer C.free(unsafe.Pointer(_arg2))
@@ -1807,13 +1449,13 @@ func (msg *Message) SetStatusFull(statusCode uint, reasonPhrase string) {
 //
 // The function takes the following parameters:
 //
-//    - uri: new URI.
+//   - uri: new URI.
 //
 func (msg *Message) SetURI(uri *URI) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 *C.SoupURI     // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	C.soup_message_set_uri(_arg0, _arg1)
@@ -1824,7 +1466,7 @@ func (msg *Message) SetURI(uri *URI) {
 func (msg *Message) Starting() {
 	var _arg0 *C.SoupMessage // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	C.soup_message_starting(_arg0)
 	runtime.KeepAlive(msg)
@@ -1833,7 +1475,7 @@ func (msg *Message) Starting() {
 func (msg *Message) WroteBody() {
 	var _arg0 *C.SoupMessage // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	C.soup_message_wrote_body(_arg0)
 	runtime.KeepAlive(msg)
@@ -1845,7 +1487,7 @@ func (msg *Message) WroteBodyData(chunk *Buffer) {
 	var _arg0 *C.SoupMessage // out
 	var _arg1 *C.SoupBuffer  // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg1 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(chunk)))
 
 	C.soup_message_wrote_body_data(_arg0, _arg1)
@@ -1856,7 +1498,7 @@ func (msg *Message) WroteBodyData(chunk *Buffer) {
 func (msg *Message) WroteChunk() {
 	var _arg0 *C.SoupMessage // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	C.soup_message_wrote_chunk(_arg0)
 	runtime.KeepAlive(msg)
@@ -1865,7 +1507,7 @@ func (msg *Message) WroteChunk() {
 func (msg *Message) WroteHeaders() {
 	var _arg0 *C.SoupMessage // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	C.soup_message_wrote_headers(_arg0)
 	runtime.KeepAlive(msg)
@@ -1874,8 +1516,155 @@ func (msg *Message) WroteHeaders() {
 func (msg *Message) WroteInformational() {
 	var _arg0 *C.SoupMessage // out
 
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	C.soup_message_wrote_informational(_arg0)
 	runtime.KeepAlive(msg)
+}
+
+func (msg *Message) finished() {
+	gclass := (*C.SoupMessageClass)(coreglib.PeekParentClass(msg))
+	fnarg := gclass.finished
+
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+
+	C._gotk4_soup2_Message_virtual_finished(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(msg)
+}
+
+func (msg *Message) gotBody() {
+	gclass := (*C.SoupMessageClass)(coreglib.PeekParentClass(msg))
+	fnarg := gclass.got_body
+
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+
+	C._gotk4_soup2_Message_virtual_got_body(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(msg)
+}
+
+// The function takes the following parameters:
+//
+func (msg *Message) gotChunk(chunk *Buffer) {
+	gclass := (*C.SoupMessageClass)(coreglib.PeekParentClass(msg))
+	fnarg := gclass.got_chunk
+
+	var _arg0 *C.SoupMessage // out
+	var _arg1 *C.SoupBuffer  // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+	_arg1 = (*C.SoupBuffer)(gextras.StructNative(unsafe.Pointer(chunk)))
+
+	C._gotk4_soup2_Message_virtual_got_chunk(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(chunk)
+}
+
+func (msg *Message) gotHeaders() {
+	gclass := (*C.SoupMessageClass)(coreglib.PeekParentClass(msg))
+	fnarg := gclass.got_headers
+
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+
+	C._gotk4_soup2_Message_virtual_got_headers(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(msg)
+}
+
+func (msg *Message) gotInformational() {
+	gclass := (*C.SoupMessageClass)(coreglib.PeekParentClass(msg))
+	fnarg := gclass.got_informational
+
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+
+	C._gotk4_soup2_Message_virtual_got_informational(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(msg)
+}
+
+func (msg *Message) restarted() {
+	gclass := (*C.SoupMessageClass)(coreglib.PeekParentClass(msg))
+	fnarg := gclass.restarted
+
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+
+	C._gotk4_soup2_Message_virtual_restarted(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(msg)
+}
+
+func (msg *Message) starting() {
+	gclass := (*C.SoupMessageClass)(coreglib.PeekParentClass(msg))
+	fnarg := gclass.starting
+
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+
+	C._gotk4_soup2_Message_virtual_starting(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(msg)
+}
+
+func (msg *Message) wroteBody() {
+	gclass := (*C.SoupMessageClass)(coreglib.PeekParentClass(msg))
+	fnarg := gclass.wrote_body
+
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+
+	C._gotk4_soup2_Message_virtual_wrote_body(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(msg)
+}
+
+func (msg *Message) wroteChunk() {
+	gclass := (*C.SoupMessageClass)(coreglib.PeekParentClass(msg))
+	fnarg := gclass.wrote_chunk
+
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+
+	C._gotk4_soup2_Message_virtual_wrote_chunk(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(msg)
+}
+
+func (msg *Message) wroteHeaders() {
+	gclass := (*C.SoupMessageClass)(coreglib.PeekParentClass(msg))
+	fnarg := gclass.wrote_headers
+
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+
+	C._gotk4_soup2_Message_virtual_wrote_headers(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(msg)
+}
+
+func (msg *Message) wroteInformational() {
+	gclass := (*C.SoupMessageClass)(coreglib.PeekParentClass(msg))
+	fnarg := gclass.wrote_informational
+
+	var _arg0 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+
+	C._gotk4_soup2_Message_virtual_wrote_informational(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(msg)
+}
+
+// MessageClass: instance of this type is always passed by reference.
+type MessageClass struct {
+	*messageClass
+}
+
+// messageClass is the struct that's finalized.
+type messageClass struct {
+	native *C.SoupMessageClass
 }

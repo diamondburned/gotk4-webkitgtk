@@ -6,7 +6,8 @@ import (
 	"runtime"
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
@@ -15,17 +16,23 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup-request-http.go.
-var GTypeRequestHTTP = externglib.Type(C.soup_request_http_get_type())
+// GType values.
+var (
+	GTypeRequestHTTP = coreglib.Type(C.soup_request_http_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeRequestHTTP, F: marshalRequestHTTP},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeRequestHTTP, F: marshalRequestHTTP},
 	})
 }
 
-// RequestHTTPOverrider contains methods that are overridable.
-type RequestHTTPOverrider interface {
+// RequestHTTPOverrides contains methods that are overridable.
+type RequestHTTPOverrides struct {
+}
+
+func defaultRequestHTTPOverrides(v *RequestHTTP) RequestHTTPOverrides {
+	return RequestHTTPOverrides{}
 }
 
 type RequestHTTP struct {
@@ -34,18 +41,26 @@ type RequestHTTP struct {
 }
 
 var (
-	_ externglib.Objector = (*RequestHTTP)(nil)
+	_ coreglib.Objector = (*RequestHTTP)(nil)
 )
 
-func classInitRequestHTTPer(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*RequestHTTP, *RequestHTTPClass, RequestHTTPOverrides](
+		GTypeRequestHTTP,
+		initRequestHTTPClass,
+		wrapRequestHTTP,
+		defaultRequestHTTPOverrides,
+	)
 }
 
-func wrapRequestHTTP(obj *externglib.Object) *RequestHTTP {
+func initRequestHTTPClass(gclass unsafe.Pointer, overrides RequestHTTPOverrides, classInitFunc func(*RequestHTTPClass)) {
+	if classInitFunc != nil {
+		class := (*RequestHTTPClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapRequestHTTP(obj *coreglib.Object) *RequestHTTP {
 	return &RequestHTTP{
 		Request: Request{
 			Object: obj,
@@ -57,27 +72,44 @@ func wrapRequestHTTP(obj *externglib.Object) *RequestHTTP {
 }
 
 func marshalRequestHTTP(p uintptr) (interface{}, error) {
-	return wrapRequestHTTP(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapRequestHTTP(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Message gets a new reference to the Message associated to this SoupRequest.
 //
 // The function returns the following values:
 //
-//    - message: new reference to the Message.
+//   - message: new reference to the Message.
 //
 func (http *RequestHTTP) Message() *Message {
 	var _arg0 *C.SoupRequestHTTP // out
 	var _cret *C.SoupMessage     // in
 
-	_arg0 = (*C.SoupRequestHTTP)(unsafe.Pointer(externglib.InternObject(http).Native()))
+	_arg0 = (*C.SoupRequestHTTP)(unsafe.Pointer(coreglib.InternObject(http).Native()))
 
 	_cret = C.soup_request_http_get_message(_arg0)
 	runtime.KeepAlive(http)
 
 	var _message *Message // out
 
-	_message = wrapMessage(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_message = wrapMessage(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _message
+}
+
+// RequestHTTPClass: instance of this type is always passed by reference.
+type RequestHTTPClass struct {
+	*requestHTTPClass
+}
+
+// requestHTTPClass is the struct that's finalized.
+type requestHTTPClass struct {
+	native *C.SoupRequestHTTPClass
+}
+
+func (r *RequestHTTPClass) Parent() *RequestClass {
+	valptr := &r.native.parent
+	var _v *RequestClass // out
+	_v = (*RequestClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
+	return _v
 }

@@ -6,48 +6,53 @@ import (
 	"runtime"
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
-// extern void _gotk4_webkit24_PermissionRequestIface_allow(WebKitPermissionRequest*);
-// extern void _gotk4_webkit24_PermissionRequestIface_deny(WebKitPermissionRequest*);
+// void _gotk4_webkit24_PermissionRequest_virtual_allow(void* fnptr, WebKitPermissionRequest* arg0) {
+//   ((void (*)(WebKitPermissionRequest*))(fnptr))(arg0);
+// };
+// void _gotk4_webkit24_PermissionRequest_virtual_deny(void* fnptr, WebKitPermissionRequest* arg0) {
+//   ((void (*)(WebKitPermissionRequest*))(fnptr))(arg0);
+// };
 import "C"
 
-// glib.Type values for WebKitPermissionRequest.go.
-var GTypePermissionRequest = externglib.Type(C.webkit_permission_request_get_type())
+// GType values.
+var (
+	GTypePermissionRequest = coreglib.Type(C.webkit_permission_request_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypePermissionRequest, F: marshalPermissionRequest},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypePermissionRequest, F: marshalPermissionRequest},
 	})
 }
 
-// PermissionRequestOverrider contains methods that are overridable.
-type PermissionRequestOverrider interface {
-	// Allow the action which triggered this request.
-	Allow()
-	// Deny the action which triggered this request.
-	Deny()
-}
-
+// PermissionRequest: permission request.
+//
+// There are situations where an embedder would need to ask the user for
+// permission to do certain types of operations, such as switching to fullscreen
+// mode or reporting the user's location through the standard Geolocation API.
+// In those cases, WebKit will emit a KitWebView::permission-request signal with
+// a KitPermissionRequest object attached to it.
 //
 // PermissionRequest wraps an interface. This means the user can get the
 // underlying type by calling Cast().
 type PermissionRequest struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 }
 
 var (
-	_ externglib.Objector = (*PermissionRequest)(nil)
+	_ coreglib.Objector = (*PermissionRequest)(nil)
 )
 
 // PermissionRequester describes PermissionRequest's interface methods.
 type PermissionRequester interface {
-	externglib.Objector
+	coreglib.Objector
 
 	// Allow the action which triggered this request.
 	Allow()
@@ -57,43 +62,21 @@ type PermissionRequester interface {
 
 var _ PermissionRequester = (*PermissionRequest)(nil)
 
-func ifaceInitPermissionRequester(gifacePtr, data C.gpointer) {
-	iface := (*C.WebKitPermissionRequestIface)(unsafe.Pointer(gifacePtr))
-	iface.allow = (*[0]byte)(C._gotk4_webkit24_PermissionRequestIface_allow)
-	iface.deny = (*[0]byte)(C._gotk4_webkit24_PermissionRequestIface_deny)
-}
-
-//export _gotk4_webkit24_PermissionRequestIface_allow
-func _gotk4_webkit24_PermissionRequestIface_allow(arg0 *C.WebKitPermissionRequest) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(PermissionRequestOverrider)
-
-	iface.Allow()
-}
-
-//export _gotk4_webkit24_PermissionRequestIface_deny
-func _gotk4_webkit24_PermissionRequestIface_deny(arg0 *C.WebKitPermissionRequest) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(PermissionRequestOverrider)
-
-	iface.Deny()
-}
-
-func wrapPermissionRequest(obj *externglib.Object) *PermissionRequest {
+func wrapPermissionRequest(obj *coreglib.Object) *PermissionRequest {
 	return &PermissionRequest{
 		Object: obj,
 	}
 }
 
 func marshalPermissionRequest(p uintptr) (interface{}, error) {
-	return wrapPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapPermissionRequest(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Allow the action which triggered this request.
 func (request *PermissionRequest) Allow() {
 	var _arg0 *C.WebKitPermissionRequest // out
 
-	_arg0 = (*C.WebKitPermissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitPermissionRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	C.webkit_permission_request_allow(_arg0)
 	runtime.KeepAlive(request)
@@ -103,8 +86,44 @@ func (request *PermissionRequest) Allow() {
 func (request *PermissionRequest) Deny() {
 	var _arg0 *C.WebKitPermissionRequest // out
 
-	_arg0 = (*C.WebKitPermissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitPermissionRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	C.webkit_permission_request_deny(_arg0)
 	runtime.KeepAlive(request)
+}
+
+// Allow: allow the action which triggered this request.
+func (request *PermissionRequest) allow() {
+	gclass := (*C.WebKitPermissionRequestIface)(coreglib.PeekParentClass(request))
+	fnarg := gclass.allow
+
+	var _arg0 *C.WebKitPermissionRequest // out
+
+	_arg0 = (*C.WebKitPermissionRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
+
+	C._gotk4_webkit24_PermissionRequest_virtual_allow(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(request)
+}
+
+// Deny: deny the action which triggered this request.
+func (request *PermissionRequest) deny() {
+	gclass := (*C.WebKitPermissionRequestIface)(coreglib.PeekParentClass(request))
+	fnarg := gclass.deny
+
+	var _arg0 *C.WebKitPermissionRequest // out
+
+	_arg0 = (*C.WebKitPermissionRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
+
+	C._gotk4_webkit24_PermissionRequest_virtual_deny(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(request)
+}
+
+// PermissionRequestIface: instance of this type is always passed by reference.
+type PermissionRequestIface struct {
+	*permissionRequestIface
+}
+
+// permissionRequestIface is the struct that's finalized.
+type permissionRequestIface struct {
+	native *C.WebKitPermissionRequestIface
 }

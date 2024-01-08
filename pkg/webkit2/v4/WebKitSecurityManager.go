@@ -6,7 +6,8 @@ import (
 	"runtime"
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -14,59 +15,81 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitSecurityManager.go.
-var GTypeSecurityManager = externglib.Type(C.webkit_security_manager_get_type())
+// GType values.
+var (
+	GTypeSecurityManager = coreglib.Type(C.webkit_security_manager_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeSecurityManager, F: marshalSecurityManager},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeSecurityManager, F: marshalSecurityManager},
 	})
 }
 
-// SecurityManagerOverrider contains methods that are overridable.
-type SecurityManagerOverrider interface {
+// SecurityManagerOverrides contains methods that are overridable.
+type SecurityManagerOverrides struct {
 }
 
+func defaultSecurityManagerOverrides(v *SecurityManager) SecurityManagerOverrides {
+	return SecurityManagerOverrides{}
+}
+
+// SecurityManager controls security settings in a KitWebContext.
+//
+// The KitSecurityManager defines security settings for URI
+// schemes in a KitWebContext. Get it from the context with
+// webkit_web_context_get_security_manager(), and use it to register a URI
+// scheme with a certain security level, or to check if it already has it.
 type SecurityManager struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 }
 
 var (
-	_ externglib.Objector = (*SecurityManager)(nil)
+	_ coreglib.Objector = (*SecurityManager)(nil)
 )
 
-func classInitSecurityManagerer(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*SecurityManager, *SecurityManagerClass, SecurityManagerOverrides](
+		GTypeSecurityManager,
+		initSecurityManagerClass,
+		wrapSecurityManager,
+		defaultSecurityManagerOverrides,
+	)
 }
 
-func wrapSecurityManager(obj *externglib.Object) *SecurityManager {
+func initSecurityManagerClass(gclass unsafe.Pointer, overrides SecurityManagerOverrides, classInitFunc func(*SecurityManagerClass)) {
+	if classInitFunc != nil {
+		class := (*SecurityManagerClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapSecurityManager(obj *coreglib.Object) *SecurityManager {
 	return &SecurityManager{
 		Object: obj,
 	}
 }
 
 func marshalSecurityManager(p uintptr) (interface{}, error) {
-	return wrapSecurityManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapSecurityManager(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // RegisterURISchemeAsCorsEnabled: register scheme as a CORS (Cross-origin
-// resource sharing) enabled scheme. This means that CORS requests are allowed.
-// See W3C CORS specification http://www.w3.org/TR/cors/.
+// resource sharing) enabled scheme.
+//
+// This means that CORS requests are allowed. See W3C CORS specification
+// http://www.w3.org/TR/cors/.
 //
 // The function takes the following parameters:
 //
-//    - scheme: URI scheme.
+//   - scheme: URI scheme.
 //
 func (securityManager *SecurityManager) RegisterURISchemeAsCorsEnabled(scheme string) {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(coreglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -76,18 +99,20 @@ func (securityManager *SecurityManager) RegisterURISchemeAsCorsEnabled(scheme st
 }
 
 // RegisterURISchemeAsDisplayIsolated: register scheme as a display isolated
-// scheme. This means that pages cannot display these URIs unless they are from
-// the same scheme.
+// scheme.
+//
+// This means that pages cannot display these URIs unless they are from the same
+// scheme.
 //
 // The function takes the following parameters:
 //
-//    - scheme: URI scheme.
+//   - scheme: URI scheme.
 //
 func (securityManager *SecurityManager) RegisterURISchemeAsDisplayIsolated(scheme string) {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(coreglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -97,17 +122,19 @@ func (securityManager *SecurityManager) RegisterURISchemeAsDisplayIsolated(schem
 }
 
 // RegisterURISchemeAsEmptyDocument: register scheme as an empty document
-// scheme. This means that they are allowed to commit synchronously.
+// scheme.
+//
+// This means that they are allowed to commit synchronously.
 //
 // The function takes the following parameters:
 //
-//    - scheme: URI scheme.
+//   - scheme: URI scheme.
 //
 func (securityManager *SecurityManager) RegisterURISchemeAsEmptyDocument(scheme string) {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(coreglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -116,18 +143,20 @@ func (securityManager *SecurityManager) RegisterURISchemeAsEmptyDocument(scheme 
 	runtime.KeepAlive(scheme)
 }
 
-// RegisterURISchemeAsLocal: register scheme as a local scheme. This means that
-// other non-local pages cannot link to or access URIs of this scheme.
+// RegisterURISchemeAsLocal: register scheme as a local scheme.
+//
+// This means that other non-local pages cannot link to or access URIs of this
+// scheme.
 //
 // The function takes the following parameters:
 //
-//    - scheme: URI scheme.
+//   - scheme: URI scheme.
 //
 func (securityManager *SecurityManager) RegisterURISchemeAsLocal(scheme string) {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(coreglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -136,19 +165,20 @@ func (securityManager *SecurityManager) RegisterURISchemeAsLocal(scheme string) 
 	runtime.KeepAlive(scheme)
 }
 
-// RegisterURISchemeAsNoAccess: register scheme as a no-access scheme. This
-// means that pages loaded with this URI scheme cannot access pages loaded with
-// any other URI scheme.
+// RegisterURISchemeAsNoAccess: register scheme as a no-access scheme.
+//
+// This means that pages loaded with this URI scheme cannot access pages loaded
+// with any other URI scheme.
 //
 // The function takes the following parameters:
 //
-//    - scheme: URI scheme.
+//   - scheme: URI scheme.
 //
 func (securityManager *SecurityManager) RegisterURISchemeAsNoAccess(scheme string) {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(coreglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -157,19 +187,20 @@ func (securityManager *SecurityManager) RegisterURISchemeAsNoAccess(scheme strin
 	runtime.KeepAlive(scheme)
 }
 
-// RegisterURISchemeAsSecure: register scheme as a secure scheme. This means
-// that mixed content warnings won't be generated for this scheme when included
-// by an HTTPS page.
+// RegisterURISchemeAsSecure: register scheme as a secure scheme.
+//
+// This means that mixed content warnings won't be generated for this scheme
+// when included by an HTTPS page.
 //
 // The function takes the following parameters:
 //
-//    - scheme: URI scheme.
+//   - scheme: URI scheme.
 //
 func (securityManager *SecurityManager) RegisterURISchemeAsSecure(scheme string) {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(coreglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -179,23 +210,24 @@ func (securityManager *SecurityManager) RegisterURISchemeAsSecure(scheme string)
 }
 
 // URISchemeIsCorsEnabled: whether scheme is considered as a CORS enabled
-// scheme. See also
-// webkit_security_manager_register_uri_scheme_as_cors_enabled().
+// scheme.
+//
+// See also webkit_security_manager_register_uri_scheme_as_cors_enabled().
 //
 // The function takes the following parameters:
 //
-//    - scheme: URI scheme.
+//   - scheme: URI scheme.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if scheme is a CORS enabled scheme or FALSE otherwise.
+//   - ok: TRUE if scheme is a CORS enabled scheme or FALSE otherwise.
 //
 func (securityManager *SecurityManager) URISchemeIsCorsEnabled(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 	var _cret C.gboolean               // in
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(coreglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -213,23 +245,24 @@ func (securityManager *SecurityManager) URISchemeIsCorsEnabled(scheme string) bo
 }
 
 // URISchemeIsDisplayIsolated: whether scheme is considered as a display
-// isolated scheme. See also
-// webkit_security_manager_register_uri_scheme_as_display_isolated().
+// isolated scheme.
+//
+// See also webkit_security_manager_register_uri_scheme_as_display_isolated().
 //
 // The function takes the following parameters:
 //
-//    - scheme: URI scheme.
+//   - scheme: URI scheme.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if scheme is a display isolated scheme or FALSE otherwise.
+//   - ok: TRUE if scheme is a display isolated scheme or FALSE otherwise.
 //
 func (securityManager *SecurityManager) URISchemeIsDisplayIsolated(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 	var _cret C.gboolean               // in
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(coreglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -247,23 +280,24 @@ func (securityManager *SecurityManager) URISchemeIsDisplayIsolated(scheme string
 }
 
 // URISchemeIsEmptyDocument: whether scheme is considered as an empty document
-// scheme. See also
-// webkit_security_manager_register_uri_scheme_as_empty_document().
+// scheme.
+//
+// See also webkit_security_manager_register_uri_scheme_as_empty_document().
 //
 // The function takes the following parameters:
 //
-//    - scheme: URI scheme.
+//   - scheme: URI scheme.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if scheme is an empty document scheme or FALSE otherwise.
+//   - ok: TRUE if scheme is an empty document scheme or FALSE otherwise.
 //
 func (securityManager *SecurityManager) URISchemeIsEmptyDocument(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 	var _cret C.gboolean               // in
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(coreglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -280,23 +314,24 @@ func (securityManager *SecurityManager) URISchemeIsEmptyDocument(scheme string) 
 	return _ok
 }
 
-// URISchemeIsLocal: whether scheme is considered as a local scheme. See also
-// webkit_security_manager_register_uri_scheme_as_local().
+// URISchemeIsLocal: whether scheme is considered as a local scheme.
+//
+// See also webkit_security_manager_register_uri_scheme_as_local().
 //
 // The function takes the following parameters:
 //
-//    - scheme: URI scheme.
+//   - scheme: URI scheme.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if scheme is a local scheme or FALSE otherwise.
+//   - ok: TRUE if scheme is a local scheme or FALSE otherwise.
 //
 func (securityManager *SecurityManager) URISchemeIsLocal(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 	var _cret C.gboolean               // in
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(coreglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -313,23 +348,24 @@ func (securityManager *SecurityManager) URISchemeIsLocal(scheme string) bool {
 	return _ok
 }
 
-// URISchemeIsNoAccess: whether scheme is considered as a no-access scheme. See
-// also webkit_security_manager_register_uri_scheme_as_no_access().
+// URISchemeIsNoAccess: whether scheme is considered as a no-access scheme.
+//
+// See also webkit_security_manager_register_uri_scheme_as_no_access().
 //
 // The function takes the following parameters:
 //
-//    - scheme: URI scheme.
+//   - scheme: URI scheme.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if scheme is a no-access scheme or FALSE otherwise.
+//   - ok: TRUE if scheme is a no-access scheme or FALSE otherwise.
 //
 func (securityManager *SecurityManager) URISchemeIsNoAccess(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 	var _cret C.gboolean               // in
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(coreglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -346,23 +382,24 @@ func (securityManager *SecurityManager) URISchemeIsNoAccess(scheme string) bool 
 	return _ok
 }
 
-// URISchemeIsSecure: whether scheme is considered as a secure scheme. See also
-// webkit_security_manager_register_uri_scheme_as_secure().
+// URISchemeIsSecure: whether scheme is considered as a secure scheme.
+//
+// See also webkit_security_manager_register_uri_scheme_as_secure().
 //
 // The function takes the following parameters:
 //
-//    - scheme: URI scheme.
+//   - scheme: URI scheme.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if scheme is a secure scheme or FALSE otherwise.
+//   - ok: TRUE if scheme is a secure scheme or FALSE otherwise.
 //
 func (securityManager *SecurityManager) URISchemeIsSecure(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
 	var _cret C.gboolean               // in
 
-	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(externglib.InternObject(securityManager).Native()))
+	_arg0 = (*C.WebKitSecurityManager)(unsafe.Pointer(coreglib.InternObject(securityManager).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(scheme)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -377,4 +414,14 @@ func (securityManager *SecurityManager) URISchemeIsSecure(scheme string) bool {
 	}
 
 	return _ok
+}
+
+// SecurityManagerClass: instance of this type is always passed by reference.
+type SecurityManagerClass struct {
+	*securityManagerClass
+}
+
+// securityManagerClass is the struct that's finalized.
+type securityManagerClass struct {
+	native *C.WebKitSecurityManagerClass
 }

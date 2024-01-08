@@ -3,187 +3,116 @@
 package webkit2
 
 import (
-	"fmt"
 	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
-// extern void _gotk4_webkit24_AuthenticationRequest_ConnectAuthenticated(gpointer, WebKitCredential*, guintptr);
 // extern void _gotk4_webkit24_AuthenticationRequest_ConnectCancelled(gpointer, guintptr);
+// extern void _gotk4_webkit24_AuthenticationRequest_ConnectAuthenticated(gpointer, WebKitCredential*, guintptr);
 import "C"
 
-// glib.Type values for WebKitAuthenticationRequest.go.
+// GType values.
 var (
-	GTypeAuthenticationScheme  = externglib.Type(C.webkit_authentication_scheme_get_type())
-	GTypeAuthenticationRequest = externglib.Type(C.webkit_authentication_request_get_type())
+	GTypeAuthenticationRequest = coreglib.Type(C.webkit_authentication_request_get_type())
 )
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeAuthenticationScheme, F: marshalAuthenticationScheme},
-		{T: GTypeAuthenticationRequest, F: marshalAuthenticationRequest},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeAuthenticationRequest, F: marshalAuthenticationRequest},
 	})
 }
 
-// AuthenticationScheme: enum values representing the authentication scheme.
-type AuthenticationScheme C.gint
-
-const (
-	// AuthenticationSchemeDefault: default authentication scheme of WebKit.
-	AuthenticationSchemeDefault AuthenticationScheme = 1
-	// AuthenticationSchemeHTTPBasic: basic authentication scheme as defined in
-	// RFC 2617.
-	AuthenticationSchemeHTTPBasic AuthenticationScheme = 2
-	// AuthenticationSchemeHTTPDigest: digest authentication scheme as defined
-	// in RFC 2617.
-	AuthenticationSchemeHTTPDigest AuthenticationScheme = 3
-	// AuthenticationSchemeHtmlForm: HTML Form authentication.
-	AuthenticationSchemeHtmlForm AuthenticationScheme = 4
-	// AuthenticationSchemeNtlm: NTLM Microsoft proprietary authentication
-	// scheme.
-	AuthenticationSchemeNtlm AuthenticationScheme = 5
-	// AuthenticationSchemeNegotiate: negotiate (or SPNEGO) authentication
-	// scheme as defined in RFC 4559.
-	AuthenticationSchemeNegotiate AuthenticationScheme = 6
-	// AuthenticationSchemeClientCertificateRequested: client Certificate
-	// Authentication (see RFC 2246).
-	AuthenticationSchemeClientCertificateRequested AuthenticationScheme = 7
-	// AuthenticationSchemeServerTrustEvaluationRequested: server Trust
-	// Authentication.
-	AuthenticationSchemeServerTrustEvaluationRequested AuthenticationScheme = 8
-	// AuthenticationSchemeUnknown: authentication scheme unknown.
-	AuthenticationSchemeUnknown AuthenticationScheme = 100
-)
-
-func marshalAuthenticationScheme(p uintptr) (interface{}, error) {
-	return AuthenticationScheme(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+// AuthenticationRequestOverrides contains methods that are overridable.
+type AuthenticationRequestOverrides struct {
 }
 
-// String returns the name in string for AuthenticationScheme.
-func (a AuthenticationScheme) String() string {
-	switch a {
-	case AuthenticationSchemeDefault:
-		return "Default"
-	case AuthenticationSchemeHTTPBasic:
-		return "HTTPBasic"
-	case AuthenticationSchemeHTTPDigest:
-		return "HTTPDigest"
-	case AuthenticationSchemeHtmlForm:
-		return "HtmlForm"
-	case AuthenticationSchemeNtlm:
-		return "Ntlm"
-	case AuthenticationSchemeNegotiate:
-		return "Negotiate"
-	case AuthenticationSchemeClientCertificateRequested:
-		return "ClientCertificateRequested"
-	case AuthenticationSchemeServerTrustEvaluationRequested:
-		return "ServerTrustEvaluationRequested"
-	case AuthenticationSchemeUnknown:
-		return "Unknown"
-	default:
-		return fmt.Sprintf("AuthenticationScheme(%d)", a)
-	}
+func defaultAuthenticationRequestOverrides(v *AuthenticationRequest) AuthenticationRequestOverrides {
+	return AuthenticationRequestOverrides{}
 }
 
-// AuthenticationRequestOverrider contains methods that are overridable.
-type AuthenticationRequestOverrider interface {
-}
-
+// AuthenticationRequest represents an authentication request.
+//
+// Whenever a client attempts to load a page protected by HTTP authentication,
+// credentials will need to be provided to authorize access. To allow the
+// client to decide how it wishes to handle authentication, WebKit will fire a
+// KitWebView::authenticate signal with a WebKitAuthenticationRequest object to
+// provide client side authentication support. Credentials are exposed through
+// the KitCredential object.
+//
+// In case the client application does not wish to handle this signal WebKit
+// will provide a default handler. To handle authentication asynchronously,
+// simply increase the reference count of the WebKitAuthenticationRequest
+// object.
 type AuthenticationRequest struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 }
 
 var (
-	_ externglib.Objector = (*AuthenticationRequest)(nil)
+	_ coreglib.Objector = (*AuthenticationRequest)(nil)
 )
 
-func classInitAuthenticationRequester(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*AuthenticationRequest, *AuthenticationRequestClass, AuthenticationRequestOverrides](
+		GTypeAuthenticationRequest,
+		initAuthenticationRequestClass,
+		wrapAuthenticationRequest,
+		defaultAuthenticationRequestOverrides,
+	)
 }
 
-func wrapAuthenticationRequest(obj *externglib.Object) *AuthenticationRequest {
+func initAuthenticationRequestClass(gclass unsafe.Pointer, overrides AuthenticationRequestOverrides, classInitFunc func(*AuthenticationRequestClass)) {
+	if classInitFunc != nil {
+		class := (*AuthenticationRequestClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapAuthenticationRequest(obj *coreglib.Object) *AuthenticationRequest {
 	return &AuthenticationRequest{
 		Object: obj,
 	}
 }
 
 func marshalAuthenticationRequest(p uintptr) (interface{}, error) {
-	return wrapAuthenticationRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-//export _gotk4_webkit24_AuthenticationRequest_ConnectAuthenticated
-func _gotk4_webkit24_AuthenticationRequest_ConnectAuthenticated(arg0 C.gpointer, arg1 *C.WebKitCredential, arg2 C.guintptr) {
-	var f func(credential *Credential)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(credential *Credential))
-	}
-
-	var _credential *Credential // out
-
-	_credential = (*Credential)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-
-	f(_credential)
+	return wrapAuthenticationRequest(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // ConnectAuthenticated: this signal is emitted when the user authentication
 // request succeeded. Applications handling their own credential storage should
 // connect to this signal to save the credentials.
-func (request *AuthenticationRequest) ConnectAuthenticated(f func(credential *Credential)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(request, "authenticated", false, unsafe.Pointer(C._gotk4_webkit24_AuthenticationRequest_ConnectAuthenticated), f)
-}
-
-//export _gotk4_webkit24_AuthenticationRequest_ConnectCancelled
-func _gotk4_webkit24_AuthenticationRequest_ConnectCancelled(arg0 C.gpointer, arg1 C.guintptr) {
-	var f func()
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func())
-	}
-
-	f()
+func (request *AuthenticationRequest) ConnectAuthenticated(f func(credential *Credential)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(request, "authenticated", false, unsafe.Pointer(C._gotk4_webkit24_AuthenticationRequest_ConnectAuthenticated), f)
 }
 
 // ConnectCancelled: this signal is emitted when the user authentication request
 // is cancelled. It allows the application to dismiss its authentication dialog
 // in case of page load failure for example.
-func (request *AuthenticationRequest) ConnectCancelled(f func()) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(request, "cancelled", false, unsafe.Pointer(C._gotk4_webkit24_AuthenticationRequest_ConnectCancelled), f)
+func (request *AuthenticationRequest) ConnectCancelled(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(request, "cancelled", false, unsafe.Pointer(C._gotk4_webkit24_AuthenticationRequest_ConnectCancelled), f)
 }
 
+// Authenticate the KitAuthenticationRequest.
+//
 // Authenticate the KitAuthenticationRequest using the KitCredential supplied.
 // To continue without credentials, pass NULL as credential.
 //
 // The function takes the following parameters:
 //
-//    - credential (optional) or NULL.
+//   - credential (optional) or NULL.
 //
 func (request *AuthenticationRequest) Authenticate(credential *Credential) {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _arg1 *C.WebKitCredential            // out
 
-	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 	if credential != nil {
 		_arg1 = (*C.WebKitCredential)(gextras.StructNative(unsafe.Pointer(credential)))
 	}
@@ -193,23 +122,25 @@ func (request *AuthenticationRequest) Authenticate(credential *Credential) {
 	runtime.KeepAlive(credential)
 }
 
-// CanSaveCredentials: determine whether the authentication method associated
-// with this KitAuthenticationRequest should allow the storage of credentials.
-// This will return FALSE if WebKit doesn't support credential storing, if
-// private browsing is enabled, or if persistent credential storage has been
-// disabled in KitWebsiteDataManager, unless credentials saving has been
-// explicitly enabled with
-// webkit_authentication_request_set_can_save_credentials().
+// CanSaveCredentials: determine whether this KitAuthenticationRequest should
+// allow the storage of credentials.
+//
+// Determine whether the authentication method associated with this
+// KitAuthenticationRequest should allow the storage of credentials. This
+// will return FALSE if WebKit doesn't support credential storing, if private
+// browsing is enabled, or if persistent credential storage has been disabled in
+// KitWebsiteDataManager, unless credentials saving has been explicitly enabled
+// with webkit_authentication_request_set_can_save_credentials().
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if WebKit can store credentials or FALSE otherwise.
+//   - ok: TRUE if WebKit can store credentials or FALSE otherwise.
 //
 func (request *AuthenticationRequest) CanSaveCredentials() bool {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.gboolean                     // in
 
-	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	_cret = C.webkit_authentication_request_can_save_credentials(_arg0)
 	runtime.KeepAlive(request)
@@ -223,29 +154,55 @@ func (request *AuthenticationRequest) CanSaveCredentials() bool {
 	return _ok
 }
 
-// Cancel the authentication challenge. This will also cancel the page loading
-// and result in a KitWebView::load-failed signal with a KitNetworkError of type
+// Cancel the authentication challenge.
+//
+// This will also cancel the page loading and result in a
+// KitWebView::load-failed signal with a KitNetworkError of type
 // WEBKIT_NETWORK_ERROR_CANCELLED being emitted.
 func (request *AuthenticationRequest) Cancel() {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 
-	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	C.webkit_authentication_request_cancel(_arg0)
 	runtime.KeepAlive(request)
+}
+
+// CertificatePINFlags: get the PasswordFlags of the
+// WEBKIT_AUTHENTICATION_SCHEME_CLIENT_CERTIFICATE_PIN_REQUESTED authentication
+// challenge.
+//
+// The function returns the following values:
+//
+//   - tlsPasswordFlags: PasswordFlags.
+//
+func (request *AuthenticationRequest) CertificatePINFlags() gio.TLSPasswordFlags {
+	var _arg0 *C.WebKitAuthenticationRequest // out
+	var _cret C.GTlsPasswordFlags            // in
+
+	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
+
+	_cret = C.webkit_authentication_request_get_certificate_pin_flags(_arg0)
+	runtime.KeepAlive(request)
+
+	var _tlsPasswordFlags gio.TLSPasswordFlags // out
+
+	_tlsPasswordFlags = gio.TLSPasswordFlags(_cret)
+
+	return _tlsPasswordFlags
 }
 
 // Host: get the host that this authentication challenge is applicable to.
 //
 // The function returns the following values:
 //
-//    - utf8: host of request.
+//   - utf8: host of request.
 //
 func (request *AuthenticationRequest) Host() string {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret *C.gchar                       // in
 
-	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	_cret = C.webkit_authentication_request_get_host(_arg0)
 	runtime.KeepAlive(request)
@@ -261,13 +218,13 @@ func (request *AuthenticationRequest) Host() string {
 //
 // The function returns the following values:
 //
-//    - guint: port of request.
+//   - guint: port of request.
 //
 func (request *AuthenticationRequest) Port() uint {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.guint                        // in
 
-	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	_cret = C.webkit_authentication_request_get_port(_arg0)
 	runtime.KeepAlive(request)
@@ -280,19 +237,22 @@ func (request *AuthenticationRequest) Port() uint {
 }
 
 // ProposedCredential: get the KitCredential of the proposed authentication
-// challenge that was stored from a previous session. The client can use this
-// directly for authentication or construct their own KitCredential.
+// challenge.
+//
+// Get the KitCredential of the proposed authentication challenge that was
+// stored from a previous session. The client can use this directly for
+// authentication or construct their own KitCredential.
 //
 // The function returns the following values:
 //
-//    - credential encapsulating credential details or NULL if there is no stored
-//      credential.
+//   - credential encapsulating credential details or NULL if there is no stored
+//     credential.
 //
 func (request *AuthenticationRequest) ProposedCredential() *Credential {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret *C.WebKitCredential            // in
 
-	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	_cret = C.webkit_authentication_request_get_proposed_credential(_arg0)
 	runtime.KeepAlive(request)
@@ -314,13 +274,13 @@ func (request *AuthenticationRequest) ProposedCredential() *Credential {
 //
 // The function returns the following values:
 //
-//    - utf8: realm of request.
+//   - utf8: realm of request.
 //
 func (request *AuthenticationRequest) Realm() string {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret *C.gchar                       // in
 
-	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	_cret = C.webkit_authentication_request_get_realm(_arg0)
 	runtime.KeepAlive(request)
@@ -336,13 +296,13 @@ func (request *AuthenticationRequest) Realm() string {
 //
 // The function returns the following values:
 //
-//    - authenticationScheme of request.
+//   - authenticationScheme of request.
 //
 func (request *AuthenticationRequest) Scheme() AuthenticationScheme {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.WebKitAuthenticationScheme   // in
 
-	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	_cret = C.webkit_authentication_request_get_scheme(_arg0)
 	runtime.KeepAlive(request)
@@ -359,13 +319,13 @@ func (request *AuthenticationRequest) Scheme() AuthenticationScheme {
 //
 // The function returns the following values:
 //
-//    - securityOrigin: newly created KitSecurityOrigin.
+//   - securityOrigin: newly created KitSecurityOrigin.
 //
 func (request *AuthenticationRequest) SecurityOrigin() *SecurityOrigin {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret *C.WebKitSecurityOrigin        // in
 
-	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	_cret = C.webkit_authentication_request_get_security_origin(_arg0)
 	runtime.KeepAlive(request)
@@ -384,17 +344,20 @@ func (request *AuthenticationRequest) SecurityOrigin() *SecurityOrigin {
 }
 
 // IsForProxy: determine whether the authentication challenge is associated with
-// a proxy server rather than an "origin" server.
+// a proxy server.
+//
+// Determine whether the authentication challenge is associated with a proxy
+// server rather than an "origin" server.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if authentication is for a proxy or FALSE otherwise.
+//   - ok: TRUE if authentication is for a proxy or FALSE otherwise.
 //
 func (request *AuthenticationRequest) IsForProxy() bool {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.gboolean                     // in
 
-	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	_cret = C.webkit_authentication_request_is_for_proxy(_arg0)
 	runtime.KeepAlive(request)
@@ -413,13 +376,13 @@ func (request *AuthenticationRequest) IsForProxy() bool {
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if authentication attempt is a retry or FALSE otherwise.
+//   - ok: TRUE if authentication attempt is a retry or FALSE otherwise.
 //
 func (request *AuthenticationRequest) IsRetry() bool {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.gboolean                     // in
 
-	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	_cret = C.webkit_authentication_request_is_retry(_arg0)
 	runtime.KeepAlive(request)
@@ -434,21 +397,23 @@ func (request *AuthenticationRequest) IsRetry() bool {
 }
 
 // SetCanSaveCredentials: set whether the authentication method associated with
-// request should allow the storage of credentials. This should be used by
-// applications handling their own credentials storage to indicate that it
-// should be supported even when internal credential storage is disabled or
-// unsupported. Note that storing of credentials will not be allowed on
-// ephemeral sessions in any case.
+// request should allow the storage of credentials.
+//
+// Set whether the authentication method associated with request should allow
+// the storage of credentials. This should be used by applications handling
+// their own credentials storage to indicate that it should be supported even
+// when internal credential storage is disabled or unsupported. Note that
+// storing of credentials will not be allowed on ephemeral sessions in any case.
 //
 // The function takes the following parameters:
 //
-//    - enabled: value to set.
+//   - enabled: value to set.
 //
 func (request *AuthenticationRequest) SetCanSaveCredentials(enabled bool) {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _arg1 C.gboolean                     // out
 
-	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 	if enabled {
 		_arg1 = C.TRUE
 	}
@@ -459,25 +424,38 @@ func (request *AuthenticationRequest) SetCanSaveCredentials(enabled bool) {
 }
 
 // SetProposedCredential: set the KitCredential of the proposed authentication
-// challenge that was stored from a previous session. This should only be used
-// by applications handling their own credential storage. (When using the
-// default WebKit credential storage,
-// webkit_authentication_request_get_proposed_credential() already contains
-// previously-stored credentials.) Passing a NULL credential will clear the
-// proposed credential.
+// challenge.
+//
+// Set the KitCredential of the proposed authentication challenge that was
+// stored from a previous session. This should only be used by applications
+// handling their own credential storage. (When using the default WebKit
+// credential storage, webkit_authentication_request_get_proposed_credential()
+// already contains previously-stored credentials.) Passing a NULL credential
+// will clear the proposed credential.
 //
 // The function takes the following parameters:
 //
-//    - credential or NULL.
+//   - credential or NULL.
 //
 func (request *AuthenticationRequest) SetProposedCredential(credential *Credential) {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _arg1 *C.WebKitCredential            // out
 
-	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 	_arg1 = (*C.WebKitCredential)(gextras.StructNative(unsafe.Pointer(credential)))
 
 	C.webkit_authentication_request_set_proposed_credential(_arg0, _arg1)
 	runtime.KeepAlive(request)
 	runtime.KeepAlive(credential)
+}
+
+// AuthenticationRequestClass: instance of this type is always passed by
+// reference.
+type AuthenticationRequestClass struct {
+	*authenticationRequestClass
+}
+
+// authenticationRequestClass is the struct that's finalized.
+type authenticationRequestClass struct {
+	native *C.WebKitAuthenticationRequestClass
 }

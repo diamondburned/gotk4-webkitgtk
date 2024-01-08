@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
 // #include <stdlib.h>
@@ -14,26 +15,26 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitError.go.
+// GType values.
 var (
-	GTypeDownloadError   = externglib.Type(C.webkit_download_error_get_type())
-	GTypeJavascriptError = externglib.Type(C.webkit_javascript_error_get_type())
-	GTypeNetworkError    = externglib.Type(C.webkit_network_error_get_type())
-	GTypePluginError     = externglib.Type(C.webkit_plugin_error_get_type())
-	GTypePolicyError     = externglib.Type(C.webkit_policy_error_get_type())
-	GTypePrintError      = externglib.Type(C.webkit_print_error_get_type())
-	GTypeSnapshotError   = externglib.Type(C.webkit_snapshot_error_get_type())
+	GTypeDownloadError   = coreglib.Type(C.webkit_download_error_get_type())
+	GTypeJavascriptError = coreglib.Type(C.webkit_javascript_error_get_type())
+	GTypeNetworkError    = coreglib.Type(C.webkit_network_error_get_type())
+	GTypePluginError     = coreglib.Type(C.webkit_plugin_error_get_type())
+	GTypePolicyError     = coreglib.Type(C.webkit_policy_error_get_type())
+	GTypePrintError      = coreglib.Type(C.webkit_print_error_get_type())
+	GTypeSnapshotError   = coreglib.Type(C.webkit_snapshot_error_get_type())
 )
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeDownloadError, F: marshalDownloadError},
-		{T: GTypeJavascriptError, F: marshalJavascriptError},
-		{T: GTypeNetworkError, F: marshalNetworkError},
-		{T: GTypePluginError, F: marshalPluginError},
-		{T: GTypePolicyError, F: marshalPolicyError},
-		{T: GTypePrintError, F: marshalPrintError},
-		{T: GTypeSnapshotError, F: marshalSnapshotError},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeDownloadError, F: marshalDownloadError},
+		coreglib.TypeMarshaler{T: GTypeJavascriptError, F: marshalJavascriptError},
+		coreglib.TypeMarshaler{T: GTypeNetworkError, F: marshalNetworkError},
+		coreglib.TypeMarshaler{T: GTypePluginError, F: marshalPluginError},
+		coreglib.TypeMarshaler{T: GTypePolicyError, F: marshalPolicyError},
+		coreglib.TypeMarshaler{T: GTypePrintError, F: marshalPrintError},
+		coreglib.TypeMarshaler{T: GTypeSnapshotError, F: marshalSnapshotError},
 	})
 }
 
@@ -50,7 +51,7 @@ const (
 )
 
 func marshalDownloadError(p uintptr) (interface{}, error) {
-	return DownloadError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return DownloadError(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for DownloadError.
@@ -67,6 +68,26 @@ func (d DownloadError) String() string {
 	}
 }
 
+// DownloadErrorQuark gets the quark for the domain of download errors.
+//
+// The function returns the following values:
+//
+//   - quark: download error domain.
+//
+func DownloadErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_download_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+	type _ = glib.Quark
+	type _ = uint32
+
+	return _quark
+}
+
 // JavascriptError: enum values used to denote errors happening when executing
 // JavaScript.
 type JavascriptError C.gint
@@ -75,20 +96,50 @@ const (
 	// JavascriptErrorScriptFailed: exception was raised in JavaScript
 	// execution.
 	JavascriptErrorScriptFailed JavascriptError = 699
+	// JavascriptErrorInvalidParameter: unsupported parameter has been used to
+	// call and async function from API. Since 2.40.
+	JavascriptErrorInvalidParameter JavascriptError = 600
+	// JavascriptErrorInvalidResult: result of JavaScript execution could not be
+	// returned. Since 2.40.
+	JavascriptErrorInvalidResult JavascriptError = 601
 )
 
 func marshalJavascriptError(p uintptr) (interface{}, error) {
-	return JavascriptError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return JavascriptError(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for JavascriptError.
 func (j JavascriptError) String() string {
 	switch j {
 	case JavascriptErrorScriptFailed:
-		return "Failed"
+		return "ScriptFailed"
+	case JavascriptErrorInvalidParameter:
+		return "InvalidParameter"
+	case JavascriptErrorInvalidResult:
+		return "InvalidResult"
 	default:
 		return fmt.Sprintf("JavascriptError(%d)", j)
 	}
+}
+
+// JavascriptErrorQuark gets the quark for the domain of JavaScript errors.
+//
+// The function returns the following values:
+//
+//   - quark: javaScript error domain.
+//
+func JavascriptErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_javascript_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+	type _ = glib.Quark
+	type _ = uint32
+
+	return _quark
 }
 
 // NetworkError: enum values used to denote the various network errors.
@@ -108,7 +159,7 @@ const (
 )
 
 func marshalNetworkError(p uintptr) (interface{}, error) {
-	return NetworkError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return NetworkError(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for NetworkError.
@@ -129,8 +180,27 @@ func (n NetworkError) String() string {
 	}
 }
 
-// PluginError: enum values used to denote the various plugin and multimedia
-// errors.
+// NetworkErrorQuark gets the quark for the domain of networking errors.
+//
+// The function returns the following values:
+//
+//   - quark: network error domain.
+//
+func NetworkErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_network_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+	type _ = glib.Quark
+	type _ = uint32
+
+	return _quark
+}
+
+// PluginError: enum values used to denote the various plugin and media errors.
 type PluginError C.gint
 
 const (
@@ -154,7 +224,7 @@ const (
 )
 
 func marshalPluginError(p uintptr) (interface{}, error) {
-	return PluginError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return PluginError(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for PluginError.
@@ -177,6 +247,26 @@ func (p PluginError) String() string {
 	}
 }
 
+// PluginErrorQuark gets the quark for the domain of plug-in errors.
+//
+// The function returns the following values:
+//
+//   - quark: plug-in error domain.
+//
+func PluginErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_plugin_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+	type _ = glib.Quark
+	type _ = uint32
+
+	return _quark
+}
+
 // PolicyError: enum values used to denote the various policy errors.
 type PolicyError C.gint
 
@@ -195,7 +285,7 @@ const (
 )
 
 func marshalPolicyError(p uintptr) (interface{}, error) {
-	return PolicyError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return PolicyError(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for PolicyError.
@@ -216,6 +306,26 @@ func (p PolicyError) String() string {
 	}
 }
 
+// PolicyErrorQuark gets the quark for the domain of policy errors.
+//
+// The function returns the following values:
+//
+//   - quark: policy error domain.
+//
+func PolicyErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_policy_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+	type _ = glib.Quark
+	type _ = uint32
+
+	return _quark
+}
+
 // PrintError: enum values used to denote the various print errors.
 type PrintError C.gint
 
@@ -229,7 +339,7 @@ const (
 )
 
 func marshalPrintError(p uintptr) (interface{}, error) {
-	return PrintError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return PrintError(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for PrintError.
@@ -246,6 +356,26 @@ func (p PrintError) String() string {
 	}
 }
 
+// PrintErrorQuark gets the quark for the domain of printing errors.
+//
+// The function returns the following values:
+//
+//   - quark: print error domain.
+//
+func PrintErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_print_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+	type _ = glib.Quark
+	type _ = uint32
+
+	return _quark
+}
+
 // SnapshotError: enum values used to denote errors happening when creating
 // snapshots of KitWebView.
 type SnapshotError C.gint
@@ -257,7 +387,7 @@ const (
 )
 
 func marshalSnapshotError(p uintptr) (interface{}, error) {
-	return SnapshotError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return SnapshotError(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for SnapshotError.
@@ -268,4 +398,45 @@ func (s SnapshotError) String() string {
 	default:
 		return fmt.Sprintf("SnapshotError(%d)", s)
 	}
+}
+
+// SnapshotErrorQuark gets the quark for the domain of page snapshot errors.
+//
+// The function returns the following values:
+//
+//   - quark: snapshot error domain.
+//
+func SnapshotErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_snapshot_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+	type _ = glib.Quark
+	type _ = uint32
+
+	return _quark
+}
+
+// UserContentFilterErrorQuark gets the quark for the domain of user content
+// filter errors.
+//
+// The function returns the following values:
+//
+//   - quark: user content filter error domain.
+//
+func UserContentFilterErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
+
+	_cret = C.webkit_user_content_filter_error_quark()
+
+	var _quark glib.Quark // out
+
+	_quark = uint32(_cret)
+	type _ = glib.Quark
+	type _ = uint32
+
+	return _quark
 }

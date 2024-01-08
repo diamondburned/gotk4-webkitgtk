@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -14,12 +14,14 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitContextMenuActions.go.
-var GTypeContextMenuAction = externglib.Type(C.webkit_context_menu_action_get_type())
+// GType values.
+var (
+	GTypeContextMenuAction = coreglib.Type(C.webkit_context_menu_action_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeContextMenuAction, F: marshalContextMenuAction},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeContextMenuAction, F: marshalContextMenuAction},
 	})
 }
 
@@ -140,7 +142,7 @@ const (
 )
 
 func marshalContextMenuAction(p uintptr) (interface{}, error) {
-	return ContextMenuAction(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return ContextMenuAction(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for ContextMenuAction.

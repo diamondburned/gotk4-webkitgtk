@@ -7,26 +7,38 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
-// extern char* _gotk4_soup2_AuthDomainClass_accepts(SoupAuthDomain*, SoupMessage*, char*);
-// extern char* _gotk4_soup2_AuthDomainClass_challenge(SoupAuthDomain*, SoupMessage*);
-// extern gboolean _gotk4_soup2_AuthDomainClass_check_password(SoupAuthDomain*, SoupMessage*, char*, char*);
-// extern gboolean _gotk4_soup2_AuthDomainFilter(SoupAuthDomain*, SoupMessage*, gpointer);
-// extern gboolean _gotk4_soup2_AuthDomainGenericAuthCallback(SoupAuthDomain*, SoupMessage*, char*, gpointer);
 // extern void callbackDelete(gpointer);
+// extern gboolean _gotk4_soup2_AuthDomainGenericAuthCallback(SoupAuthDomain*, SoupMessage*, char*, gpointer);
+// extern gboolean _gotk4_soup2_AuthDomainFilter(SoupAuthDomain*, SoupMessage*, gpointer);
+// extern gboolean _gotk4_soup2_AuthDomainClass_check_password(SoupAuthDomain*, SoupMessage*, char*, char*);
+// extern char* _gotk4_soup2_AuthDomainClass_challenge(SoupAuthDomain*, SoupMessage*);
+// extern char* _gotk4_soup2_AuthDomainClass_accepts(SoupAuthDomain*, SoupMessage*, char*);
+// char* _gotk4_soup2_AuthDomain_virtual_accepts(void* fnptr, SoupAuthDomain* arg0, SoupMessage* arg1, char* arg2) {
+//   return ((char* (*)(SoupAuthDomain*, SoupMessage*, char*))(fnptr))(arg0, arg1, arg2);
+// };
+// char* _gotk4_soup2_AuthDomain_virtual_challenge(void* fnptr, SoupAuthDomain* arg0, SoupMessage* arg1) {
+//   return ((char* (*)(SoupAuthDomain*, SoupMessage*))(fnptr))(arg0, arg1);
+// };
+// gboolean _gotk4_soup2_AuthDomain_virtual_check_password(void* fnptr, SoupAuthDomain* arg0, SoupMessage* arg1, char* arg2, char* arg3) {
+//   return ((gboolean (*)(SoupAuthDomain*, SoupMessage*, char*, char*))(fnptr))(arg0, arg1, arg2, arg3);
+// };
 import "C"
 
-// glib.Type values for soup-auth-domain.go.
-var GTypeAuthDomain = externglib.Type(C.soup_auth_domain_get_type())
+// GType values.
+var (
+	GTypeAuthDomain = coreglib.Type(C.soup_auth_domain_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeAuthDomain, F: marshalAuthDomain},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeAuthDomain, F: marshalAuthDomain},
 	})
 }
 
@@ -38,8 +50,8 @@ const AUTH_DOMAIN_ADD_PATH = "add-path"
 // AuthDomainFilter for the domain.).
 const AUTH_DOMAIN_FILTER = "filter"
 
-// AUTH_DOMAIN_FILTER_DATA alias for the AuthDomain:filter-data property. (Data
-// to pass to the AuthDomainFilter.).
+// AUTH_DOMAIN_FILTER_DATA alias for the AuthDomain:filter-data property.
+// (Data to pass to the AuthDomainFilter.).
 const AUTH_DOMAIN_FILTER_DATA = "filter-data"
 
 // AUTH_DOMAIN_GENERIC_AUTH_CALLBACK alias for the
@@ -67,48 +79,6 @@ const AUTH_DOMAIN_REMOVE_PATH = "remove-path"
 // soup_auth_domain_set_filter() for details.
 type AuthDomainFilter func(domain AuthDomainer, msg *Message) (ok bool)
 
-//export _gotk4_soup2_AuthDomainFilter
-func _gotk4_soup2_AuthDomainFilter(arg1 *C.SoupAuthDomain, arg2 *C.SoupMessage, arg3 C.gpointer) (cret C.gboolean) {
-	var fn AuthDomainFilter
-	{
-		v := gbox.Get(uintptr(arg3))
-		if v == nil {
-			panic(`callback not found`)
-		}
-		fn = v.(AuthDomainFilter)
-	}
-
-	var _domain AuthDomainer // out
-	var _msg *Message        // out
-
-	{
-		objptr := unsafe.Pointer(arg1)
-		if objptr == nil {
-			panic("object of type soup.AuthDomainer is nil")
-		}
-
-		object := externglib.Take(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
-			_, ok := obj.(AuthDomainer)
-			return ok
-		})
-		rv, ok := casted.(AuthDomainer)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.AuthDomainer")
-		}
-		_domain = rv
-	}
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg2)))
-
-	ok := fn(_domain, _msg)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
 // AuthDomainGenericAuthCallback: prototype for a AuthDomain generic
 // authentication callback.
 //
@@ -126,60 +96,16 @@ func _gotk4_soup2_AuthDomainFilter(arg1 *C.SoupAuthDomain, arg2 *C.SoupMessage, 
 // considering.
 type AuthDomainGenericAuthCallback func(domain AuthDomainer, msg *Message, username string) (ok bool)
 
-//export _gotk4_soup2_AuthDomainGenericAuthCallback
-func _gotk4_soup2_AuthDomainGenericAuthCallback(arg1 *C.SoupAuthDomain, arg2 *C.SoupMessage, arg3 *C.char, arg4 C.gpointer) (cret C.gboolean) {
-	var fn AuthDomainGenericAuthCallback
-	{
-		v := gbox.Get(uintptr(arg4))
-		if v == nil {
-			panic(`callback not found`)
-		}
-		fn = v.(AuthDomainGenericAuthCallback)
-	}
-
-	var _domain AuthDomainer // out
-	var _msg *Message        // out
-	var _username string     // out
-
-	{
-		objptr := unsafe.Pointer(arg1)
-		if objptr == nil {
-			panic("object of type soup.AuthDomainer is nil")
-		}
-
-		object := externglib.Take(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
-			_, ok := obj.(AuthDomainer)
-			return ok
-		})
-		rv, ok := casted.(AuthDomainer)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.AuthDomainer")
-		}
-		_domain = rv
-	}
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg2)))
-	_username = C.GoString((*C.gchar)(unsafe.Pointer(arg3)))
-
-	ok := fn(_domain, _msg, _username)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-// AuthDomainOverrider contains methods that are overridable.
-type AuthDomainOverrider interface {
+// AuthDomainOverrides contains methods that are overridable.
+type AuthDomainOverrides struct {
 	// The function takes the following parameters:
 	//
-	//    - msg
-	//    - header
+	//   - msg
+	//   - header
 	//
 	// The function returns the following values:
 	//
-	Accepts(msg *Message, header string) string
+	Accepts func(msg *Message, header string) string
 	// Challenge adds a "WWW-Authenticate" or "Proxy-Authenticate" header to
 	// msg, requesting that the client authenticate, and sets msg's status
 	// accordingly.
@@ -189,35 +115,43 @@ type AuthDomainOverrider interface {
 	//
 	// The function takes the following parameters:
 	//
-	//    - msg: Message.
+	//   - msg: Message.
 	//
 	// The function returns the following values:
 	//
-	Challenge(msg *Message) string
-	// CheckPassword checks if msg authenticates to domain via username and
-	// password. This would normally be called from a
+	Challenge func(msg *Message) string
+	// CheckPassword checks if msg authenticates to domain via
+	// username and password. This would normally be called from a
 	// AuthDomainGenericAuthCallback.
 	//
 	// The function takes the following parameters:
 	//
-	//    - msg: Message.
-	//    - username: username.
-	//    - password: password.
+	//   - msg: Message.
+	//   - username: username.
+	//   - password: password.
 	//
 	// The function returns the following values:
 	//
-	//    - ok: whether or not the message is authenticated.
+	//   - ok: whether or not the message is authenticated.
 	//
-	CheckPassword(msg *Message, username, password string) bool
+	CheckPassword func(msg *Message, username, password string) bool
+}
+
+func defaultAuthDomainOverrides(v *AuthDomain) AuthDomainOverrides {
+	return AuthDomainOverrides{
+		Accepts:       v.accepts,
+		Challenge:     v.challenge,
+		CheckPassword: v.checkPassword,
+	}
 }
 
 type AuthDomain struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 }
 
 var (
-	_ externglib.Objector = (*AuthDomain)(nil)
+	_ coreglib.Objector = (*AuthDomain)(nil)
 )
 
 // AuthDomainer describes types inherited from class AuthDomain.
@@ -225,108 +159,50 @@ var (
 // To get the original type, the caller must assert this to an interface or
 // another type.
 type AuthDomainer interface {
-	externglib.Objector
+	coreglib.Objector
 	baseAuthDomain() *AuthDomain
 }
 
 var _ AuthDomainer = (*AuthDomain)(nil)
 
-func classInitAuthDomainer(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+func init() {
+	coreglib.RegisterClassInfo[*AuthDomain, *AuthDomainClass, AuthDomainOverrides](
+		GTypeAuthDomain,
+		initAuthDomainClass,
+		wrapAuthDomain,
+		defaultAuthDomainOverrides,
+	)
+}
 
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+func initAuthDomainClass(gclass unsafe.Pointer, overrides AuthDomainOverrides, classInitFunc func(*AuthDomainClass)) {
+	pclass := (*C.SoupAuthDomainClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeAuthDomain))))
 
-	goval := gbox.Get(uintptr(data))
-	pclass := (*C.SoupAuthDomainClass)(unsafe.Pointer(gclassPtr))
-	// gclass := (*C.GTypeClass)(unsafe.Pointer(gclassPtr))
-	// pclass := (*C.SoupAuthDomainClass)(unsafe.Pointer(C.g_type_class_peek_parent(gclass)))
-
-	if _, ok := goval.(interface {
-		Accepts(msg *Message, header string) string
-	}); ok {
+	if overrides.Accepts != nil {
 		pclass.accepts = (*[0]byte)(C._gotk4_soup2_AuthDomainClass_accepts)
 	}
 
-	if _, ok := goval.(interface{ Challenge(msg *Message) string }); ok {
+	if overrides.Challenge != nil {
 		pclass.challenge = (*[0]byte)(C._gotk4_soup2_AuthDomainClass_challenge)
 	}
 
-	if _, ok := goval.(interface {
-		CheckPassword(msg *Message, username, password string) bool
-	}); ok {
+	if overrides.CheckPassword != nil {
 		pclass.check_password = (*[0]byte)(C._gotk4_soup2_AuthDomainClass_check_password)
 	}
-}
 
-//export _gotk4_soup2_AuthDomainClass_accepts
-func _gotk4_soup2_AuthDomainClass_accepts(arg0 *C.SoupAuthDomain, arg1 *C.SoupMessage, arg2 *C.char) (cret *C.char) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		Accepts(msg *Message, header string) string
-	})
-
-	var _msg *Message  // out
-	var _header string // out
-
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-	_header = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-
-	utf8 := iface.Accepts(_msg, _header)
-
-	cret = (*C.char)(unsafe.Pointer(C.CString(utf8)))
-
-	return cret
-}
-
-//export _gotk4_soup2_AuthDomainClass_challenge
-func _gotk4_soup2_AuthDomainClass_challenge(arg0 *C.SoupAuthDomain, arg1 *C.SoupMessage) (cret *C.char) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ Challenge(msg *Message) string })
-
-	var _msg *Message // out
-
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-
-	utf8 := iface.Challenge(_msg)
-
-	cret = (*C.char)(unsafe.Pointer(C.CString(utf8)))
-
-	return cret
-}
-
-//export _gotk4_soup2_AuthDomainClass_check_password
-func _gotk4_soup2_AuthDomainClass_check_password(arg0 *C.SoupAuthDomain, arg1 *C.SoupMessage, arg2 *C.char, arg3 *C.char) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		CheckPassword(msg *Message, username, password string) bool
-	})
-
-	var _msg *Message    // out
-	var _username string // out
-	var _password string // out
-
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-	_username = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-	_password = C.GoString((*C.gchar)(unsafe.Pointer(arg3)))
-
-	ok := iface.CheckPassword(_msg, _username, _password)
-
-	if ok {
-		cret = C.TRUE
+	if classInitFunc != nil {
+		class := (*AuthDomainClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
 	}
-
-	return cret
 }
 
-func wrapAuthDomain(obj *externglib.Object) *AuthDomain {
+func wrapAuthDomain(obj *coreglib.Object) *AuthDomain {
 	return &AuthDomain{
 		Object: obj,
 	}
 }
 
 func marshalAuthDomain(p uintptr) (interface{}, error) {
-	return wrapAuthDomain(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapAuthDomain(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 func (domain *AuthDomain) baseAuthDomain() *AuthDomain {
@@ -346,20 +222,20 @@ func BaseAuthDomain(obj AuthDomainer) *AuthDomain {
 //
 // The function takes the following parameters:
 //
-//    - msg: Message.
+//   - msg: Message.
 //
 // The function returns the following values:
 //
-//    - utf8 (optional): username that msg has authenticated as, if in fact it
-//      has authenticated. NULL otherwise.
+//   - utf8 (optional): username that msg has authenticated as, if in fact it
+//     has authenticated. NULL otherwise.
 //
 func (domain *AuthDomain) Accepts(msg *Message) string {
 	var _arg0 *C.SoupAuthDomain // out
 	var _arg1 *C.SoupMessage    // out
 	var _cret *C.char           // in
 
-	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(externglib.InternObject(domain).Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(coreglib.InternObject(domain).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_auth_domain_accepts(_arg0, _arg1)
 	runtime.KeepAlive(domain)
@@ -375,8 +251,8 @@ func (domain *AuthDomain) Accepts(msg *Message) string {
 	return _utf8
 }
 
-// AddPath adds path to domain, such that requests under path on domain's server
-// will require authentication (unless overridden by
+// AddPath adds path to domain, such that requests under path on
+// domain's server will require authentication (unless overridden by
 // soup_auth_domain_remove_path() or soup_auth_domain_set_filter()).
 //
 // You can also add paths by setting the SOUP_AUTH_DOMAIN_ADD_PATH property,
@@ -384,13 +260,13 @@ func (domain *AuthDomain) Accepts(msg *Message) string {
 //
 // The function takes the following parameters:
 //
-//    - path to add to domain.
+//   - path to add to domain.
 //
 func (domain *AuthDomain) AddPath(path string) {
 	var _arg0 *C.SoupAuthDomain // out
 	var _arg1 *C.char           // out
 
-	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(externglib.InternObject(domain).Native()))
+	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(coreglib.InternObject(domain).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -406,14 +282,14 @@ func (domain *AuthDomain) AddPath(path string) {
 //
 // The function takes the following parameters:
 //
-//    - msg: Message.
+//   - msg: Message.
 //
 func (domain *AuthDomain) Challenge(msg *Message) {
 	var _arg0 *C.SoupAuthDomain // out
 	var _arg1 *C.SoupMessage    // out
 
-	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(externglib.InternObject(domain).Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(coreglib.InternObject(domain).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	C.soup_auth_domain_challenge(_arg0, _arg1)
 	runtime.KeepAlive(domain)
@@ -425,13 +301,13 @@ func (domain *AuthDomain) Challenge(msg *Message) {
 //
 // The function takes the following parameters:
 //
-//    - msg: Message.
-//    - username: username.
-//    - password: password.
+//   - msg: Message.
+//   - username: username.
+//   - password: password.
 //
 // The function returns the following values:
 //
-//    - ok: whether or not the message is authenticated.
+//   - ok: whether or not the message is authenticated.
 //
 func (domain *AuthDomain) CheckPassword(msg *Message, username, password string) bool {
 	var _arg0 *C.SoupAuthDomain // out
@@ -440,8 +316,8 @@ func (domain *AuthDomain) CheckPassword(msg *Message, username, password string)
 	var _arg3 *C.char           // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(externglib.InternObject(domain).Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(coreglib.InternObject(domain).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(username)))
 	defer C.free(unsafe.Pointer(_arg2))
 	_arg3 = (*C.char)(unsafe.Pointer(C.CString(password)))
@@ -462,27 +338,27 @@ func (domain *AuthDomain) CheckPassword(msg *Message, username, password string)
 	return _ok
 }
 
-// Covers checks if domain requires msg to be authenticated (according to its
-// paths and filter function). This does not actually look at whether msg
+// Covers checks if domain requires msg to be authenticated (according to
+// its paths and filter function). This does not actually look at whether msg
 // <emphasis>is</emphasis> authenticated, merely whether or not it needs to be.
 //
 // This is used by Server internally and is probably of no use to anyone else.
 //
 // The function takes the following parameters:
 //
-//    - msg: Message.
+//   - msg: Message.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if domain requires msg to be authenticated.
+//   - ok: TRUE if domain requires msg to be authenticated.
 //
 func (domain *AuthDomain) Covers(msg *Message) bool {
 	var _arg0 *C.SoupAuthDomain // out
 	var _arg1 *C.SoupMessage    // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(externglib.InternObject(domain).Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(coreglib.InternObject(domain).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_auth_domain_covers(_arg0, _arg1)
 	runtime.KeepAlive(domain)
@@ -501,13 +377,13 @@ func (domain *AuthDomain) Covers(msg *Message) bool {
 //
 // The function returns the following values:
 //
-//    - utf8 domain's realm.
+//   - utf8 domain's realm.
 //
 func (domain *AuthDomain) Realm() string {
 	var _arg0 *C.SoupAuthDomain // out
 	var _cret *C.char           // in
 
-	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(externglib.InternObject(domain).Native()))
+	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(coreglib.InternObject(domain).Native()))
 
 	_cret = C.soup_auth_domain_get_realm(_arg0)
 	runtime.KeepAlive(domain)
@@ -522,8 +398,8 @@ func (domain *AuthDomain) Realm() string {
 // RemovePath removes path from domain, such that requests under path on
 // domain's server will NOT require authentication.
 //
-// This is not simply an undo-er for soup_auth_domain_add_path(); it can be used
-// to "carve out" a subtree that does not require authentication inside a
+// This is not simply an undo-er for soup_auth_domain_add_path(); it can be
+// used to "carve out" a subtree that does not require authentication inside a
 // hierarchy that does. Note also that unlike with soup_auth_domain_add_path(),
 // this cannot be overridden by adding a filter, as filters can only bypass
 // authentication that would otherwise be required, not require it where it
@@ -535,13 +411,13 @@ func (domain *AuthDomain) Realm() string {
 //
 // The function takes the following parameters:
 //
-//    - path to remove from domain.
+//   - path to remove from domain.
 //
 func (domain *AuthDomain) RemovePath(path string) {
 	var _arg0 *C.SoupAuthDomain // out
 	var _arg1 *C.char           // out
 
-	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(externglib.InternObject(domain).Native()))
+	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(coreglib.InternObject(domain).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -560,12 +436,12 @@ func (domain *AuthDomain) RemovePath(path string) {
 // authentication, or FALSE if authentication is unnecessary for this request.
 //
 // To help prevent security holes, your filter should return TRUE by default,
-// and only return FALSE under specifically-tested circumstances, rather than
-// the other way around. Eg, in the example above, where you want to
+// and only return FALSE under specifically-tested circumstances, rather
+// than the other way around. Eg, in the example above, where you want to
 // authenticate PUTs but not GETs, you should check if the method is GET and
 // return FALSE in that case, and then return TRUE for all other methods (rather
-// than returning TRUE for PUT and FALSE for all other methods). This way if it
-// turned out (now or later) that some paths supported additional methods
+// than returning TRUE for PUT and FALSE for all other methods). This way if
+// it turned out (now or later) that some paths supported additional methods
 // besides GET and PUT, those methods would default to being NOT allowed for
 // unauthenticated users.
 //
@@ -575,7 +451,7 @@ func (domain *AuthDomain) RemovePath(path string) {
 //
 // The function takes the following parameters:
 //
-//    - filter: auth filter for domain.
+//   - filter: auth filter for domain.
 //
 func (domain *AuthDomain) SetFilter(filter AuthDomainFilter) {
 	var _arg0 *C.SoupAuthDomain      // out
@@ -583,7 +459,7 @@ func (domain *AuthDomain) SetFilter(filter AuthDomainFilter) {
 	var _arg2 C.gpointer
 	var _arg3 C.GDestroyNotify
 
-	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(externglib.InternObject(domain).Native()))
+	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(coreglib.InternObject(domain).Native()))
 	_arg1 = (*[0]byte)(C._gotk4_soup2_AuthDomainFilter)
 	_arg2 = C.gpointer(gbox.Assign(filter))
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
@@ -594,14 +470,14 @@ func (domain *AuthDomain) SetFilter(filter AuthDomainFilter) {
 }
 
 // SetGenericAuthCallback sets auth_callback as an authentication-handling
-// callback for domain. Whenever a request comes in to domain which cannot be
-// authenticated via a domain-specific auth callback (eg,
+// callback for domain. Whenever a request comes in to domain which
+// cannot be authenticated via a domain-specific auth callback (eg,
 // AuthDomainDigestAuthCallback), the generic auth callback will be invoked. See
 // AuthDomainGenericAuthCallback for information on what the callback should do.
 //
 // The function takes the following parameters:
 //
-//    - authCallback: auth callback.
+//   - authCallback: auth callback.
 //
 func (domain *AuthDomain) SetGenericAuthCallback(authCallback AuthDomainGenericAuthCallback) {
 	var _arg0 *C.SoupAuthDomain                   // out
@@ -609,7 +485,7 @@ func (domain *AuthDomain) SetGenericAuthCallback(authCallback AuthDomainGenericA
 	var _arg2 C.gpointer
 	var _arg3 C.GDestroyNotify
 
-	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(externglib.InternObject(domain).Native()))
+	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(coreglib.InternObject(domain).Native()))
 	_arg1 = (*[0]byte)(C._gotk4_soup2_AuthDomainGenericAuthCallback)
 	_arg2 = C.gpointer(gbox.Assign(authCallback))
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
@@ -621,8 +497,8 @@ func (domain *AuthDomain) SetGenericAuthCallback(authCallback AuthDomainGenericA
 
 // The function takes the following parameters:
 //
-//    - msg
-//    - username
+//   - msg
+//   - username
 //
 // The function returns the following values:
 //
@@ -632,8 +508,8 @@ func (domain *AuthDomain) TryGenericAuthCallback(msg *Message, username string) 
 	var _arg2 *C.char           // out
 	var _cret C.gboolean        // in
 
-	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(externglib.InternObject(domain).Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(coreglib.InternObject(domain).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(username)))
 	defer C.free(unsafe.Pointer(_arg2))
 
@@ -649,4 +525,127 @@ func (domain *AuthDomain) TryGenericAuthCallback(msg *Message, username string) 
 	}
 
 	return _ok
+}
+
+// The function takes the following parameters:
+//
+//   - msg
+//   - header
+//
+// The function returns the following values:
+//
+func (domain *AuthDomain) accepts(msg *Message, header string) string {
+	gclass := (*C.SoupAuthDomainClass)(coreglib.PeekParentClass(domain))
+	fnarg := gclass.accepts
+
+	var _arg0 *C.SoupAuthDomain // out
+	var _arg1 *C.SoupMessage    // out
+	var _arg2 *C.char           // out
+	var _cret *C.char           // in
+
+	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(coreglib.InternObject(domain).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+	_arg2 = (*C.char)(unsafe.Pointer(C.CString(header)))
+	defer C.free(unsafe.Pointer(_arg2))
+
+	_cret = C._gotk4_soup2_AuthDomain_virtual_accepts(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(header)
+
+	var _utf8 string // out
+
+	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	defer C.free(unsafe.Pointer(_cret))
+
+	return _utf8
+}
+
+// Challenge adds a "WWW-Authenticate" or "Proxy-Authenticate" header to msg,
+// requesting that the client authenticate, and sets msg's status accordingly.
+//
+// This is used by Server internally and is probably of no use to anyone else.
+//
+// The function takes the following parameters:
+//
+//   - msg: Message.
+//
+// The function returns the following values:
+//
+func (domain *AuthDomain) challenge(msg *Message) string {
+	gclass := (*C.SoupAuthDomainClass)(coreglib.PeekParentClass(domain))
+	fnarg := gclass.challenge
+
+	var _arg0 *C.SoupAuthDomain // out
+	var _arg1 *C.SoupMessage    // out
+	var _cret *C.char           // in
+
+	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(coreglib.InternObject(domain).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+
+	_cret = C._gotk4_soup2_AuthDomain_virtual_challenge(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(msg)
+
+	var _utf8 string // out
+
+	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	defer C.free(unsafe.Pointer(_cret))
+
+	return _utf8
+}
+
+// checkPassword checks if msg authenticates to domain via username and
+// password. This would normally be called from a AuthDomainGenericAuthCallback.
+//
+// The function takes the following parameters:
+//
+//   - msg: Message.
+//   - username: username.
+//   - password: password.
+//
+// The function returns the following values:
+//
+//   - ok: whether or not the message is authenticated.
+//
+func (domain *AuthDomain) checkPassword(msg *Message, username, password string) bool {
+	gclass := (*C.SoupAuthDomainClass)(coreglib.PeekParentClass(domain))
+	fnarg := gclass.check_password
+
+	var _arg0 *C.SoupAuthDomain // out
+	var _arg1 *C.SoupMessage    // out
+	var _arg2 *C.char           // out
+	var _arg3 *C.char           // out
+	var _cret C.gboolean        // in
+
+	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(coreglib.InternObject(domain).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+	_arg2 = (*C.char)(unsafe.Pointer(C.CString(username)))
+	defer C.free(unsafe.Pointer(_arg2))
+	_arg3 = (*C.char)(unsafe.Pointer(C.CString(password)))
+	defer C.free(unsafe.Pointer(_arg3))
+
+	_cret = C._gotk4_soup2_AuthDomain_virtual_check_password(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(domain)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(username)
+	runtime.KeepAlive(password)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// AuthDomainClass: instance of this type is always passed by reference.
+type AuthDomainClass struct {
+	*authDomainClass
+}
+
+// authDomainClass is the struct that's finalized.
+type authDomainClass struct {
+	native *C.SoupAuthDomainClass
 }

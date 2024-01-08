@@ -7,7 +7,8 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4-webkitgtk/pkg/soup/v2"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -15,19 +16,25 @@ import (
 // #include <libsoup/soup-gnome.h>
 import "C"
 
-// glib.Type values for soup-cookie-jar-sqlite.go.
-var GTypeCookieJarSqlite = externglib.Type(C.soup_cookie_jar_sqlite_get_type())
+// GType values.
+var (
+	GTypeCookieJarSqlite = coreglib.Type(C.soup_cookie_jar_sqlite_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeCookieJarSqlite, F: marshalCookieJarSqlite},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeCookieJarSqlite, F: marshalCookieJarSqlite},
 	})
 }
 
 const COOKIE_JAR_SQLITE_FILENAME = "filename"
 
-// CookieJarSqliteOverrider contains methods that are overridable.
-type CookieJarSqliteOverrider interface {
+// CookieJarSqliteOverrides contains methods that are overridable.
+type CookieJarSqliteOverrides struct {
+}
+
+func defaultCookieJarSqliteOverrides(v *CookieJarSqlite) CookieJarSqliteOverrides {
+	return CookieJarSqliteOverrides{}
 }
 
 type CookieJarSqlite struct {
@@ -36,18 +43,26 @@ type CookieJarSqlite struct {
 }
 
 var (
-	_ externglib.Objector = (*CookieJarSqlite)(nil)
+	_ coreglib.Objector = (*CookieJarSqlite)(nil)
 )
 
-func classInitCookieJarSqliter(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*CookieJarSqlite, *CookieJarSqliteClass, CookieJarSqliteOverrides](
+		GTypeCookieJarSqlite,
+		initCookieJarSqliteClass,
+		wrapCookieJarSqlite,
+		defaultCookieJarSqliteOverrides,
+	)
 }
 
-func wrapCookieJarSqlite(obj *externglib.Object) *CookieJarSqlite {
+func initCookieJarSqliteClass(gclass unsafe.Pointer, overrides CookieJarSqliteOverrides, classInitFunc func(*CookieJarSqliteClass)) {
+	if classInitFunc != nil {
+		class := (*CookieJarSqliteClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapCookieJarSqlite(obj *coreglib.Object) *CookieJarSqlite {
 	return &CookieJarSqlite{
 		CookieJarDB: soup.CookieJarDB{
 			CookieJar: soup.CookieJar{
@@ -61,13 +76,13 @@ func wrapCookieJarSqlite(obj *externglib.Object) *CookieJarSqlite {
 }
 
 func marshalCookieJarSqlite(p uintptr) (interface{}, error) {
-	return wrapCookieJarSqlite(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapCookieJarSqlite(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // The function takes the following parameters:
 //
-//    - filename
-//    - readOnly
+//   - filename
+//   - readOnly
 //
 // The function returns the following values:
 //
@@ -88,7 +103,24 @@ func NewCookieJarSqlite(filename string, readOnly bool) *CookieJarSqlite {
 
 	var _cookieJarSqlite *CookieJarSqlite // out
 
-	_cookieJarSqlite = wrapCookieJarSqlite(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_cookieJarSqlite = wrapCookieJarSqlite(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _cookieJarSqlite
+}
+
+// CookieJarSqliteClass: instance of this type is always passed by reference.
+type CookieJarSqliteClass struct {
+	*cookieJarSqliteClass
+}
+
+// cookieJarSqliteClass is the struct that's finalized.
+type cookieJarSqliteClass struct {
+	native *C.SoupCookieJarSqliteClass
+}
+
+func (c *CookieJarSqliteClass) ParentClass() *soup.CookieJarDBClass {
+	valptr := &c.native.parent_class
+	var _v *soup.CookieJarDBClass // out
+	_v = (*soup.CookieJarDBClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
+	return _v
 }

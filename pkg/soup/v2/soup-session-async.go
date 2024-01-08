@@ -5,7 +5,8 @@ package soup
 import (
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -13,17 +14,23 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup-session-async.go.
-var GTypeSessionAsync = externglib.Type(C.soup_session_async_get_type())
+// GType values.
+var (
+	GTypeSessionAsync = coreglib.Type(C.soup_session_async_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeSessionAsync, F: marshalSessionAsync},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeSessionAsync, F: marshalSessionAsync},
 	})
 }
 
-// SessionAsyncOverrider contains methods that are overridable.
-type SessionAsyncOverrider interface {
+// SessionAsyncOverrides contains methods that are overridable.
+type SessionAsyncOverrides struct {
+}
+
+func defaultSessionAsyncOverrides(v *SessionAsync) SessionAsyncOverrides {
+	return SessionAsyncOverrides{}
 }
 
 type SessionAsync struct {
@@ -32,18 +39,26 @@ type SessionAsync struct {
 }
 
 var (
-	_ externglib.Objector = (*SessionAsync)(nil)
+	_ coreglib.Objector = (*SessionAsync)(nil)
 )
 
-func classInitSessionAsyncer(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*SessionAsync, *SessionAsyncClass, SessionAsyncOverrides](
+		GTypeSessionAsync,
+		initSessionAsyncClass,
+		wrapSessionAsync,
+		defaultSessionAsyncOverrides,
+	)
 }
 
-func wrapSessionAsync(obj *externglib.Object) *SessionAsync {
+func initSessionAsyncClass(gclass unsafe.Pointer, overrides SessionAsyncOverrides, classInitFunc func(*SessionAsyncClass)) {
+	if classInitFunc != nil {
+		class := (*SessionAsyncClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapSessionAsync(obj *coreglib.Object) *SessionAsync {
 	return &SessionAsync{
 		Session: Session{
 			Object: obj,
@@ -52,7 +67,7 @@ func wrapSessionAsync(obj *externglib.Object) *SessionAsync {
 }
 
 func marshalSessionAsync(p uintptr) (interface{}, error) {
-	return wrapSessionAsync(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapSessionAsync(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewSessionAsync creates an asynchronous Session with the default options.
@@ -63,7 +78,7 @@ func marshalSessionAsync(p uintptr) (interface{}, error) {
 //
 // The function returns the following values:
 //
-//    - sessionAsync: new session.
+//   - sessionAsync: new session.
 //
 func NewSessionAsync() *SessionAsync {
 	var _cret *C.SoupSession // in
@@ -72,7 +87,24 @@ func NewSessionAsync() *SessionAsync {
 
 	var _sessionAsync *SessionAsync // out
 
-	_sessionAsync = wrapSessionAsync(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_sessionAsync = wrapSessionAsync(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _sessionAsync
+}
+
+// SessionAsyncClass: instance of this type is always passed by reference.
+type SessionAsyncClass struct {
+	*sessionAsyncClass
+}
+
+// sessionAsyncClass is the struct that's finalized.
+type sessionAsyncClass struct {
+	native *C.SoupSessionAsyncClass
+}
+
+func (s *SessionAsyncClass) ParentClass() *SessionClass {
+	valptr := &s.native.parent_class
+	var _v *SessionClass // out
+	_v = (*SessionClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
+	return _v
 }

@@ -7,7 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -15,82 +15,111 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitPlugin.go.
-var GTypePlugin = externglib.Type(C.webkit_plugin_get_type())
+// GType values.
+var (
+	GTypePlugin = coreglib.Type(C.webkit_plugin_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypePlugin, F: marshalPlugin},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypePlugin, F: marshalPlugin},
 	})
 }
 
-// PluginOverrider contains methods that are overridable.
-type PluginOverrider interface {
+// PluginOverrides contains methods that are overridable.
+type PluginOverrides struct {
 }
 
+func defaultPluginOverrides(v *Plugin) PluginOverrides {
+	return PluginOverrides{}
+}
+
+// Plugin represents a plugin, enabling fine-grained control.
+//
+// This object represents a single plugin, found while scanning the various
+// platform plugin directories. This object can be used to get more
+// information about a plugin, and enable/disable it, allowing fine-grained
+// control of plugins. The list of available plugins can be obtained from the
+// KitWebContext, with webkit_web_context_get_plugins().
+//
+// Deprecated: since version 2.32.
 type Plugin struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 }
 
 var (
-	_ externglib.Objector = (*Plugin)(nil)
+	_ coreglib.Objector = (*Plugin)(nil)
 )
 
-func classInitPluginner(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*Plugin, *PluginClass, PluginOverrides](
+		GTypePlugin,
+		initPluginClass,
+		wrapPlugin,
+		defaultPluginOverrides,
+	)
 }
 
-func wrapPlugin(obj *externglib.Object) *Plugin {
+func initPluginClass(gclass unsafe.Pointer, overrides PluginOverrides, classInitFunc func(*PluginClass)) {
+	if classInitFunc != nil {
+		class := (*PluginClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapPlugin(obj *coreglib.Object) *Plugin {
 	return &Plugin{
 		Object: obj,
 	}
 }
 
 func marshalPlugin(p uintptr) (interface{}, error) {
-	return wrapPlugin(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapPlugin(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// Description: deprecated: since version 2.32.
+// Description: obtain the plugin description.
+//
+// Deprecated: since version 2.32.
 //
 // The function returns the following values:
 //
-//    - utf8: description of the plugin.
+//   - utf8 (optional): description, as a string.
 //
 func (plugin *Plugin) Description() string {
 	var _arg0 *C.WebKitPlugin // out
 	var _cret *C.gchar        // in
 
-	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(externglib.InternObject(plugin).Native()))
+	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(coreglib.InternObject(plugin).Native()))
 
 	_cret = C.webkit_plugin_get_description(_arg0)
 	runtime.KeepAlive(plugin)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
 
-// MIMEInfoList: get information about MIME types handled by the plugin, as a
-// list of KitMimeInfo.
+// MIMEInfoList: get information about MIME types handled by the plugin.
+//
+// Get information about MIME types handled by the plugin, as a list of
+// KitMimeInfo.
 //
 // Deprecated: since version 2.32.
 //
 // The function returns the following values:
 //
-//    - list of KitMimeInfo.
+//   - list of KitMimeInfo.
 //
 func (plugin *Plugin) MIMEInfoList() []*MIMEInfo {
 	var _arg0 *C.WebKitPlugin // out
 	var _cret *C.GList        // in
 
-	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(externglib.InternObject(plugin).Native()))
+	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(coreglib.InternObject(plugin).Native()))
 
 	_cret = C.webkit_plugin_get_mime_info_list(_arg0)
 	runtime.KeepAlive(plugin)
@@ -115,46 +144,64 @@ func (plugin *Plugin) MIMEInfoList() []*MIMEInfo {
 	return _list
 }
 
-// Name: deprecated: since version 2.32.
+// Name: obtain the plugin name.
+//
+// Deprecated: since version 2.32.
 //
 // The function returns the following values:
 //
-//    - utf8: name of the plugin.
+//   - utf8 (optional): name, as a string.
 //
 func (plugin *Plugin) Name() string {
 	var _arg0 *C.WebKitPlugin // out
 	var _cret *C.gchar        // in
 
-	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(externglib.InternObject(plugin).Native()))
+	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(coreglib.InternObject(plugin).Native()))
 
 	_cret = C.webkit_plugin_get_name(_arg0)
 	runtime.KeepAlive(plugin)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
 
-// Path: deprecated: since version 2.32.
+// Path: obtain the absolute path where the plugin is installed.
+//
+// Deprecated: since version 2.32.
 //
 // The function returns the following values:
 //
-//    - utf8: absolute path where the plugin is installed.
+//   - utf8 (optional): path, as a string.
 //
 func (plugin *Plugin) Path() string {
 	var _arg0 *C.WebKitPlugin // out
 	var _cret *C.gchar        // in
 
-	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(externglib.InternObject(plugin).Native()))
+	_arg0 = (*C.WebKitPlugin)(unsafe.Pointer(coreglib.InternObject(plugin).Native()))
 
 	_cret = C.webkit_plugin_get_path(_arg0)
 	runtime.KeepAlive(plugin)
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
+}
+
+// PluginClass: instance of this type is always passed by reference.
+type PluginClass struct {
+	*pluginClass
+}
+
+// pluginClass is the struct that's finalized.
+type pluginClass struct {
+	native *C.WebKitPluginClass
 }

@@ -4,11 +4,10 @@ package webkit2
 
 import (
 	"runtime"
-	"runtime/cgo"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -16,78 +15,103 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitFormSubmissionRequest.go.
-var GTypeFormSubmissionRequest = externglib.Type(C.webkit_form_submission_request_get_type())
+// GType values.
+var (
+	GTypeFormSubmissionRequest = coreglib.Type(C.webkit_form_submission_request_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeFormSubmissionRequest, F: marshalFormSubmissionRequest},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeFormSubmissionRequest, F: marshalFormSubmissionRequest},
 	})
 }
 
-// FormSubmissionRequestOverrider contains methods that are overridable.
-type FormSubmissionRequestOverrider interface {
+// FormSubmissionRequestOverrides contains methods that are overridable.
+type FormSubmissionRequestOverrides struct {
 }
 
+func defaultFormSubmissionRequestOverrides(v *FormSubmissionRequest) FormSubmissionRequestOverrides {
+	return FormSubmissionRequestOverrides{}
+}
+
+// FormSubmissionRequest represents a form submission request.
+//
+// When a form is about to be submitted in a KitWebView, the
+// KitWebView::submit-form signal is emitted. Its request argument
+// contains information about the text fields of the form, that are
+// typically used to store login information, returned as lists by
+// webkit_form_submission_request_list_text_fields(). You can submit the form
+// with webkit_form_submission_request_submit().
 type FormSubmissionRequest struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 }
 
 var (
-	_ externglib.Objector = (*FormSubmissionRequest)(nil)
+	_ coreglib.Objector = (*FormSubmissionRequest)(nil)
 )
 
-func classInitFormSubmissionRequester(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*FormSubmissionRequest, *FormSubmissionRequestClass, FormSubmissionRequestOverrides](
+		GTypeFormSubmissionRequest,
+		initFormSubmissionRequestClass,
+		wrapFormSubmissionRequest,
+		defaultFormSubmissionRequestOverrides,
+	)
 }
 
-func wrapFormSubmissionRequest(obj *externglib.Object) *FormSubmissionRequest {
+func initFormSubmissionRequestClass(gclass unsafe.Pointer, overrides FormSubmissionRequestOverrides, classInitFunc func(*FormSubmissionRequestClass)) {
+	if classInitFunc != nil {
+		class := (*FormSubmissionRequestClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapFormSubmissionRequest(obj *coreglib.Object) *FormSubmissionRequest {
 	return &FormSubmissionRequest{
 		Object: obj,
 	}
 }
 
 func marshalFormSubmissionRequest(p uintptr) (interface{}, error) {
-	return wrapFormSubmissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapFormSubmissionRequest(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// TextFields: get a Table with the values of the text fields contained in the
-// form associated to request. Note that fields will be missing if the form
-// contains multiple text input elements with the same name, so this function
-// does not reliably return all text fields.
+// TextFields: get the values of the text fields contained in the form
+// associated to request.
+//
+// Get a Table with the values of the text fields contained in the form
+// associated to request. Note that fields will be missing if the form contains
+// multiple text input elements with the same name, so this function does not
+// reliably return all text fields.
 //
 // Deprecated: Use webkit_form_submission_request_list_text_fields() instead.
 //
 // The function returns the following values:
 //
-//    - hashTable (optional) with the form text fields, or NULL if the form
-//      doesn't contain text fields.
+//   - hashTable (optional) with the form text fields, or NULL if the form
+//     doesn't contain text fields.
 //
-func (request *FormSubmissionRequest) TextFields() map[cgo.Handle]cgo.Handle {
+func (request *FormSubmissionRequest) TextFields() map[unsafe.Pointer]unsafe.Pointer {
 	var _arg0 *C.WebKitFormSubmissionRequest // out
 	var _cret *C.GHashTable                  // in
 
-	_arg0 = (*C.WebKitFormSubmissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitFormSubmissionRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	_cret = C.webkit_form_submission_request_get_text_fields(_arg0)
 	runtime.KeepAlive(request)
 
-	var _hashTable map[cgo.Handle]cgo.Handle // out
+	var _hashTable map[unsafe.Pointer]unsafe.Pointer // out
 
 	if _cret != nil {
-		_hashTable = make(map[cgo.Handle]cgo.Handle, gextras.HashTableSize(unsafe.Pointer(_cret)))
+		_hashTable = make(map[unsafe.Pointer]unsafe.Pointer, gextras.HashTableSize(unsafe.Pointer(_cret)))
 		gextras.MoveHashTable(unsafe.Pointer(_cret), false, func(k, v unsafe.Pointer) {
 			ksrc := *(**C.gpointer)(k)
 			vsrc := *(**C.gpointer)(v)
-			var kdst cgo.Handle // out
-			var vdst cgo.Handle // out
-			kdst = (cgo.Handle)(unsafe.Pointer(ksrc))
-			vdst = (cgo.Handle)(unsafe.Pointer(vsrc))
+			var kdst unsafe.Pointer // out
+			var vdst unsafe.Pointer // out
+			kdst = (unsafe.Pointer)(unsafe.Pointer(ksrc))
+			vdst = (unsafe.Pointer)(unsafe.Pointer(vsrc))
 			_hashTable[kdst] = vdst
 		})
 	}
@@ -99,8 +123,19 @@ func (request *FormSubmissionRequest) TextFields() map[cgo.Handle]cgo.Handle {
 func (request *FormSubmissionRequest) Submit() {
 	var _arg0 *C.WebKitFormSubmissionRequest // out
 
-	_arg0 = (*C.WebKitFormSubmissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitFormSubmissionRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	C.webkit_form_submission_request_submit(_arg0)
 	runtime.KeepAlive(request)
+}
+
+// FormSubmissionRequestClass: instance of this type is always passed by
+// reference.
+type FormSubmissionRequestClass struct {
+	*formSubmissionRequestClass
+}
+
+// formSubmissionRequestClass is the struct that's finalized.
+type formSubmissionRequestClass struct {
+	native *C.WebKitFormSubmissionRequestClass
 }

@@ -3,10 +3,10 @@
 package webkit2
 
 import (
-	"runtime"
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -14,66 +14,66 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitMediaKeySystemPermissionRequest.go.
-var GTypeMediaKeySystemPermissionRequest = externglib.Type(C.webkit_media_key_system_permission_request_get_type())
+// GType values.
+var (
+	GTypeMediaKeySystemPermissionRequest = coreglib.Type(C.webkit_media_key_system_permission_request_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeMediaKeySystemPermissionRequest, F: marshalMediaKeySystemPermissionRequest},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeMediaKeySystemPermissionRequest, F: marshalMediaKeySystemPermissionRequest},
 	})
 }
 
-// MediaKeySystemPermissionGetName: get the key system for which access
-// permission is being requested.
-//
-// The function takes the following parameters:
-//
-//    - request: KitMediaKeySystemPermissionRequest.
-//
-// The function returns the following values:
-//
-//    - utf8: key system name for request.
-//
-func MediaKeySystemPermissionGetName(request *MediaKeySystemPermissionRequest) string {
-	var _arg1 *C.WebKitMediaKeySystemPermissionRequest // out
-	var _cret *C.gchar                                 // in
-
-	_arg1 = (*C.WebKitMediaKeySystemPermissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
-
-	_cret = C.webkit_media_key_system_permission_get_name(_arg1)
-	runtime.KeepAlive(request)
-
-	var _utf8 string // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-
-	return _utf8
+// MediaKeySystemPermissionRequestOverrides contains methods that are overridable.
+type MediaKeySystemPermissionRequestOverrides struct {
 }
 
-// MediaKeySystemPermissionRequestOverrider contains methods that are overridable.
-type MediaKeySystemPermissionRequestOverrider interface {
+func defaultMediaKeySystemPermissionRequestOverrides(v *MediaKeySystemPermissionRequest) MediaKeySystemPermissionRequestOverrides {
+	return MediaKeySystemPermissionRequestOverrides{}
 }
 
+// MediaKeySystemPermissionRequest: permission request for using an EME Content
+// Decryption Module.
+//
+// WebKitMediaKeySystemPermissionRequest represents a request for permission to
+// decide whether WebKit should use the given CDM to access protected media when
+// requested through the MediaKeySystem API.
+//
+// When a WebKitMediaKeySystemPermissionRequest is not handled by the user,
+// it is denied by default.
+//
+// When handling this permission request the application may perform additional
+// installation of the requested CDM, unless it is already present on the host
+// system.
 type MediaKeySystemPermissionRequest struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 
 	PermissionRequest
 }
 
 var (
-	_ externglib.Objector = (*MediaKeySystemPermissionRequest)(nil)
+	_ coreglib.Objector = (*MediaKeySystemPermissionRequest)(nil)
 )
 
-func classInitMediaKeySystemPermissionRequester(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*MediaKeySystemPermissionRequest, *MediaKeySystemPermissionRequestClass, MediaKeySystemPermissionRequestOverrides](
+		GTypeMediaKeySystemPermissionRequest,
+		initMediaKeySystemPermissionRequestClass,
+		wrapMediaKeySystemPermissionRequest,
+		defaultMediaKeySystemPermissionRequestOverrides,
+	)
 }
 
-func wrapMediaKeySystemPermissionRequest(obj *externglib.Object) *MediaKeySystemPermissionRequest {
+func initMediaKeySystemPermissionRequestClass(gclass unsafe.Pointer, overrides MediaKeySystemPermissionRequestOverrides, classInitFunc func(*MediaKeySystemPermissionRequestClass)) {
+	if classInitFunc != nil {
+		class := (*MediaKeySystemPermissionRequestClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapMediaKeySystemPermissionRequest(obj *coreglib.Object) *MediaKeySystemPermissionRequest {
 	return &MediaKeySystemPermissionRequest{
 		Object: obj,
 		PermissionRequest: PermissionRequest{
@@ -83,5 +83,16 @@ func wrapMediaKeySystemPermissionRequest(obj *externglib.Object) *MediaKeySystem
 }
 
 func marshalMediaKeySystemPermissionRequest(p uintptr) (interface{}, error) {
-	return wrapMediaKeySystemPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapMediaKeySystemPermissionRequest(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+// MediaKeySystemPermissionRequestClass: instance of this type is always passed
+// by reference.
+type MediaKeySystemPermissionRequestClass struct {
+	*mediaKeySystemPermissionRequestClass
+}
+
+// mediaKeySystemPermissionRequestClass is the struct that's finalized.
+type mediaKeySystemPermissionRequestClass struct {
+	native *C.WebKitMediaKeySystemPermissionRequestClass
 }

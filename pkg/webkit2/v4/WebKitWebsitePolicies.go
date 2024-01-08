@@ -2,130 +2,16 @@
 
 package webkit2
 
-import (
-	"fmt"
-	"runtime"
-	"unsafe"
-
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
-)
-
 // #include <stdlib.h>
-// #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitWebsitePolicies.go.
-var (
-	GTypeAutoplayPolicy  = externglib.Type(C.webkit_autoplay_policy_get_type())
-	GTypeWebsitePolicies = externglib.Type(C.webkit_website_policies_get_type())
-)
-
-func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeAutoplayPolicy, F: marshalAutoplayPolicy},
-		{T: GTypeWebsitePolicies, F: marshalWebsitePolicies},
-	})
+// WebsitePoliciesClass: instance of this type is always passed by reference.
+type WebsitePoliciesClass struct {
+	*websitePoliciesClass
 }
 
-// AutoplayPolicy: enum values used to specify autoplay policies.
-type AutoplayPolicy C.gint
-
-const (
-	// AutoplayAllow: do not restrict autoplay.
-	AutoplayAllow AutoplayPolicy = iota
-	// AutoplayAllowWithoutSound: allow videos to autoplay if they have no audio
-	// track, or if their audio track is muted.
-	AutoplayAllowWithoutSound
-	// AutoplayDeny: never allow autoplay.
-	AutoplayDeny
-)
-
-func marshalAutoplayPolicy(p uintptr) (interface{}, error) {
-	return AutoplayPolicy(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
-}
-
-// String returns the name in string for AutoplayPolicy.
-func (a AutoplayPolicy) String() string {
-	switch a {
-	case AutoplayAllow:
-		return "Allow"
-	case AutoplayAllowWithoutSound:
-		return "AllowWithoutSound"
-	case AutoplayDeny:
-		return "Deny"
-	default:
-		return fmt.Sprintf("AutoplayPolicy(%d)", a)
-	}
-}
-
-// WebsitePoliciesOverrider contains methods that are overridable.
-type WebsitePoliciesOverrider interface {
-}
-
-type WebsitePolicies struct {
-	_ [0]func() // equal guard
-	*externglib.Object
-}
-
-var (
-	_ externglib.Objector = (*WebsitePolicies)(nil)
-)
-
-func classInitWebsitePolicieser(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
-}
-
-func wrapWebsitePolicies(obj *externglib.Object) *WebsitePolicies {
-	return &WebsitePolicies{
-		Object: obj,
-	}
-}
-
-func marshalWebsitePolicies(p uintptr) (interface{}, error) {
-	return wrapWebsitePolicies(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewWebsitePolicies: create a new KitWebsitePolicies.
-//
-// The function returns the following values:
-//
-//    - websitePolicies: newly created KitWebsitePolicies.
-//
-func NewWebsitePolicies() *WebsitePolicies {
-	var _cret *C.WebKitWebsitePolicies // in
-
-	_cret = C.webkit_website_policies_new()
-
-	var _websitePolicies *WebsitePolicies // out
-
-	_websitePolicies = wrapWebsitePolicies(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _websitePolicies
-}
-
-// AutoplayPolicy: get the KitWebsitePolicies:autoplay property.
-//
-// The function returns the following values:
-//
-//    - autoplayPolicy: KitAutoplayPolicy.
-//
-func (policies *WebsitePolicies) AutoplayPolicy() AutoplayPolicy {
-	var _arg0 *C.WebKitWebsitePolicies // out
-	var _cret C.WebKitAutoplayPolicy   // in
-
-	_arg0 = (*C.WebKitWebsitePolicies)(unsafe.Pointer(externglib.InternObject(policies).Native()))
-
-	_cret = C.webkit_website_policies_get_autoplay_policy(_arg0)
-	runtime.KeepAlive(policies)
-
-	var _autoplayPolicy AutoplayPolicy // out
-
-	_autoplayPolicy = AutoplayPolicy(_cret)
-
-	return _autoplayPolicy
+// websitePoliciesClass is the struct that's finalized.
+type websitePoliciesClass struct {
+	native *C.WebKitWebsitePoliciesClass
 }

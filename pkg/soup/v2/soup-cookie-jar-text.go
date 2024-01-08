@@ -6,7 +6,8 @@ import (
 	"runtime"
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -14,21 +15,27 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup-cookie-jar-text.go.
-var GTypeCookieJarText = externglib.Type(C.soup_cookie_jar_text_get_type())
+// GType values.
+var (
+	GTypeCookieJarText = coreglib.Type(C.soup_cookie_jar_text_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeCookieJarText, F: marshalCookieJarText},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeCookieJarText, F: marshalCookieJarText},
 	})
 }
 
-// COOKIE_JAR_TEXT_FILENAME alias for the CookieJarText:filename property. (The
-// cookie-storage filename.).
+// COOKIE_JAR_TEXT_FILENAME alias for the CookieJarText:filename property.
+// (The cookie-storage filename.).
 const COOKIE_JAR_TEXT_FILENAME = "filename"
 
-// CookieJarTextOverrider contains methods that are overridable.
-type CookieJarTextOverrider interface {
+// CookieJarTextOverrides contains methods that are overridable.
+type CookieJarTextOverrides struct {
+}
+
+func defaultCookieJarTextOverrides(v *CookieJarText) CookieJarTextOverrides {
+	return CookieJarTextOverrides{}
 }
 
 type CookieJarText struct {
@@ -37,18 +44,26 @@ type CookieJarText struct {
 }
 
 var (
-	_ externglib.Objector = (*CookieJarText)(nil)
+	_ coreglib.Objector = (*CookieJarText)(nil)
 )
 
-func classInitCookieJarTexter(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*CookieJarText, *CookieJarTextClass, CookieJarTextOverrides](
+		GTypeCookieJarText,
+		initCookieJarTextClass,
+		wrapCookieJarText,
+		defaultCookieJarTextOverrides,
+	)
 }
 
-func wrapCookieJarText(obj *externglib.Object) *CookieJarText {
+func initCookieJarTextClass(gclass unsafe.Pointer, overrides CookieJarTextOverrides, classInitFunc func(*CookieJarTextClass)) {
+	if classInitFunc != nil {
+		class := (*CookieJarTextClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapCookieJarText(obj *coreglib.Object) *CookieJarText {
 	return &CookieJarText{
 		CookieJar: CookieJar{
 			Object: obj,
@@ -60,7 +75,7 @@ func wrapCookieJarText(obj *externglib.Object) *CookieJarText {
 }
 
 func marshalCookieJarText(p uintptr) (interface{}, error) {
-	return wrapCookieJarText(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapCookieJarText(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewCookieJarText creates a CookieJarText.
@@ -73,12 +88,12 @@ func marshalCookieJarText(p uintptr) (interface{}, error) {
 //
 // The function takes the following parameters:
 //
-//    - filename to read to/write from.
-//    - readOnly: TRUE if filename is read-only.
+//   - filename to read to/write from.
+//   - readOnly: TRUE if filename is read-only.
 //
 // The function returns the following values:
 //
-//    - cookieJarText: new CookieJar.
+//   - cookieJarText: new CookieJar.
 //
 func NewCookieJarText(filename string, readOnly bool) *CookieJarText {
 	var _arg1 *C.char          // out
@@ -97,7 +112,24 @@ func NewCookieJarText(filename string, readOnly bool) *CookieJarText {
 
 	var _cookieJarText *CookieJarText // out
 
-	_cookieJarText = wrapCookieJarText(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_cookieJarText = wrapCookieJarText(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _cookieJarText
+}
+
+// CookieJarTextClass: instance of this type is always passed by reference.
+type CookieJarTextClass struct {
+	*cookieJarTextClass
+}
+
+// cookieJarTextClass is the struct that's finalized.
+type cookieJarTextClass struct {
+	native *C.SoupCookieJarTextClass
+}
+
+func (c *CookieJarTextClass) ParentClass() *CookieJarClass {
+	valptr := &c.native.parent_class
+	var _v *CookieJarClass // out
+	_v = (*CookieJarClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
+	return _v
 }

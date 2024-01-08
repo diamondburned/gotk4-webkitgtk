@@ -7,7 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v3"
@@ -18,44 +18,64 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitContextMenuItem.go.
-var GTypeContextMenuItem = externglib.Type(C.webkit_context_menu_item_get_type())
+// GType values.
+var (
+	GTypeContextMenuItem = coreglib.Type(C.webkit_context_menu_item_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeContextMenuItem, F: marshalContextMenuItem},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeContextMenuItem, F: marshalContextMenuItem},
 	})
 }
 
-// ContextMenuItemOverrider contains methods that are overridable.
-type ContextMenuItemOverrider interface {
+// ContextMenuItemOverrides contains methods that are overridable.
+type ContextMenuItemOverrides struct {
 }
 
+func defaultContextMenuItemOverrides(v *ContextMenuItem) ContextMenuItemOverrides {
+	return ContextMenuItemOverrides{}
+}
+
+// ContextMenuItem: one item of a KitContextMenu.
+//
+// The KitContextMenu is composed of KitContextMenuItem<!-- -->s. These
+// items can be created from a Action, from a KitContextMenuAction or from a
+// KitContextMenuAction and a label. These KitContextMenuAction<!-- -->s denote
+// stock actions for the items. You can also create separators and submenus.
 type ContextMenuItem struct {
 	_ [0]func() // equal guard
-	externglib.InitiallyUnowned
+	coreglib.InitiallyUnowned
 }
 
 var ()
 
-func classInitContextMenuItemmer(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*ContextMenuItem, *ContextMenuItemClass, ContextMenuItemOverrides](
+		GTypeContextMenuItem,
+		initContextMenuItemClass,
+		wrapContextMenuItem,
+		defaultContextMenuItemOverrides,
+	)
 }
 
-func wrapContextMenuItem(obj *externglib.Object) *ContextMenuItem {
+func initContextMenuItemClass(gclass unsafe.Pointer, overrides ContextMenuItemOverrides, classInitFunc func(*ContextMenuItemClass)) {
+	if classInitFunc != nil {
+		class := (*ContextMenuItemClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapContextMenuItem(obj *coreglib.Object) *ContextMenuItem {
 	return &ContextMenuItem{
-		InitiallyUnowned: externglib.InitiallyUnowned{
+		InitiallyUnowned: coreglib.InitiallyUnowned{
 			Object: obj,
 		},
 	}
 }
 
 func marshalContextMenuItem(p uintptr) (interface{}, error) {
-	return wrapContextMenuItem(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapContextMenuItem(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewContextMenuItem creates a new KitContextMenuItem for the given action.
@@ -64,41 +84,42 @@ func marshalContextMenuItem(p uintptr) (interface{}, error) {
 //
 // The function takes the following parameters:
 //
-//    - action: Action.
+//   - action: Action.
 //
 // The function returns the following values:
 //
-//    - contextMenuItem: newly created KitContextMenuItem object.
+//   - contextMenuItem: newly created KitContextMenuItem object.
 //
 func NewContextMenuItem(action *gtk.Action) *ContextMenuItem {
 	var _arg1 *C.GtkAction             // out
 	var _cret *C.WebKitContextMenuItem // in
 
-	_arg1 = (*C.GtkAction)(unsafe.Pointer(externglib.InternObject(action).Native()))
+	_arg1 = (*C.GtkAction)(unsafe.Pointer(coreglib.InternObject(action).Native()))
 
 	_cret = C.webkit_context_menu_item_new(_arg1)
 	runtime.KeepAlive(action)
 
 	var _contextMenuItem *ContextMenuItem // out
 
-	_contextMenuItem = wrapContextMenuItem(externglib.Take(unsafe.Pointer(_cret)))
+	_contextMenuItem = wrapContextMenuItem(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _contextMenuItem
 }
 
 // NewContextMenuItemFromGaction creates a new KitContextMenuItem for the given
-// action and label. On activation target will be passed as parameter to the
-// callback.
+// action and label.
+//
+// On activation target will be passed as parameter to the callback.
 //
 // The function takes the following parameters:
 //
-//    - action: #GAction.
-//    - label: menu item label text.
-//    - target (optional) to use as the action target.
+//   - action: #GAction.
+//   - label: menu item label text.
+//   - target (optional) to use as the action target.
 //
 // The function returns the following values:
 //
-//    - contextMenuItem: newly created KitContextMenuItem object.
+//   - contextMenuItem: newly created KitContextMenuItem object.
 //
 func NewContextMenuItemFromGaction(action gio.Actioner, label string, target *glib.Variant) *ContextMenuItem {
 	var _arg1 *C.GAction               // out
@@ -106,7 +127,7 @@ func NewContextMenuItemFromGaction(action gio.Actioner, label string, target *gl
 	var _arg3 *C.GVariant              // out
 	var _cret *C.WebKitContextMenuItem // in
 
-	_arg1 = (*C.GAction)(unsafe.Pointer(externglib.InternObject(action).Native()))
+	_arg1 = (*C.GAction)(unsafe.Pointer(coreglib.InternObject(action).Native()))
 	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(label)))
 	defer C.free(unsafe.Pointer(_arg2))
 	if target != nil {
@@ -120,28 +141,29 @@ func NewContextMenuItemFromGaction(action gio.Actioner, label string, target *gl
 
 	var _contextMenuItem *ContextMenuItem // out
 
-	_contextMenuItem = wrapContextMenuItem(externglib.Take(unsafe.Pointer(_cret)))
+	_contextMenuItem = wrapContextMenuItem(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _contextMenuItem
 }
 
 // NewContextMenuItemFromStockAction creates a new KitContextMenuItem for the
-// given stock action. Stock actions are handled automatically by WebKit so
-// that, for example, when a menu item created with a
-// WEBKIT_CONTEXT_MENU_ACTION_STOP is activated the action associated will be
-// handled by WebKit and the current load operation will be stopped. You can get
-// the #GAction of a KitContextMenuItem created with a KitContextMenuAction with
-// webkit_context_menu_item_get_gaction() and connect to the Action::activate
-// signal to be notified when the item is activated, but you can't prevent the
-// associated action from being performed.
+// given stock action.
+//
+// Stock actions are handled automatically by WebKit so that, for example, when
+// a menu item created with a WEBKIT_CONTEXT_MENU_ACTION_STOP is activated the
+// action associated will be handled by WebKit and the current load operation
+// will be stopped. You can get the #GAction of a KitContextMenuItem created
+// with a KitContextMenuAction with webkit_context_menu_item_get_gaction()
+// and connect to the Action::activate signal to be notified when the item is
+// activated, but you can't prevent the associated action from being performed.
 //
 // The function takes the following parameters:
 //
-//    - action stock action.
+//   - action stock action.
 //
 // The function returns the following values:
 //
-//    - contextMenuItem: newly created KitContextMenuItem object.
+//   - contextMenuItem: newly created KitContextMenuItem object.
 //
 func NewContextMenuItemFromStockAction(action ContextMenuAction) *ContextMenuItem {
 	var _arg1 C.WebKitContextMenuAction // out
@@ -154,24 +176,25 @@ func NewContextMenuItemFromStockAction(action ContextMenuAction) *ContextMenuIte
 
 	var _contextMenuItem *ContextMenuItem // out
 
-	_contextMenuItem = wrapContextMenuItem(externglib.Take(unsafe.Pointer(_cret)))
+	_contextMenuItem = wrapContextMenuItem(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _contextMenuItem
 }
 
 // NewContextMenuItemFromStockActionWithLabel creates a new KitContextMenuItem
-// for the given stock action using the given label. Stock actions have a
-// predefined label, this method can be used to create a KitContextMenuItem for
-// a KitContextMenuAction but using a custom label.
+// for the given stock action using the given label.
+//
+// Stock actions have a predefined label, this method can be used to create a
+// KitContextMenuItem for a KitContextMenuAction but using a custom label.
 //
 // The function takes the following parameters:
 //
-//    - action stock action.
-//    - label: custom label text to use instead of the predefined one.
+//   - action stock action.
+//   - label: custom label text to use instead of the predefined one.
 //
 // The function returns the following values:
 //
-//    - contextMenuItem: newly created KitContextMenuItem object.
+//   - contextMenuItem: newly created KitContextMenuItem object.
 //
 func NewContextMenuItemFromStockActionWithLabel(action ContextMenuAction, label string) *ContextMenuItem {
 	var _arg1 C.WebKitContextMenuAction // out
@@ -188,7 +211,7 @@ func NewContextMenuItemFromStockActionWithLabel(action ContextMenuAction, label 
 
 	var _contextMenuItem *ContextMenuItem // out
 
-	_contextMenuItem = wrapContextMenuItem(externglib.Take(unsafe.Pointer(_cret)))
+	_contextMenuItem = wrapContextMenuItem(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _contextMenuItem
 }
@@ -198,7 +221,7 @@ func NewContextMenuItemFromStockActionWithLabel(action ContextMenuAction, label 
 //
 // The function returns the following values:
 //
-//    - contextMenuItem: newly created KitContextMenuItem object.
+//   - contextMenuItem: newly created KitContextMenuItem object.
 //
 func NewContextMenuItemSeparator() *ContextMenuItem {
 	var _cret *C.WebKitContextMenuItem // in
@@ -207,7 +230,7 @@ func NewContextMenuItemSeparator() *ContextMenuItem {
 
 	var _contextMenuItem *ContextMenuItem // out
 
-	_contextMenuItem = wrapContextMenuItem(externglib.Take(unsafe.Pointer(_cret)))
+	_contextMenuItem = wrapContextMenuItem(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _contextMenuItem
 }
@@ -217,12 +240,12 @@ func NewContextMenuItemSeparator() *ContextMenuItem {
 //
 // The function takes the following parameters:
 //
-//    - label: menu item label text.
-//    - submenu to set.
+//   - label: menu item label text.
+//   - submenu to set.
 //
 // The function returns the following values:
 //
-//    - contextMenuItem: newly created KitContextMenuItem object.
+//   - contextMenuItem: newly created KitContextMenuItem object.
 //
 func NewContextMenuItemWithSubmenu(label string, submenu *ContextMenu) *ContextMenuItem {
 	var _arg1 *C.gchar                 // out
@@ -231,7 +254,7 @@ func NewContextMenuItemWithSubmenu(label string, submenu *ContextMenu) *ContextM
 
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(label)))
 	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.WebKitContextMenu)(unsafe.Pointer(externglib.InternObject(submenu).Native()))
+	_arg2 = (*C.WebKitContextMenu)(unsafe.Pointer(coreglib.InternObject(submenu).Native()))
 
 	_cret = C.webkit_context_menu_item_new_with_submenu(_arg1, _arg2)
 	runtime.KeepAlive(label)
@@ -239,7 +262,7 @@ func NewContextMenuItemWithSubmenu(label string, submenu *ContextMenu) *ContextM
 
 	var _contextMenuItem *ContextMenuItem // out
 
-	_contextMenuItem = wrapContextMenuItem(externglib.Take(unsafe.Pointer(_cret)))
+	_contextMenuItem = wrapContextMenuItem(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _contextMenuItem
 }
@@ -250,14 +273,14 @@ func NewContextMenuItemWithSubmenu(label string, submenu *ContextMenu) *ContextM
 //
 // The function returns the following values:
 //
-//    - action associated to the KitContextMenuItem, or NULL if item is a
-//      separator.
+//   - action associated to the KitContextMenuItem, or NULL if item is a
+//     separator.
 //
 func (item *ContextMenuItem) Action() *gtk.Action {
 	var _arg0 *C.WebKitContextMenuItem // out
 	var _cret *C.GtkAction             // in
 
-	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(item).Native()))
+	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(coreglib.InternObject(item).Native()))
 
 	_cret = C.webkit_context_menu_item_get_action(_arg0)
 	runtime.KeepAlive(item)
@@ -265,7 +288,7 @@ func (item *ContextMenuItem) Action() *gtk.Action {
 	var _action *gtk.Action // out
 
 	{
-		obj := externglib.Take(unsafe.Pointer(_cret))
+		obj := coreglib.Take(unsafe.Pointer(_cret))
 		_action = &gtk.Action{
 			Object: obj,
 			Buildable: gtk.Buildable{
@@ -281,14 +304,14 @@ func (item *ContextMenuItem) Action() *gtk.Action {
 //
 // The function returns the following values:
 //
-//    - action associated to the KitContextMenuItem, or NULL if item is a
-//      separator.
+//   - action associated to the KitContextMenuItem, or NULL if item is a
+//     separator.
 //
 func (item *ContextMenuItem) Gaction() *gio.Action {
 	var _arg0 *C.WebKitContextMenuItem // out
 	var _cret *C.GAction               // in
 
-	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(item).Native()))
+	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(coreglib.InternObject(item).Native()))
 
 	_cret = C.webkit_context_menu_item_get_gaction(_arg0)
 	runtime.KeepAlive(item)
@@ -296,7 +319,7 @@ func (item *ContextMenuItem) Gaction() *gio.Action {
 	var _action *gio.Action // out
 
 	{
-		obj := externglib.Take(unsafe.Pointer(_cret))
+		obj := coreglib.Take(unsafe.Pointer(_cret))
 		_action = &gio.Action{
 			Object: obj,
 		}
@@ -305,20 +328,21 @@ func (item *ContextMenuItem) Gaction() *gio.Action {
 	return _action
 }
 
-// StockAction gets the KitContextMenuAction of item. If the KitContextMenuItem
-// was not created for a stock action WEBKIT_CONTEXT_MENU_ACTION_CUSTOM will be
-// returned. If the KitContextMenuItem is a separator
-// WEBKIT_CONTEXT_MENU_ACTION_NO_ACTION will be returned.
+// StockAction gets the KitContextMenuAction of item.
+//
+// If the KitContextMenuItem was not created for a stock action
+// WEBKIT_CONTEXT_MENU_ACTION_CUSTOM will be returned. If the KitContextMenuItem
+// is a separator WEBKIT_CONTEXT_MENU_ACTION_NO_ACTION will be returned.
 //
 // The function returns the following values:
 //
-//    - contextMenuAction of item.
+//   - contextMenuAction of item.
 //
 func (item *ContextMenuItem) StockAction() ContextMenuAction {
 	var _arg0 *C.WebKitContextMenuItem  // out
 	var _cret C.WebKitContextMenuAction // in
 
-	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(item).Native()))
+	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(coreglib.InternObject(item).Native()))
 
 	_cret = C.webkit_context_menu_item_get_stock_action(_arg0)
 	runtime.KeepAlive(item)
@@ -334,21 +358,21 @@ func (item *ContextMenuItem) StockAction() ContextMenuAction {
 //
 // The function returns the following values:
 //
-//    - contextMenu representing the submenu of item or NULL if item doesn't have
-//      a submenu.
+//   - contextMenu representing the submenu of item or NULL if item doesn't have
+//     a submenu.
 //
 func (item *ContextMenuItem) Submenu() *ContextMenu {
 	var _arg0 *C.WebKitContextMenuItem // out
 	var _cret *C.WebKitContextMenu     // in
 
-	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(item).Native()))
+	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(coreglib.InternObject(item).Native()))
 
 	_cret = C.webkit_context_menu_item_get_submenu(_arg0)
 	runtime.KeepAlive(item)
 
 	var _contextMenu *ContextMenu // out
 
-	_contextMenu = wrapContextMenu(externglib.Take(unsafe.Pointer(_cret)))
+	_contextMenu = wrapContextMenu(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _contextMenu
 }
@@ -357,13 +381,13 @@ func (item *ContextMenuItem) Submenu() *ContextMenu {
 //
 // The function returns the following values:
 //
-//    - ok: TRUE is item is a separator or FALSE otherwise.
+//   - ok: TRUE is item is a separator or FALSE otherwise.
 //
 func (item *ContextMenuItem) IsSeparator() bool {
 	var _arg0 *C.WebKitContextMenuItem // out
 	var _cret C.gboolean               // in
 
-	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(item).Native()))
+	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(coreglib.InternObject(item).Native()))
 
 	_cret = C.webkit_context_menu_item_is_separator(_arg0)
 	runtime.KeepAlive(item)
@@ -377,23 +401,34 @@ func (item *ContextMenuItem) IsSeparator() bool {
 	return _ok
 }
 
-// SetSubmenu sets or replaces the item submenu. If submenu is NULL the current
-// submenu of item is removed.
+// SetSubmenu sets or replaces the item submenu.
+//
+// If submenu is NULL the current submenu of item is removed.
 //
 // The function takes the following parameters:
 //
-//    - submenu (optional): KitContextMenu.
+//   - submenu (optional): KitContextMenu.
 //
 func (item *ContextMenuItem) SetSubmenu(submenu *ContextMenu) {
 	var _arg0 *C.WebKitContextMenuItem // out
 	var _arg1 *C.WebKitContextMenu     // out
 
-	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(externglib.InternObject(item).Native()))
+	_arg0 = (*C.WebKitContextMenuItem)(unsafe.Pointer(coreglib.InternObject(item).Native()))
 	if submenu != nil {
-		_arg1 = (*C.WebKitContextMenu)(unsafe.Pointer(externglib.InternObject(submenu).Native()))
+		_arg1 = (*C.WebKitContextMenu)(unsafe.Pointer(coreglib.InternObject(submenu).Native()))
 	}
 
 	C.webkit_context_menu_item_set_submenu(_arg0, _arg1)
 	runtime.KeepAlive(item)
 	runtime.KeepAlive(submenu)
+}
+
+// ContextMenuItemClass: instance of this type is always passed by reference.
+type ContextMenuItemClass struct {
+	*contextMenuItemClass
+}
+
+// contextMenuItemClass is the struct that's finalized.
+type contextMenuItemClass struct {
+	native *C.WebKitContextMenuItemClass
 }

@@ -6,7 +6,8 @@ import (
 	"runtime"
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gtk/v3"
 )
 
@@ -15,78 +16,111 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitFileChooserRequest.go.
-var GTypeFileChooserRequest = externglib.Type(C.webkit_file_chooser_request_get_type())
+// GType values.
+var (
+	GTypeFileChooserRequest = coreglib.Type(C.webkit_file_chooser_request_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeFileChooserRequest, F: marshalFileChooserRequest},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeFileChooserRequest, F: marshalFileChooserRequest},
 	})
 }
 
-// FileChooserRequestOverrider contains methods that are overridable.
-type FileChooserRequestOverrider interface {
+// FileChooserRequestOverrides contains methods that are overridable.
+type FileChooserRequestOverrides struct {
 }
 
+func defaultFileChooserRequestOverrides(v *FileChooserRequest) FileChooserRequestOverrides {
+	return FileChooserRequestOverrides{}
+}
+
+// FileChooserRequest: request to open a file chooser.
+//
+// Whenever the user interacts with an HTML input element with file type,
+// WebKit will need to show a dialog to choose one or more files to be uploaded
+// to the server along with the rest of the form data. For that to happen in a
+// general way, instead of just opening a FileChooserDialog (which might be not
+// desirable in some cases, which could prefer to use their own file chooser
+// dialog), WebKit will fire the KitWebView::run-file-chooser signal with a
+// KitFileChooserRequest object, which will allow the client application to
+// specify the files to be selected, to inspect the details of the request (e.g.
+// if multiple selection should be allowed) and to cancel the request, in case
+// nothing was selected.
+//
+// In case the client application does not wish to handle this signal,
+// WebKit will provide a default handler which will asynchronously run a regular
+// FileChooserDialog for the user to interact with.
 type FileChooserRequest struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 }
 
 var (
-	_ externglib.Objector = (*FileChooserRequest)(nil)
+	_ coreglib.Objector = (*FileChooserRequest)(nil)
 )
 
-func classInitFileChooserRequester(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*FileChooserRequest, *FileChooserRequestClass, FileChooserRequestOverrides](
+		GTypeFileChooserRequest,
+		initFileChooserRequestClass,
+		wrapFileChooserRequest,
+		defaultFileChooserRequestOverrides,
+	)
 }
 
-func wrapFileChooserRequest(obj *externglib.Object) *FileChooserRequest {
+func initFileChooserRequestClass(gclass unsafe.Pointer, overrides FileChooserRequestOverrides, classInitFunc func(*FileChooserRequestClass)) {
+	if classInitFunc != nil {
+		class := (*FileChooserRequestClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapFileChooserRequest(obj *coreglib.Object) *FileChooserRequest {
 	return &FileChooserRequest{
 		Object: obj,
 	}
 }
 
 func marshalFileChooserRequest(p uintptr) (interface{}, error) {
-	return wrapFileChooserRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapFileChooserRequest(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// Cancel: ask WebKit to cancel the request. It's important to do this in case
-// no selection has been made in the client, otherwise the request won't be
-// properly completed and the browser will keep the request pending forever,
-// which might cause the browser to hang.
+// Cancel: ask WebKit to cancel the request.
+//
+// It's important to do this in case no selection has been made in the client,
+// otherwise the request won't be properly completed and the browser will keep
+// the request pending forever, which might cause the browser to hang.
 func (request *FileChooserRequest) Cancel() {
 	var _arg0 *C.WebKitFileChooserRequest // out
 
-	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	C.webkit_file_chooser_request_cancel(_arg0)
 	runtime.KeepAlive(request)
 }
 
-// MIMETypes: get the list of MIME types the file chooser dialog should handle,
-// in the format specified in RFC 2046 for "media types". Its contents depend on
-// the value of the 'accept' attribute for HTML input elements. This function
-// should normally be called before presenting the file chooser dialog to the
-// user, to decide whether to allow the user to select multiple files at once or
-// only one.
+// MIMETypes: get the list of MIME types the file chooser dialog should handle.
+//
+// Get the list of MIME types the file chooser dialog should handle, in the
+// format specified in RFC 2046 for "media types". Its contents depend on the
+// value of the 'accept' attribute for HTML input elements. This function should
+// normally be called before presenting the file chooser dialog to the user,
+// to decide whether to allow the user to select multiple files at once or only
+// one.
 //
 // The function returns the following values:
 //
-//    - utf8s: a NULL-terminated array of strings if a list of accepted MIME
-//      types is defined or NULL otherwise, meaning that any MIME type should be
-//      accepted. This array and its contents are owned by WebKit and should not
-//      be modified or freed.
+//   - utf8s: a NULL-terminated array of strings if a list of accepted MIME
+//     types is defined or NULL otherwise, meaning that any MIME type should be
+//     accepted. This array and its contents are owned by WebKit and should not
+//     be modified or freed.
 //
 func (request *FileChooserRequest) MIMETypes() []string {
 	var _arg0 *C.WebKitFileChooserRequest // out
 	var _cret **C.gchar                   // in
 
-	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	_cret = C.webkit_file_chooser_request_get_mime_types(_arg0)
 	runtime.KeepAlive(request)
@@ -110,25 +144,26 @@ func (request *FileChooserRequest) MIMETypes() []string {
 	return _utf8s
 }
 
-// MIMETypesFilter: get the filter currently associated with the request, ready
-// to be used by FileChooser. This function should normally be called before
-// presenting the file chooser dialog to the user, to decide whether to apply a
-// filter so the user would not be allowed to select files with other MIME
-// types.
+// MIMETypesFilter: get the filter currently associated with the request.
+//
+// Get the filter currently associated with the request, ready to be used by
+// FileChooser. This function should normally be called before presenting the
+// file chooser dialog to the user, to decide whether to apply a filter so the
+// user would not be allowed to select files with other MIME types.
 //
 // See webkit_file_chooser_request_get_mime_types() if you are interested in
 // getting the list of accepted MIME types.
 //
 // The function returns the following values:
 //
-//    - fileFilter if a list of accepted MIME types is defined or NULL otherwise.
-//      The returned object is owned by WebKit should not be modified or freed.
+//   - fileFilter if a list of accepted MIME types is defined or NULL otherwise.
+//     The returned object is owned by WebKit should not be modified or freed.
 //
 func (request *FileChooserRequest) MIMETypesFilter() *gtk.FileFilter {
 	var _arg0 *C.WebKitFileChooserRequest // out
 	var _cret *C.GtkFileFilter            // in
 
-	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	_cret = C.webkit_file_chooser_request_get_mime_types_filter(_arg0)
 	runtime.KeepAlive(request)
@@ -136,9 +171,9 @@ func (request *FileChooserRequest) MIMETypesFilter() *gtk.FileFilter {
 	var _fileFilter *gtk.FileFilter // out
 
 	{
-		obj := externglib.Take(unsafe.Pointer(_cret))
+		obj := coreglib.Take(unsafe.Pointer(_cret))
 		_fileFilter = &gtk.FileFilter{
-			InitiallyUnowned: externglib.InitiallyUnowned{
+			InitiallyUnowned: coreglib.InitiallyUnowned{
 				Object: obj,
 			},
 			Object: obj,
@@ -151,20 +186,23 @@ func (request *FileChooserRequest) MIMETypesFilter() *gtk.FileFilter {
 	return _fileFilter
 }
 
-// SelectMultiple: determine whether the file chooser associated to this
-// KitFileChooserRequest should allow selecting multiple files, which depends on
-// the HTML input element having a 'multiple' attribute defined.
+// SelectMultiple: whether the file chooser should allow selecting multiple
+// files.
+//
+// Determine whether the file chooser associated to this KitFileChooserRequest
+// should allow selecting multiple files, which depends on the HTML input
+// element having a 'multiple' attribute defined.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if the file chooser should allow selecting multiple files or
-//      FALSE otherwise.
+//   - ok: TRUE if the file chooser should allow selecting multiple files or
+//     FALSE otherwise.
 //
 func (request *FileChooserRequest) SelectMultiple() bool {
 	var _arg0 *C.WebKitFileChooserRequest // out
 	var _cret C.gboolean                  // in
 
-	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	_cret = C.webkit_file_chooser_request_get_select_multiple(_arg0)
 	runtime.KeepAlive(request)
@@ -178,9 +216,11 @@ func (request *FileChooserRequest) SelectMultiple() bool {
 	return _ok
 }
 
-// SelectedFiles: get the list of selected files currently associated to the
-// request. Initially, the return value of this method contains any files
-// selected in previous file chooser requests for this HTML input element. Once
+// SelectedFiles: get the list of selected files associated to the request.
+//
+// Get the list of selected files currently associated to the request.
+// Initially, the return value of this method contains any files selected
+// in previous file chooser requests for this HTML input element. Once
 // webkit_file_chooser_request_select_files, the value will reflect whatever
 // files are given.
 //
@@ -190,15 +230,15 @@ func (request *FileChooserRequest) SelectMultiple() bool {
 //
 // The function returns the following values:
 //
-//    - utf8s: a NULL-terminated array of strings if there are selected files
-//      associated with the request or NULL otherwise. This array and its
-//      contents are owned by WebKit and should not be modified or freed.
+//   - utf8s: a NULL-terminated array of strings if there are selected files
+//     associated with the request or NULL otherwise. This array and its
+//     contents are owned by WebKit and should not be modified or freed.
 //
 func (request *FileChooserRequest) SelectedFiles() []string {
 	var _arg0 *C.WebKitFileChooserRequest // out
 	var _cret **C.gchar                   // in
 
-	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	_cret = C.webkit_file_chooser_request_get_selected_files(_arg0)
 	runtime.KeepAlive(request)
@@ -227,14 +267,14 @@ func (request *FileChooserRequest) SelectedFiles() []string {
 //
 // The function takes the following parameters:
 //
-//    - files: a NULL-terminated array of strings, containing paths to local
-//      files.
+//   - files: a NULL-terminated array of strings, containing paths to local
+//     files.
 //
 func (request *FileChooserRequest) SelectFiles(files []string) {
 	var _arg0 *C.WebKitFileChooserRequest // out
 	var _arg1 **C.gchar                   // out
 
-	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 	{
 		_arg1 = (**C.gchar)(C.calloc(C.size_t((len(files) + 1)), C.size_t(unsafe.Sizeof(uint(0)))))
 		defer C.free(unsafe.Pointer(_arg1))
@@ -252,4 +292,14 @@ func (request *FileChooserRequest) SelectFiles(files []string) {
 	C.webkit_file_chooser_request_select_files(_arg0, _arg1)
 	runtime.KeepAlive(request)
 	runtime.KeepAlive(files)
+}
+
+// FileChooserRequestClass: instance of this type is always passed by reference.
+type FileChooserRequestClass struct {
+	*fileChooserRequestClass
+}
+
+// fileChooserRequestClass is the struct that's finalized.
+type fileChooserRequestClass struct {
+	native *C.WebKitFileChooserRequestClass
 }

@@ -8,35 +8,30 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
-// extern SoupLoggerLogLevel _gotk4_soup2_LoggerFilter(SoupLogger*, SoupMessage*, gpointer);
-// extern void _gotk4_soup2_LoggerPrinter(SoupLogger*, SoupLoggerLogLevel, char, char*, gpointer);
 // extern void callbackDelete(gpointer);
+// extern void _gotk4_soup2_LoggerPrinter(SoupLogger*, SoupLoggerLogLevel, char, char*, gpointer);
+// extern SoupLoggerLogLevel _gotk4_soup2_LoggerFilter(SoupLogger*, SoupMessage*, gpointer);
 import "C"
 
-// glib.Type values for soup-logger.go.
+// GType values.
 var (
-	GTypeLoggerLogLevel = externglib.Type(C.soup_logger_log_level_get_type())
-	GTypeLogger         = externglib.Type(C.soup_logger_get_type())
+	GTypeLoggerLogLevel = coreglib.Type(C.soup_logger_log_level_get_type())
+	GTypeLogger         = coreglib.Type(C.soup_logger_get_type())
 )
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeLoggerLogLevel, F: marshalLoggerLogLevel},
-		{T: GTypeLogger, F: marshalLogger},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeLoggerLogLevel, F: marshalLoggerLogLevel},
+		coreglib.TypeMarshaler{T: GTypeLogger, F: marshalLogger},
 	})
 }
-
-// LOGGER_LEVEL alias for the Logger:level property, qv.
-const LOGGER_LEVEL = "level"
-
-// LOGGER_MAX_BODY_SIZE alias for the Logger:max-body-size property, qv.
-const LOGGER_MAX_BODY_SIZE = "max-body-size"
 
 // LoggerLogLevel describes the level of logging output to provide.
 type LoggerLogLevel C.gint
@@ -54,7 +49,7 @@ const (
 )
 
 func marshalLoggerLogLevel(p uintptr) (interface{}, error) {
-	return LoggerLogLevel(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return LoggerLogLevel(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for LoggerLogLevel.
@@ -80,30 +75,6 @@ func (l LoggerLogLevel) String() string {
 // the Content-Type.
 type LoggerFilter func(logger *Logger, msg *Message) (loggerLogLevel LoggerLogLevel)
 
-//export _gotk4_soup2_LoggerFilter
-func _gotk4_soup2_LoggerFilter(arg1 *C.SoupLogger, arg2 *C.SoupMessage, arg3 C.gpointer) (cret C.SoupLoggerLogLevel) {
-	var fn LoggerFilter
-	{
-		v := gbox.Get(uintptr(arg3))
-		if v == nil {
-			panic(`callback not found`)
-		}
-		fn = v.(LoggerFilter)
-	}
-
-	var _logger *Logger // out
-	var _msg *Message   // out
-
-	_logger = wrapLogger(externglib.Take(unsafe.Pointer(arg1)))
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg2)))
-
-	loggerLogLevel := fn(_logger, _msg)
-
-	cret = C.SoupLoggerLogLevel(loggerLogLevel)
-
-	return cret
-}
-
 // LoggerPrinter: prototype for a custom printing callback.
 //
 // level indicates what kind of information is being printed. Eg, it will be
@@ -118,54 +89,42 @@ func _gotk4_soup2_LoggerFilter(arg1 *C.SoupLogger, arg2 *C.SoupMessage, arg3 C.g
 // </programlisting></informalexample>.
 type LoggerPrinter func(logger *Logger, level LoggerLogLevel, direction byte, data string)
 
-//export _gotk4_soup2_LoggerPrinter
-func _gotk4_soup2_LoggerPrinter(arg1 *C.SoupLogger, arg2 C.SoupLoggerLogLevel, arg3 C.char, arg4 *C.char, arg5 C.gpointer) {
-	var fn LoggerPrinter
-	{
-		v := gbox.Get(uintptr(arg5))
-		if v == nil {
-			panic(`callback not found`)
-		}
-		fn = v.(LoggerPrinter)
-	}
-
-	var _logger *Logger       // out
-	var _level LoggerLogLevel // out
-	var _direction byte       // out
-	var _data string          // out
-
-	_logger = wrapLogger(externglib.Take(unsafe.Pointer(arg1)))
-	_level = LoggerLogLevel(arg2)
-	_direction = byte(arg3)
-	_data = C.GoString((*C.gchar)(unsafe.Pointer(arg4)))
-
-	fn(_logger, _level, _direction, _data)
+// LoggerOverrides contains methods that are overridable.
+type LoggerOverrides struct {
 }
 
-// LoggerOverrider contains methods that are overridable.
-type LoggerOverrider interface {
+func defaultLoggerOverrides(v *Logger) LoggerOverrides {
+	return LoggerOverrides{}
 }
 
 type Logger struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 
 	SessionFeature
 }
 
 var (
-	_ externglib.Objector = (*Logger)(nil)
+	_ coreglib.Objector = (*Logger)(nil)
 )
 
-func classInitLoggerer(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*Logger, *LoggerClass, LoggerOverrides](
+		GTypeLogger,
+		initLoggerClass,
+		wrapLogger,
+		defaultLoggerOverrides,
+	)
 }
 
-func wrapLogger(obj *externglib.Object) *Logger {
+func initLoggerClass(gclass unsafe.Pointer, overrides LoggerOverrides, classInitFunc func(*LoggerClass)) {
+	if classInitFunc != nil {
+		class := (*LoggerClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapLogger(obj *coreglib.Object) *Logger {
 	return &Logger{
 		Object: obj,
 		SessionFeature: SessionFeature{
@@ -175,24 +134,24 @@ func wrapLogger(obj *externglib.Object) *Logger {
 }
 
 func marshalLogger(p uintptr) (interface{}, error) {
-	return wrapLogger(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapLogger(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewLogger creates a new Logger with the given debug level. If level is
 // SOUP_LOGGER_LOG_BODY, max_body_size gives the maximum number of bytes of the
 // body that will be logged. (-1 means "no limit".)
 //
-// If you need finer control over what message parts are and aren't logged, use
-// soup_logger_set_request_filter() and soup_logger_set_response_filter().
+// If you need finer control over what message parts are and aren't logged,
+// use soup_logger_set_request_filter() and soup_logger_set_response_filter().
 //
 // The function takes the following parameters:
 //
-//    - level: debug level.
-//    - maxBodySize: maximum body size to output, or -1.
+//   - level: debug level.
+//   - maxBodySize: maximum body size to output, or -1.
 //
 // The function returns the following values:
 //
-//    - logger: new Logger.
+//   - logger: new Logger.
 //
 func NewLogger(level LoggerLogLevel, maxBodySize int) *Logger {
 	var _arg1 C.SoupLoggerLogLevel // out
@@ -208,7 +167,7 @@ func NewLogger(level LoggerLogLevel, maxBodySize int) *Logger {
 
 	var _logger *Logger // out
 
-	_logger = wrapLogger(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_logger = wrapLogger(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _logger
 }
@@ -223,14 +182,14 @@ func NewLogger(level LoggerLogLevel, maxBodySize int) *Logger {
 //
 // The function takes the following parameters:
 //
-//    - session: Session.
+//   - session: Session.
 //
 func (logger *Logger) Attach(session *Session) {
 	var _arg0 *C.SoupLogger  // out
 	var _arg1 *C.SoupSession // out
 
-	_arg0 = (*C.SoupLogger)(unsafe.Pointer(externglib.InternObject(logger).Native()))
-	_arg1 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
+	_arg0 = (*C.SoupLogger)(unsafe.Pointer(coreglib.InternObject(logger).Native()))
+	_arg1 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
 
 	C.soup_logger_attach(_arg0, _arg1)
 	runtime.KeepAlive(logger)
@@ -243,14 +202,14 @@ func (logger *Logger) Attach(session *Session) {
 //
 // The function takes the following parameters:
 //
-//    - session: Session.
+//   - session: Session.
 //
 func (logger *Logger) Detach(session *Session) {
 	var _arg0 *C.SoupLogger  // out
 	var _arg1 *C.SoupSession // out
 
-	_arg0 = (*C.SoupLogger)(unsafe.Pointer(externglib.InternObject(logger).Native()))
-	_arg1 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
+	_arg0 = (*C.SoupLogger)(unsafe.Pointer(coreglib.InternObject(logger).Native()))
+	_arg1 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
 
 	C.soup_logger_detach(_arg0, _arg1)
 	runtime.KeepAlive(logger)
@@ -262,7 +221,7 @@ func (logger *Logger) Detach(session *Session) {
 //
 // The function takes the following parameters:
 //
-//    - printer: callback for printing logging output.
+//   - printer: callback for printing logging output.
 //
 func (logger *Logger) SetPrinter(printer LoggerPrinter) {
 	var _arg0 *C.SoupLogger       // out
@@ -270,7 +229,7 @@ func (logger *Logger) SetPrinter(printer LoggerPrinter) {
 	var _arg2 C.gpointer
 	var _arg3 C.GDestroyNotify
 
-	_arg0 = (*C.SoupLogger)(unsafe.Pointer(externglib.InternObject(logger).Native()))
+	_arg0 = (*C.SoupLogger)(unsafe.Pointer(coreglib.InternObject(logger).Native()))
 	_arg1 = (*[0]byte)(C._gotk4_soup2_LoggerPrinter)
 	_arg2 = C.gpointer(gbox.Assign(printer))
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
@@ -281,14 +240,14 @@ func (logger *Logger) SetPrinter(printer LoggerPrinter) {
 }
 
 // SetRequestFilter sets up a filter to determine the log level for a given
-// request. For each HTTP request logger will invoke request_filter to determine
-// how much (if any) of that request to log. (If you do not set a request
-// filter, logger will just always log requests at the level passed to
+// request. For each HTTP request logger will invoke request_filter to
+// determine how much (if any) of that request to log. (If you do not set a
+// request filter, logger will just always log requests at the level passed to
 // soup_logger_new().).
 //
 // The function takes the following parameters:
 //
-//    - requestFilter: callback for request debugging.
+//   - requestFilter: callback for request debugging.
 //
 func (logger *Logger) SetRequestFilter(requestFilter LoggerFilter) {
 	var _arg0 *C.SoupLogger      // out
@@ -296,7 +255,7 @@ func (logger *Logger) SetRequestFilter(requestFilter LoggerFilter) {
 	var _arg2 C.gpointer
 	var _arg3 C.GDestroyNotify
 
-	_arg0 = (*C.SoupLogger)(unsafe.Pointer(externglib.InternObject(logger).Native()))
+	_arg0 = (*C.SoupLogger)(unsafe.Pointer(coreglib.InternObject(logger).Native()))
 	_arg1 = (*[0]byte)(C._gotk4_soup2_LoggerFilter)
 	_arg2 = C.gpointer(gbox.Assign(requestFilter))
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
@@ -314,7 +273,7 @@ func (logger *Logger) SetRequestFilter(requestFilter LoggerFilter) {
 //
 // The function takes the following parameters:
 //
-//    - responseFilter: callback for response debugging.
+//   - responseFilter: callback for response debugging.
 //
 func (logger *Logger) SetResponseFilter(responseFilter LoggerFilter) {
 	var _arg0 *C.SoupLogger      // out
@@ -322,7 +281,7 @@ func (logger *Logger) SetResponseFilter(responseFilter LoggerFilter) {
 	var _arg2 C.gpointer
 	var _arg3 C.GDestroyNotify
 
-	_arg0 = (*C.SoupLogger)(unsafe.Pointer(externglib.InternObject(logger).Native()))
+	_arg0 = (*C.SoupLogger)(unsafe.Pointer(coreglib.InternObject(logger).Native()))
 	_arg1 = (*[0]byte)(C._gotk4_soup2_LoggerFilter)
 	_arg2 = C.gpointer(gbox.Assign(responseFilter))
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
@@ -330,4 +289,14 @@ func (logger *Logger) SetResponseFilter(responseFilter LoggerFilter) {
 	C.soup_logger_set_response_filter(_arg0, _arg1, _arg2, _arg3)
 	runtime.KeepAlive(logger)
 	runtime.KeepAlive(responseFilter)
+}
+
+// LoggerClass: instance of this type is always passed by reference.
+type LoggerClass struct {
+	*loggerClass
+}
+
+// loggerClass is the struct that's finalized.
+type loggerClass struct {
+	native *C.SoupLoggerClass
 }

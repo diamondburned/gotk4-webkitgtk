@@ -2,82 +2,17 @@
 
 package webkit2
 
-import (
-	"runtime"
-	"unsafe"
-
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
-)
-
 // #include <stdlib.h>
-// #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitInstallMissingMediaPluginsPermissionRequest.go.
-var GTypeInstallMissingMediaPluginsPermissionRequest = externglib.Type(C.webkit_install_missing_media_plugins_permission_request_get_type())
-
-func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeInstallMissingMediaPluginsPermissionRequest, F: marshalInstallMissingMediaPluginsPermissionRequest},
-	})
+// InstallMissingMediaPluginsPermissionRequestClass: instance of this type is
+// always passed by reference.
+type InstallMissingMediaPluginsPermissionRequestClass struct {
+	*installMissingMediaPluginsPermissionRequestClass
 }
 
-// InstallMissingMediaPluginsPermissionRequestOverrider contains methods that are overridable.
-type InstallMissingMediaPluginsPermissionRequestOverrider interface {
-}
-
-type InstallMissingMediaPluginsPermissionRequest struct {
-	_ [0]func() // equal guard
-	*externglib.Object
-
-	PermissionRequest
-}
-
-var (
-	_ externglib.Objector = (*InstallMissingMediaPluginsPermissionRequest)(nil)
-)
-
-func classInitInstallMissingMediaPluginsPermissionRequester(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
-}
-
-func wrapInstallMissingMediaPluginsPermissionRequest(obj *externglib.Object) *InstallMissingMediaPluginsPermissionRequest {
-	return &InstallMissingMediaPluginsPermissionRequest{
-		Object: obj,
-		PermissionRequest: PermissionRequest{
-			Object: obj,
-		},
-	}
-}
-
-func marshalInstallMissingMediaPluginsPermissionRequest(p uintptr) (interface{}, error) {
-	return wrapInstallMissingMediaPluginsPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// Description gets the description about the missing plugins provided by the
-// media backend when a media couldn't be played.
-//
-// The function returns the following values:
-//
-//    - utf8: string with the description provided by the media backend.
-//
-func (request *InstallMissingMediaPluginsPermissionRequest) Description() string {
-	var _arg0 *C.WebKitInstallMissingMediaPluginsPermissionRequest // out
-	var _cret *C.gchar                                             // in
-
-	_arg0 = (*C.WebKitInstallMissingMediaPluginsPermissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
-
-	_cret = C.webkit_install_missing_media_plugins_permission_request_get_description(_arg0)
-	runtime.KeepAlive(request)
-
-	var _utf8 string // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-
-	return _utf8
+// installMissingMediaPluginsPermissionRequestClass is the struct that's finalized.
+type installMissingMediaPluginsPermissionRequestClass struct {
+	native *C.WebKitInstallMissingMediaPluginsPermissionRequestClass
 }

@@ -5,11 +5,10 @@ package soup
 import (
 	"fmt"
 	"runtime"
-	"runtime/cgo"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
@@ -18,18 +17,18 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup-message-body.go.
+// GType values.
 var (
-	GTypeMemoryUse   = externglib.Type(C.soup_memory_use_get_type())
-	GTypeBuffer      = externglib.Type(C.soup_buffer_get_type())
-	GTypeMessageBody = externglib.Type(C.soup_message_body_get_type())
+	GTypeMemoryUse   = coreglib.Type(C.soup_memory_use_get_type())
+	GTypeBuffer      = coreglib.Type(C.soup_buffer_get_type())
+	GTypeMessageBody = coreglib.Type(C.soup_message_body_get_type())
 )
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeMemoryUse, F: marshalMemoryUse},
-		{T: GTypeBuffer, F: marshalBuffer},
-		{T: GTypeMessageBody, F: marshalMessageBody},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeMemoryUse, F: marshalMemoryUse},
+		coreglib.TypeMarshaler{T: GTypeBuffer, F: marshalBuffer},
+		coreglib.TypeMarshaler{T: GTypeMessageBody, F: marshalMessageBody},
 	})
 }
 
@@ -53,14 +52,14 @@ const (
 	MemoryCopy
 	// MemoryTemporary: passed-in data belongs to the caller, but will remain
 	// valid for the lifetime of the Buffer. The difference between this and
-	// SOUP_MEMORY_STATIC is that if you copy a SOUP_MEMORY_TEMPORARY buffer, it
-	// will make a copy of the memory as well, rather than reusing the original
-	// memory.
+	// SOUP_MEMORY_STATIC is that if you copy a SOUP_MEMORY_TEMPORARY buffer,
+	// it will make a copy of the memory as well, rather than reusing the
+	// original memory.
 	MemoryTemporary
 )
 
 func marshalMemoryUse(p uintptr) (interface{}, error) {
-	return MemoryUse(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return MemoryUse(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for MemoryUse.
@@ -95,7 +94,7 @@ type buffer struct {
 }
 
 func marshalBuffer(p uintptr) (interface{}, error) {
-	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	b := coreglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
 	return &Buffer{&buffer{(*C.SoupBuffer)(b)}}, nil
 }
 
@@ -127,20 +126,27 @@ func NewBuffer(data []byte) *Buffer {
 
 // Length: length of data.
 func (b *Buffer) Length() uint {
-	var v uint // out
-	v = uint(b.native.length)
-	return v
+	valptr := &b.native.length
+	var _v uint // out
+	_v = uint(*valptr)
+	return _v
 }
 
-// Copy makes a copy of buffer. In reality, Buffer is a refcounted type, and
-// calling soup_buffer_copy() will normally just increment the refcount on
+// Length: length of data.
+func (b *Buffer) SetLength(length uint) {
+	valptr := &b.native.length
+	*valptr = C.gsize(length)
+}
+
+// Copy makes a copy of buffer. In reality, Buffer is a refcounted type,
+// and calling soup_buffer_copy() will normally just increment the refcount on
 // buffer and return it. However, if buffer was created with UP_MEMORY_TEMPORARY
 // memory, then soup_buffer_copy() will actually return a copy of it, so that
 // the data in the copy will remain valid after the temporary buffer is freed.
 //
 // The function returns the following values:
 //
-//    - ret: new (or newly-reffed) buffer.
+//   - ret: new (or newly-reffed) buffer.
 //
 func (buffer *Buffer) Copy() *Buffer {
 	var _arg0 *C.SoupBuffer // out
@@ -170,7 +176,7 @@ func (buffer *Buffer) Copy() *Buffer {
 //
 // The function returns the following values:
 //
-//    - bytes: new #GBytes which has the same content as the Buffer.
+//   - bytes: new #GBytes which has the same content as the Buffer.
 //
 func (buffer *Buffer) AsBytes() *glib.Bytes {
 	var _arg0 *C.SoupBuffer // out
@@ -200,7 +206,7 @@ func (buffer *Buffer) AsBytes() *glib.Bytes {
 //
 // The function returns the following values:
 //
-//    - data: pointer to the buffer data is stored here.
+//   - data: pointer to the buffer data is stored here.
 //
 func (buffer *Buffer) Data() []byte {
 	var _arg0 *C.SoupBuffer // out
@@ -225,9 +231,9 @@ func (buffer *Buffer) Data() []byte {
 //
 // The function returns the following values:
 //
-//    - gpointer (optional): owner pointer.
+//   - gpointer (optional): owner pointer.
 //
-func (buffer *Buffer) Owner() cgo.Handle {
+func (buffer *Buffer) Owner() unsafe.Pointer {
 	var _arg0 *C.SoupBuffer // out
 	var _cret C.gpointer    // in
 
@@ -236,9 +242,9 @@ func (buffer *Buffer) Owner() cgo.Handle {
 	_cret = C.soup_buffer_get_owner(_arg0)
 	runtime.KeepAlive(buffer)
 
-	var _gpointer cgo.Handle // out
+	var _gpointer unsafe.Pointer // out
 
-	_gpointer = (cgo.Handle)(unsafe.Pointer(_cret))
+	_gpointer = (unsafe.Pointer)(unsafe.Pointer(_cret))
 
 	return _gpointer
 }
@@ -249,12 +255,12 @@ func (buffer *Buffer) Owner() cgo.Handle {
 //
 // The function takes the following parameters:
 //
-//    - offset within parent to start at.
-//    - length: number of bytes to copy from parent.
+//   - offset within parent to start at.
+//   - length: number of bytes to copy from parent.
 //
 // The function returns the following values:
 //
-//    - buffer: new Buffer.
+//   - buffer: new Buffer.
 //
 func (parent *Buffer) NewSubbuffer(offset uint, length uint) *Buffer {
 	var _arg0 *C.SoupBuffer // out
@@ -286,8 +292,8 @@ func (parent *Buffer) NewSubbuffer(offset uint, length uint) *Buffer {
 
 // MessageBody request or response body.
 //
-// Note that while length always reflects the full length of the message body,
-// data is normally NULL, and will only be filled in after
+// Note that while length always reflects the full length of the
+// message body, data is normally NULL, and will only be filled in after
 // soup_message_body_flatten() is called. For client-side messages, this
 // automatically happens for the response body after it has been fully read,
 // unless you set the SOUP_MESSAGE_OVERWRITE_CHUNKS flags. Likewise, for
@@ -308,7 +314,7 @@ type messageBody struct {
 }
 
 func marshalMessageBody(p uintptr) (interface{}, error) {
-	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	b := coreglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
 	return &MessageBody{&messageBody{(*C.SoupMessageBody)(b)}}, nil
 }
 
@@ -333,16 +339,24 @@ func NewMessageBody() *MessageBody {
 
 // Data: data.
 func (m *MessageBody) Data() string {
-	var v string // out
-	v = C.GoString((*C.gchar)(unsafe.Pointer(m.native.data)))
-	return v
+	valptr := &m.native.data
+	var _v string // out
+	_v = C.GoString((*C.gchar)(unsafe.Pointer(*valptr)))
+	return _v
 }
 
 // Length: length of data.
 func (m *MessageBody) Length() int64 {
-	var v int64 // out
-	v = int64(m.native.length)
-	return v
+	valptr := &m.native.length
+	var _v int64 // out
+	_v = int64(*valptr)
+	return _v
+}
+
+// Length: length of data.
+func (m *MessageBody) SetLength(length int64) {
+	valptr := &m.native.length
+	*valptr = C.goffset(length)
 }
 
 // AppendBuffer appends the data from buffer to body. (MessageBody uses Buffers
@@ -351,7 +365,7 @@ func (m *MessageBody) Length() int64 {
 //
 // The function takes the following parameters:
 //
-//    - buffer: Buffer.
+//   - buffer: Buffer.
 //
 func (body *MessageBody) AppendBuffer(buffer *Buffer) {
 	var _arg0 *C.SoupMessageBody // out
@@ -373,7 +387,7 @@ func (body *MessageBody) AppendBuffer(buffer *Buffer) {
 //
 // The function takes the following parameters:
 //
-//    - data to append.
+//   - data to append.
 //
 func (body *MessageBody) Append(data []byte) {
 	var _arg0 *C.SoupMessageBody // out
@@ -406,8 +420,8 @@ func (body *MessageBody) Complete() {
 //
 // The function returns the following values:
 //
-//    - buffer containing the same data as body. (You must free this buffer if
-//      you do not want it.).
+//   - buffer containing the same data as body. (You must free this buffer if
+//     you do not want it.).
 //
 func (body *MessageBody) Flatten() *Buffer {
 	var _arg0 *C.SoupMessageBody // out
@@ -436,7 +450,7 @@ func (body *MessageBody) Flatten() *Buffer {
 //
 // The function returns the following values:
 //
-//    - ok: accumulate flag for body.
+//   - ok: accumulate flag for body.
 //
 func (body *MessageBody) Accumulate() bool {
 	var _arg0 *C.SoupMessageBody // out
@@ -456,26 +470,26 @@ func (body *MessageBody) Accumulate() bool {
 	return _ok
 }
 
-// Chunk gets a Buffer containing data from body starting at offset. The size of
-// the returned chunk is unspecified. You can iterate through the entire body by
-// first calling soup_message_body_get_chunk() with an offset of 0, and then on
-// each successive call, increment the offset by the length of the
+// Chunk gets a Buffer containing data from body starting at offset. The size
+// of the returned chunk is unspecified. You can iterate through the entire
+// body by first calling soup_message_body_get_chunk() with an offset of 0,
+// and then on each successive call, increment the offset by the length of the
 // previously-returned chunk.
 //
 // If offset is greater than or equal to the total length of body, then the
-// return value depends on whether or not soup_message_body_complete() has been
-// called or not; if it has, then soup_message_body_get_chunk() will return a
-// 0-length chunk (indicating the end of body). If it has not, then
-// soup_message_body_get_chunk() will return NULL (indicating that body may
+// return value depends on whether or not soup_message_body_complete() has
+// been called or not; if it has, then soup_message_body_get_chunk() will
+// return a 0-length chunk (indicating the end of body). If it has not,
+// then soup_message_body_get_chunk() will return NULL (indicating that body may
 // still potentially have more data, but that data is not currently available).
 //
 // The function takes the following parameters:
 //
-//    - offset: offset.
+//   - offset: offset.
 //
 // The function returns the following values:
 //
-//    - buffer (optional) or NULL.
+//   - buffer (optional) or NULL.
 //
 func (body *MessageBody) Chunk(offset int64) *Buffer {
 	var _arg0 *C.SoupMessageBody // out
@@ -504,8 +518,8 @@ func (body *MessageBody) Chunk(offset int64) *Buffer {
 	return _buffer
 }
 
-// GotChunk handles the MessageBody part of receiving a chunk of data from the
-// network. Normally this means appending chunk to body, exactly as with
+// GotChunk handles the MessageBody part of receiving a chunk of data from
+// the network. Normally this means appending chunk to body, exactly as with
 // soup_message_body_append_buffer(), but if you have set body's accumulate flag
 // to FALSE, then that will not happen.
 //
@@ -513,7 +527,7 @@ func (body *MessageBody) Chunk(offset int64) *Buffer {
 //
 // The function takes the following parameters:
 //
-//    - chunk received from the network.
+//   - chunk received from the network.
 //
 func (body *MessageBody) GotChunk(chunk *Buffer) {
 	var _arg0 *C.SoupMessageBody // out
@@ -528,15 +542,15 @@ func (body *MessageBody) GotChunk(chunk *Buffer) {
 }
 
 // SetAccumulate sets or clears the accumulate flag on body. (The default value
-// is TRUE.) If set to FALSE, body's data field will not be filled in after the
-// body is fully sent/received, and the chunks that make up body may be
+// is TRUE.) If set to FALSE, body's data field will not be filled in after
+// the body is fully sent/received, and the chunks that make up body may be
 // discarded when they are no longer needed.
 //
-// In particular, if you set this flag to FALSE on an "incoming" message body
-// (that is, the Message:response_body of a client-side message, or
-// Message:request_body of a server-side message), this will cause each chunk of
-// the body to be discarded after its corresponding Message::got_chunk signal is
-// emitted. (This is equivalent to setting the deprecated
+// In particular, if you set this flag to FALSE on an "incoming" message
+// body (that is, the Message:response_body of a client-side message,
+// or Message:request_body of a server-side message), this will cause each
+// chunk of the body to be discarded after its corresponding Message::got_chunk
+// signal is emitted. (This is equivalent to setting the deprecated
 // SOUP_MESSAGE_OVERWRITE_CHUNKS flag on the message.)
 //
 // If you set this flag to FALSE on the Message:response_body of a server-side
@@ -544,18 +558,18 @@ func (body *MessageBody) GotChunk(chunk *Buffer) {
 // corresponding Message::wrote_chunk signal is emitted.
 //
 // If you set the flag to FALSE on the Message:request_body of a client-side
-// message, it will block the accumulation of chunks into body's data field, but
-// it will not normally cause the chunks to be discarded after being written
-// like in the server-side Message:response_body case, because the request body
-// needs to be kept around in case the request needs to be sent a second time
-// due to redirection or authentication. However, if you set the
-// SOUP_MESSAGE_CAN_REBUILD flag on the message, then the chunks will be
+// message, it will block the accumulation of chunks into body's data field,
+// but it will not normally cause the chunks to be discarded after being
+// written like in the server-side Message:response_body case, because the
+// request body needs to be kept around in case the request needs to be sent
+// a second time due to redirection or authentication. However, if you set
+// the SOUP_MESSAGE_CAN_REBUILD flag on the message, then the chunks will be
 // discarded, and you will be responsible for recreating the request body after
 // the Message::restarted signal is emitted.
 //
 // The function takes the following parameters:
 //
-//    - accumulate: whether or not to accumulate body chunks in body.
+//   - accumulate: whether or not to accumulate body chunks in body.
 //
 func (body *MessageBody) SetAccumulate(accumulate bool) {
 	var _arg0 *C.SoupMessageBody // out
@@ -590,7 +604,7 @@ func (body *MessageBody) Truncate() {
 //
 // The function takes the following parameters:
 //
-//    - chunk returned from soup_message_body_get_chunk().
+//   - chunk returned from soup_message_body_get_chunk().
 //
 func (body *MessageBody) WroteChunk(chunk *Buffer) {
 	var _arg0 *C.SoupMessageBody // out

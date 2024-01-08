@@ -7,41 +7,41 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4-webkitgtk/pkg/soup/v2"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
-// #cgo pkg-config: libsoup-gnome-2.4
+// #cgo pkg-config: libsoup-gnome-2.4 libsoup-2.4
 // #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup-gnome.h>
 import "C"
 
-// glib.Type values for soupgnome.go.
+// GType values.
 var (
-	GTypePasswordManagerGNOME = externglib.Type(C.soup_password_manager_gnome_get_type())
-	GTypeProxyResolverGNOME   = externglib.Type(C.soup_proxy_resolver_gnome_get_type())
+	GTypePasswordManagerGNOME = coreglib.Type(C.soup_password_manager_gnome_get_type())
+	GTypeProxyResolverGNOME   = coreglib.Type(C.soup_proxy_resolver_gnome_get_type())
 )
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypePasswordManagerGNOME, F: marshalPasswordManagerGNOME},
-		{T: GTypeProxyResolverGNOME, F: marshalProxyResolverGNOME},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypePasswordManagerGNOME, F: marshalPasswordManagerGNOME},
+		coreglib.TypeMarshaler{T: GTypeProxyResolverGNOME, F: marshalProxyResolverGNOME},
 	})
 }
 
 type PasswordManagerGNOME struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 
 	soup.SessionFeature
 }
 
 var (
-	_ externglib.Objector = (*PasswordManagerGNOME)(nil)
+	_ coreglib.Objector = (*PasswordManagerGNOME)(nil)
 )
 
-func wrapPasswordManagerGNOME(obj *externglib.Object) *PasswordManagerGNOME {
+func wrapPasswordManagerGNOME(obj *coreglib.Object) *PasswordManagerGNOME {
 	return &PasswordManagerGNOME{
 		Object: obj,
 		SessionFeature: soup.SessionFeature{
@@ -51,7 +51,7 @@ func wrapPasswordManagerGNOME(obj *externglib.Object) *PasswordManagerGNOME {
 }
 
 func marshalPasswordManagerGNOME(p uintptr) (interface{}, error) {
-	return wrapPasswordManagerGNOME(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapPasswordManagerGNOME(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 type ProxyResolverGNOME struct {
@@ -60,10 +60,10 @@ type ProxyResolverGNOME struct {
 }
 
 var (
-	_ externglib.Objector = (*ProxyResolverGNOME)(nil)
+	_ coreglib.Objector = (*ProxyResolverGNOME)(nil)
 )
 
-func wrapProxyResolverGNOME(obj *externglib.Object) *ProxyResolverGNOME {
+func wrapProxyResolverGNOME(obj *coreglib.Object) *ProxyResolverGNOME {
 	return &ProxyResolverGNOME{
 		ProxyResolverDefault: soup.ProxyResolverDefault{
 			Object: obj,
@@ -77,5 +77,5 @@ func wrapProxyResolverGNOME(obj *externglib.Object) *ProxyResolverGNOME {
 }
 
 func marshalProxyResolverGNOME(p uintptr) (interface{}, error) {
-	return wrapProxyResolverGNOME(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapProxyResolverGNOME(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }

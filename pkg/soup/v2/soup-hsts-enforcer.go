@@ -6,166 +6,132 @@ import (
 	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
-// extern gboolean _gotk4_soup2_HSTSEnforcerClass_has_valid_policy(SoupHSTSEnforcer*, char*);
-// extern gboolean _gotk4_soup2_HSTSEnforcerClass_is_persistent(SoupHSTSEnforcer*);
-// extern void _gotk4_soup2_HSTSEnforcerClass_changed(SoupHSTSEnforcer*, SoupHSTSPolicy*, SoupHSTSPolicy*);
-// extern void _gotk4_soup2_HSTSEnforcerClass_hsts_enforced(SoupHSTSEnforcer*, SoupMessage*);
-// extern void _gotk4_soup2_HSTSEnforcer_ConnectChanged(gpointer, SoupHSTSPolicy*, SoupHSTSPolicy*, guintptr);
 // extern void _gotk4_soup2_HSTSEnforcer_ConnectHstsEnforced(gpointer, SoupMessage*, guintptr);
+// extern void _gotk4_soup2_HSTSEnforcer_ConnectChanged(gpointer, SoupHSTSPolicy*, SoupHSTSPolicy*, guintptr);
+// extern void _gotk4_soup2_HSTSEnforcerClass_hsts_enforced(SoupHSTSEnforcer*, SoupMessage*);
+// extern void _gotk4_soup2_HSTSEnforcerClass_changed(SoupHSTSEnforcer*, SoupHSTSPolicy*, SoupHSTSPolicy*);
+// extern gboolean _gotk4_soup2_HSTSEnforcerClass_is_persistent(SoupHSTSEnforcer*);
+// extern gboolean _gotk4_soup2_HSTSEnforcerClass_has_valid_policy(SoupHSTSEnforcer*, char*);
+// gboolean _gotk4_soup2_HSTSEnforcer_virtual_has_valid_policy(void* fnptr, SoupHSTSEnforcer* arg0, char* arg1) {
+//   return ((gboolean (*)(SoupHSTSEnforcer*, char*))(fnptr))(arg0, arg1);
+// };
+// gboolean _gotk4_soup2_HSTSEnforcer_virtual_is_persistent(void* fnptr, SoupHSTSEnforcer* arg0) {
+//   return ((gboolean (*)(SoupHSTSEnforcer*))(fnptr))(arg0);
+// };
+// void _gotk4_soup2_HSTSEnforcer_virtual_changed(void* fnptr, SoupHSTSEnforcer* arg0, SoupHSTSPolicy* arg1, SoupHSTSPolicy* arg2) {
+//   ((void (*)(SoupHSTSEnforcer*, SoupHSTSPolicy*, SoupHSTSPolicy*))(fnptr))(arg0, arg1, arg2);
+// };
+// void _gotk4_soup2_HSTSEnforcer_virtual_hsts_enforced(void* fnptr, SoupHSTSEnforcer* arg0, SoupMessage* arg1) {
+//   ((void (*)(SoupHSTSEnforcer*, SoupMessage*))(fnptr))(arg0, arg1);
+// };
 import "C"
 
-// glib.Type values for soup-hsts-enforcer.go.
-var GTypeHSTSEnforcer = externglib.Type(C.soup_hsts_enforcer_get_type())
+// GType values.
+var (
+	GTypeHSTSEnforcer = coreglib.Type(C.soup_hsts_enforcer_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeHSTSEnforcer, F: marshalHSTSEnforcer},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeHSTSEnforcer, F: marshalHSTSEnforcer},
 	})
 }
 
-// HSTSEnforcerOverrider contains methods that are overridable.
-type HSTSEnforcerOverrider interface {
+// HSTSEnforcerOverrides contains methods that are overridable.
+type HSTSEnforcerOverrides struct {
 	// The function takes the following parameters:
 	//
-	//    - oldPolicy
-	//    - newPolicy
+	//   - oldPolicy
+	//   - newPolicy
 	//
-	Changed(oldPolicy, newPolicy *HSTSPolicy)
+	Changed func(oldPolicy, newPolicy *HSTSPolicy)
 	// HasValidPolicy gets whether hsts_enforcer has a currently valid policy
 	// for domain.
 	//
 	// The function takes the following parameters:
 	//
-	//    - domain: domain.
+	//   - domain: domain.
 	//
 	// The function returns the following values:
 	//
-	//    - ok: TRUE if access to domain should happen over HTTPS, false
-	//      otherwise.
+	//   - ok: TRUE if access to domain should happen over HTTPS, false
+	//     otherwise.
 	//
-	HasValidPolicy(domain string) bool
+	HasValidPolicy func(domain string) bool
 	// The function takes the following parameters:
 	//
-	HstsEnforced(message *Message)
+	HstsEnforced func(message *Message)
 	// IsPersistent gets whether hsts_enforcer stores policies persistenly.
 	//
 	// The function returns the following values:
 	//
-	//    - ok: TRUE if hsts_enforcer storage is persistent or FALSE otherwise.
+	//   - ok: TRUE if hsts_enforcer storage is persistent or FALSE otherwise.
 	//
-	IsPersistent() bool
+	IsPersistent func() bool
+}
+
+func defaultHSTSEnforcerOverrides(v *HSTSEnforcer) HSTSEnforcerOverrides {
+	return HSTSEnforcerOverrides{
+		Changed:        v.changed,
+		HasValidPolicy: v.hasValidPolicy,
+		HstsEnforced:   v.hstsEnforced,
+		IsPersistent:   v.isPersistent,
+	}
 }
 
 type HSTSEnforcer struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 
 	SessionFeature
 }
 
 var (
-	_ externglib.Objector = (*HSTSEnforcer)(nil)
+	_ coreglib.Objector = (*HSTSEnforcer)(nil)
 )
 
-func classInitHSTSEnforcerer(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+func init() {
+	coreglib.RegisterClassInfo[*HSTSEnforcer, *HSTSEnforcerClass, HSTSEnforcerOverrides](
+		GTypeHSTSEnforcer,
+		initHSTSEnforcerClass,
+		wrapHSTSEnforcer,
+		defaultHSTSEnforcerOverrides,
+	)
+}
 
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+func initHSTSEnforcerClass(gclass unsafe.Pointer, overrides HSTSEnforcerOverrides, classInitFunc func(*HSTSEnforcerClass)) {
+	pclass := (*C.SoupHSTSEnforcerClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeHSTSEnforcer))))
 
-	goval := gbox.Get(uintptr(data))
-	pclass := (*C.SoupHSTSEnforcerClass)(unsafe.Pointer(gclassPtr))
-	// gclass := (*C.GTypeClass)(unsafe.Pointer(gclassPtr))
-	// pclass := (*C.SoupHSTSEnforcerClass)(unsafe.Pointer(C.g_type_class_peek_parent(gclass)))
-
-	if _, ok := goval.(interface {
-		Changed(oldPolicy, newPolicy *HSTSPolicy)
-	}); ok {
+	if overrides.Changed != nil {
 		pclass.changed = (*[0]byte)(C._gotk4_soup2_HSTSEnforcerClass_changed)
 	}
 
-	if _, ok := goval.(interface{ HasValidPolicy(domain string) bool }); ok {
+	if overrides.HasValidPolicy != nil {
 		pclass.has_valid_policy = (*[0]byte)(C._gotk4_soup2_HSTSEnforcerClass_has_valid_policy)
 	}
 
-	if _, ok := goval.(interface{ HstsEnforced(message *Message) }); ok {
+	if overrides.HstsEnforced != nil {
 		pclass.hsts_enforced = (*[0]byte)(C._gotk4_soup2_HSTSEnforcerClass_hsts_enforced)
 	}
 
-	if _, ok := goval.(interface{ IsPersistent() bool }); ok {
+	if overrides.IsPersistent != nil {
 		pclass.is_persistent = (*[0]byte)(C._gotk4_soup2_HSTSEnforcerClass_is_persistent)
 	}
-}
 
-//export _gotk4_soup2_HSTSEnforcerClass_changed
-func _gotk4_soup2_HSTSEnforcerClass_changed(arg0 *C.SoupHSTSEnforcer, arg1 *C.SoupHSTSPolicy, arg2 *C.SoupHSTSPolicy) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		Changed(oldPolicy, newPolicy *HSTSPolicy)
-	})
-
-	var _oldPolicy *HSTSPolicy // out
-	var _newPolicy *HSTSPolicy // out
-
-	_oldPolicy = (*HSTSPolicy)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-	_newPolicy = (*HSTSPolicy)(gextras.NewStructNative(unsafe.Pointer(arg2)))
-
-	iface.Changed(_oldPolicy, _newPolicy)
-}
-
-//export _gotk4_soup2_HSTSEnforcerClass_has_valid_policy
-func _gotk4_soup2_HSTSEnforcerClass_has_valid_policy(arg0 *C.SoupHSTSEnforcer, arg1 *C.char) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ HasValidPolicy(domain string) bool })
-
-	var _domain string // out
-
-	_domain = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
-
-	ok := iface.HasValidPolicy(_domain)
-
-	if ok {
-		cret = C.TRUE
+	if classInitFunc != nil {
+		class := (*HSTSEnforcerClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
 	}
-
-	return cret
 }
 
-//export _gotk4_soup2_HSTSEnforcerClass_hsts_enforced
-func _gotk4_soup2_HSTSEnforcerClass_hsts_enforced(arg0 *C.SoupHSTSEnforcer, arg1 *C.SoupMessage) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ HstsEnforced(message *Message) })
-
-	var _message *Message // out
-
-	_message = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-
-	iface.HstsEnforced(_message)
-}
-
-//export _gotk4_soup2_HSTSEnforcerClass_is_persistent
-func _gotk4_soup2_HSTSEnforcerClass_is_persistent(arg0 *C.SoupHSTSEnforcer) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ IsPersistent() bool })
-
-	ok := iface.IsPersistent()
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-func wrapHSTSEnforcer(obj *externglib.Object) *HSTSEnforcer {
+func wrapHSTSEnforcer(obj *coreglib.Object) *HSTSEnforcer {
 	return &HSTSEnforcer{
 		Object: obj,
 		SessionFeature: SessionFeature{
@@ -175,29 +141,7 @@ func wrapHSTSEnforcer(obj *externglib.Object) *HSTSEnforcer {
 }
 
 func marshalHSTSEnforcer(p uintptr) (interface{}, error) {
-	return wrapHSTSEnforcer(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-//export _gotk4_soup2_HSTSEnforcer_ConnectChanged
-func _gotk4_soup2_HSTSEnforcer_ConnectChanged(arg0 C.gpointer, arg1 *C.SoupHSTSPolicy, arg2 *C.SoupHSTSPolicy, arg3 C.guintptr) {
-	var f func(oldPolicy, newPolicy *HSTSPolicy)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(oldPolicy, newPolicy *HSTSPolicy))
-	}
-
-	var _oldPolicy *HSTSPolicy // out
-	var _newPolicy *HSTSPolicy // out
-
-	_oldPolicy = (*HSTSPolicy)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-	_newPolicy = (*HSTSPolicy)(gextras.NewStructNative(unsafe.Pointer(arg2)))
-
-	f(_oldPolicy, _newPolicy)
+	return wrapHSTSEnforcer(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // ConnectChanged is emitted when hsts_enforcer changes. If a policy has been
@@ -207,34 +151,14 @@ func _gotk4_soup2_HSTSEnforcer_ConnectChanged(arg0 C.gpointer, arg1 *C.SoupHSTSP
 // will contain its old value, and new_policy its new value.
 //
 // Note that you shouldn't modify the policies from a callback to this signal.
-func (hstsEnforcer *HSTSEnforcer) ConnectChanged(f func(oldPolicy, newPolicy *HSTSPolicy)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(hstsEnforcer, "changed", false, unsafe.Pointer(C._gotk4_soup2_HSTSEnforcer_ConnectChanged), f)
-}
-
-//export _gotk4_soup2_HSTSEnforcer_ConnectHstsEnforced
-func _gotk4_soup2_HSTSEnforcer_ConnectHstsEnforced(arg0 C.gpointer, arg1 *C.SoupMessage, arg2 C.guintptr) {
-	var f func(message *Message)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(message *Message))
-	}
-
-	var _message *Message // out
-
-	_message = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-
-	f(_message)
+func (hstsEnforcer *HSTSEnforcer) ConnectChanged(f func(oldPolicy, newPolicy *HSTSPolicy)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(hstsEnforcer, "changed", false, unsafe.Pointer(C._gotk4_soup2_HSTSEnforcer_ConnectChanged), f)
 }
 
 // ConnectHstsEnforced is emitted when hsts_enforcer has upgraded the protocol
 // for message to HTTPS as a result of matching its domain with a HSTS policy.
-func (hstsEnforcer *HSTSEnforcer) ConnectHstsEnforced(f func(message *Message)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(hstsEnforcer, "hsts-enforced", false, unsafe.Pointer(C._gotk4_soup2_HSTSEnforcer_ConnectHstsEnforced), f)
+func (hstsEnforcer *HSTSEnforcer) ConnectHstsEnforced(f func(message *Message)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(hstsEnforcer, "hsts-enforced", false, unsafe.Pointer(C._gotk4_soup2_HSTSEnforcer_ConnectHstsEnforced), f)
 }
 
 // NewHSTSEnforcer creates a new HSTSEnforcer. The base HSTSEnforcer class does
@@ -242,7 +166,7 @@ func (hstsEnforcer *HSTSEnforcer) ConnectHstsEnforced(f func(message *Message)) 
 //
 // The function returns the following values:
 //
-//    - hstsEnforcer: new HSTSEnforcer.
+//   - hstsEnforcer: new HSTSEnforcer.
 //
 func NewHSTSEnforcer() *HSTSEnforcer {
 	var _cret *C.SoupHSTSEnforcer // in
@@ -251,7 +175,7 @@ func NewHSTSEnforcer() *HSTSEnforcer {
 
 	var _hstsEnforcer *HSTSEnforcer // out
 
-	_hstsEnforcer = wrapHSTSEnforcer(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_hstsEnforcer = wrapHSTSEnforcer(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _hstsEnforcer
 }
@@ -260,19 +184,19 @@ func NewHSTSEnforcer() *HSTSEnforcer {
 //
 // The function takes the following parameters:
 //
-//    - sessionPolicies: whether to include session policies.
+//   - sessionPolicies: whether to include session policies.
 //
 // The function returns the following values:
 //
-//    - list: newly allocated list of domains. Use g_list_free_full() and
-//      g_free() to free the list.
+//   - list: newly allocated list of domains. Use g_list_free_full() and
+//     g_free() to free the list.
 //
 func (hstsEnforcer *HSTSEnforcer) Domains(sessionPolicies bool) []string {
 	var _arg0 *C.SoupHSTSEnforcer // out
 	var _arg1 C.gboolean          // out
 	var _cret *C.GList            // in
 
-	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(externglib.InternObject(hstsEnforcer).Native()))
+	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(coreglib.InternObject(hstsEnforcer).Native()))
 	if sessionPolicies {
 		_arg1 = C.TRUE
 	}
@@ -299,19 +223,19 @@ func (hstsEnforcer *HSTSEnforcer) Domains(sessionPolicies bool) []string {
 //
 // The function takes the following parameters:
 //
-//    - sessionPolicies: whether to include session policies.
+//   - sessionPolicies: whether to include session policies.
 //
 // The function returns the following values:
 //
-//    - list: newly allocated list of policies. Use g_list_free_full() and
-//      soup_hsts_policy_free() to free the list.
+//   - list: newly allocated list of policies. Use g_list_free_full() and
+//     soup_hsts_policy_free() to free the list.
 //
 func (hstsEnforcer *HSTSEnforcer) Policies(sessionPolicies bool) []*HSTSPolicy {
 	var _arg0 *C.SoupHSTSEnforcer // out
 	var _arg1 C.gboolean          // out
 	var _cret *C.GList            // in
 
-	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(externglib.InternObject(hstsEnforcer).Native()))
+	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(coreglib.InternObject(hstsEnforcer).Native()))
 	if sessionPolicies {
 		_arg1 = C.TRUE
 	}
@@ -344,18 +268,18 @@ func (hstsEnforcer *HSTSEnforcer) Policies(sessionPolicies bool) []*HSTSPolicy {
 //
 // The function takes the following parameters:
 //
-//    - domain: domain.
+//   - domain: domain.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if access to domain should happen over HTTPS, false otherwise.
+//   - ok: TRUE if access to domain should happen over HTTPS, false otherwise.
 //
 func (hstsEnforcer *HSTSEnforcer) HasValidPolicy(domain string) bool {
 	var _arg0 *C.SoupHSTSEnforcer // out
 	var _arg1 *C.char             // out
 	var _cret C.gboolean          // in
 
-	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(externglib.InternObject(hstsEnforcer).Native()))
+	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(coreglib.InternObject(hstsEnforcer).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(domain)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -376,13 +300,13 @@ func (hstsEnforcer *HSTSEnforcer) HasValidPolicy(domain string) bool {
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if hsts_enforcer storage is persistent or FALSE otherwise.
+//   - ok: TRUE if hsts_enforcer storage is persistent or FALSE otherwise.
 //
 func (hstsEnforcer *HSTSEnforcer) IsPersistent() bool {
 	var _arg0 *C.SoupHSTSEnforcer // out
 	var _cret C.gboolean          // in
 
-	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(externglib.InternObject(hstsEnforcer).Native()))
+	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(coreglib.InternObject(hstsEnforcer).Native()))
 
 	_cret = C.soup_hsts_enforcer_is_persistent(_arg0)
 	runtime.KeepAlive(hstsEnforcer)
@@ -397,21 +321,21 @@ func (hstsEnforcer *HSTSEnforcer) IsPersistent() bool {
 }
 
 // SetPolicy sets policy to hsts_enforcer. If policy is expired, any existing
-// HSTS policy for its host will be removed instead. If a policy existed for
-// this host, it will be replaced. Otherwise, the new policy will be inserted.
-// If the policy is a session policy, that is, one created with
+// HSTS policy for its host will be removed instead. If a policy existed
+// for this host, it will be replaced. Otherwise, the new policy will be
+// inserted. If the policy is a session policy, that is, one created with
 // soup_hsts_policy_new_session_policy(), the policy will not expire and will be
 // enforced during the lifetime of hsts_enforcer's Session.
 //
 // The function takes the following parameters:
 //
-//    - policy of the HSTS host.
+//   - policy of the HSTS host.
 //
 func (hstsEnforcer *HSTSEnforcer) SetPolicy(policy *HSTSPolicy) {
 	var _arg0 *C.SoupHSTSEnforcer // out
 	var _arg1 *C.SoupHSTSPolicy   // out
 
-	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(externglib.InternObject(hstsEnforcer).Native()))
+	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(coreglib.InternObject(hstsEnforcer).Native()))
 	_arg1 = (*C.SoupHSTSPolicy)(gextras.StructNative(unsafe.Pointer(policy)))
 
 	C.soup_hsts_enforcer_set_policy(_arg0, _arg1)
@@ -425,15 +349,15 @@ func (hstsEnforcer *HSTSEnforcer) SetPolicy(policy *HSTSPolicy) {
 //
 // The function takes the following parameters:
 //
-//    - domain: policy domain or hostname.
-//    - includeSubdomains: TRUE if the policy applies on sub domains.
+//   - domain: policy domain or hostname.
+//   - includeSubdomains: TRUE if the policy applies on sub domains.
 //
 func (hstsEnforcer *HSTSEnforcer) SetSessionPolicy(domain string, includeSubdomains bool) {
 	var _arg0 *C.SoupHSTSEnforcer // out
 	var _arg1 *C.char             // out
 	var _arg2 C.gboolean          // out
 
-	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(externglib.InternObject(hstsEnforcer).Native()))
+	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(coreglib.InternObject(hstsEnforcer).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(domain)))
 	defer C.free(unsafe.Pointer(_arg1))
 	if includeSubdomains {
@@ -444,4 +368,117 @@ func (hstsEnforcer *HSTSEnforcer) SetSessionPolicy(domain string, includeSubdoma
 	runtime.KeepAlive(hstsEnforcer)
 	runtime.KeepAlive(domain)
 	runtime.KeepAlive(includeSubdomains)
+}
+
+// The function takes the following parameters:
+//
+//   - oldPolicy
+//   - newPolicy
+//
+func (enforcer *HSTSEnforcer) changed(oldPolicy, newPolicy *HSTSPolicy) {
+	gclass := (*C.SoupHSTSEnforcerClass)(coreglib.PeekParentClass(enforcer))
+	fnarg := gclass.changed
+
+	var _arg0 *C.SoupHSTSEnforcer // out
+	var _arg1 *C.SoupHSTSPolicy   // out
+	var _arg2 *C.SoupHSTSPolicy   // out
+
+	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(coreglib.InternObject(enforcer).Native()))
+	_arg1 = (*C.SoupHSTSPolicy)(gextras.StructNative(unsafe.Pointer(oldPolicy)))
+	_arg2 = (*C.SoupHSTSPolicy)(gextras.StructNative(unsafe.Pointer(newPolicy)))
+
+	C._gotk4_soup2_HSTSEnforcer_virtual_changed(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2)
+	runtime.KeepAlive(enforcer)
+	runtime.KeepAlive(oldPolicy)
+	runtime.KeepAlive(newPolicy)
+}
+
+// hasValidPolicy gets whether hsts_enforcer has a currently valid policy for
+// domain.
+//
+// The function takes the following parameters:
+//
+//   - domain: domain.
+//
+// The function returns the following values:
+//
+//   - ok: TRUE if access to domain should happen over HTTPS, false otherwise.
+//
+func (hstsEnforcer *HSTSEnforcer) hasValidPolicy(domain string) bool {
+	gclass := (*C.SoupHSTSEnforcerClass)(coreglib.PeekParentClass(hstsEnforcer))
+	fnarg := gclass.has_valid_policy
+
+	var _arg0 *C.SoupHSTSEnforcer // out
+	var _arg1 *C.char             // out
+	var _cret C.gboolean          // in
+
+	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(coreglib.InternObject(hstsEnforcer).Native()))
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(domain)))
+	defer C.free(unsafe.Pointer(_arg1))
+
+	_cret = C._gotk4_soup2_HSTSEnforcer_virtual_has_valid_policy(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(hstsEnforcer)
+	runtime.KeepAlive(domain)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// The function takes the following parameters:
+//
+func (enforcer *HSTSEnforcer) hstsEnforced(message *Message) {
+	gclass := (*C.SoupHSTSEnforcerClass)(coreglib.PeekParentClass(enforcer))
+	fnarg := gclass.hsts_enforced
+
+	var _arg0 *C.SoupHSTSEnforcer // out
+	var _arg1 *C.SoupMessage      // out
+
+	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(coreglib.InternObject(enforcer).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(message).Native()))
+
+	C._gotk4_soup2_HSTSEnforcer_virtual_hsts_enforced(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(enforcer)
+	runtime.KeepAlive(message)
+}
+
+// isPersistent gets whether hsts_enforcer stores policies persistenly.
+//
+// The function returns the following values:
+//
+//   - ok: TRUE if hsts_enforcer storage is persistent or FALSE otherwise.
+//
+func (hstsEnforcer *HSTSEnforcer) isPersistent() bool {
+	gclass := (*C.SoupHSTSEnforcerClass)(coreglib.PeekParentClass(hstsEnforcer))
+	fnarg := gclass.is_persistent
+
+	var _arg0 *C.SoupHSTSEnforcer // out
+	var _cret C.gboolean          // in
+
+	_arg0 = (*C.SoupHSTSEnforcer)(unsafe.Pointer(coreglib.InternObject(hstsEnforcer).Native()))
+
+	_cret = C._gotk4_soup2_HSTSEnforcer_virtual_is_persistent(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(hstsEnforcer)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// HSTSEnforcerClass: instance of this type is always passed by reference.
+type HSTSEnforcerClass struct {
+	*hstsEnforcerClass
+}
+
+// hstsEnforcerClass is the struct that's finalized.
+type hstsEnforcerClass struct {
+	native *C.SoupHSTSEnforcerClass
 }

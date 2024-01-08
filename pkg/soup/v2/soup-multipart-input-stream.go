@@ -7,57 +7,69 @@ import (
 	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
-// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
 import "C"
 
-// glib.Type values for soup-multipart-input-stream.go.
-var GTypeMultipartInputStream = externglib.Type(C.soup_multipart_input_stream_get_type())
+// GType values.
+var (
+	GTypeMultipartInputStream = coreglib.Type(C.soup_multipart_input_stream_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeMultipartInputStream, F: marshalMultipartInputStream},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeMultipartInputStream, F: marshalMultipartInputStream},
 	})
 }
 
-// MultipartInputStreamOverrider contains methods that are overridable.
-type MultipartInputStreamOverrider interface {
+// MultipartInputStreamOverrides contains methods that are overridable.
+type MultipartInputStreamOverrides struct {
+}
+
+func defaultMultipartInputStreamOverrides(v *MultipartInputStream) MultipartInputStreamOverrides {
+	return MultipartInputStreamOverrides{}
 }
 
 type MultipartInputStream struct {
 	_ [0]func() // equal guard
 	gio.FilterInputStream
 
-	*externglib.Object
+	*coreglib.Object
 	gio.InputStream
 	gio.PollableInputStream
 }
 
 var (
 	_ gio.FilterInputStreamer = (*MultipartInputStream)(nil)
-	_ externglib.Objector     = (*MultipartInputStream)(nil)
+	_ coreglib.Objector       = (*MultipartInputStream)(nil)
 	_ gio.InputStreamer       = (*MultipartInputStream)(nil)
 )
 
-func classInitMultipartInputStreamer(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*MultipartInputStream, *MultipartInputStreamClass, MultipartInputStreamOverrides](
+		GTypeMultipartInputStream,
+		initMultipartInputStreamClass,
+		wrapMultipartInputStream,
+		defaultMultipartInputStreamOverrides,
+	)
 }
 
-func wrapMultipartInputStream(obj *externglib.Object) *MultipartInputStream {
+func initMultipartInputStreamClass(gclass unsafe.Pointer, overrides MultipartInputStreamOverrides, classInitFunc func(*MultipartInputStreamClass)) {
+	if classInitFunc != nil {
+		class := (*MultipartInputStreamClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapMultipartInputStream(obj *coreglib.Object) *MultipartInputStream {
 	return &MultipartInputStream{
 		FilterInputStream: gio.FilterInputStream{
 			InputStream: gio.InputStream{
@@ -77,30 +89,30 @@ func wrapMultipartInputStream(obj *externglib.Object) *MultipartInputStream {
 }
 
 func marshalMultipartInputStream(p uintptr) (interface{}, error) {
-	return wrapMultipartInputStream(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapMultipartInputStream(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewMultipartInputStream creates a new MultipartInputStream that wraps the
-// Stream obtained by sending the Request. Reads should not be done directly
-// through this object, use the input streams returned by
+// NewMultipartInputStream creates a new MultipartInputStream that wraps
+// the Stream obtained by sending the Request. Reads should not be done
+// directly through this object, use the input streams returned by
 // soup_multipart_input_stream_next_part() or its async counterpart instead.
 //
 // The function takes the following parameters:
 //
-//    - msg the response is related to.
-//    - baseStream returned by sending the request.
+//   - msg the response is related to.
+//   - baseStream returned by sending the request.
 //
 // The function returns the following values:
 //
-//    - multipartInputStream: new MultipartInputStream.
+//   - multipartInputStream: new MultipartInputStream.
 //
 func NewMultipartInputStream(msg *Message, baseStream gio.InputStreamer) *MultipartInputStream {
 	var _arg1 *C.SoupMessage              // out
 	var _arg2 *C.GInputStream             // out
 	var _cret *C.SoupMultipartInputStream // in
 
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
-	_arg2 = (*C.GInputStream)(unsafe.Pointer(externglib.InternObject(baseStream).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+	_arg2 = (*C.GInputStream)(unsafe.Pointer(coreglib.InternObject(baseStream).Native()))
 
 	_cret = C.soup_multipart_input_stream_new(_arg1, _arg2)
 	runtime.KeepAlive(msg)
@@ -108,14 +120,14 @@ func NewMultipartInputStream(msg *Message, baseStream gio.InputStreamer) *Multip
 
 	var _multipartInputStream *MultipartInputStream // out
 
-	_multipartInputStream = wrapMultipartInputStream(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_multipartInputStream = wrapMultipartInputStream(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _multipartInputStream
 }
 
-// Headers obtains the headers for the part currently being processed. Note that
-// the MessageHeaders that are returned are owned by the MultipartInputStream
-// and will be replaced when a call is made to
+// Headers obtains the headers for the part currently being processed.
+// Note that the MessageHeaders that are returned are owned by the
+// MultipartInputStream and will be replaced when a call is made to
 // soup_multipart_input_stream_next_part() or its async counterpart, so if
 // keeping the headers is required, a copy must be made.
 //
@@ -124,14 +136,14 @@ func NewMultipartInputStream(msg *Message, baseStream gio.InputStreamer) *Multip
 //
 // The function returns the following values:
 //
-//    - messageHeaders (optional) the headers for the part currently being
-//      processed or NULL if the headers failed to parse.
+//   - messageHeaders (optional) the headers for the part currently being
+//     processed or NULL if the headers failed to parse.
 //
 func (multipart *MultipartInputStream) Headers() *MessageHeaders {
 	var _arg0 *C.SoupMultipartInputStream // out
 	var _cret *C.SoupMessageHeaders       // in
 
-	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(externglib.InternObject(multipart).Native()))
+	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(coreglib.InternObject(multipart).Native()))
 
 	_cret = C.soup_multipart_input_stream_get_headers(_arg0)
 	runtime.KeepAlive(multipart)
@@ -145,8 +157,8 @@ func (multipart *MultipartInputStream) Headers() *MessageHeaders {
 	return _messageHeaders
 }
 
-// NextPart obtains an input stream for the next part. When dealing with a
-// multipart response the input stream needs to be wrapped in a
+// NextPart obtains an input stream for the next part. When dealing
+// with a multipart response the input stream needs to be wrapped in a
 // MultipartInputStream and this function or its async counterpart need to be
 // called to obtain the first part for reading.
 //
@@ -157,11 +169,11 @@ func (multipart *MultipartInputStream) Headers() *MessageHeaders {
 //
 // The function takes the following parameters:
 //
-//    - ctx (optional): #GCancellable.
+//   - ctx (optional): #GCancellable.
 //
 // The function returns the following values:
 //
-//    - inputStream (optional): new Stream, or NULL if there are no more parts.
+//   - inputStream (optional): new Stream, or NULL if there are no more parts.
 //
 func (multipart *MultipartInputStream) NextPart(ctx context.Context) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupMultipartInputStream // out
@@ -169,7 +181,7 @@ func (multipart *MultipartInputStream) NextPart(ctx context.Context) (gio.InputS
 	var _cret *C.GInputStream             // in
 	var _cerr *C.GError                   // in
 
-	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(externglib.InternObject(multipart).Native()))
+	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(coreglib.InternObject(multipart).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -187,8 +199,8 @@ func (multipart *MultipartInputStream) NextPart(ctx context.Context) (gio.InputS
 		{
 			objptr := unsafe.Pointer(_cret)
 
-			object := externglib.AssumeOwnership(objptr)
-			casted := object.WalkCast(func(obj externglib.Objector) bool {
+			object := coreglib.AssumeOwnership(objptr)
+			casted := object.WalkCast(func(obj coreglib.Objector) bool {
 				_, ok := obj.(gio.InputStreamer)
 				return ok
 			})
@@ -206,51 +218,16 @@ func (multipart *MultipartInputStream) NextPart(ctx context.Context) (gio.InputS
 	return _inputStream, _goerr
 }
 
-// NextPartAsync obtains a Stream for the next request. See
-// soup_multipart_input_stream_next_part() for details on the workflow.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional): #GCancellable.
-//    - ioPriority: i/O priority for the request.
-//    - callback (optional) to call when request is satisfied.
-//
-func (multipart *MultipartInputStream) NextPartAsync(ctx context.Context, ioPriority int, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.SoupMultipartInputStream // out
-	var _arg2 *C.GCancellable             // out
-	var _arg1 C.int                       // out
-	var _arg3 C.GAsyncReadyCallback       // out
-	var _arg4 C.gpointer
-
-	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(externglib.InternObject(multipart).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = C.int(ioPriority)
-	if callback != nil {
-		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg4 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.soup_multipart_input_stream_next_part_async(_arg0, _arg1, _arg2, _arg3, _arg4)
-	runtime.KeepAlive(multipart)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(ioPriority)
-	runtime.KeepAlive(callback)
-}
-
 // NextPartFinish finishes an asynchronous request for the next part.
 //
 // The function takes the following parameters:
 //
-//    - result: Result.
+//   - result: Result.
 //
 // The function returns the following values:
 //
-//    - inputStream (optional): newly created Stream for reading the next part or
-//      NULL if there are no more parts.
+//   - inputStream (optional): newly created Stream for reading the next part or
+//     NULL if there are no more parts.
 //
 func (multipart *MultipartInputStream) NextPartFinish(result gio.AsyncResulter) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupMultipartInputStream // out
@@ -258,8 +235,8 @@ func (multipart *MultipartInputStream) NextPartFinish(result gio.AsyncResulter) 
 	var _cret *C.GInputStream             // in
 	var _cerr *C.GError                   // in
 
-	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(externglib.InternObject(multipart).Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
+	_arg0 = (*C.SoupMultipartInputStream)(unsafe.Pointer(coreglib.InternObject(multipart).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(result).Native()))
 
 	_cret = C.soup_multipart_input_stream_next_part_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(multipart)
@@ -272,8 +249,8 @@ func (multipart *MultipartInputStream) NextPartFinish(result gio.AsyncResulter) 
 		{
 			objptr := unsafe.Pointer(_cret)
 
-			object := externglib.AssumeOwnership(objptr)
-			casted := object.WalkCast(func(obj externglib.Objector) bool {
+			object := coreglib.AssumeOwnership(objptr)
+			casted := object.WalkCast(func(obj coreglib.Objector) bool {
 				_, ok := obj.(gio.InputStreamer)
 				return ok
 			})
@@ -289,4 +266,22 @@ func (multipart *MultipartInputStream) NextPartFinish(result gio.AsyncResulter) 
 	}
 
 	return _inputStream, _goerr
+}
+
+// MultipartInputStreamClass: instance of this type is always passed by
+// reference.
+type MultipartInputStreamClass struct {
+	*multipartInputStreamClass
+}
+
+// multipartInputStreamClass is the struct that's finalized.
+type multipartInputStreamClass struct {
+	native *C.SoupMultipartInputStreamClass
+}
+
+func (m *MultipartInputStreamClass) ParentClass() *gio.FilterInputStreamClass {
+	valptr := &m.native.parent_class
+	var _v *gio.FilterInputStreamClass // out
+	_v = (*gio.FilterInputStreamClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
+	return _v
 }

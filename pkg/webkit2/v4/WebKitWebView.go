@@ -3,19 +3,17 @@
 package webkit2
 
 import (
-	"context"
 	"fmt"
 	"runtime"
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4-webkitgtk/pkg/javascriptcore/v4"
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/cairo"
-	"github.com/diamondburned/gotk4/pkg/core/gbox"
-	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v3"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
@@ -25,84 +23,164 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
-// extern GtkWidget* _gotk4_webkit24_WebView_ConnectCreate(gpointer, WebKitNavigationAction*, guintptr);
-// extern gboolean _gotk4_webkit24_WebViewClass_authenticate(WebKitWebView*, WebKitAuthenticationRequest*);
-// extern gboolean _gotk4_webkit24_WebViewClass_context_menu(WebKitWebView*, WebKitContextMenu*, GdkEvent*, WebKitHitTestResult*);
-// extern gboolean _gotk4_webkit24_WebViewClass_decide_policy(WebKitWebView*, WebKitPolicyDecision*, WebKitPolicyDecisionType);
-// extern gboolean _gotk4_webkit24_WebViewClass_enter_fullscreen(WebKitWebView*);
-// extern gboolean _gotk4_webkit24_WebViewClass_leave_fullscreen(WebKitWebView*);
-// extern gboolean _gotk4_webkit24_WebViewClass_load_failed(WebKitWebView*, WebKitLoadEvent, gchar*, GError*);
-// extern gboolean _gotk4_webkit24_WebViewClass_load_failed_with_tls_errors(WebKitWebView*, gchar*, GTlsCertificate*, GTlsCertificateFlags);
-// extern gboolean _gotk4_webkit24_WebViewClass_permission_request(WebKitWebView*, WebKitPermissionRequest*);
-// extern gboolean _gotk4_webkit24_WebViewClass_print(WebKitWebView*, WebKitPrintOperation*);
-// extern gboolean _gotk4_webkit24_WebViewClass_run_color_chooser(WebKitWebView*, WebKitColorChooserRequest*);
-// extern gboolean _gotk4_webkit24_WebViewClass_run_file_chooser(WebKitWebView*, WebKitFileChooserRequest*);
-// extern gboolean _gotk4_webkit24_WebViewClass_script_dialog(WebKitWebView*, WebKitScriptDialog*);
-// extern gboolean _gotk4_webkit24_WebViewClass_show_notification(WebKitWebView*, WebKitNotification*);
-// extern gboolean _gotk4_webkit24_WebViewClass_show_option_menu(WebKitWebView*, GdkRectangle*, WebKitOptionMenu*);
-// extern gboolean _gotk4_webkit24_WebViewClass_user_message_received(WebKitWebView*, WebKitUserMessage*);
-// extern gboolean _gotk4_webkit24_WebViewClass_web_process_crashed(WebKitWebView*);
-// extern gboolean _gotk4_webkit24_WebView_ConnectAuthenticate(gpointer, WebKitAuthenticationRequest*, guintptr);
-// extern gboolean _gotk4_webkit24_WebView_ConnectContextMenu(gpointer, WebKitContextMenu*, GdkEvent, WebKitHitTestResult*, guintptr);
-// extern gboolean _gotk4_webkit24_WebView_ConnectDecidePolicy(gpointer, WebKitPolicyDecision*, WebKitPolicyDecisionType, guintptr);
-// extern gboolean _gotk4_webkit24_WebView_ConnectEnterFullscreen(gpointer, guintptr);
-// extern gboolean _gotk4_webkit24_WebView_ConnectLeaveFullscreen(gpointer, guintptr);
-// extern gboolean _gotk4_webkit24_WebView_ConnectLoadFailed(gpointer, WebKitLoadEvent, gchar*, GError*, guintptr);
-// extern gboolean _gotk4_webkit24_WebView_ConnectLoadFailedWithTLSErrors(gpointer, gchar*, GTlsCertificate*, GTlsCertificateFlags, guintptr);
-// extern gboolean _gotk4_webkit24_WebView_ConnectPermissionRequest(gpointer, WebKitPermissionRequest*, guintptr);
-// extern gboolean _gotk4_webkit24_WebView_ConnectPrint(gpointer, WebKitPrintOperation*, guintptr);
-// extern gboolean _gotk4_webkit24_WebView_ConnectRunColorChooser(gpointer, WebKitColorChooserRequest*, guintptr);
-// extern gboolean _gotk4_webkit24_WebView_ConnectRunFileChooser(gpointer, WebKitFileChooserRequest*, guintptr);
-// extern gboolean _gotk4_webkit24_WebView_ConnectScriptDialog(gpointer, WebKitScriptDialog*, guintptr);
-// extern gboolean _gotk4_webkit24_WebView_ConnectShowNotification(gpointer, WebKitNotification*, guintptr);
-// extern gboolean _gotk4_webkit24_WebView_ConnectShowOptionMenu(gpointer, WebKitOptionMenu*, GdkEvent, GdkRectangle*, guintptr);
-// extern gboolean _gotk4_webkit24_WebView_ConnectUserMessageReceived(gpointer, WebKitUserMessage*, guintptr);
-// extern gboolean _gotk4_webkit24_WebView_ConnectWebProcessCrashed(gpointer, guintptr);
-// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
-// extern void _gotk4_webkit24_WebViewClass_close(WebKitWebView*);
-// extern void _gotk4_webkit24_WebViewClass_context_menu_dismissed(WebKitWebView*);
-// extern void _gotk4_webkit24_WebViewClass_insecure_content_detected(WebKitWebView*, WebKitInsecureContentEvent);
-// extern void _gotk4_webkit24_WebViewClass_load_changed(WebKitWebView*, WebKitLoadEvent);
-// extern void _gotk4_webkit24_WebViewClass_mouse_target_changed(WebKitWebView*, WebKitHitTestResult*, guint);
-// extern void _gotk4_webkit24_WebViewClass_ready_to_show(WebKitWebView*);
-// extern void _gotk4_webkit24_WebViewClass_resource_load_started(WebKitWebView*, WebKitWebResource*, WebKitURIRequest*);
-// extern void _gotk4_webkit24_WebViewClass_run_as_modal(WebKitWebView*);
-// extern void _gotk4_webkit24_WebViewClass_submit_form(WebKitWebView*, WebKitFormSubmissionRequest*);
-// extern void _gotk4_webkit24_WebViewClass_web_process_terminated(WebKitWebView*, WebKitWebProcessTerminationReason);
-// extern void _gotk4_webkit24_WebView_ConnectClose(gpointer, guintptr);
-// extern void _gotk4_webkit24_WebView_ConnectContextMenuDismissed(gpointer, guintptr);
-// extern void _gotk4_webkit24_WebView_ConnectInsecureContentDetected(gpointer, WebKitInsecureContentEvent, guintptr);
-// extern void _gotk4_webkit24_WebView_ConnectLoadChanged(gpointer, WebKitLoadEvent, guintptr);
-// extern void _gotk4_webkit24_WebView_ConnectMouseTargetChanged(gpointer, WebKitHitTestResult*, guint, guintptr);
-// extern void _gotk4_webkit24_WebView_ConnectReadyToShow(gpointer, guintptr);
-// extern void _gotk4_webkit24_WebView_ConnectResourceLoadStarted(gpointer, WebKitWebResource*, WebKitURIRequest*, guintptr);
-// extern void _gotk4_webkit24_WebView_ConnectRunAsModal(gpointer, guintptr);
-// extern void _gotk4_webkit24_WebView_ConnectSubmitForm(gpointer, WebKitFormSubmissionRequest*, guintptr);
 // extern void _gotk4_webkit24_WebView_ConnectWebProcessTerminated(gpointer, WebKitWebProcessTerminationReason, guintptr);
+// extern void _gotk4_webkit24_WebView_ConnectSubmitForm(gpointer, WebKitFormSubmissionRequest*, guintptr);
+// extern void _gotk4_webkit24_WebView_ConnectRunAsModal(gpointer, guintptr);
+// extern void _gotk4_webkit24_WebView_ConnectResourceLoadStarted(gpointer, WebKitWebResource*, WebKitURIRequest*, guintptr);
+// extern void _gotk4_webkit24_WebView_ConnectReadyToShow(gpointer, guintptr);
+// extern void _gotk4_webkit24_WebView_ConnectMouseTargetChanged(gpointer, WebKitHitTestResult*, guint, guintptr);
+// extern void _gotk4_webkit24_WebView_ConnectLoadChanged(gpointer, WebKitLoadEvent, guintptr);
+// extern void _gotk4_webkit24_WebView_ConnectInsecureContentDetected(gpointer, WebKitInsecureContentEvent, guintptr);
+// extern void _gotk4_webkit24_WebView_ConnectContextMenuDismissed(gpointer, guintptr);
+// extern void _gotk4_webkit24_WebView_ConnectClose(gpointer, guintptr);
+// extern void _gotk4_webkit24_WebViewClass_web_process_terminated(WebKitWebView*, WebKitWebProcessTerminationReason);
+// extern void _gotk4_webkit24_WebViewClass_submit_form(WebKitWebView*, WebKitFormSubmissionRequest*);
+// extern void _gotk4_webkit24_WebViewClass_run_as_modal(WebKitWebView*);
+// extern void _gotk4_webkit24_WebViewClass_resource_load_started(WebKitWebView*, WebKitWebResource*, WebKitURIRequest*);
+// extern void _gotk4_webkit24_WebViewClass_ready_to_show(WebKitWebView*);
+// extern void _gotk4_webkit24_WebViewClass_mouse_target_changed(WebKitWebView*, WebKitHitTestResult*, guint);
+// extern void _gotk4_webkit24_WebViewClass_load_changed(WebKitWebView*, WebKitLoadEvent);
+// extern void _gotk4_webkit24_WebViewClass_insecure_content_detected(WebKitWebView*, WebKitInsecureContentEvent);
+// extern void _gotk4_webkit24_WebViewClass_context_menu_dismissed(WebKitWebView*);
+// extern void _gotk4_webkit24_WebViewClass_close(WebKitWebView*);
+// extern gboolean _gotk4_webkit24_WebView_ConnectWebProcessCrashed(gpointer, guintptr);
+// extern gboolean _gotk4_webkit24_WebView_ConnectUserMessageReceived(gpointer, WebKitUserMessage*, guintptr);
+// extern gboolean _gotk4_webkit24_WebView_ConnectShowOptionMenu(gpointer, WebKitOptionMenu*, GdkEvent, GdkRectangle*, guintptr);
+// extern gboolean _gotk4_webkit24_WebView_ConnectShowNotification(gpointer, WebKitNotification*, guintptr);
+// extern gboolean _gotk4_webkit24_WebView_ConnectScriptDialog(gpointer, WebKitScriptDialog*, guintptr);
+// extern gboolean _gotk4_webkit24_WebView_ConnectRunFileChooser(gpointer, WebKitFileChooserRequest*, guintptr);
+// extern gboolean _gotk4_webkit24_WebView_ConnectRunColorChooser(gpointer, WebKitColorChooserRequest*, guintptr);
+// extern gboolean _gotk4_webkit24_WebView_ConnectQueryPermissionState(gpointer, WebKitPermissionStateQuery*, guintptr);
+// extern gboolean _gotk4_webkit24_WebView_ConnectPrint(gpointer, WebKitPrintOperation*, guintptr);
+// extern gboolean _gotk4_webkit24_WebView_ConnectPermissionRequest(gpointer, WebKitPermissionRequest*, guintptr);
+// extern gboolean _gotk4_webkit24_WebView_ConnectLoadFailedWithTLSErrors(gpointer, gchar*, GTlsCertificate*, GTlsCertificateFlags, guintptr);
+// extern gboolean _gotk4_webkit24_WebView_ConnectLoadFailed(gpointer, WebKitLoadEvent, gchar*, GError*, guintptr);
+// extern gboolean _gotk4_webkit24_WebView_ConnectLeaveFullscreen(gpointer, guintptr);
+// extern gboolean _gotk4_webkit24_WebView_ConnectEnterFullscreen(gpointer, guintptr);
+// extern gboolean _gotk4_webkit24_WebView_ConnectDecidePolicy(gpointer, WebKitPolicyDecision*, WebKitPolicyDecisionType, guintptr);
+// extern gboolean _gotk4_webkit24_WebView_ConnectContextMenu(gpointer, WebKitContextMenu*, GdkEvent, WebKitHitTestResult*, guintptr);
+// extern gboolean _gotk4_webkit24_WebView_ConnectAuthenticate(gpointer, WebKitAuthenticationRequest*, guintptr);
+// extern gboolean _gotk4_webkit24_WebViewClass_web_process_crashed(WebKitWebView*);
+// extern gboolean _gotk4_webkit24_WebViewClass_user_message_received(WebKitWebView*, WebKitUserMessage*);
+// extern gboolean _gotk4_webkit24_WebViewClass_show_option_menu(WebKitWebView*, WebKitOptionMenu*, GdkEvent*, GdkRectangle*);
+// extern gboolean _gotk4_webkit24_WebViewClass_show_notification(WebKitWebView*, WebKitNotification*);
+// extern gboolean _gotk4_webkit24_WebViewClass_script_dialog(WebKitWebView*, WebKitScriptDialog*);
+// extern gboolean _gotk4_webkit24_WebViewClass_run_file_chooser(WebKitWebView*, WebKitFileChooserRequest*);
+// extern gboolean _gotk4_webkit24_WebViewClass_run_color_chooser(WebKitWebView*, WebKitColorChooserRequest*);
+// extern gboolean _gotk4_webkit24_WebViewClass_query_permission_state(WebKitWebView*, WebKitPermissionStateQuery*);
+// extern gboolean _gotk4_webkit24_WebViewClass_print(WebKitWebView*, WebKitPrintOperation*);
+// extern gboolean _gotk4_webkit24_WebViewClass_permission_request(WebKitWebView*, WebKitPermissionRequest*);
+// extern gboolean _gotk4_webkit24_WebViewClass_load_failed_with_tls_errors(WebKitWebView*, gchar*, GTlsCertificate*, GTlsCertificateFlags);
+// extern gboolean _gotk4_webkit24_WebViewClass_load_failed(WebKitWebView*, WebKitLoadEvent, gchar*, GError*);
+// extern gboolean _gotk4_webkit24_WebViewClass_leave_fullscreen(WebKitWebView*);
+// extern gboolean _gotk4_webkit24_WebViewClass_enter_fullscreen(WebKitWebView*);
+// extern gboolean _gotk4_webkit24_WebViewClass_decide_policy(WebKitWebView*, WebKitPolicyDecision*, WebKitPolicyDecisionType);
+// extern gboolean _gotk4_webkit24_WebViewClass_context_menu(WebKitWebView*, WebKitContextMenu*, GdkEvent*, WebKitHitTestResult*);
+// extern gboolean _gotk4_webkit24_WebViewClass_authenticate(WebKitWebView*, WebKitAuthenticationRequest*);
+// extern GtkWidget* _gotk4_webkit24_WebView_ConnectCreate(gpointer, WebKitNavigationAction*, guintptr);
+// gboolean _gotk4_webkit24_WebView_virtual_authenticate(void* fnptr, WebKitWebView* arg0, WebKitAuthenticationRequest* arg1) {
+//   return ((gboolean (*)(WebKitWebView*, WebKitAuthenticationRequest*))(fnptr))(arg0, arg1);
+// };
+// gboolean _gotk4_webkit24_WebView_virtual_context_menu(void* fnptr, WebKitWebView* arg0, WebKitContextMenu* arg1, GdkEvent* arg2, WebKitHitTestResult* arg3) {
+//   return ((gboolean (*)(WebKitWebView*, WebKitContextMenu*, GdkEvent*, WebKitHitTestResult*))(fnptr))(arg0, arg1, arg2, arg3);
+// };
+// gboolean _gotk4_webkit24_WebView_virtual_decide_policy(void* fnptr, WebKitWebView* arg0, WebKitPolicyDecision* arg1, WebKitPolicyDecisionType arg2) {
+//   return ((gboolean (*)(WebKitWebView*, WebKitPolicyDecision*, WebKitPolicyDecisionType))(fnptr))(arg0, arg1, arg2);
+// };
+// gboolean _gotk4_webkit24_WebView_virtual_enter_fullscreen(void* fnptr, WebKitWebView* arg0) {
+//   return ((gboolean (*)(WebKitWebView*))(fnptr))(arg0);
+// };
+// gboolean _gotk4_webkit24_WebView_virtual_leave_fullscreen(void* fnptr, WebKitWebView* arg0) {
+//   return ((gboolean (*)(WebKitWebView*))(fnptr))(arg0);
+// };
+// gboolean _gotk4_webkit24_WebView_virtual_load_failed(void* fnptr, WebKitWebView* arg0, WebKitLoadEvent arg1, gchar* arg2, GError* arg3) {
+//   return ((gboolean (*)(WebKitWebView*, WebKitLoadEvent, gchar*, GError*))(fnptr))(arg0, arg1, arg2, arg3);
+// };
+// gboolean _gotk4_webkit24_WebView_virtual_load_failed_with_tls_errors(void* fnptr, WebKitWebView* arg0, gchar* arg1, GTlsCertificate* arg2, GTlsCertificateFlags arg3) {
+//   return ((gboolean (*)(WebKitWebView*, gchar*, GTlsCertificate*, GTlsCertificateFlags))(fnptr))(arg0, arg1, arg2, arg3);
+// };
+// gboolean _gotk4_webkit24_WebView_virtual_permission_request(void* fnptr, WebKitWebView* arg0, WebKitPermissionRequest* arg1) {
+//   return ((gboolean (*)(WebKitWebView*, WebKitPermissionRequest*))(fnptr))(arg0, arg1);
+// };
+// gboolean _gotk4_webkit24_WebView_virtual_print(void* fnptr, WebKitWebView* arg0, WebKitPrintOperation* arg1) {
+//   return ((gboolean (*)(WebKitWebView*, WebKitPrintOperation*))(fnptr))(arg0, arg1);
+// };
+// gboolean _gotk4_webkit24_WebView_virtual_query_permission_state(void* fnptr, WebKitWebView* arg0, WebKitPermissionStateQuery* arg1) {
+//   return ((gboolean (*)(WebKitWebView*, WebKitPermissionStateQuery*))(fnptr))(arg0, arg1);
+// };
+// gboolean _gotk4_webkit24_WebView_virtual_run_color_chooser(void* fnptr, WebKitWebView* arg0, WebKitColorChooserRequest* arg1) {
+//   return ((gboolean (*)(WebKitWebView*, WebKitColorChooserRequest*))(fnptr))(arg0, arg1);
+// };
+// gboolean _gotk4_webkit24_WebView_virtual_run_file_chooser(void* fnptr, WebKitWebView* arg0, WebKitFileChooserRequest* arg1) {
+//   return ((gboolean (*)(WebKitWebView*, WebKitFileChooserRequest*))(fnptr))(arg0, arg1);
+// };
+// gboolean _gotk4_webkit24_WebView_virtual_script_dialog(void* fnptr, WebKitWebView* arg0, WebKitScriptDialog* arg1) {
+//   return ((gboolean (*)(WebKitWebView*, WebKitScriptDialog*))(fnptr))(arg0, arg1);
+// };
+// gboolean _gotk4_webkit24_WebView_virtual_show_notification(void* fnptr, WebKitWebView* arg0, WebKitNotification* arg1) {
+//   return ((gboolean (*)(WebKitWebView*, WebKitNotification*))(fnptr))(arg0, arg1);
+// };
+// gboolean _gotk4_webkit24_WebView_virtual_show_option_menu(void* fnptr, WebKitWebView* arg0, WebKitOptionMenu* arg1, GdkEvent* arg2, GdkRectangle* arg3) {
+//   return ((gboolean (*)(WebKitWebView*, WebKitOptionMenu*, GdkEvent*, GdkRectangle*))(fnptr))(arg0, arg1, arg2, arg3);
+// };
+// gboolean _gotk4_webkit24_WebView_virtual_user_message_received(void* fnptr, WebKitWebView* arg0, WebKitUserMessage* arg1) {
+//   return ((gboolean (*)(WebKitWebView*, WebKitUserMessage*))(fnptr))(arg0, arg1);
+// };
+// gboolean _gotk4_webkit24_WebView_virtual_web_process_crashed(void* fnptr, WebKitWebView* arg0) {
+//   return ((gboolean (*)(WebKitWebView*))(fnptr))(arg0);
+// };
+// void _gotk4_webkit24_WebView_virtual_close(void* fnptr, WebKitWebView* arg0) {
+//   ((void (*)(WebKitWebView*))(fnptr))(arg0);
+// };
+// void _gotk4_webkit24_WebView_virtual_context_menu_dismissed(void* fnptr, WebKitWebView* arg0) {
+//   ((void (*)(WebKitWebView*))(fnptr))(arg0);
+// };
+// void _gotk4_webkit24_WebView_virtual_insecure_content_detected(void* fnptr, WebKitWebView* arg0, WebKitInsecureContentEvent arg1) {
+//   ((void (*)(WebKitWebView*, WebKitInsecureContentEvent))(fnptr))(arg0, arg1);
+// };
+// void _gotk4_webkit24_WebView_virtual_load_changed(void* fnptr, WebKitWebView* arg0, WebKitLoadEvent arg1) {
+//   ((void (*)(WebKitWebView*, WebKitLoadEvent))(fnptr))(arg0, arg1);
+// };
+// void _gotk4_webkit24_WebView_virtual_mouse_target_changed(void* fnptr, WebKitWebView* arg0, WebKitHitTestResult* arg1, guint arg2) {
+//   ((void (*)(WebKitWebView*, WebKitHitTestResult*, guint))(fnptr))(arg0, arg1, arg2);
+// };
+// void _gotk4_webkit24_WebView_virtual_ready_to_show(void* fnptr, WebKitWebView* arg0) {
+//   ((void (*)(WebKitWebView*))(fnptr))(arg0);
+// };
+// void _gotk4_webkit24_WebView_virtual_resource_load_started(void* fnptr, WebKitWebView* arg0, WebKitWebResource* arg1, WebKitURIRequest* arg2) {
+//   ((void (*)(WebKitWebView*, WebKitWebResource*, WebKitURIRequest*))(fnptr))(arg0, arg1, arg2);
+// };
+// void _gotk4_webkit24_WebView_virtual_run_as_modal(void* fnptr, WebKitWebView* arg0) {
+//   ((void (*)(WebKitWebView*))(fnptr))(arg0);
+// };
+// void _gotk4_webkit24_WebView_virtual_submit_form(void* fnptr, WebKitWebView* arg0, WebKitFormSubmissionRequest* arg1) {
+//   ((void (*)(WebKitWebView*, WebKitFormSubmissionRequest*))(fnptr))(arg0, arg1);
+// };
+// void _gotk4_webkit24_WebView_virtual_web_process_terminated(void* fnptr, WebKitWebView* arg0, WebKitWebProcessTerminationReason arg1) {
+//   ((void (*)(WebKitWebView*, WebKitWebProcessTerminationReason))(fnptr))(arg0, arg1);
+// };
 import "C"
 
-// glib.Type values for WebKitWebView.go.
+// GType values.
 var (
-	GTypeInsecureContentEvent        = externglib.Type(C.webkit_insecure_content_event_get_type())
-	GTypeLoadEvent                   = externglib.Type(C.webkit_load_event_get_type())
-	GTypePolicyDecisionType          = externglib.Type(C.webkit_policy_decision_type_get_type())
-	GTypeSaveMode                    = externglib.Type(C.webkit_save_mode_get_type())
-	GTypeSnapshotRegion              = externglib.Type(C.webkit_snapshot_region_get_type())
-	GTypeWebProcessTerminationReason = externglib.Type(C.webkit_web_process_termination_reason_get_type())
-	GTypeSnapshotOptions             = externglib.Type(C.webkit_snapshot_options_get_type())
-	GTypeWebView                     = externglib.Type(C.webkit_web_view_get_type())
+	GTypeInsecureContentEvent = coreglib.Type(C.webkit_insecure_content_event_get_type())
+	GTypeLoadEvent            = coreglib.Type(C.webkit_load_event_get_type())
+	GTypePolicyDecisionType   = coreglib.Type(C.webkit_policy_decision_type_get_type())
+	GTypeSaveMode             = coreglib.Type(C.webkit_save_mode_get_type())
+	GTypeSnapshotRegion       = coreglib.Type(C.webkit_snapshot_region_get_type())
+	GTypeSnapshotOptions      = coreglib.Type(C.webkit_snapshot_options_get_type())
+	GTypeWebView              = coreglib.Type(C.webkit_web_view_get_type())
 )
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeInsecureContentEvent, F: marshalInsecureContentEvent},
-		{T: GTypeLoadEvent, F: marshalLoadEvent},
-		{T: GTypePolicyDecisionType, F: marshalPolicyDecisionType},
-		{T: GTypeSaveMode, F: marshalSaveMode},
-		{T: GTypeSnapshotRegion, F: marshalSnapshotRegion},
-		{T: GTypeWebProcessTerminationReason, F: marshalWebProcessTerminationReason},
-		{T: GTypeSnapshotOptions, F: marshalSnapshotOptions},
-		{T: GTypeWebView, F: marshalWebView},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeInsecureContentEvent, F: marshalInsecureContentEvent},
+		coreglib.TypeMarshaler{T: GTypeLoadEvent, F: marshalLoadEvent},
+		coreglib.TypeMarshaler{T: GTypePolicyDecisionType, F: marshalPolicyDecisionType},
+		coreglib.TypeMarshaler{T: GTypeSaveMode, F: marshalSaveMode},
+		coreglib.TypeMarshaler{T: GTypeSnapshotRegion, F: marshalSnapshotRegion},
+		coreglib.TypeMarshaler{T: GTypeSnapshotOptions, F: marshalSnapshotOptions},
+		coreglib.TypeMarshaler{T: GTypeWebView, F: marshalWebView},
 	})
 }
 
@@ -120,7 +198,7 @@ const (
 )
 
 func marshalInsecureContentEvent(p uintptr) (interface{}, error) {
-	return InsecureContentEvent(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return InsecureContentEvent(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for InsecureContentEvent.
@@ -156,7 +234,7 @@ const (
 )
 
 func marshalLoadEvent(p uintptr) (interface{}, error) {
-	return LoadEvent(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return LoadEvent(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for LoadEvent.
@@ -181,25 +259,25 @@ type PolicyDecisionType C.gint
 
 const (
 	// PolicyDecisionTypeNavigationAction: this type of policy decision is
-	// requested when WebKit is about to navigate to a new page in either the
-	// main frame or a subframe. Acceptable policy decisions are either
+	// requested when WebKit is about to navigate to a new page in either
+	// the main frame or a subframe. Acceptable policy decisions are either
 	// webkit_policy_decision_use() or webkit_policy_decision_ignore(). This
 	// type of policy decision is always a KitNavigationPolicyDecision.
 	PolicyDecisionTypeNavigationAction PolicyDecisionType = iota
-	// PolicyDecisionTypeNewWindowAction: this type of policy decision is
-	// requested when WebKit is about to create a new window. Acceptable policy
-	// decisions are either webkit_policy_decision_use() or
+	// PolicyDecisionTypeNewWindowAction: this type of policy decision
+	// is requested when WebKit is about to create a new window.
+	// Acceptable policy decisions are either webkit_policy_decision_use() or
 	// webkit_policy_decision_ignore(). This type of policy decision is always a
 	// KitNavigationPolicyDecision. These decisions are useful for implementing
 	// special actions for new windows, such as forcing the new window to open
 	// in a tab when a keyboard modifier is active or handling a special target
-	// attribute on &lt;a&gt; elements.
+	// attribute on <a> elements.
 	PolicyDecisionTypeNewWindowAction
-	// PolicyDecisionTypeResponse: this type of decision is used when WebKit has
-	// received a response for a network resource and is about to start the
-	// load. Note that these resources include all subresources of a page such
-	// as images and stylesheets as well as main documents. Appropriate policy
-	// responses to this decision are webkit_policy_decision_use(),
+	// PolicyDecisionTypeResponse: this type of decision is used when WebKit
+	// has received a response for a network resource and is about to start
+	// the load. Note that these resources include all subresources of a page
+	// such as images and stylesheets as well as main documents. Appropriate
+	// policy responses to this decision are webkit_policy_decision_use(),
 	// webkit_policy_decision_ignore(), or webkit_policy_decision_download().
 	// This type of policy decision is always a KitResponsePolicyDecision. This
 	// decision is useful for forcing some types of resources to be downloaded
@@ -209,7 +287,7 @@ const (
 )
 
 func marshalPolicyDecisionType(p uintptr) (interface{}, error) {
-	return PolicyDecisionType(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return PolicyDecisionType(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for PolicyDecisionType.
@@ -236,7 +314,7 @@ const (
 )
 
 func marshalSaveMode(p uintptr) (interface{}, error) {
-	return SaveMode(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return SaveMode(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for SaveMode.
@@ -262,7 +340,7 @@ const (
 )
 
 func marshalSnapshotRegion(p uintptr) (interface{}, error) {
-	return SnapshotRegion(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return SnapshotRegion(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for SnapshotRegion.
@@ -274,33 +352,6 @@ func (s SnapshotRegion) String() string {
 		return "FullDocument"
 	default:
 		return fmt.Sprintf("SnapshotRegion(%d)", s)
-	}
-}
-
-// WebProcessTerminationReason: enum values used to specify the reason why the
-// web process terminated abnormally.
-type WebProcessTerminationReason C.gint
-
-const (
-	// WebProcessCrashed: web process crashed.
-	WebProcessCrashed WebProcessTerminationReason = iota
-	// WebProcessExceededMemoryLimit: web process exceeded the memory limit.
-	WebProcessExceededMemoryLimit
-)
-
-func marshalWebProcessTerminationReason(p uintptr) (interface{}, error) {
-	return WebProcessTerminationReason(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
-}
-
-// String returns the name in string for WebProcessTerminationReason.
-func (w WebProcessTerminationReason) String() string {
-	switch w {
-	case WebProcessCrashed:
-		return "Crashed"
-	case WebProcessExceededMemoryLimit:
-		return "ExceededMemoryLimit"
-	default:
-		return fmt.Sprintf("WebProcessTerminationReason(%d)", w)
 	}
 }
 
@@ -320,7 +371,7 @@ const (
 )
 
 func marshalSnapshotOptions(p uintptr) (interface{}, error) {
-	return SnapshotOptions(externglib.ValueFromNative(unsafe.Pointer(p)).Flags()), nil
+	return SnapshotOptions(coreglib.ValueFromNative(unsafe.Pointer(p)).Flags()), nil
 }
 
 // String returns the names in string for SnapshotOptions.
@@ -358,130 +409,177 @@ func (s SnapshotOptions) Has(other SnapshotOptions) bool {
 	return (s & other) == other
 }
 
-// WebViewOverrider contains methods that are overridable.
-type WebViewOverrider interface {
+// WebViewOverrides contains methods that are overridable.
+type WebViewOverrides struct {
 	// The function takes the following parameters:
 	//
 	// The function returns the following values:
 	//
-	Authenticate(request *AuthenticationRequest) bool
-	Close()
+	Authenticate func(request *AuthenticationRequest) bool
+	Close        func()
 	// The function takes the following parameters:
 	//
-	//    - contextMenu
-	//    - event
-	//    - hitTestResult
+	//   - contextMenu
+	//   - event
+	//   - hitTestResult
 	//
 	// The function returns the following values:
 	//
-	ContextMenu(contextMenu *ContextMenu, event *gdk.Event, hitTestResult *HitTestResult) bool
-	ContextMenuDismissed()
+	ContextMenu          func(contextMenu *ContextMenu, event *gdk.Event, hitTestResult *HitTestResult) bool
+	ContextMenuDismissed func()
 	// The function takes the following parameters:
 	//
-	//    - decision
-	//    - typ
+	//   - decision
+	//   - typ
 	//
 	// The function returns the following values:
 	//
-	DecidePolicy(decision PolicyDecisioner, typ PolicyDecisionType) bool
+	DecidePolicy func(decision PolicyDecisioner, typ PolicyDecisionType) bool
 	// The function returns the following values:
 	//
-	EnterFullscreen() bool
+	EnterFullscreen func() bool
 	// The function takes the following parameters:
 	//
-	InsecureContentDetected(event InsecureContentEvent)
+	InsecureContentDetected func(event InsecureContentEvent)
 	// The function returns the following values:
 	//
-	LeaveFullscreen() bool
+	LeaveFullscreen func() bool
 	// The function takes the following parameters:
 	//
-	LoadChanged(loadEvent LoadEvent)
+	LoadChanged func(loadEvent LoadEvent)
 	// The function takes the following parameters:
 	//
-	//    - loadEvent
-	//    - failingUri
-	//    - err
-	//
-	// The function returns the following values:
-	//
-	LoadFailed(loadEvent LoadEvent, failingUri string, err error) bool
-	// The function takes the following parameters:
-	//
-	//    - failingUri
-	//    - certificate
-	//    - errors
+	//   - loadEvent
+	//   - failingUri
+	//   - err
 	//
 	// The function returns the following values:
 	//
-	LoadFailedWithTLSErrors(failingUri string, certificate gio.TLSCertificater, errors gio.TLSCertificateFlags) bool
+	LoadFailed func(loadEvent LoadEvent, failingUri string, err error) bool
 	// The function takes the following parameters:
 	//
-	//    - hitTestResult
-	//    - modifiers
-	//
-	MouseTargetChanged(hitTestResult *HitTestResult, modifiers uint)
-	// The function takes the following parameters:
+	//   - failingUri
+	//   - certificate
+	//   - errors
 	//
 	// The function returns the following values:
 	//
-	PermissionRequest(permissionRequest PermissionRequester) bool
+	LoadFailedWithTLSErrors func(failingUri string, certificate gio.TLSCertificater, errors gio.TLSCertificateFlags) bool
+	// The function takes the following parameters:
+	//
+	//   - hitTestResult
+	//   - modifiers
+	//
+	MouseTargetChanged func(hitTestResult *HitTestResult, modifiers uint)
 	// The function takes the following parameters:
 	//
 	// The function returns the following values:
 	//
-	Print(printOperation *PrintOperation) bool
-	ReadyToShow()
-	// The function takes the following parameters:
-	//
-	//    - resource
-	//    - request
-	//
-	ResourceLoadStarted(resource *WebResource, request *URIRequest)
-	RunAsModal()
+	PermissionRequest func(permissionRequest PermissionRequester) bool
 	// The function takes the following parameters:
 	//
 	// The function returns the following values:
 	//
-	RunColorChooser(request *ColorChooserRequest) bool
+	Print func(printOperation *PrintOperation) bool
 	// The function takes the following parameters:
 	//
 	// The function returns the following values:
 	//
-	RunFileChooser(request *FileChooserRequest) bool
+	QueryPermissionState func(query *PermissionStateQuery) bool
+	ReadyToShow          func()
+	// The function takes the following parameters:
+	//
+	//   - resource
+	//   - request
+	//
+	ResourceLoadStarted func(resource *WebResource, request *URIRequest)
+	RunAsModal          func()
 	// The function takes the following parameters:
 	//
 	// The function returns the following values:
 	//
-	ScriptDialog(dialog *ScriptDialog) bool
+	RunColorChooser func(request *ColorChooserRequest) bool
 	// The function takes the following parameters:
 	//
 	// The function returns the following values:
 	//
-	ShowNotification(notification *Notification) bool
-	// The function takes the following parameters:
-	//
-	//    - rectangle
-	//    - menu
-	//
-	// The function returns the following values:
-	//
-	ShowOptionMenu(rectangle *gdk.Rectangle, menu *OptionMenu) bool
-	// The function takes the following parameters:
-	//
-	SubmitForm(request *FormSubmissionRequest)
+	RunFileChooser func(request *FileChooserRequest) bool
 	// The function takes the following parameters:
 	//
 	// The function returns the following values:
 	//
-	UserMessageReceived(message *UserMessage) bool
-	// The function returns the following values:
-	//
-	WebProcessCrashed() bool
+	ScriptDialog func(dialog *ScriptDialog) bool
 	// The function takes the following parameters:
 	//
-	WebProcessTerminated(reason WebProcessTerminationReason)
+	// The function returns the following values:
+	//
+	ShowNotification func(notification *Notification) bool
+	// The function takes the following parameters:
+	//
+	//   - menu
+	//   - event
+	//   - rectangle
+	//
+	// The function returns the following values:
+	//
+	ShowOptionMenu func(menu *OptionMenu, event *gdk.Event, rectangle *gdk.Rectangle) bool
+	// The function takes the following parameters:
+	//
+	SubmitForm func(request *FormSubmissionRequest)
+	// The function takes the following parameters:
+	//
+	// The function returns the following values:
+	//
+	UserMessageReceived func(message *UserMessage) bool
+	// The function returns the following values:
+	//
+	WebProcessCrashed func() bool
+	// The function takes the following parameters:
+	//
+	WebProcessTerminated func(reason WebProcessTerminationReason)
 }
 
+func defaultWebViewOverrides(v *WebView) WebViewOverrides {
+	return WebViewOverrides{
+		Authenticate:            v.authenticate,
+		Close:                   v.close,
+		ContextMenu:             v.contextMenu,
+		ContextMenuDismissed:    v.contextMenuDismissed,
+		DecidePolicy:            v.decidePolicy,
+		EnterFullscreen:         v.enterFullscreen,
+		InsecureContentDetected: v.insecureContentDetected,
+		LeaveFullscreen:         v.leaveFullscreen,
+		LoadChanged:             v.loadChanged,
+		LoadFailed:              v.loadFailed,
+		LoadFailedWithTLSErrors: v.loadFailedWithTLSErrors,
+		MouseTargetChanged:      v.mouseTargetChanged,
+		PermissionRequest:       v.permissionRequest,
+		Print:                   v.print,
+		QueryPermissionState:    v.queryPermissionState,
+		ReadyToShow:             v.readyToShow,
+		ResourceLoadStarted:     v.resourceLoadStarted,
+		RunAsModal:              v.runAsModal,
+		RunColorChooser:         v.runColorChooser,
+		RunFileChooser:          v.runFileChooser,
+		ScriptDialog:            v.scriptDialog,
+		ShowNotification:        v.showNotification,
+		ShowOptionMenu:          v.showOptionMenu,
+		SubmitForm:              v.submitForm,
+		UserMessageReceived:     v.userMessageReceived,
+		WebProcessCrashed:       v.webProcessCrashed,
+		WebProcessTerminated:    v.webProcessTerminated,
+	}
+}
+
+// WebView: central class of the WPE WebKit and WebKitGTK APIs.
+//
+// KitWebView is the central class of the WPE WebKit and WebKitGTK APIs. It is
+// responsible for managing the drawing of the content and forwarding of events.
+// You can load any URI into the KitWebView or a data string. With KitSettings
+// you can control various aspects of the rendering and loading of the content.
+//
+// Note that in WebKitGTK, KitWebView is scrollable by itself, so you don't need
+// to embed it in a ScrolledWindow.
 type WebView struct {
 	_ [0]func() // equal guard
 	WebViewBase
@@ -491,659 +589,138 @@ var (
 	_ gtk.Containerer = (*WebView)(nil)
 )
 
-func classInitWebViewer(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+func init() {
+	coreglib.RegisterClassInfo[*WebView, *WebViewClass, WebViewOverrides](
+		GTypeWebView,
+		initWebViewClass,
+		wrapWebView,
+		defaultWebViewOverrides,
+	)
+}
 
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+func initWebViewClass(gclass unsafe.Pointer, overrides WebViewOverrides, classInitFunc func(*WebViewClass)) {
+	pclass := (*C.WebKitWebViewClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeWebView))))
 
-	goval := gbox.Get(uintptr(data))
-	pclass := (*C.WebKitWebViewClass)(unsafe.Pointer(gclassPtr))
-	// gclass := (*C.GTypeClass)(unsafe.Pointer(gclassPtr))
-	// pclass := (*C.WebKitWebViewClass)(unsafe.Pointer(C.g_type_class_peek_parent(gclass)))
-
-	if _, ok := goval.(interface {
-		Authenticate(request *AuthenticationRequest) bool
-	}); ok {
+	if overrides.Authenticate != nil {
 		pclass.authenticate = (*[0]byte)(C._gotk4_webkit24_WebViewClass_authenticate)
 	}
 
-	if _, ok := goval.(interface{ Close() }); ok {
+	if overrides.Close != nil {
 		pclass.close = (*[0]byte)(C._gotk4_webkit24_WebViewClass_close)
 	}
 
-	if _, ok := goval.(interface {
-		ContextMenu(contextMenu *ContextMenu, event *gdk.Event, hitTestResult *HitTestResult) bool
-	}); ok {
+	if overrides.ContextMenu != nil {
 		pclass.context_menu = (*[0]byte)(C._gotk4_webkit24_WebViewClass_context_menu)
 	}
 
-	if _, ok := goval.(interface{ ContextMenuDismissed() }); ok {
+	if overrides.ContextMenuDismissed != nil {
 		pclass.context_menu_dismissed = (*[0]byte)(C._gotk4_webkit24_WebViewClass_context_menu_dismissed)
 	}
 
-	if _, ok := goval.(interface {
-		DecidePolicy(decision PolicyDecisioner, typ PolicyDecisionType) bool
-	}); ok {
+	if overrides.DecidePolicy != nil {
 		pclass.decide_policy = (*[0]byte)(C._gotk4_webkit24_WebViewClass_decide_policy)
 	}
 
-	if _, ok := goval.(interface{ EnterFullscreen() bool }); ok {
+	if overrides.EnterFullscreen != nil {
 		pclass.enter_fullscreen = (*[0]byte)(C._gotk4_webkit24_WebViewClass_enter_fullscreen)
 	}
 
-	if _, ok := goval.(interface {
-		InsecureContentDetected(event InsecureContentEvent)
-	}); ok {
+	if overrides.InsecureContentDetected != nil {
 		pclass.insecure_content_detected = (*[0]byte)(C._gotk4_webkit24_WebViewClass_insecure_content_detected)
 	}
 
-	if _, ok := goval.(interface{ LeaveFullscreen() bool }); ok {
+	if overrides.LeaveFullscreen != nil {
 		pclass.leave_fullscreen = (*[0]byte)(C._gotk4_webkit24_WebViewClass_leave_fullscreen)
 	}
 
-	if _, ok := goval.(interface{ LoadChanged(loadEvent LoadEvent) }); ok {
+	if overrides.LoadChanged != nil {
 		pclass.load_changed = (*[0]byte)(C._gotk4_webkit24_WebViewClass_load_changed)
 	}
 
-	if _, ok := goval.(interface {
-		LoadFailed(loadEvent LoadEvent, failingUri string, err error) bool
-	}); ok {
+	if overrides.LoadFailed != nil {
 		pclass.load_failed = (*[0]byte)(C._gotk4_webkit24_WebViewClass_load_failed)
 	}
 
-	if _, ok := goval.(interface {
-		LoadFailedWithTLSErrors(failingUri string, certificate gio.TLSCertificater, errors gio.TLSCertificateFlags) bool
-	}); ok {
+	if overrides.LoadFailedWithTLSErrors != nil {
 		pclass.load_failed_with_tls_errors = (*[0]byte)(C._gotk4_webkit24_WebViewClass_load_failed_with_tls_errors)
 	}
 
-	if _, ok := goval.(interface {
-		MouseTargetChanged(hitTestResult *HitTestResult, modifiers uint)
-	}); ok {
+	if overrides.MouseTargetChanged != nil {
 		pclass.mouse_target_changed = (*[0]byte)(C._gotk4_webkit24_WebViewClass_mouse_target_changed)
 	}
 
-	if _, ok := goval.(interface {
-		PermissionRequest(permissionRequest PermissionRequester) bool
-	}); ok {
+	if overrides.PermissionRequest != nil {
 		pclass.permission_request = (*[0]byte)(C._gotk4_webkit24_WebViewClass_permission_request)
 	}
 
-	if _, ok := goval.(interface {
-		Print(printOperation *PrintOperation) bool
-	}); ok {
+	if overrides.Print != nil {
 		pclass.print = (*[0]byte)(C._gotk4_webkit24_WebViewClass_print)
 	}
 
-	if _, ok := goval.(interface{ ReadyToShow() }); ok {
+	if overrides.QueryPermissionState != nil {
+		pclass.query_permission_state = (*[0]byte)(C._gotk4_webkit24_WebViewClass_query_permission_state)
+	}
+
+	if overrides.ReadyToShow != nil {
 		pclass.ready_to_show = (*[0]byte)(C._gotk4_webkit24_WebViewClass_ready_to_show)
 	}
 
-	if _, ok := goval.(interface {
-		ResourceLoadStarted(resource *WebResource, request *URIRequest)
-	}); ok {
+	if overrides.ResourceLoadStarted != nil {
 		pclass.resource_load_started = (*[0]byte)(C._gotk4_webkit24_WebViewClass_resource_load_started)
 	}
 
-	if _, ok := goval.(interface{ RunAsModal() }); ok {
+	if overrides.RunAsModal != nil {
 		pclass.run_as_modal = (*[0]byte)(C._gotk4_webkit24_WebViewClass_run_as_modal)
 	}
 
-	if _, ok := goval.(interface {
-		RunColorChooser(request *ColorChooserRequest) bool
-	}); ok {
+	if overrides.RunColorChooser != nil {
 		pclass.run_color_chooser = (*[0]byte)(C._gotk4_webkit24_WebViewClass_run_color_chooser)
 	}
 
-	if _, ok := goval.(interface {
-		RunFileChooser(request *FileChooserRequest) bool
-	}); ok {
+	if overrides.RunFileChooser != nil {
 		pclass.run_file_chooser = (*[0]byte)(C._gotk4_webkit24_WebViewClass_run_file_chooser)
 	}
 
-	if _, ok := goval.(interface {
-		ScriptDialog(dialog *ScriptDialog) bool
-	}); ok {
+	if overrides.ScriptDialog != nil {
 		pclass.script_dialog = (*[0]byte)(C._gotk4_webkit24_WebViewClass_script_dialog)
 	}
 
-	if _, ok := goval.(interface {
-		ShowNotification(notification *Notification) bool
-	}); ok {
+	if overrides.ShowNotification != nil {
 		pclass.show_notification = (*[0]byte)(C._gotk4_webkit24_WebViewClass_show_notification)
 	}
 
-	if _, ok := goval.(interface {
-		ShowOptionMenu(rectangle *gdk.Rectangle, menu *OptionMenu) bool
-	}); ok {
+	if overrides.ShowOptionMenu != nil {
 		pclass.show_option_menu = (*[0]byte)(C._gotk4_webkit24_WebViewClass_show_option_menu)
 	}
 
-	if _, ok := goval.(interface {
-		SubmitForm(request *FormSubmissionRequest)
-	}); ok {
+	if overrides.SubmitForm != nil {
 		pclass.submit_form = (*[0]byte)(C._gotk4_webkit24_WebViewClass_submit_form)
 	}
 
-	if _, ok := goval.(interface {
-		UserMessageReceived(message *UserMessage) bool
-	}); ok {
+	if overrides.UserMessageReceived != nil {
 		pclass.user_message_received = (*[0]byte)(C._gotk4_webkit24_WebViewClass_user_message_received)
 	}
 
-	if _, ok := goval.(interface{ WebProcessCrashed() bool }); ok {
+	if overrides.WebProcessCrashed != nil {
 		pclass.web_process_crashed = (*[0]byte)(C._gotk4_webkit24_WebViewClass_web_process_crashed)
 	}
 
-	if _, ok := goval.(interface {
-		WebProcessTerminated(reason WebProcessTerminationReason)
-	}); ok {
+	if overrides.WebProcessTerminated != nil {
 		pclass.web_process_terminated = (*[0]byte)(C._gotk4_webkit24_WebViewClass_web_process_terminated)
 	}
-}
 
-//export _gotk4_webkit24_WebViewClass_authenticate
-func _gotk4_webkit24_WebViewClass_authenticate(arg0 *C.WebKitWebView, arg1 *C.WebKitAuthenticationRequest) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		Authenticate(request *AuthenticationRequest) bool
-	})
-
-	var _request *AuthenticationRequest // out
-
-	_request = wrapAuthenticationRequest(externglib.Take(unsafe.Pointer(arg1)))
-
-	ok := iface.Authenticate(_request)
-
-	if ok {
-		cret = C.TRUE
+	if classInitFunc != nil {
+		class := (*WebViewClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
 	}
-
-	return cret
 }
 
-//export _gotk4_webkit24_WebViewClass_close
-func _gotk4_webkit24_WebViewClass_close(arg0 *C.WebKitWebView) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ Close() })
-
-	iface.Close()
-}
-
-//export _gotk4_webkit24_WebViewClass_context_menu
-func _gotk4_webkit24_WebViewClass_context_menu(arg0 *C.WebKitWebView, arg1 *C.WebKitContextMenu, arg2 *C.GdkEvent, arg3 *C.WebKitHitTestResult) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		ContextMenu(contextMenu *ContextMenu, event *gdk.Event, hitTestResult *HitTestResult) bool
-	})
-
-	var _contextMenu *ContextMenu     // out
-	var _event *gdk.Event             // out
-	var _hitTestResult *HitTestResult // out
-
-	_contextMenu = wrapContextMenu(externglib.Take(unsafe.Pointer(arg1)))
-	{
-		v := (*gdk.Event)(gextras.NewStructNative(unsafe.Pointer(arg2)))
-		v = gdk.CopyEventer(v)
-		_event = v
-	}
-	_hitTestResult = wrapHitTestResult(externglib.Take(unsafe.Pointer(arg3)))
-
-	ok := iface.ContextMenu(_contextMenu, _event, _hitTestResult)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_webkit24_WebViewClass_context_menu_dismissed
-func _gotk4_webkit24_WebViewClass_context_menu_dismissed(arg0 *C.WebKitWebView) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ ContextMenuDismissed() })
-
-	iface.ContextMenuDismissed()
-}
-
-//export _gotk4_webkit24_WebViewClass_decide_policy
-func _gotk4_webkit24_WebViewClass_decide_policy(arg0 *C.WebKitWebView, arg1 *C.WebKitPolicyDecision, arg2 C.WebKitPolicyDecisionType) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		DecidePolicy(decision PolicyDecisioner, typ PolicyDecisionType) bool
-	})
-
-	var _decision PolicyDecisioner // out
-	var _typ PolicyDecisionType    // out
-
-	{
-		objptr := unsafe.Pointer(arg1)
-		if objptr == nil {
-			panic("object of type webkit2.PolicyDecisioner is nil")
-		}
-
-		object := externglib.Take(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
-			_, ok := obj.(PolicyDecisioner)
-			return ok
-		})
-		rv, ok := casted.(PolicyDecisioner)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching webkit2.PolicyDecisioner")
-		}
-		_decision = rv
-	}
-	_typ = PolicyDecisionType(arg2)
-
-	ok := iface.DecidePolicy(_decision, _typ)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_webkit24_WebViewClass_enter_fullscreen
-func _gotk4_webkit24_WebViewClass_enter_fullscreen(arg0 *C.WebKitWebView) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ EnterFullscreen() bool })
-
-	ok := iface.EnterFullscreen()
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_webkit24_WebViewClass_insecure_content_detected
-func _gotk4_webkit24_WebViewClass_insecure_content_detected(arg0 *C.WebKitWebView, arg1 C.WebKitInsecureContentEvent) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		InsecureContentDetected(event InsecureContentEvent)
-	})
-
-	var _event InsecureContentEvent // out
-
-	_event = InsecureContentEvent(arg1)
-
-	iface.InsecureContentDetected(_event)
-}
-
-//export _gotk4_webkit24_WebViewClass_leave_fullscreen
-func _gotk4_webkit24_WebViewClass_leave_fullscreen(arg0 *C.WebKitWebView) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ LeaveFullscreen() bool })
-
-	ok := iface.LeaveFullscreen()
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_webkit24_WebViewClass_load_changed
-func _gotk4_webkit24_WebViewClass_load_changed(arg0 *C.WebKitWebView, arg1 C.WebKitLoadEvent) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ LoadChanged(loadEvent LoadEvent) })
-
-	var _loadEvent LoadEvent // out
-
-	_loadEvent = LoadEvent(arg1)
-
-	iface.LoadChanged(_loadEvent)
-}
-
-//export _gotk4_webkit24_WebViewClass_load_failed
-func _gotk4_webkit24_WebViewClass_load_failed(arg0 *C.WebKitWebView, arg1 C.WebKitLoadEvent, arg2 *C.gchar, arg3 *C.GError) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		LoadFailed(loadEvent LoadEvent, failingUri string, err error) bool
-	})
-
-	var _loadEvent LoadEvent // out
-	var _failingUri string   // out
-	var _err error           // out
-
-	_loadEvent = LoadEvent(arg1)
-	_failingUri = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-	_err = gerror.Take(unsafe.Pointer(arg3))
-
-	ok := iface.LoadFailed(_loadEvent, _failingUri, _err)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_webkit24_WebViewClass_load_failed_with_tls_errors
-func _gotk4_webkit24_WebViewClass_load_failed_with_tls_errors(arg0 *C.WebKitWebView, arg1 *C.gchar, arg2 *C.GTlsCertificate, arg3 C.GTlsCertificateFlags) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		LoadFailedWithTLSErrors(failingUri string, certificate gio.TLSCertificater, errors gio.TLSCertificateFlags) bool
-	})
-
-	var _failingUri string               // out
-	var _certificate gio.TLSCertificater // out
-	var _errors gio.TLSCertificateFlags  // out
-
-	_failingUri = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
-	{
-		objptr := unsafe.Pointer(arg2)
-		if objptr == nil {
-			panic("object of type gio.TLSCertificater is nil")
-		}
-
-		object := externglib.Take(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
-			_, ok := obj.(gio.TLSCertificater)
-			return ok
-		})
-		rv, ok := casted.(gio.TLSCertificater)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.TLSCertificater")
-		}
-		_certificate = rv
-	}
-	_errors = gio.TLSCertificateFlags(arg3)
-
-	ok := iface.LoadFailedWithTLSErrors(_failingUri, _certificate, _errors)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_webkit24_WebViewClass_mouse_target_changed
-func _gotk4_webkit24_WebViewClass_mouse_target_changed(arg0 *C.WebKitWebView, arg1 *C.WebKitHitTestResult, arg2 C.guint) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		MouseTargetChanged(hitTestResult *HitTestResult, modifiers uint)
-	})
-
-	var _hitTestResult *HitTestResult // out
-	var _modifiers uint               // out
-
-	_hitTestResult = wrapHitTestResult(externglib.Take(unsafe.Pointer(arg1)))
-	_modifiers = uint(arg2)
-
-	iface.MouseTargetChanged(_hitTestResult, _modifiers)
-}
-
-//export _gotk4_webkit24_WebViewClass_permission_request
-func _gotk4_webkit24_WebViewClass_permission_request(arg0 *C.WebKitWebView, arg1 *C.WebKitPermissionRequest) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		PermissionRequest(permissionRequest PermissionRequester) bool
-	})
-
-	var _permissionRequest PermissionRequester // out
-
-	{
-		objptr := unsafe.Pointer(arg1)
-		if objptr == nil {
-			panic("object of type webkit2.PermissionRequester is nil")
-		}
-
-		object := externglib.Take(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
-			_, ok := obj.(PermissionRequester)
-			return ok
-		})
-		rv, ok := casted.(PermissionRequester)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching webkit2.PermissionRequester")
-		}
-		_permissionRequest = rv
-	}
-
-	ok := iface.PermissionRequest(_permissionRequest)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_webkit24_WebViewClass_print
-func _gotk4_webkit24_WebViewClass_print(arg0 *C.WebKitWebView, arg1 *C.WebKitPrintOperation) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		Print(printOperation *PrintOperation) bool
-	})
-
-	var _printOperation *PrintOperation // out
-
-	_printOperation = wrapPrintOperation(externglib.Take(unsafe.Pointer(arg1)))
-
-	ok := iface.Print(_printOperation)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_webkit24_WebViewClass_ready_to_show
-func _gotk4_webkit24_WebViewClass_ready_to_show(arg0 *C.WebKitWebView) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ ReadyToShow() })
-
-	iface.ReadyToShow()
-}
-
-//export _gotk4_webkit24_WebViewClass_resource_load_started
-func _gotk4_webkit24_WebViewClass_resource_load_started(arg0 *C.WebKitWebView, arg1 *C.WebKitWebResource, arg2 *C.WebKitURIRequest) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		ResourceLoadStarted(resource *WebResource, request *URIRequest)
-	})
-
-	var _resource *WebResource // out
-	var _request *URIRequest   // out
-
-	_resource = wrapWebResource(externglib.Take(unsafe.Pointer(arg1)))
-	_request = wrapURIRequest(externglib.Take(unsafe.Pointer(arg2)))
-
-	iface.ResourceLoadStarted(_resource, _request)
-}
-
-//export _gotk4_webkit24_WebViewClass_run_as_modal
-func _gotk4_webkit24_WebViewClass_run_as_modal(arg0 *C.WebKitWebView) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ RunAsModal() })
-
-	iface.RunAsModal()
-}
-
-//export _gotk4_webkit24_WebViewClass_run_color_chooser
-func _gotk4_webkit24_WebViewClass_run_color_chooser(arg0 *C.WebKitWebView, arg1 *C.WebKitColorChooserRequest) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		RunColorChooser(request *ColorChooserRequest) bool
-	})
-
-	var _request *ColorChooserRequest // out
-
-	_request = wrapColorChooserRequest(externglib.Take(unsafe.Pointer(arg1)))
-
-	ok := iface.RunColorChooser(_request)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_webkit24_WebViewClass_run_file_chooser
-func _gotk4_webkit24_WebViewClass_run_file_chooser(arg0 *C.WebKitWebView, arg1 *C.WebKitFileChooserRequest) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		RunFileChooser(request *FileChooserRequest) bool
-	})
-
-	var _request *FileChooserRequest // out
-
-	_request = wrapFileChooserRequest(externglib.Take(unsafe.Pointer(arg1)))
-
-	ok := iface.RunFileChooser(_request)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_webkit24_WebViewClass_script_dialog
-func _gotk4_webkit24_WebViewClass_script_dialog(arg0 *C.WebKitWebView, arg1 *C.WebKitScriptDialog) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		ScriptDialog(dialog *ScriptDialog) bool
-	})
-
-	var _dialog *ScriptDialog // out
-
-	_dialog = (*ScriptDialog)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-	C.webkit_script_dialog_ref(arg1)
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_dialog)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.webkit_script_dialog_unref((*C.WebKitScriptDialog)(intern.C))
-		},
-	)
-
-	ok := iface.ScriptDialog(_dialog)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_webkit24_WebViewClass_show_notification
-func _gotk4_webkit24_WebViewClass_show_notification(arg0 *C.WebKitWebView, arg1 *C.WebKitNotification) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		ShowNotification(notification *Notification) bool
-	})
-
-	var _notification *Notification // out
-
-	_notification = wrapNotification(externglib.Take(unsafe.Pointer(arg1)))
-
-	ok := iface.ShowNotification(_notification)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_webkit24_WebViewClass_show_option_menu
-func _gotk4_webkit24_WebViewClass_show_option_menu(arg0 *C.WebKitWebView, arg1 *C.GdkRectangle, arg2 *C.WebKitOptionMenu) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		ShowOptionMenu(rectangle *gdk.Rectangle, menu *OptionMenu) bool
-	})
-
-	var _rectangle *gdk.Rectangle // out
-	var _menu *OptionMenu         // out
-
-	_rectangle = (*gdk.Rectangle)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-	_menu = wrapOptionMenu(externglib.Take(unsafe.Pointer(arg2)))
-
-	ok := iface.ShowOptionMenu(_rectangle, _menu)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_webkit24_WebViewClass_submit_form
-func _gotk4_webkit24_WebViewClass_submit_form(arg0 *C.WebKitWebView, arg1 *C.WebKitFormSubmissionRequest) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		SubmitForm(request *FormSubmissionRequest)
-	})
-
-	var _request *FormSubmissionRequest // out
-
-	_request = wrapFormSubmissionRequest(externglib.Take(unsafe.Pointer(arg1)))
-
-	iface.SubmitForm(_request)
-}
-
-//export _gotk4_webkit24_WebViewClass_user_message_received
-func _gotk4_webkit24_WebViewClass_user_message_received(arg0 *C.WebKitWebView, arg1 *C.WebKitUserMessage) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		UserMessageReceived(message *UserMessage) bool
-	})
-
-	var _message *UserMessage // out
-
-	_message = wrapUserMessage(externglib.Take(unsafe.Pointer(arg1)))
-
-	ok := iface.UserMessageReceived(_message)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_webkit24_WebViewClass_web_process_crashed
-func _gotk4_webkit24_WebViewClass_web_process_crashed(arg0 *C.WebKitWebView) (cret C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ WebProcessCrashed() bool })
-
-	ok := iface.WebProcessCrashed()
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_webkit24_WebViewClass_web_process_terminated
-func _gotk4_webkit24_WebViewClass_web_process_terminated(arg0 *C.WebKitWebView, arg1 C.WebKitWebProcessTerminationReason) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		WebProcessTerminated(reason WebProcessTerminationReason)
-	})
-
-	var _reason WebProcessTerminationReason // out
-
-	_reason = WebProcessTerminationReason(arg1)
-
-	iface.WebProcessTerminated(_reason)
-}
-
-func wrapWebView(obj *externglib.Object) *WebView {
+func wrapWebView(obj *coreglib.Object) *WebView {
 	return &WebView{
 		WebViewBase: WebViewBase{
 			Container: gtk.Container{
 				Widget: gtk.Widget{
-					InitiallyUnowned: externglib.InitiallyUnowned{
+					InitiallyUnowned: coreglib.InitiallyUnowned{
 						Object: obj,
 					},
 					Object: obj,
@@ -1160,64 +737,22 @@ func wrapWebView(obj *externglib.Object) *WebView {
 }
 
 func marshalWebView(p uintptr) (interface{}, error) {
-	return wrapWebView(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapWebView(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-//export _gotk4_webkit24_WebView_ConnectAuthenticate
-func _gotk4_webkit24_WebView_ConnectAuthenticate(arg0 C.gpointer, arg1 *C.WebKitAuthenticationRequest, arg2 C.guintptr) (cret C.gboolean) {
-	var f func(request *AuthenticationRequest) (ok bool)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(request *AuthenticationRequest) (ok bool))
-	}
-
-	var _request *AuthenticationRequest // out
-
-	_request = wrapAuthenticationRequest(externglib.Take(unsafe.Pointer(arg1)))
-
-	ok := f(_request)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-// ConnectAuthenticate: this signal is emitted when the user is challenged with
-// HTTP authentication. To let the application access or supply the credentials
-// as well as to allow the client application to either cancel the request or
-// perform the authentication, the signal will pass an instance of the
-// KitAuthenticationRequest in the request argument. To handle this signal
-// asynchronously you should keep a ref of the request and return TRUE. To
-// disable HTTP authentication entirely, connect to this signal and simply
+// ConnectAuthenticate: this signal is emitted when the user is challenged
+// with HTTP authentication. To let the application access or supply the
+// credentials as well as to allow the client application to either cancel the
+// request or perform the authentication, the signal will pass an instance
+// of the KitAuthenticationRequest in the request argument. To handle this
+// signal asynchronously you should keep a ref of the request and return TRUE.
+// To disable HTTP authentication entirely, connect to this signal and simply
 // return TRUE.
 //
 // The default signal handler will run a default authentication dialog
 // asynchronously for the user to interact with.
-func (webView *WebView) ConnectAuthenticate(f func(request *AuthenticationRequest) (ok bool)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "authenticate", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectAuthenticate), f)
-}
-
-//export _gotk4_webkit24_WebView_ConnectClose
-func _gotk4_webkit24_WebView_ConnectClose(arg0 C.gpointer, arg1 C.guintptr) {
-	var f func()
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func())
-	}
-
-	f()
+func (webView *WebView) ConnectAuthenticate(f func(request *AuthenticationRequest) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "authenticate", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectAuthenticate), f)
 }
 
 // ConnectClose is emitted when closing a KitWebView is requested. This occurs
@@ -1225,72 +760,33 @@ func _gotk4_webkit24_WebView_ConnectClose(arg0 C.gpointer, arg1 C.guintptr) {
 // function or after trying to close the web_view with
 // webkit_web_view_try_close(). It is the owner's responsibility to handle this
 // signal to hide or destroy the KitWebView, if necessary.
-func (webView *WebView) ConnectClose(f func()) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "close", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectClose), f)
+func (webView *WebView) ConnectClose(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "close", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectClose), f)
 }
 
-//export _gotk4_webkit24_WebView_ConnectContextMenu
-func _gotk4_webkit24_WebView_ConnectContextMenu(arg0 C.gpointer, arg1 *C.WebKitContextMenu, arg2 C.GdkEvent, arg3 *C.WebKitHitTestResult, arg4 C.guintptr) (cret C.gboolean) {
-	var f func(contextMenu *ContextMenu, event *gdk.Event, hitTestResult *HitTestResult) (ok bool)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg4))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(contextMenu *ContextMenu, event *gdk.Event, hitTestResult *HitTestResult) (ok bool))
-	}
-
-	var _contextMenu *ContextMenu     // out
-	var _event *gdk.Event             // out
-	var _hitTestResult *HitTestResult // out
-
-	_contextMenu = wrapContextMenu(externglib.Take(unsafe.Pointer(arg1)))
-	{
-		v := (*gdk.Event)(gextras.NewStructNative(unsafe.Pointer((&arg2))))
-		v = gdk.CopyEventer(v)
-		_event = v
-	}
-	_hitTestResult = wrapHitTestResult(externglib.Take(unsafe.Pointer(arg3)))
-
-	ok := f(_contextMenu, _event, _hitTestResult)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-// ConnectContextMenu is emitted when a context menu is about to be displayed to
-// give the application a chance to customize the proposed menu, prevent the
-// menu from being displayed, or build its own context menu. <itemizedlist>
-// <listitem><para> To customize the proposed menu you can use
-// webkit_context_menu_prepend(), webkit_context_menu_append() or
+// ConnectContextMenu is emitted when a context menu is about to be displayed
+// to give the application a chance to customize the proposed menu,
+// prevent the menu from being displayed, or build its own context menu.
+// <itemizedlist> <listitem><para> To customize the proposed menu you
+// can use webkit_context_menu_prepend(), webkit_context_menu_append() or
 // webkit_context_menu_insert() to add new KitContextMenuItem<!-- -->s to
-// context_menu, webkit_context_menu_move_item() to reorder existing items, or
-// webkit_context_menu_remove() to remove an existing item. The signal handler
-// should return FALSE, and the menu represented by context_menu will be shown.
-// </para></listitem> <listitem><para> To prevent the menu from being displayed
-// you can just connect to this signal and return TRUE so that the proposed menu
-// will not be shown. </para></listitem> <listitem><para> To build your own
-// menu, you can remove all items from the proposed menu with
+// context_menu, webkit_context_menu_move_item() to reorder existing items,
+// or webkit_context_menu_remove() to remove an existing item. The signal
+// handler should return FALSE, and the menu represented by context_menu will
+// be shown. </para></listitem> <listitem><para> To prevent the menu from being
+// displayed you can just connect to this signal and return TRUE so that the
+// proposed menu will not be shown. </para></listitem> <listitem><para> To
+// build your own menu, you can remove all items from the proposed menu with
 // webkit_context_menu_remove_all(), add your own items and return FALSE so that
 // the menu will be shown. You can also ignore the proposed KitContextMenu,
 // build your own Menu and return TRUE to prevent the proposed menu from being
 // shown. </para></listitem> <listitem><para> If you just want the default menu
-// to be shown always, simply don't connect to this signal because showing the
-// proposed context menu is the default behaviour. </para></listitem>
+// to be shown always, simply don't connect to this signal because showing
+// the proposed context menu is the default behaviour. </para></listitem>
 // </itemizedlist>
 //
-// The event is expected to be one of the following types: <itemizedlist>
-// <listitem><para> a EventButton of type GDK_BUTTON_PRESS when the context menu
-// was triggered with mouse. </para></listitem> <listitem><para> a EventKey of
-// type GDK_KEY_PRESS if the keyboard was used to show the menu.
-// </para></listitem> <listitem><para> a generic Event of type GDK_NOTHING when
-// the Widget::popup-menu signal was used to show the context menu.
-// </para></listitem> </itemizedlist>
+// The event parameter is now deprecated. Use webkit_context_menu_get_event() to
+// get the Event that triggered the context menu.
 //
 // If the signal handler returns FALSE the context menu represented by
 // context_menu will be shown, if it return TRUE the context menu will not be
@@ -1298,55 +794,14 @@ func _gotk4_webkit24_WebView_ConnectContextMenu(arg0 C.gpointer, arg1 *C.WebKitC
 //
 // The proposed KitContextMenu passed in context_menu argument is only valid
 // during the signal emission.
-func (webView *WebView) ConnectContextMenu(f func(contextMenu *ContextMenu, event *gdk.Event, hitTestResult *HitTestResult) (ok bool)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "context-menu", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectContextMenu), f)
-}
-
-//export _gotk4_webkit24_WebView_ConnectContextMenuDismissed
-func _gotk4_webkit24_WebView_ConnectContextMenuDismissed(arg0 C.gpointer, arg1 C.guintptr) {
-	var f func()
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func())
-	}
-
-	f()
+func (webView *WebView) ConnectContextMenu(f func(contextMenu *ContextMenu, event *gdk.Event, hitTestResult *HitTestResult) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "context-menu", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectContextMenu), f)
 }
 
 // ConnectContextMenuDismissed is emitted after KitWebView::context-menu signal,
 // if the context menu is shown, to notify that the context menu is dismissed.
-func (webView *WebView) ConnectContextMenuDismissed(f func()) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "context-menu-dismissed", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectContextMenuDismissed), f)
-}
-
-//export _gotk4_webkit24_WebView_ConnectCreate
-func _gotk4_webkit24_WebView_ConnectCreate(arg0 C.gpointer, arg1 *C.WebKitNavigationAction, arg2 C.guintptr) (cret *C.GtkWidget) {
-	var f func(navigationAction *NavigationAction) (widget gtk.Widgetter)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(navigationAction *NavigationAction) (widget gtk.Widgetter))
-	}
-
-	var _navigationAction *NavigationAction // out
-
-	_navigationAction = (*NavigationAction)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-
-	widget := f(_navigationAction)
-
-	cret = (*C.GtkWidget)(unsafe.Pointer(externglib.InternObject(widget).Native()))
-	C.g_object_ref(C.gpointer(externglib.InternObject(widget).Native()))
-
-	return cret
+func (webView *WebView) ConnectContextMenuDismissed(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "context-menu-dismissed", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectContextMenuDismissed), f)
 }
 
 // ConnectCreate is emitted when the creation of a new KitWebView is requested.
@@ -1356,212 +811,94 @@ func _gotk4_webkit24_WebView_ConnectCreate(arg0 C.gpointer, arg1 *C.WebKitNaviga
 // The KitNavigationAction parameter contains information about the navigation
 // action that triggered this signal.
 //
-// The new KitWebView must be related to web_view, see
-// webkit_web_view_new_with_related_view() for more details.
+// The new KitWebView must be related to web_view, see KitWebView:related-view
+// for more details.
 //
 // The new KitWebView should not be displayed to the user until the
 // KitWebView::ready-to-show signal is emitted.
-func (webView *WebView) ConnectCreate(f func(navigationAction *NavigationAction) (widget gtk.Widgetter)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "create", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectCreate), f)
+func (webView *WebView) ConnectCreate(f func(navigationAction *NavigationAction) (widget gtk.Widgetter)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "create", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectCreate), f)
 }
 
-//export _gotk4_webkit24_WebView_ConnectDecidePolicy
-func _gotk4_webkit24_WebView_ConnectDecidePolicy(arg0 C.gpointer, arg1 *C.WebKitPolicyDecision, arg2 C.WebKitPolicyDecisionType, arg3 C.guintptr) (cret C.gboolean) {
-	var f func(decision PolicyDecisioner, decisionType PolicyDecisionType) (ok bool)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(decision PolicyDecisioner, decisionType PolicyDecisionType) (ok bool))
-	}
-
-	var _decision PolicyDecisioner       // out
-	var _decisionType PolicyDecisionType // out
-
-	{
-		objptr := unsafe.Pointer(arg1)
-		if objptr == nil {
-			panic("object of type webkit2.PolicyDecisioner is nil")
-		}
-
-		object := externglib.Take(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
-			_, ok := obj.(PolicyDecisioner)
-			return ok
-		})
-		rv, ok := casted.(PolicyDecisioner)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching webkit2.PolicyDecisioner")
-		}
-		_decision = rv
-	}
-	_decisionType = PolicyDecisionType(arg2)
-
-	ok := f(_decision, _decisionType)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-// ConnectDecidePolicy: this signal is emitted when WebKit is requesting the
-// client to decide a policy decision, such as whether to navigate to a page,
-// open a new window or whether or not to download a resource. The
-// KitNavigationPolicyDecision passed in the decision argument is a generic
+// ConnectDecidePolicy: this signal is emitted when WebKit is requesting
+// the client to decide a policy decision, such as whether to navigate to
+// a page, open a new window or whether or not to download a resource.
+// The KitNavigationPolicyDecision passed in the decision argument is a generic
 // type, but should be casted to a more specific type when making the decision.
 // For example:
 //
-// <informalexample><programlisting> static gboolean decide_policy_cb
-// (WebKitWebView *web_view, WebKitPolicyDecision *decision,
-// WebKitPolicyDecisionType type) { switch (type) { case
-// WEBKIT_POLICY_DECISION_TYPE_NAVIGATION_ACTION: {
-// WebKitNavigationPolicyDecision *navigation_decision =
-// WEBKIT_NAVIGATION_POLICY_DECISION (decision); /<!-- -->* Make a policy
-// decision here. *<!-- -->/ break; } case
-// WEBKIT_POLICY_DECISION_TYPE_NEW_WINDOW_ACTION: {
-// WebKitNavigationPolicyDecision *navigation_decision =
-// WEBKIT_NAVIGATION_POLICY_DECISION (decision); /<!-- -->* Make a policy
-// decision here. *<!-- -->/ break; } case WEBKIT_POLICY_DECISION_TYPE_RESPONSE:
-// WebKitResponsePolicyDecision *response = WEBKIT_RESPONSE_POLICY_DECISION
-// (decision); /<!-- -->* Make a policy decision here. *<!-- -->/ break;
-// default: /<!-- -->* Making no decision results in
-// webkit_policy_decision_use(). *<!-- -->/ return FALSE; } return TRUE; }
-// </programlisting></informalexample>
+//    static gboolean
+//    decide_policy_cb (WebKitWebView *web_view,
+//                      WebKitPolicyDecision *decision,
+//                      WebKitPolicyDecisionType type)
+//    {
+//        switch (type) {
+//        case WEBKIT_POLICY_DECISION_TYPE_NAVIGATION_ACTION: {
+//            WebKitNavigationPolicyDecision *navigation_decision = WEBKIT_NAVIGATION_POLICY_DECISION (decision);
+//            // Make a policy decision here
+//            break;
+//        }
+//        case WEBKIT_POLICY_DECISION_TYPE_NEW_WINDOW_ACTION: {
+//            WebKitNavigationPolicyDecision *navigation_decision = WEBKIT_NAVIGATION_POLICY_DECISION (decision);
+//            // Make a policy decision here
+//            break;
+//        }
+//        case WEBKIT_POLICY_DECISION_TYPE_RESPONSE:
+//            WebKitResponsePolicyDecision *response = WEBKIT_RESPONSE_POLICY_DECISION (decision);
+//            // Make a policy decision here
+//            break;
+//        default:
+//            // Making no decision results in webkit_policy_decision_use()
+//            return FALSE;
+//        }
+//        return TRUE;
+//    }
 //
-// It is possible to make policy decision asynchronously, by simply calling
-// g_object_ref() on the decision argument and returning TRUE to block the
-// default signal handler. If the last reference is removed on a
-// KitPolicyDecision and no decision has been made explicitly,
+// It is possible to make policy decision asynchronously, by simply
+// calling g_object_ref() on the decision argument and returning TRUE to
+// block the default signal handler. If the last reference is removed
+// on a KitPolicyDecision and no decision has been made explicitly,
 // webkit_policy_decision_use() will be the default policy decision. The default
 // signal handler will simply call webkit_policy_decision_use(). Only the first
 // policy decision chosen for a given KitPolicyDecision will have any affect.
-func (webView *WebView) ConnectDecidePolicy(f func(decision PolicyDecisioner, decisionType PolicyDecisionType) (ok bool)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "decide-policy", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectDecidePolicy), f)
-}
-
-//export _gotk4_webkit24_WebView_ConnectEnterFullscreen
-func _gotk4_webkit24_WebView_ConnectEnterFullscreen(arg0 C.gpointer, arg1 C.guintptr) (cret C.gboolean) {
-	var f func() (ok bool)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func() (ok bool))
-	}
-
-	ok := f()
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
+func (webView *WebView) ConnectDecidePolicy(f func(decision PolicyDecisioner, decisionType PolicyDecisionType) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "decide-policy", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectDecidePolicy), f)
 }
 
 // ConnectEnterFullscreen is emitted when JavaScript code calls
 // <function>element.webkitRequestFullScreen</function>. If the signal is not
-// handled the KitWebView will proceed to full screen its top level window. This
-// signal can be used by client code to request permission to the user prior
-// doing the full screen transition and eventually prepare the top-level window
-// (e.g. hide some widgets that would otherwise be part of the full screen
-// window).
-func (webView *WebView) ConnectEnterFullscreen(f func() (ok bool)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "enter-fullscreen", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectEnterFullscreen), f)
+// handled the KitWebView will proceed to full screen its top level window.
+// This signal can be used by client code to request permission to the user
+// prior doing the full screen transition and eventually prepare the top-level
+// window (e.g. hide some widgets that would otherwise be part of the full
+// screen window).
+func (webView *WebView) ConnectEnterFullscreen(f func() (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "enter-fullscreen", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectEnterFullscreen), f)
 }
 
-//export _gotk4_webkit24_WebView_ConnectInsecureContentDetected
-func _gotk4_webkit24_WebView_ConnectInsecureContentDetected(arg0 C.gpointer, arg1 C.WebKitInsecureContentEvent, arg2 C.guintptr) {
-	var f func(event InsecureContentEvent)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(event InsecureContentEvent))
-	}
-
-	var _event InsecureContentEvent // out
-
-	_event = InsecureContentEvent(arg1)
-
-	f(_event)
-}
-
-// ConnectInsecureContentDetected: this signal is emitted when insecure content
-// has been detected in a page loaded through a secure connection. This
-// typically means that a external resource from an unstrusted source has been
-// run or displayed, resulting in a mix of HTTPS and non-HTTPS content.
+// ConnectInsecureContentDetected: this signal is emitted when insecure
+// content has been detected in a page loaded through a secure connection.
+// This typically means that a external resource from an unstrusted source has
+// been run or displayed, resulting in a mix of HTTPS and non-HTTPS content.
 //
 // You can check the event parameter to know exactly which kind of event has
 // been detected (see KitInsecureContentEvent).
-func (webView *WebView) ConnectInsecureContentDetected(f func(event InsecureContentEvent)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "insecure-content-detected", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectInsecureContentDetected), f)
+func (webView *WebView) ConnectInsecureContentDetected(f func(event InsecureContentEvent)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "insecure-content-detected", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectInsecureContentDetected), f)
 }
 
-//export _gotk4_webkit24_WebView_ConnectLeaveFullscreen
-func _gotk4_webkit24_WebView_ConnectLeaveFullscreen(arg0 C.gpointer, arg1 C.guintptr) (cret C.gboolean) {
-	var f func() (ok bool)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func() (ok bool))
-	}
-
-	ok := f()
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-// ConnectLeaveFullscreen is emitted when the KitWebView is about to restore its
-// top level window out of its full screen state. This signal can be used by
+// ConnectLeaveFullscreen is emitted when the KitWebView is about to restore
+// its top level window out of its full screen state. This signal can be used by
 // client code to restore widgets hidden during the KitWebView::enter-fullscreen
 // stage for instance.
-func (webView *WebView) ConnectLeaveFullscreen(f func() (ok bool)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "leave-fullscreen", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectLeaveFullscreen), f)
+func (webView *WebView) ConnectLeaveFullscreen(f func() (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "leave-fullscreen", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectLeaveFullscreen), f)
 }
 
-//export _gotk4_webkit24_WebView_ConnectLoadChanged
-func _gotk4_webkit24_WebView_ConnectLoadChanged(arg0 C.gpointer, arg1 C.WebKitLoadEvent, arg2 C.guintptr) {
-	var f func(loadEvent LoadEvent)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(loadEvent LoadEvent))
-	}
-
-	var _loadEvent LoadEvent // out
-
-	_loadEvent = LoadEvent(arg1)
-
-	f(_loadEvent)
-}
-
-// ConnectLoadChanged is emitted when a load operation in web_view changes. The
-// signal is always emitted with WEBKIT_LOAD_STARTED when a new load request is
-// made and WEBKIT_LOAD_FINISHED when the load finishes successfully or due to
-// an error. When the ongoing load operation fails KitWebView::load-failed
+// ConnectLoadChanged is emitted when a load operation in web_view changes.
+// The signal is always emitted with WEBKIT_LOAD_STARTED when a new load request
+// is made and WEBKIT_LOAD_FINISHED when the load finishes successfully or due
+// to an error. When the ongoing load operation fails KitWebView::load-failed
 // signal is emitted before KitWebView::load-changed is emitted with
 // WEBKIT_LOAD_FINISHED. If a redirection is received from the server, this
 // signal is emitted with WEBKIT_LOAD_REDIRECTED after the initial emission with
@@ -1571,56 +908,39 @@ func _gotk4_webkit24_WebView_ConnectLoadChanged(arg0 C.gpointer, arg1 C.WebKitLo
 // You can handle this signal and use a switch to track any ongoing load
 // operation.
 //
-// <informalexample><programlisting> static void web_view_load_changed
-// (WebKitWebView *web_view, WebKitLoadEvent load_event, gpointer user_data) {
-// switch (load_event) { case WEBKIT_LOAD_STARTED: /<!-- -->* New load, we have
-// now a provisional URI *<!-- -->/ provisional_uri = webkit_web_view_get_uri
-// (web_view); /<!-- -->* Here we could start a spinner or update the <!-- -->*
-// location bar with the provisional URI *<!-- -->/ break; case
-// WEBKIT_LOAD_REDIRECTED: redirected_uri = webkit_web_view_get_uri (web_view);
-// break; case WEBKIT_LOAD_COMMITTED: /<!-- -->* The load is being performed.
-// Current URI is <!-- -->* the final one and it won't change unless a new <!--
-// -->* load is requested or a navigation within the <!-- -->* same page is
-// performed *<!-- -->/ uri = webkit_web_view_get_uri (web_view); break; case
-// WEBKIT_LOAD_FINISHED: /<!-- -->* Load finished, we can now stop the spinner
-// *<!-- -->/ break; } } </programlisting></informalexample>.
-func (webView *WebView) ConnectLoadChanged(f func(loadEvent LoadEvent)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "load-changed", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectLoadChanged), f)
+//    static void web_view_load_changed (WebKitWebView  *web_view,
+//                                       WebKitLoadEvent load_event,
+//                                       gpointer        user_data)
+//    {
+//        switch (load_event) {
+//        case WEBKIT_LOAD_STARTED:
+//            // New load, we have now a provisional URI
+//            provisional_uri = webkit_web_view_get_uri (web_view);
+//            // Here we could start a spinner or update the
+//            // location bar with the provisional URI
+//            break;
+//        case WEBKIT_LOAD_REDIRECTED:
+//            redirected_uri = webkit_web_view_get_uri (web_view);
+//            break;
+//        case WEBKIT_LOAD_COMMITTED:
+//            // The load is being performed. Current URI is
+//            // the final one and it won't change unless a new
+//            // load is requested or a navigation within the
+//            // same page is performed
+//            uri = webkit_web_view_get_uri (web_view);
+//            break;
+//        case WEBKIT_LOAD_FINISHED:
+//            // Load finished, we can now stop the spinner
+//            break;
+//        }
+//    }.
+func (webView *WebView) ConnectLoadChanged(f func(loadEvent LoadEvent)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "load-changed", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectLoadChanged), f)
 }
 
-//export _gotk4_webkit24_WebView_ConnectLoadFailed
-func _gotk4_webkit24_WebView_ConnectLoadFailed(arg0 C.gpointer, arg1 C.WebKitLoadEvent, arg2 *C.gchar, arg3 *C.GError, arg4 C.guintptr) (cret C.gboolean) {
-	var f func(loadEvent LoadEvent, failingUri string, err error) (ok bool)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg4))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(loadEvent LoadEvent, failingUri string, err error) (ok bool))
-	}
-
-	var _loadEvent LoadEvent // out
-	var _failingUri string   // out
-	var _err error           // out
-
-	_loadEvent = LoadEvent(arg1)
-	_failingUri = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-	_err = gerror.Take(unsafe.Pointer(arg3))
-
-	ok := f(_loadEvent, _failingUri, _err)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-// ConnectLoadFailed is emitted when an error occurs during a load operation. If
-// the error happened when starting to load data for a page load_event will be
-// WEBKIT_LOAD_STARTED. If it happened while loading a committed data source
+// ConnectLoadFailed is emitted when an error occurs during a load operation.
+// If the error happened when starting to load data for a page load_event will
+// be WEBKIT_LOAD_STARTED. If it happened while loading a committed data source
 // load_event will be WEBKIT_LOAD_COMMITTED. Since a load error causes the load
 // operation to finish, the signal WebKitWebView::load-changed will always be
 // emitted with WEBKIT_LOAD_FINISHED event right after this one.
@@ -1628,54 +948,8 @@ func _gotk4_webkit24_WebView_ConnectLoadFailed(arg0 C.gpointer, arg1 C.WebKitLoa
 // By default, if the signal is not handled, a stock error page will be
 // displayed. You need to handle the signal if you want to provide your own
 // error page.
-func (webView *WebView) ConnectLoadFailed(f func(loadEvent LoadEvent, failingUri string, err error) (ok bool)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "load-failed", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectLoadFailed), f)
-}
-
-//export _gotk4_webkit24_WebView_ConnectLoadFailedWithTLSErrors
-func _gotk4_webkit24_WebView_ConnectLoadFailedWithTLSErrors(arg0 C.gpointer, arg1 *C.gchar, arg2 *C.GTlsCertificate, arg3 C.GTlsCertificateFlags, arg4 C.guintptr) (cret C.gboolean) {
-	var f func(failingUri string, certificate gio.TLSCertificater, errors gio.TLSCertificateFlags) (ok bool)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg4))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(failingUri string, certificate gio.TLSCertificater, errors gio.TLSCertificateFlags) (ok bool))
-	}
-
-	var _failingUri string               // out
-	var _certificate gio.TLSCertificater // out
-	var _errors gio.TLSCertificateFlags  // out
-
-	_failingUri = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
-	{
-		objptr := unsafe.Pointer(arg2)
-		if objptr == nil {
-			panic("object of type gio.TLSCertificater is nil")
-		}
-
-		object := externglib.Take(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
-			_, ok := obj.(gio.TLSCertificater)
-			return ok
-		})
-		rv, ok := casted.(gio.TLSCertificater)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.TLSCertificater")
-		}
-		_certificate = rv
-	}
-	_errors = gio.TLSCertificateFlags(arg3)
-
-	ok := f(_failingUri, _certificate, _errors)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
+func (webView *WebView) ConnectLoadFailed(f func(loadEvent LoadEvent, failingUri string, err error) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "load-failed", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectLoadFailed), f)
 }
 
 // ConnectLoadFailedWithTLSErrors is emitted when a TLS error occurs during a
@@ -1687,30 +961,8 @@ func _gotk4_webkit24_WebView_ConnectLoadFailedWithTLSErrors(arg0 C.gpointer, arg
 //
 // If FALSE is returned, KitWebView::load-failed will be emitted. The load will
 // finish regardless of the returned value.
-func (webView *WebView) ConnectLoadFailedWithTLSErrors(f func(failingUri string, certificate gio.TLSCertificater, errors gio.TLSCertificateFlags) (ok bool)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "load-failed-with-tls-errors", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectLoadFailedWithTLSErrors), f)
-}
-
-//export _gotk4_webkit24_WebView_ConnectMouseTargetChanged
-func _gotk4_webkit24_WebView_ConnectMouseTargetChanged(arg0 C.gpointer, arg1 *C.WebKitHitTestResult, arg2 C.guint, arg3 C.guintptr) {
-	var f func(hitTestResult *HitTestResult, modifiers uint)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(hitTestResult *HitTestResult, modifiers uint))
-	}
-
-	var _hitTestResult *HitTestResult // out
-	var _modifiers uint               // out
-
-	_hitTestResult = wrapHitTestResult(externglib.Take(unsafe.Pointer(arg1)))
-	_modifiers = uint(arg2)
-
-	f(_hitTestResult, _modifiers)
+func (webView *WebView) ConnectLoadFailedWithTLSErrors(f func(failingUri string, certificate gio.TLSCertificater, errors gio.TLSCertificateFlags) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "load-failed-with-tls-errors", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectLoadFailedWithTLSErrors), f)
 }
 
 // ConnectMouseTargetChanged: this signal is emitted when the mouse cursor moves
@@ -1720,50 +972,8 @@ func _gotk4_webkit24_WebView_ConnectMouseTargetChanged(arg0 C.gpointer, arg1 *C.
 // argument. The modifiers argument is a bitmask of ModifierType flags
 // indicating the state of modifier keys. The signal is emitted again when the
 // mouse is moved out of the current element with a new hit_test_result.
-func (webView *WebView) ConnectMouseTargetChanged(f func(hitTestResult *HitTestResult, modifiers uint)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "mouse-target-changed", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectMouseTargetChanged), f)
-}
-
-//export _gotk4_webkit24_WebView_ConnectPermissionRequest
-func _gotk4_webkit24_WebView_ConnectPermissionRequest(arg0 C.gpointer, arg1 *C.WebKitPermissionRequest, arg2 C.guintptr) (cret C.gboolean) {
-	var f func(request PermissionRequester) (ok bool)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(request PermissionRequester) (ok bool))
-	}
-
-	var _request PermissionRequester // out
-
-	{
-		objptr := unsafe.Pointer(arg1)
-		if objptr == nil {
-			panic("object of type webkit2.PermissionRequester is nil")
-		}
-
-		object := externglib.Take(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
-			_, ok := obj.(PermissionRequester)
-			return ok
-		})
-		rv, ok := casted.(PermissionRequester)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching webkit2.PermissionRequester")
-		}
-		_request = rv
-	}
-
-	ok := f(_request)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
+func (webView *WebView) ConnectMouseTargetChanged(f func(hitTestResult *HitTestResult, modifiers uint)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "mouse-target-changed", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectMouseTargetChanged), f)
 }
 
 // ConnectPermissionRequest: this signal is emitted when WebKit is requesting
@@ -1773,191 +983,102 @@ func _gotk4_webkit24_WebView_ConnectPermissionRequest(arg0 C.gpointer, arg1 *C.W
 // A possible way to use this signal could be through a dialog allowing the user
 // decide what to do with the request:
 //
-// <informalexample><programlisting> static gboolean permission_request_cb
-// (WebKitWebView *web_view, WebKitPermissionRequest *request, GtkWindow
-// *parent_window) { GtkWidget *dialog = gtk_message_dialog_new (parent_window,
-// GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "Allow Permission
-// Request?"); gtk_widget_show (dialog); gint result = gtk_dialog_run
-// (GTK_DIALOG (dialog));
+//    static gboolean permission_request_cb (WebKitWebView *web_view,
+//                                           WebKitPermissionRequest *request,
+//                                           GtkWindow *parent_window)
+//    {
+//        GtkWidget *dialog = gtk_message_dialog_new (parent_window,
+//                                                    GTK_DIALOG_MODAL,
+//                                                    GTK_MESSAGE_QUESTION,
+//                                                    GTK_BUTTONS_YES_NO,
+//                                                    "Allow Permission Request?");
+//        gtk_widget_show (dialog);
+//        gint result = gtk_dialog_run (GTK_DIALOG (dialog));
 //
-//    switch (result) {
-//    case GTK_RESPONSE_YES:
-//        webkit_permission_request_allow (request);
-//        break;
-//    default:
-//        webkit_permission_request_deny (request);
-//        break;
+//        switch (result) {
+//        case GTK_RESPONSE_YES:
+//            webkit_permission_request_allow (request);
+//            break;
+//        default:
+//            webkit_permission_request_deny (request);
+//            break;
+//        }
+//        gtk_widget_destroy (dialog);
+//
+//        return TRUE;
 //    }
-//    gtk_widget_destroy (dialog);
 //
-//    return TRUE;
-//
-// } </programlisting></informalexample>
-//
-// It is possible to handle permission requests asynchronously, by simply
-// calling g_object_ref() on the request argument and returning TRUE to block
-// the default signal handler. If the last reference is removed on a
-// KitPermissionRequest and the request has not been handled,
+// It is possible to handle permission requests asynchronously,
+// by simply calling g_object_ref() on the request argument and returning
+// TRUE to block the default signal handler. If the last reference is
+// removed on a KitPermissionRequest and the request has not been handled,
 // webkit_permission_request_deny() will be the default action.
 //
-// If the signal is not handled, the request will be completed automatically by
-// the specific KitPermissionRequest that could allow or deny it. Check the
+// If the signal is not handled, the request will be completed automatically
+// by the specific KitPermissionRequest that could allow or deny it. Check the
 // documentation of classes implementing KitPermissionRequest interface to know
 // their default action.
-func (webView *WebView) ConnectPermissionRequest(f func(request PermissionRequester) (ok bool)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "permission-request", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectPermissionRequest), f)
+func (webView *WebView) ConnectPermissionRequest(f func(request PermissionRequester) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "permission-request", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectPermissionRequest), f)
 }
 
-//export _gotk4_webkit24_WebView_ConnectPrint
-func _gotk4_webkit24_WebView_ConnectPrint(arg0 C.gpointer, arg1 *C.WebKitPrintOperation, arg2 C.guintptr) (cret C.gboolean) {
-	var f func(printOperation *PrintOperation) (ok bool)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(printOperation *PrintOperation) (ok bool))
-	}
-
-	var _printOperation *PrintOperation // out
-
-	_printOperation = wrapPrintOperation(externglib.Take(unsafe.Pointer(arg1)))
-
-	ok := f(_printOperation)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-// ConnectPrint is emitted when printing is requested on web_view, usually by a
-// JavaScript call, before the print dialog is shown. This signal can be used to
-// set the initial print settings and page setup of print_operation to be used
-// as default values in the print dialog. You can call
-// webkit_print_operation_set_print_settings() and
+// ConnectPrint is emitted when printing is requested on web_view,
+// usually by a JavaScript call, before the print dialog is shown.
+// This signal can be used to set the initial print settings and page
+// setup of print_operation to be used as default values in the print
+// dialog. You can call webkit_print_operation_set_print_settings() and
 // webkit_print_operation_set_page_setup() and then return FALSE to propagate
 // the event so that the print dialog is shown.
 //
 // You can connect to this signal and return TRUE to cancel the print operation
 // or implement your own print dialog.
-func (webView *WebView) ConnectPrint(f func(printOperation *PrintOperation) (ok bool)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "print", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectPrint), f)
+func (webView *WebView) ConnectPrint(f func(printOperation *PrintOperation) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "print", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectPrint), f)
 }
 
-//export _gotk4_webkit24_WebView_ConnectReadyToShow
-func _gotk4_webkit24_WebView_ConnectReadyToShow(arg0 C.gpointer, arg1 C.guintptr) {
-	var f func()
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func())
-	}
-
-	f()
+// ConnectQueryPermissionState: this signal allows the User-Agent to respond to
+// permission requests for powerful features, as specified by the Permissions
+// W3C Specification (https://w3c.github.io/permissions/). You can reply to the
+// query using webkit_permission_state_query_finish().
+//
+// You can handle the query asynchronously by calling
+// webkit_permission_state_query_ref() on query and returning TRUE. If the last
+// reference of query is removed and the query has not been handled, the query
+// result will be set to WEBKIT_QUERY_PERMISSION_PROMPT.
+func (webView *WebView) ConnectQueryPermissionState(f func(query *PermissionStateQuery) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "query-permission-state", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectQueryPermissionState), f)
 }
 
 // ConnectReadyToShow is emitted after KitWebView::create on the newly created
 // KitWebView when it should be displayed to the user. When this signal is
 // emitted all the information about how the window should look, including size,
-// position, whether the location, status and scrollbars should be displayed, is
-// already set on the KitWindowProperties of web_view. See also
+// position, whether the location, status and scrollbars should be displayed,
+// is already set on the KitWindowProperties of web_view. See also
 // webkit_web_view_get_window_properties().
-func (webView *WebView) ConnectReadyToShow(f func()) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "ready-to-show", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectReadyToShow), f)
-}
-
-//export _gotk4_webkit24_WebView_ConnectResourceLoadStarted
-func _gotk4_webkit24_WebView_ConnectResourceLoadStarted(arg0 C.gpointer, arg1 *C.WebKitWebResource, arg2 *C.WebKitURIRequest, arg3 C.guintptr) {
-	var f func(resource *WebResource, request *URIRequest)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(resource *WebResource, request *URIRequest))
-	}
-
-	var _resource *WebResource // out
-	var _request *URIRequest   // out
-
-	_resource = wrapWebResource(externglib.Take(unsafe.Pointer(arg1)))
-	_request = wrapURIRequest(externglib.Take(unsafe.Pointer(arg2)))
-
-	f(_resource, _request)
+func (webView *WebView) ConnectReadyToShow(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "ready-to-show", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectReadyToShow), f)
 }
 
 // ConnectResourceLoadStarted is emitted when a new resource is going to be
 // loaded. The request parameter contains the KitURIRequest that will be sent to
 // the server. You can monitor the load operation by connecting to the different
 // signals of resource.
-func (webView *WebView) ConnectResourceLoadStarted(f func(resource *WebResource, request *URIRequest)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "resource-load-started", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectResourceLoadStarted), f)
+func (webView *WebView) ConnectResourceLoadStarted(f func(resource *WebResource, request *URIRequest)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "resource-load-started", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectResourceLoadStarted), f)
 }
 
-//export _gotk4_webkit24_WebView_ConnectRunAsModal
-func _gotk4_webkit24_WebView_ConnectRunAsModal(arg0 C.gpointer, arg1 C.guintptr) {
-	var f func()
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func())
-	}
-
-	f()
-}
-
-// ConnectRunAsModal is emitted after KitWebView::ready-to-show on the newly
-// created KitWebView when JavaScript code calls
+// ConnectRunAsModal is emitted after KitWebView::ready-to-show
+// on the newly created KitWebView when JavaScript code calls
 // <function>window.showModalDialog</function>. The purpose of this signal is to
 // allow the client application to prepare the new view to behave as modal. Once
 // the signal is emitted a new main loop will be run to block user interaction
 // in the parent KitWebView until the new dialog is closed.
-func (webView *WebView) ConnectRunAsModal(f func()) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "run-as-modal", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectRunAsModal), f)
+func (webView *WebView) ConnectRunAsModal(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "run-as-modal", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectRunAsModal), f)
 }
 
-//export _gotk4_webkit24_WebView_ConnectRunColorChooser
-func _gotk4_webkit24_WebView_ConnectRunColorChooser(arg0 C.gpointer, arg1 *C.WebKitColorChooserRequest, arg2 C.guintptr) (cret C.gboolean) {
-	var f func(request *ColorChooserRequest) (ok bool)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(request *ColorChooserRequest) (ok bool))
-	}
-
-	var _request *ColorChooserRequest // out
-
-	_request = wrapColorChooserRequest(externglib.Take(unsafe.Pointer(arg1)))
-
-	ok := f(_request)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-// ConnectRunColorChooser: this signal is emitted when the user interacts with a
-// &lt;input type='color' /&gt; HTML element, requesting from WebKit to show a
+// ConnectRunColorChooser: this signal is emitted when the user interacts with
+// a <input type='color' /> HTML element, requesting from WebKit to show a
 // dialog to select a color. To let the application know the details of the
 // color chooser, as well as to allow the client application to either cancel
 // the request or perform an actual color selection, the signal will pass an
@@ -1968,205 +1089,71 @@ func _gotk4_webkit24_WebView_ConnectRunColorChooser(arg0 C.gpointer, arg1 *C.Web
 //
 // The default signal handler will asynchronously run a regular ColorChooser for
 // the user to interact with.
-func (webView *WebView) ConnectRunColorChooser(f func(request *ColorChooserRequest) (ok bool)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "run-color-chooser", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectRunColorChooser), f)
-}
-
-//export _gotk4_webkit24_WebView_ConnectRunFileChooser
-func _gotk4_webkit24_WebView_ConnectRunFileChooser(arg0 C.gpointer, arg1 *C.WebKitFileChooserRequest, arg2 C.guintptr) (cret C.gboolean) {
-	var f func(request *FileChooserRequest) (ok bool)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(request *FileChooserRequest) (ok bool))
-	}
-
-	var _request *FileChooserRequest // out
-
-	_request = wrapFileChooserRequest(externglib.Take(unsafe.Pointer(arg1)))
-
-	ok := f(_request)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
+func (webView *WebView) ConnectRunColorChooser(f func(request *ColorChooserRequest) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "run-color-chooser", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectRunColorChooser), f)
 }
 
 // ConnectRunFileChooser: this signal is emitted when the user interacts with a
-// &lt;input type='file' /&gt; HTML element, requesting from WebKit to show a
-// dialog to select one or more files to be uploaded. To let the application
-// know the details of the file chooser, as well as to allow the client
-// application to either cancel the request or perform an actual selection of
-// files, the signal will pass an instance of the KitFileChooserRequest in the
-// request argument.
+// <input type='file' /> HTML element, requesting from WebKit to show a dialog
+// to select one or more files to be uploaded. To let the application know the
+// details of the file chooser, as well as to allow the client application to
+// either cancel the request or perform an actual selection of files, the signal
+// will pass an instance of the KitFileChooserRequest in the request argument.
 //
 // The default signal handler will asynchronously run a regular
 // FileChooserDialog for the user to interact with.
-func (webView *WebView) ConnectRunFileChooser(f func(request *FileChooserRequest) (ok bool)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "run-file-chooser", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectRunFileChooser), f)
-}
-
-//export _gotk4_webkit24_WebView_ConnectScriptDialog
-func _gotk4_webkit24_WebView_ConnectScriptDialog(arg0 C.gpointer, arg1 *C.WebKitScriptDialog, arg2 C.guintptr) (cret C.gboolean) {
-	var f func(dialog *ScriptDialog) (ok bool)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(dialog *ScriptDialog) (ok bool))
-	}
-
-	var _dialog *ScriptDialog // out
-
-	_dialog = (*ScriptDialog)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-	C.webkit_script_dialog_ref(arg1)
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_dialog)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.webkit_script_dialog_unref((*C.WebKitScriptDialog)(intern.C))
-		},
-	)
-
-	ok := f(_dialog)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
+func (webView *WebView) ConnectRunFileChooser(f func(request *FileChooserRequest) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "run-file-chooser", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectRunFileChooser), f)
 }
 
 // ConnectScriptDialog is emitted when JavaScript code calls
-// <function>window.alert</function>, <function>window.confirm</function> or
-// <function>window.prompt</function>, or when
+// <function>window.alert</function>, <function>window.confirm</function>
+// or <function>window.prompt</function>, or when
 // <function>onbeforeunload</function> event is fired. The dialog parameter
-// should be used to build the dialog. If the signal is not handled a different
-// dialog will be built and shown depending on the dialog type: <itemizedlist>
-// <listitem><para> WEBKIT_SCRIPT_DIALOG_ALERT: message dialog with a single
-// Close button. </para></listitem> <listitem><para>
+// should be used to build the dialog. If the signal is not handled a
+// different dialog will be built and shown depending on the dialog type:
+// <itemizedlist> <listitem><para> WEBKIT_SCRIPT_DIALOG_ALERT: message
+// dialog with a single Close button. </para></listitem> <listitem><para>
 // WEBKIT_SCRIPT_DIALOG_CONFIRM: message dialog with OK and Cancel buttons.
-// </para></listitem> <listitem><para> WEBKIT_SCRIPT_DIALOG_PROMPT: message
-// dialog with OK and Cancel buttons and a text entry with the default text.
-// </para></listitem> <listitem><para>
+// </para></listitem> <listitem><para> WEBKIT_SCRIPT_DIALOG_PROMPT:
+// message dialog with OK and Cancel buttons and a text entry
+// with the default text. </para></listitem> <listitem><para>
 // WEBKIT_SCRIPT_DIALOG_BEFORE_UNLOAD_CONFIRM: message dialog with Stay and
 // Leave buttons. </para></listitem> </itemizedlist>
 //
-// It is possible to handle the script dialog request asynchronously, by simply
-// caling webkit_script_dialog_ref() on the dialog argument and calling
-// webkit_script_dialog_close() when done. If the last reference is removed on a
-// KitScriptDialog and the dialog has not been closed,
+// It is possible to handle the script dialog request asynchronously,
+// by simply caling webkit_script_dialog_ref() on the dialog argument and
+// calling webkit_script_dialog_close() when done. If the last reference
+// is removed on a KitScriptDialog and the dialog has not been closed,
 // webkit_script_dialog_close() will be called.
-func (webView *WebView) ConnectScriptDialog(f func(dialog *ScriptDialog) (ok bool)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "script-dialog", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectScriptDialog), f)
+func (webView *WebView) ConnectScriptDialog(f func(dialog *ScriptDialog) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "script-dialog", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectScriptDialog), f)
 }
 
-//export _gotk4_webkit24_WebView_ConnectShowNotification
-func _gotk4_webkit24_WebView_ConnectShowNotification(arg0 C.gpointer, arg1 *C.WebKitNotification, arg2 C.guintptr) (cret C.gboolean) {
-	var f func(notification *Notification) (ok bool)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(notification *Notification) (ok bool))
-	}
-
-	var _notification *Notification // out
-
-	_notification = wrapNotification(externglib.Take(unsafe.Pointer(arg1)))
-
-	ok := f(_notification)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-// ConnectShowNotification: this signal is emitted when a notification should be
-// presented to the user. The notification is kept alive until either: 1) the
-// web page cancels it or 2) a navigation happens.
+// ConnectShowNotification: this signal is emitted when a notification should
+// be presented to the user. The notification is kept alive until either:
+// 1) the web page cancels it or 2) a navigation happens.
 //
 // The default handler will emit a notification using libnotify, if built with
 // support for it.
-func (webView *WebView) ConnectShowNotification(f func(notification *Notification) (ok bool)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "show-notification", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectShowNotification), f)
-}
-
-//export _gotk4_webkit24_WebView_ConnectShowOptionMenu
-func _gotk4_webkit24_WebView_ConnectShowOptionMenu(arg0 C.gpointer, arg1 *C.WebKitOptionMenu, arg2 C.GdkEvent, arg3 *C.GdkRectangle, arg4 C.guintptr) (cret C.gboolean) {
-	var f func(object *OptionMenu, p0 *gdk.Event, p1 *gdk.Rectangle) (ok bool)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg4))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(object *OptionMenu, p0 *gdk.Event, p1 *gdk.Rectangle) (ok bool))
-	}
-
-	var _object *OptionMenu // out
-	var _p0 *gdk.Event      // out
-	var _p1 *gdk.Rectangle  // out
-
-	_object = wrapOptionMenu(externglib.Take(unsafe.Pointer(arg1)))
-	{
-		v := (*gdk.Event)(gextras.NewStructNative(unsafe.Pointer((&arg2))))
-		v = gdk.CopyEventer(v)
-		_p0 = v
-	}
-	_p1 = (*gdk.Rectangle)(gextras.NewStructNative(unsafe.Pointer(arg3)))
-
-	ok := f(_object, _p0, _p1)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
+func (webView *WebView) ConnectShowNotification(f func(notification *Notification) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "show-notification", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectShowNotification), f)
 }
 
 // ConnectShowOptionMenu: this signal is emitted when a select element in
-// web_view needs to display a dropdown menu. This signal can be used to show a
-// custom menu, using menu to get the details of all items that should be
+// web_view needs to display a dropdown menu. This signal can be used to show
+// a custom menu, using menu to get the details of all items that should be
 // displayed. The area of the element in the KitWebView is given as rectangle
-// parameter, it can be used to position the menu. To handle this signal
-// asynchronously you should keep a ref of the menu.
-func (webView *WebView) ConnectShowOptionMenu(f func(object *OptionMenu, p0 *gdk.Event, p1 *gdk.Rectangle) (ok bool)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "show-option-menu", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectShowOptionMenu), f)
-}
-
-//export _gotk4_webkit24_WebView_ConnectSubmitForm
-func _gotk4_webkit24_WebView_ConnectSubmitForm(arg0 C.gpointer, arg1 *C.WebKitFormSubmissionRequest, arg2 C.guintptr) {
-	var f func(request *FormSubmissionRequest)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(request *FormSubmissionRequest))
-	}
-
-	var _request *FormSubmissionRequest // out
-
-	_request = wrapFormSubmissionRequest(externglib.Take(unsafe.Pointer(arg1)))
-
-	f(_request)
+// parameter, it can be used to position the menu. If this was triggered by a
+// user interaction, like a mouse click, event parameter provides the Event.
+// To handle this signal asynchronously you should keep a ref of the menu.
+//
+// The event parameter is now deprecated. Use webkit_option_menu_get_event() to
+// get the Event that triggered the dropdown menu.
+//
+// The default signal handler will pop up a Menu.
+func (webView *WebView) ConnectShowOptionMenu(f func(menu *OptionMenu, event *gdk.Event, rectangle *gdk.Rectangle) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "show-option-menu", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectShowOptionMenu), f)
 }
 
 // ConnectSubmitForm: this signal is emitted when a form is about to be
@@ -2175,40 +1162,14 @@ func _gotk4_webkit24_WebView_ConnectSubmitForm(arg0 C.gpointer, arg1 *C.WebKitFo
 // can be used later to pre-fill the form. The form will not be submitted until
 // webkit_form_submission_request_submit() is called.
 //
-// It is possible to handle the form submission request asynchronously, by
-// simply calling g_object_ref() on the request argument and calling
+// It is possible to handle the form submission request asynchronously,
+// by simply calling g_object_ref() on the request argument and calling
 // webkit_form_submission_request_submit() when done to continue with the form
 // submission. If the last reference is removed on a KitFormSubmissionRequest
 // and the form has not been submitted, webkit_form_submission_request_submit()
 // will be called.
-func (webView *WebView) ConnectSubmitForm(f func(request *FormSubmissionRequest)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "submit-form", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectSubmitForm), f)
-}
-
-//export _gotk4_webkit24_WebView_ConnectUserMessageReceived
-func _gotk4_webkit24_WebView_ConnectUserMessageReceived(arg0 C.gpointer, arg1 *C.WebKitUserMessage, arg2 C.guintptr) (cret C.gboolean) {
-	var f func(message *UserMessage) (ok bool)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(message *UserMessage) (ok bool))
-	}
-
-	var _message *UserMessage // out
-
-	_message = wrapUserMessage(externglib.Take(unsafe.Pointer(arg1)))
-
-	ok := f(_message)
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
+func (webView *WebView) ConnectSubmitForm(f func(request *FormSubmissionRequest)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "submit-form", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectSubmitForm), f)
 }
 
 // ConnectUserMessageReceived: this signal is emitted when a KitUserMessage is
@@ -2219,73 +1180,33 @@ func _gotk4_webkit24_WebView_ConnectUserMessageReceived(arg0 C.gpointer, arg1 *C
 // message and returning TRUE. If the last reference of message is removed and
 // the message has not been replied to, the operation in the KitWebPage will
 // finish with error WEBKIT_USER_MESSAGE_UNHANDLED_MESSAGE.
-func (webView *WebView) ConnectUserMessageReceived(f func(message *UserMessage) (ok bool)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "user-message-received", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectUserMessageReceived), f)
-}
-
-//export _gotk4_webkit24_WebView_ConnectWebProcessCrashed
-func _gotk4_webkit24_WebView_ConnectWebProcessCrashed(arg0 C.gpointer, arg1 C.guintptr) (cret C.gboolean) {
-	var f func() (ok bool)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func() (ok bool))
-	}
-
-	ok := f()
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
+func (webView *WebView) ConnectUserMessageReceived(f func(message *UserMessage) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "user-message-received", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectUserMessageReceived), f)
 }
 
 // ConnectWebProcessCrashed: this signal is emitted when the web process
 // crashes.
-func (webView *WebView) ConnectWebProcessCrashed(f func() (ok bool)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "web-process-crashed", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectWebProcessCrashed), f)
-}
-
-//export _gotk4_webkit24_WebView_ConnectWebProcessTerminated
-func _gotk4_webkit24_WebView_ConnectWebProcessTerminated(arg0 C.gpointer, arg1 C.WebKitWebProcessTerminationReason, arg2 C.guintptr) {
-	var f func(reason WebProcessTerminationReason)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(reason WebProcessTerminationReason))
-	}
-
-	var _reason WebProcessTerminationReason // out
-
-	_reason = WebProcessTerminationReason(arg1)
-
-	f(_reason)
+func (webView *WebView) ConnectWebProcessCrashed(f func() (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "web-process-crashed", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectWebProcessCrashed), f)
 }
 
 // ConnectWebProcessTerminated: this signal is emitted when the web process
 // terminates abnormally due to reason.
-func (webView *WebView) ConnectWebProcessTerminated(f func(reason WebProcessTerminationReason)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(webView, "web-process-terminated", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectWebProcessTerminated), f)
+func (webView *WebView) ConnectWebProcessTerminated(f func(reason WebProcessTerminationReason)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webView, "web-process-terminated", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectWebProcessTerminated), f)
 }
 
-// NewWebView creates a new KitWebView with the default KitWebContext and no
-// KitUserContentManager associated with it. See also
-// webkit_web_view_new_with_context(),
+// NewWebView creates a new KitWebView with the default KitWebContext.
+//
+// Creates a new KitWebView with the default KitWebContext
+// and no KitUserContentManager associated with it.
+// See also webkit_web_view_new_with_context(),
 // webkit_web_view_new_with_user_content_manager(), and
 // webkit_web_view_new_with_settings().
 //
 // The function returns the following values:
 //
-//    - webView: newly created KitWebView widget.
+//   - webView: newly created KitWebView widget.
 //
 func NewWebView() *WebView {
 	var _cret *C.GtkWidget // in
@@ -2294,48 +1215,52 @@ func NewWebView() *WebView {
 
 	var _webView *WebView // out
 
-	_webView = wrapWebView(externglib.Take(unsafe.Pointer(_cret)))
+	_webView = wrapWebView(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _webView
 }
 
-// NewWebViewWithContext creates a new KitWebView with the given KitWebContext
-// and no KitUserContentManager associated with it. See also
-// webkit_web_view_new_with_user_content_manager() and
+// NewWebViewWithContext creates a new KitWebView with the given KitWebContext.
+//
+// Creates a new KitWebView with the given KitWebContext
+// and no KitUserContentManager associated with it.
+// See also webkit_web_view_new_with_user_content_manager() and
 // webkit_web_view_new_with_settings().
 //
 // The function takes the following parameters:
 //
-//    - context to be used by the KitWebView.
+//   - context to be used by the KitWebView.
 //
 // The function returns the following values:
 //
-//    - webView: newly created KitWebView widget.
+//   - webView: newly created KitWebView widget.
 //
 func NewWebViewWithContext(context *WebContext) *WebView {
 	var _arg1 *C.WebKitWebContext // out
 	var _cret *C.GtkWidget        // in
 
-	_arg1 = (*C.WebKitWebContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
+	_arg1 = (*C.WebKitWebContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
 
 	_cret = C.webkit_web_view_new_with_context(_arg1)
 	runtime.KeepAlive(context)
 
 	var _webView *WebView // out
 
-	_webView = wrapWebView(externglib.Take(unsafe.Pointer(_cret)))
+	_webView = wrapWebView(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _webView
 }
 
 // NewWebViewWithRelatedView creates a new KitWebView sharing the same web
-// process with web_view. This method doesn't have any effect when
-// WEBKIT_PROCESS_MODEL_SHARED_SECONDARY_PROCESS process model is used, because
-// a single web process is shared for all the web views in the same
+// process with web_view.
+//
+// This method doesn't have any effect when
+// WEBKIT_PROCESS_MODEL_SHARED_SECONDARY_PROCESS process model is used,
+// because a single web process is shared for all the web views in the same
 // KitWebContext. When using WEBKIT_PROCESS_MODEL_MULTIPLE_SECONDARY_PROCESSES
-// process model, this method should always be used when creating the KitWebView
-// in the KitWebView::create signal. You can also use this method to implement
-// other process models based on
+// process model, this method should always be used when creating
+// the KitWebView in the KitWebView::create signal. You can also
+// use this method to implement other process models based on
 // WEBKIT_PROCESS_MODEL_MULTIPLE_SECONDARY_PROCESSES, like for example, sharing
 // the same web process for all the views in the same security domain.
 //
@@ -2344,122 +1269,126 @@ func NewWebViewWithContext(context *WebContext) *WebView {
 //
 // The function takes the following parameters:
 //
-//    - webView: related KitWebView.
+//   - webView: related KitWebView.
 //
 // The function returns the following values:
 //
-//    - webView: newly created KitWebView widget.
+//   - webView: newly created KitWebView widget.
 //
 func NewWebViewWithRelatedView(webView *WebView) *WebView {
 	var _arg1 *C.WebKitWebView // out
 	var _cret *C.GtkWidget     // in
 
-	_arg1 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_new_with_related_view(_arg1)
 	runtime.KeepAlive(webView)
 
 	var _webView *WebView // out
 
-	_webView = wrapWebView(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_webView = wrapWebView(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _webView
 }
 
 // NewWebViewWithSettings creates a new KitWebView with the given KitSettings.
+//
 // See also webkit_web_view_new_with_context(), and
 // webkit_web_view_new_with_user_content_manager().
 //
 // The function takes the following parameters:
 //
-//    - settings: KitSettings.
+//   - settings: KitSettings.
 //
 // The function returns the following values:
 //
-//    - webView: newly created KitWebView widget.
+//   - webView: newly created KitWebView widget.
 //
 func NewWebViewWithSettings(settings *Settings) *WebView {
 	var _arg1 *C.WebKitSettings // out
 	var _cret *C.GtkWidget      // in
 
-	_arg1 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
+	_arg1 = (*C.WebKitSettings)(unsafe.Pointer(coreglib.InternObject(settings).Native()))
 
 	_cret = C.webkit_web_view_new_with_settings(_arg1)
 	runtime.KeepAlive(settings)
 
 	var _webView *WebView // out
 
-	_webView = wrapWebView(externglib.Take(unsafe.Pointer(_cret)))
+	_webView = wrapWebView(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _webView
 }
 
 // NewWebViewWithUserContentManager creates a new KitWebView with the given
-// KitUserContentManager. The content loaded in the view may be affected by the
-// content injected in the view by the user content manager.
+// KitUserContentManager.
+//
+// The content loaded in the view may be affected by the content injected in the
+// view by the user content manager.
 //
 // The function takes the following parameters:
 //
-//    - userContentManager: KitUserContentManager.
+//   - userContentManager: KitUserContentManager.
 //
 // The function returns the following values:
 //
-//    - webView: newly created KitWebView widget.
+//   - webView: newly created KitWebView widget.
 //
 func NewWebViewWithUserContentManager(userContentManager *UserContentManager) *WebView {
 	var _arg1 *C.WebKitUserContentManager // out
 	var _cret *C.GtkWidget                // in
 
-	_arg1 = (*C.WebKitUserContentManager)(unsafe.Pointer(externglib.InternObject(userContentManager).Native()))
+	_arg1 = (*C.WebKitUserContentManager)(unsafe.Pointer(coreglib.InternObject(userContentManager).Native()))
 
 	_cret = C.webkit_web_view_new_with_user_content_manager(_arg1)
 	runtime.KeepAlive(userContentManager)
 
 	var _webView *WebView // out
 
-	_webView = wrapWebView(externglib.Take(unsafe.Pointer(_cret)))
+	_webView = wrapWebView(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _webView
 }
 
-// CanExecuteEditingCommand: asynchronously check if it is possible to execute
-// the given editing command.
-//
-// When the operation is finished, callback will be called. You can then call
-// webkit_web_view_can_execute_editing_command_finish() to get the result of the
-// operation.
+// CallAsyncJavascriptFunctionFinish: finish an asynchronous operation started
+// with webkit_web_view_call_async_javascript_function().
 //
 // The function takes the following parameters:
 //
-//    - ctx (optional) or NULL to ignore.
-//    - command to check.
-//    - callback (optional) to call when the request is satisfied.
+//   - result: Result.
 //
-func (webView *WebView) CanExecuteEditingCommand(ctx context.Context, command string, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.WebKitWebView      // out
-	var _arg2 *C.GCancellable       // out
-	var _arg1 *C.gchar              // out
-	var _arg3 C.GAsyncReadyCallback // out
-	var _arg4 C.gpointer
+// The function returns the following values:
+//
+//   - value with the return value of the async function or NULL in case of
+//     error.
+//
+func (webView *WebView) CallAsyncJavascriptFunctionFinish(result gio.AsyncResulter) (*javascriptcore.Value, error) {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 *C.GAsyncResult  // out
+	var _cret *C.JSCValue      // in
+	var _cerr *C.GError        // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(command)))
-	defer C.free(unsafe.Pointer(_arg1))
-	if callback != nil {
-		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg4 = C.gpointer(gbox.AssignOnce(callback))
-	}
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(result).Native()))
 
-	C.webkit_web_view_can_execute_editing_command(_arg0, _arg1, _arg2, _arg3, _arg4)
+	_cret = C.webkit_web_view_call_async_javascript_function_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(webView)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(command)
-	runtime.KeepAlive(callback)
+	runtime.KeepAlive(result)
+
+	var _value *javascriptcore.Value // out
+	var _goerr error                 // out
+
+	{
+		obj := coreglib.AssumeOwnership(unsafe.Pointer(_cret))
+		_value = &javascriptcore.Value{
+			Object: obj,
+		}
+	}
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
+
+	return _value, _goerr
 }
 
 // CanExecuteEditingCommandFinish: finish an asynchronous operation started with
@@ -2467,15 +1396,15 @@ func (webView *WebView) CanExecuteEditingCommand(ctx context.Context, command st
 //
 // The function takes the following parameters:
 //
-//    - result: Result.
+//   - result: Result.
 //
 func (webView *WebView) CanExecuteEditingCommandFinish(result gio.AsyncResulter) error {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.GAsyncResult  // out
 	var _cerr *C.GError        // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(result).Native()))
 
 	C.webkit_web_view_can_execute_editing_command_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(webView)
@@ -2494,13 +1423,13 @@ func (webView *WebView) CanExecuteEditingCommandFinish(result gio.AsyncResulter)
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if able to move back or FALSE otherwise.
+//   - ok: TRUE if able to move back or FALSE otherwise.
 //
 func (webView *WebView) CanGoBack() bool {
 	var _arg0 *C.WebKitWebView // out
 	var _cret C.gboolean       // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_can_go_back(_arg0)
 	runtime.KeepAlive(webView)
@@ -2518,13 +1447,13 @@ func (webView *WebView) CanGoBack() bool {
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if able to move forward or FALSE otherwise.
+//   - ok: TRUE if able to move forward or FALSE otherwise.
 //
 func (webView *WebView) CanGoForward() bool {
 	var _arg0 *C.WebKitWebView // out
 	var _cret C.gboolean       // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_can_go_forward(_arg0)
 	runtime.KeepAlive(webView)
@@ -2542,18 +1471,18 @@ func (webView *WebView) CanGoForward() bool {
 //
 // The function takes the following parameters:
 //
-//    - mimeType: MIME type.
+//   - mimeType: MIME type.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if the MIME type mime_type can be displayed or FALSE otherwise.
+//   - ok: TRUE if the MIME type mime_type can be displayed or FALSE otherwise.
 //
 func (webView *WebView) CanShowMIMEType(mimeType string) bool {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.gchar         // out
 	var _cret C.gboolean       // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(mimeType)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -2574,18 +1503,18 @@ func (webView *WebView) CanShowMIMEType(mimeType string) bool {
 //
 // The function takes the following parameters:
 //
-//    - uri: URI to download.
+//   - uri: URI to download.
 //
 // The function returns the following values:
 //
-//    - download: new KitDownload representing the download operation.
+//   - download: new KitDownload representing the download operation.
 //
 func (webView *WebView) DownloadURI(uri string) *Download {
 	var _arg0 *C.WebKitWebView  // out
 	var _arg1 *C.char           // out
 	var _cret *C.WebKitDownload // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(uri)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -2595,24 +1524,66 @@ func (webView *WebView) DownloadURI(uri string) *Download {
 
 	var _download *Download // out
 
-	_download = wrapDownload(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_download = wrapDownload(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _download
 }
 
-// ExecuteEditingCommand: request to execute the given command for web_view. You
-// can use webkit_web_view_can_execute_editing_command() to check whether it's
-// possible to execute the command.
+// EvaluateJavascriptFinish: finish an asynchronous operation started with
+// webkit_web_view_evaluate_javascript().
 //
 // The function takes the following parameters:
 //
-//    - command to execute.
+//   - result: Result.
+//
+// The function returns the following values:
+//
+//   - value with the result of the last executed statement in script or NULL in
+//     case of error.
+//
+func (webView *WebView) EvaluateJavascriptFinish(result gio.AsyncResulter) (*javascriptcore.Value, error) {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 *C.GAsyncResult  // out
+	var _cret *C.JSCValue      // in
+	var _cerr *C.GError        // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(result).Native()))
+
+	_cret = C.webkit_web_view_evaluate_javascript_finish(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(result)
+
+	var _value *javascriptcore.Value // out
+	var _goerr error                 // out
+
+	{
+		obj := coreglib.AssumeOwnership(unsafe.Pointer(_cret))
+		_value = &javascriptcore.Value{
+			Object: obj,
+		}
+	}
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
+
+	return _value, _goerr
+}
+
+// ExecuteEditingCommand: request to execute the given command for web_view.
+//
+// You can use webkit_web_view_can_execute_editing_command() to check whether
+// it's possible to execute the command.
+//
+// The function takes the following parameters:
+//
+//   - command to execute.
 //
 func (webView *WebView) ExecuteEditingCommand(command string) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.gchar         // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(command)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -2622,21 +1593,22 @@ func (webView *WebView) ExecuteEditingCommand(command string) {
 }
 
 // ExecuteEditingCommandWithArgument: request to execute the given command with
-// argument for web_view. You can use
-// webkit_web_view_can_execute_editing_command() to check whether it's possible
-// to execute the command.
+// argument for web_view.
+//
+// You can use webkit_web_view_can_execute_editing_command() to check whether
+// it's possible to execute the command.
 //
 // The function takes the following parameters:
 //
-//    - command to execute.
-//    - argument: command argument.
+//   - command to execute.
+//   - argument: command argument.
 //
 func (webView *WebView) ExecuteEditingCommandWithArgument(command, argument string) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.char          // out
 	var _arg2 *C.char          // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(command)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(argument)))
@@ -2653,14 +1625,14 @@ func (webView *WebView) ExecuteEditingCommandWithArgument(command, argument stri
 //
 // The function returns the following values:
 //
-//    - automationBrowsingContextPresentation:
-//      KitAutomationBrowsingContextPresentation.
+//   - automationBrowsingContextPresentation:
+//     KitAutomationBrowsingContextPresentation.
 //
 func (webView *WebView) AutomationPresentationType() AutomationBrowsingContextPresentation {
 	var _arg0 *C.WebKitWebView                              // out
 	var _cret C.WebKitAutomationBrowsingContextPresentation // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_automation_presentation_type(_arg0)
 	runtime.KeepAlive(webView)
@@ -2673,41 +1645,45 @@ func (webView *WebView) AutomationPresentationType() AutomationBrowsingContextPr
 }
 
 // BackForwardList obtains the KitBackForwardList associated with the given
-// KitWebView. The KitBackForwardList is owned by the KitWebView.
+// KitWebView.
+//
+// The KitBackForwardList is owned by the KitWebView.
 //
 // The function returns the following values:
 //
-//    - backForwardList: KitBackForwardList.
+//   - backForwardList: KitBackForwardList.
 //
 func (webView *WebView) BackForwardList() *BackForwardList {
 	var _arg0 *C.WebKitWebView         // out
 	var _cret *C.WebKitBackForwardList // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_back_forward_list(_arg0)
 	runtime.KeepAlive(webView)
 
 	var _backForwardList *BackForwardList // out
 
-	_backForwardList = wrapBackForwardList(externglib.Take(unsafe.Pointer(_cret)))
+	_backForwardList = wrapBackForwardList(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _backForwardList
 }
 
-// BackgroundColor gets the color that is used to draw the web_view background
-// before the actual contents are rendered. For more information see also
+// BackgroundColor gets the color that is used to draw the web_view background.
+//
+// Gets the color that is used to draw the web_view background before
+// the actual contents are rendered. For more information see also
 // webkit_web_view_set_background_color().
 //
 // The function returns the following values:
 //
-//    - rgba to fill in with the background color.
+//   - rgba to fill in with the background color.
 //
 func (webView *WebView) BackgroundColor() *gdk.RGBA {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 C.GdkRGBA        // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	C.webkit_web_view_get_background_color(_arg0, &_arg1)
 	runtime.KeepAlive(webView)
@@ -2719,24 +1695,47 @@ func (webView *WebView) BackgroundColor() *gdk.RGBA {
 	return _rgba
 }
 
+// CameraCaptureState: get the camera capture state of a KitWebView.
+//
+// The function returns the following values:
+//
+//   - mediaCaptureState of the camera device. If KitSettings:enable-mediastream
+//     is FALSE, this method will return WEBKIT_MEDIA_CAPTURE_STATE_NONE.
+//
+func (webView *WebView) CameraCaptureState() MediaCaptureState {
+	var _arg0 *C.WebKitWebView          // out
+	var _cret C.WebKitMediaCaptureState // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+
+	_cret = C.webkit_web_view_get_camera_capture_state(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _mediaCaptureState MediaCaptureState // out
+
+	_mediaCaptureState = MediaCaptureState(_cret)
+
+	return _mediaCaptureState
+}
+
 // Context gets the web context of web_view.
 //
 // The function returns the following values:
 //
-//    - webContext of the view.
+//   - webContext of the view.
 //
 func (webView *WebView) Context() *WebContext {
 	var _arg0 *C.WebKitWebView    // out
 	var _cret *C.WebKitWebContext // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_context(_arg0)
 	runtime.KeepAlive(webView)
 
 	var _webContext *WebContext // out
 
-	_webContext = wrapWebContext(externglib.Take(unsafe.Pointer(_cret)))
+	_webContext = wrapWebContext(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _webContext
 }
@@ -2745,14 +1744,14 @@ func (webView *WebView) Context() *WebContext {
 //
 // The function returns the following values:
 //
-//    - utf8: current custom character encoding name or NULL if no custom
-//      character encoding has been set.
+//   - utf8: current custom character encoding name or NULL if no custom
+//     character encoding has been set.
 //
 func (webView *WebView) CustomCharset() string {
 	var _arg0 *C.WebKitWebView // out
 	var _cret *C.gchar         // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_custom_charset(_arg0)
 	runtime.KeepAlive(webView)
@@ -2764,43 +1763,93 @@ func (webView *WebView) CustomCharset() string {
 	return _utf8
 }
 
+// DefaultContentSecurityPolicy gets the configured default
+// Content-Security-Policy.
+//
+// The function returns the following values:
+//
+//   - utf8 (optional): default policy or NULL.
+//
+func (webView *WebView) DefaultContentSecurityPolicy() string {
+	var _arg0 *C.WebKitWebView // out
+	var _cret *C.gchar         // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+
+	_cret = C.webkit_web_view_get_default_content_security_policy(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _utf8 string // out
+
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
+
+	return _utf8
+}
+
+// DisplayCaptureState: get the display capture state of a KitWebView.
+//
+// The function returns the following values:
+//
+//   - mediaCaptureState of the display device. If
+//     KitSettings:enable-mediastream is FALSE, this method will return
+//     WEBKIT_MEDIA_CAPTURE_STATE_NONE.
+//
+func (webView *WebView) DisplayCaptureState() MediaCaptureState {
+	var _arg0 *C.WebKitWebView          // out
+	var _cret C.WebKitMediaCaptureState // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+
+	_cret = C.webkit_web_view_get_display_capture_state(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _mediaCaptureState MediaCaptureState // out
+
+	_mediaCaptureState = MediaCaptureState(_cret)
+
+	return _mediaCaptureState
+}
+
 // EditorState gets the web editor state of web_view.
 //
 // The function returns the following values:
 //
-//    - editorState of the view.
+//   - editorState of the view.
 //
 func (webView *WebView) EditorState() *EditorState {
 	var _arg0 *C.WebKitWebView     // out
 	var _cret *C.WebKitEditorState // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_editor_state(_arg0)
 	runtime.KeepAlive(webView)
 
 	var _editorState *EditorState // out
 
-	_editorState = wrapEditorState(externglib.Take(unsafe.Pointer(_cret)))
+	_editorState = wrapEditorState(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _editorState
 }
 
 // EstimatedLoadProgress gets the value of the
-// KitWebView:estimated-load-progress property. You can monitor the estimated
-// progress of a load operation by connecting to the
-// notify::estimated-load-progress signal of web_view.
+// KitWebView:estimated-load-progress property.
+//
+// You can monitor the estimated progress of a load operation by connecting to
+// the notify::estimated-load-progress signal of web_view.
 //
 // The function returns the following values:
 //
-//    - gdouble: estimate of the of the percent complete for a document load as a
-//      range from 0.0 to 1.0.
+//   - gdouble: estimate of the of the percent complete for a document load as a
+//     range from 0.0 to 1.0.
 //
 func (webView *WebView) EstimatedLoadProgress() float64 {
 	var _arg0 *C.WebKitWebView // out
 	var _cret C.gdouble        // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_estimated_load_progress(_arg0)
 	runtime.KeepAlive(webView)
@@ -2812,20 +1861,22 @@ func (webView *WebView) EstimatedLoadProgress() float64 {
 	return _gdouble
 }
 
-// Favicon returns favicon currently associated to web_view, if any. You can
-// connect to notify::favicon signal of web_view to be notified when the favicon
-// is available.
+// Favicon returns favicon currently associated to web_view.
+//
+// Returns favicon currently associated to web_view, if any. You can connect
+// to notify::favicon signal of web_view to be notified when the favicon is
+// available.
 //
 // The function returns the following values:
 //
-//    - surface: pointer to a #cairo_surface_t with the favicon or NULL if
-//      there's no icon associated with web_view.
+//   - surface: favicon image or NULL if there's no icon associated with
+//     web_view.
 //
 func (webView *WebView) Favicon() *cairo.Surface {
 	var _arg0 *C.WebKitWebView   // out
 	var _cret *C.cairo_surface_t // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_favicon(_arg0)
 	runtime.KeepAlive(webView)
@@ -2841,41 +1892,46 @@ func (webView *WebView) Favicon() *cairo.Surface {
 	return _surface
 }
 
-// FindController gets the KitFindController that will allow the caller to query
-// the KitWebView for the text to look for.
+// FindController gets the KitFindController.
+//
+// Gets the KitFindController that will allow the caller to query the KitWebView
+// for the text to look for.
 //
 // The function returns the following values:
 //
-//    - findController associated to this particular KitWebView.
+//   - findController associated to this particular KitWebView.
 //
 func (webView *WebView) FindController() *FindController {
 	var _arg0 *C.WebKitWebView        // out
 	var _cret *C.WebKitFindController // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_find_controller(_arg0)
 	runtime.KeepAlive(webView)
 
 	var _findController *FindController // out
 
-	_findController = wrapFindController(externglib.Take(unsafe.Pointer(_cret)))
+	_findController = wrapFindController(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _findController
 }
 
 // InputMethodContext: get the KitInputMethodContext currently in use by
-// web_view, or NULL if no input method is being used.
+// web_view.
+//
+// Get the KitInputMethodContext currently in use by web_view, or NULL if no
+// input method is being used.
 //
 // The function returns the following values:
 //
-//    - inputMethodContext (optional) or NULL.
+//   - inputMethodContext (optional) or NULL.
 //
 func (webView *WebView) InputMethodContext() InputMethodContexter {
 	var _arg0 *C.WebKitWebView            // out
 	var _cret *C.WebKitInputMethodContext // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_input_method_context(_arg0)
 	runtime.KeepAlive(webView)
@@ -2886,8 +1942,8 @@ func (webView *WebView) InputMethodContext() InputMethodContexter {
 		{
 			objptr := unsafe.Pointer(_cret)
 
-			object := externglib.Take(objptr)
-			casted := object.WalkCast(func(obj externglib.Objector) bool {
+			object := coreglib.Take(objptr)
+			casted := object.WalkCast(func(obj coreglib.Objector) bool {
 				_, ok := obj.(InputMethodContexter)
 				return ok
 			})
@@ -2906,20 +1962,20 @@ func (webView *WebView) InputMethodContext() InputMethodContexter {
 //
 // The function returns the following values:
 //
-//    - webInspector of web_view.
+//   - webInspector of web_view.
 //
 func (webView *WebView) Inspector() *WebInspector {
 	var _arg0 *C.WebKitWebView      // out
 	var _cret *C.WebKitWebInspector // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_inspector(_arg0)
 	runtime.KeepAlive(webView)
 
 	var _webInspector *WebInspector // out
 
-	_webInspector = wrapWebInspector(externglib.Take(unsafe.Pointer(_cret)))
+	_webInspector = wrapWebInspector(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _webInspector
 }
@@ -2928,15 +1984,41 @@ func (webView *WebView) Inspector() *WebInspector {
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if web_view audio is muted or FALSE is audio is not muted.
+//   - ok: TRUE if web_view audio is muted or FALSE is audio is not muted.
 //
 func (webView *WebView) IsMuted() bool {
 	var _arg0 *C.WebKitWebView // out
 	var _cret C.gboolean       // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_is_muted(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// IsWebProcessResponsive: get whether the current web process of a KitWebView
+// is responsive.
+//
+// The function returns the following values:
+//
+//   - ok: TRUE if the web process attached to web_view is responsive, or FALSE
+//     otherwise.
+//
+func (webView *WebView) IsWebProcessResponsive() bool {
+	var _arg0 *C.WebKitWebView // out
+	var _cret C.gboolean       // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+
+	_cret = C.webkit_web_view_get_is_web_process_responsive(_arg0)
 	runtime.KeepAlive(webView)
 
 	var _ok bool // out
@@ -2952,36 +2034,60 @@ func (webView *WebView) IsMuted() bool {
 //
 // The function returns the following values:
 //
-//    - webResource: main KitWebResource of the view or NULL if nothing has been
-//      loaded.
+//   - webResource: main KitWebResource of the view or NULL if nothing has been
+//     loaded.
 //
 func (webView *WebView) MainResource() *WebResource {
 	var _arg0 *C.WebKitWebView     // out
 	var _cret *C.WebKitWebResource // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_main_resource(_arg0)
 	runtime.KeepAlive(webView)
 
 	var _webResource *WebResource // out
 
-	_webResource = wrapWebResource(externglib.Take(unsafe.Pointer(_cret)))
+	_webResource = wrapWebResource(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _webResource
+}
+
+// MicrophoneCaptureState: get the microphone capture state of a KitWebView.
+//
+// The function returns the following values:
+//
+//   - mediaCaptureState of the microphone device. If
+//     KitSettings:enable-mediastream is FALSE, this method will return
+//     WEBKIT_MEDIA_CAPTURE_STATE_NONE.
+//
+func (webView *WebView) MicrophoneCaptureState() MediaCaptureState {
+	var _arg0 *C.WebKitWebView          // out
+	var _cret C.WebKitMediaCaptureState // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+
+	_cret = C.webkit_web_view_get_microphone_capture_state(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _mediaCaptureState MediaCaptureState // out
+
+	_mediaCaptureState = MediaCaptureState(_cret)
+
+	return _mediaCaptureState
 }
 
 // PageID: get the identifier of the KitWebPage corresponding to the KitWebView.
 //
 // The function returns the following values:
 //
-//    - guint64: page ID of web_view.
+//   - guint64: page ID of web_view.
 //
 func (webView *WebView) PageID() uint64 {
 	var _arg0 *C.WebKitWebView // out
 	var _cret C.guint64        // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_page_id(_arg0)
 	runtime.KeepAlive(webView)
@@ -2997,13 +2103,13 @@ func (webView *WebView) PageID() uint64 {
 //
 // The function returns the following values:
 //
-//    - webViewSessionState: KitWebViewSessionState.
+//   - webViewSessionState: KitWebViewSessionState.
 //
 func (webView *WebView) SessionState() *WebViewSessionState {
 	var _arg0 *C.WebKitWebView             // out
 	var _cret *C.WebKitWebViewSessionState // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_session_state(_arg0)
 	runtime.KeepAlive(webView)
@@ -3021,77 +2127,36 @@ func (webView *WebView) SessionState() *WebViewSessionState {
 	return _webViewSessionState
 }
 
-// Settings gets the KitSettings currently applied to web_view. If no other
-// KitSettings have been explicitly applied to web_view with
+// Settings gets the KitSettings currently applied to web_view.
+//
+// If no other KitSettings have been explicitly applied to web_view with
 // webkit_web_view_set_settings(), the default KitSettings will be returned.
-// This method always returns a valid KitSettings object. To modify any of the
-// web_view settings, you can either create a new KitSettings object with
+// This method always returns a valid KitSettings object. To modify any of
+// the web_view settings, you can either create a new KitSettings object with
 // webkit_settings_new(), setting the desired preferences, and then replace the
 // existing web_view settings with webkit_web_view_set_settings() or get the
-// existing web_view settings and update it directly. KitSettings objects can be
-// shared by multiple KitWebView<!-- -->s, so modifying the settings of a
+// existing web_view settings and update it directly. KitSettings objects can
+// be shared by multiple KitWebView<!-- -->s, so modifying the settings of a
 // KitWebView would affect other KitWebView<!-- -->s using the same KitSettings.
 //
 // The function returns the following values:
 //
-//    - settings attached to web_view.
+//   - settings attached to web_view.
 //
 func (webView *WebView) Settings() *Settings {
 	var _arg0 *C.WebKitWebView  // out
 	var _cret *C.WebKitSettings // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_settings(_arg0)
 	runtime.KeepAlive(webView)
 
 	var _settings *Settings // out
 
-	_settings = wrapSettings(externglib.Take(unsafe.Pointer(_cret)))
+	_settings = wrapSettings(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _settings
-}
-
-// Snapshot: asynchronously retrieves a snapshot of web_view for region. options
-// specifies how the snapshot should be rendered.
-//
-// When the operation is finished, callback will be called. You must call
-// webkit_web_view_get_snapshot_finish() to get the result of the operation.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional): #GCancellable.
-//    - region for this snapshot.
-//    - options for the snapshot.
-//    - callback (optional): ReadyCallback.
-//
-func (webView *WebView) Snapshot(ctx context.Context, region SnapshotRegion, options SnapshotOptions, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.WebKitWebView        // out
-	var _arg3 *C.GCancellable         // out
-	var _arg1 C.WebKitSnapshotRegion  // out
-	var _arg2 C.WebKitSnapshotOptions // out
-	var _arg4 C.GAsyncReadyCallback   // out
-	var _arg5 C.gpointer
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = C.WebKitSnapshotRegion(region)
-	_arg2 = C.WebKitSnapshotOptions(options)
-	if callback != nil {
-		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg5 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.webkit_web_view_get_snapshot(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(region)
-	runtime.KeepAlive(options)
-	runtime.KeepAlive(callback)
 }
 
 // SnapshotFinish finishes an asynchronous operation started with
@@ -3099,11 +2164,11 @@ func (webView *WebView) Snapshot(ctx context.Context, region SnapshotRegion, opt
 //
 // The function takes the following parameters:
 //
-//    - result: Result.
+//   - result: Result.
 //
 // The function returns the following values:
 //
-//    - surface with the retrieved snapshot or NULL in error.
+//   - surface: image with the retrieved snapshot, or NULL in case of error.
 //
 func (webView *WebView) SnapshotFinish(result gio.AsyncResulter) (*cairo.Surface, error) {
 	var _arg0 *C.WebKitWebView   // out
@@ -3111,8 +2176,8 @@ func (webView *WebView) SnapshotFinish(result gio.AsyncResulter) (*cairo.Surface
 	var _cret *C.cairo_surface_t // in
 	var _cerr *C.GError          // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(result).Native()))
 
 	_cret = C.webkit_web_view_get_snapshot_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(webView)
@@ -3132,19 +2197,20 @@ func (webView *WebView) SnapshotFinish(result gio.AsyncResulter) (*cairo.Surface
 	return _surface, _goerr
 }
 
-// Title gets the value of the KitWebView:title property. You can connect to
-// notify::title signal of web_view to be notified when the title has been
-// received.
+// Title gets the value of the KitWebView:title property.
+//
+// You can connect to notify::title signal of web_view to be notified when the
+// title has been received.
 //
 // The function returns the following values:
 //
-//    - utf8: main frame document title of web_view.
+//   - utf8: main frame document title of web_view.
 //
 func (webView *WebView) Title() string {
 	var _arg0 *C.WebKitWebView // out
 	var _cret *C.gchar         // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_title(_arg0)
 	runtime.KeepAlive(webView)
@@ -3157,26 +2223,29 @@ func (webView *WebView) Title() string {
 }
 
 // TLSInfo retrieves the Certificate associated with the main resource of
-// web_view, and the CertificateFlags showing what problems, if any, have been
-// found with that certificate. If the connection is not HTTPS, this function
-// returns FALSE. This function should be called after a response has been
-// received from the server, so you can connect to KitWebView::load-changed and
-// call this function when it's emitted with WEBKIT_LOAD_COMMITTED event.
+// web_view.
+//
+// Retrieves the Certificate associated with the main resource of web_view, and
+// the CertificateFlags showing what problems, if any, have been found with that
+// certificate. If the connection is not HTTPS, this function returns FALSE.
+// This function should be called after a response has been received from the
+// server, so you can connect to KitWebView::load-changed and call this function
+// when it's emitted with WEBKIT_LOAD_COMMITTED event.
 //
 // Note that this function provides no information about the security of the web
-// page if the current KitTLSErrorsPolicy is WEBKIT_TLS_ERRORS_POLICY_IGNORE, as
-// subresources of the page may be controlled by an attacker. This function may
-// safely be used to determine the security status of the current page only if
-// the current KitTLSErrorsPolicy is WEBKIT_TLS_ERRORS_POLICY_FAIL, in which
+// page if the current KitTLSErrorsPolicy is WEBKIT_TLS_ERRORS_POLICY_IGNORE,
+// as subresources of the page may be controlled by an attacker. This function
+// may safely be used to determine the security status of the current page only
+// if the current KitTLSErrorsPolicy is WEBKIT_TLS_ERRORS_POLICY_FAIL, in which
 // case subresources that fail certificate verification will be blocked.
 //
 // The function returns the following values:
 //
-//    - certificate: return location for a Certificate.
-//    - errors: return location for a CertificateFlags the verification status of
-//      certificate.
-//    - ok: TRUE if the web_view connection uses HTTPS and a response has been
-//      received from the server, or FALSE otherwise.
+//   - certificate: return location for a Certificate.
+//   - errors: return location for a CertificateFlags the verification status of
+//     certificate.
+//   - ok: TRUE if the web_view connection uses HTTPS and a response has been
+//     received from the server, or FALSE otherwise.
 //
 func (webView *WebView) TLSInfo() (gio.TLSCertificater, gio.TLSCertificateFlags, bool) {
 	var _arg0 *C.WebKitWebView       // out
@@ -3184,7 +2253,7 @@ func (webView *WebView) TLSInfo() (gio.TLSCertificater, gio.TLSCertificateFlags,
 	var _arg2 C.GTlsCertificateFlags // in
 	var _cret C.gboolean             // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_tls_info(_arg0, &_arg1, &_arg2)
 	runtime.KeepAlive(webView)
@@ -3199,8 +2268,8 @@ func (webView *WebView) TLSInfo() (gio.TLSCertificater, gio.TLSCertificateFlags,
 			panic("object of type gio.TLSCertificater is nil")
 		}
 
-		object := externglib.Take(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
+		object := coreglib.Take(objptr)
+		casted := object.WalkCast(func(obj coreglib.Objector) bool {
 			_, ok := obj.(gio.TLSCertificater)
 			return ok
 		})
@@ -3218,32 +2287,33 @@ func (webView *WebView) TLSInfo() (gio.TLSCertificater, gio.TLSCertificateFlags,
 	return _certificate, _errors, _ok
 }
 
-// URI returns the current active URI of web_view. The active URI might change
-// during a load operation:
+// URI returns the current active URI of web_view.
 //
-// <orderedlist> <listitem><para> When nothing has been loaded yet on web_view
-// the active URI is NULL. </para></listitem> <listitem><para> When a new load
-// operation starts the active URI is the requested URI: <itemizedlist>
-// <listitem><para> If the load operation was started by
-// webkit_web_view_load_uri(), the requested URI is the given one.
-// </para></listitem> <listitem><para> If the load operation was started by
-// webkit_web_view_load_html(), the requested URI is "about:blank".
+// The active URI might change during a load operation:
+//
+// <orderedlist> <listitem><para> When nothing has been loaded yet on
+// web_view the active URI is NULL. </para></listitem> <listitem><para>
+// When a new load operation starts the active URI is the requested URI:
+// <itemizedlist> <listitem><para> If the load operation was started
+// by webkit_web_view_load_uri(), the requested URI is the given one.
+// </para></listitem> <listitem><para> If the load operation was started
+// by webkit_web_view_load_html(), the requested URI is "about:blank".
 // </para></listitem> <listitem><para> If the load operation was started by
 // webkit_web_view_load_alternate_html(), the requested URI is content URI
 // provided. </para></listitem> <listitem><para> If the load operation was
-// started by webkit_web_view_go_back() or webkit_web_view_go_forward(), the
-// requested URI is the original URI of the previous/next item in the
+// started by webkit_web_view_go_back() or webkit_web_view_go_forward(),
+// the requested URI is the original URI of the previous/next item in the
 // KitBackForwardList of web_view. </para></listitem> <listitem><para> If the
 // load operation was started by webkit_web_view_go_to_back_forward_list_item(),
 // the requested URI is the opriginal URI of the given KitBackForwardListItem.
 // </para></listitem> </itemizedlist> </para></listitem> <listitem><para> If
 // there is a server redirection during the load operation, the active URI is
-// the redirected URI. When the signal KitWebView::load-changed is emitted with
-// WEBKIT_LOAD_REDIRECTED event, the active URI is already updated to the
-// redirected URI. </para></listitem> <listitem><para> When the signal
-// KitWebView::load-changed is emitted with WEBKIT_LOAD_COMMITTED event, the
-// active URI is the final one and it will not change unless a new load
-// operation is started or a navigation action within the same page is
+// the redirected URI. When the signal KitWebView::load-changed is emitted
+// with WEBKIT_LOAD_REDIRECTED event, the active URI is already updated to
+// the redirected URI. </para></listitem> <listitem><para> When the signal
+// KitWebView::load-changed is emitted with WEBKIT_LOAD_COMMITTED event,
+// the active URI is the final one and it will not change unless a new
+// load operation is started or a navigation action within the same page is
 // performed. </para></listitem> </orderedlist>
 //
 // You can monitor the active URI by connecting to the notify::uri signal of
@@ -3251,14 +2321,14 @@ func (webView *WebView) TLSInfo() (gio.TLSCertificater, gio.TLSCertificateFlags,
 //
 // The function returns the following values:
 //
-//    - utf8: current active URI of web_view or NULL if nothing has been loaded
-//      yet.
+//   - utf8: current active URI of web_view or NULL if nothing has been loaded
+//     yet.
 //
 func (webView *WebView) URI() string {
 	var _arg0 *C.WebKitWebView // out
 	var _cret *C.gchar         // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_uri(_arg0)
 	runtime.KeepAlive(webView)
@@ -3274,109 +2344,138 @@ func (webView *WebView) URI() string {
 //
 // The function returns the following values:
 //
-//    - userContentManager associated with the view.
+//   - userContentManager associated with the view.
 //
 func (webView *WebView) UserContentManager() *UserContentManager {
 	var _arg0 *C.WebKitWebView            // out
 	var _cret *C.WebKitUserContentManager // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_user_content_manager(_arg0)
 	runtime.KeepAlive(webView)
 
 	var _userContentManager *UserContentManager // out
 
-	_userContentManager = wrapUserContentManager(externglib.Take(unsafe.Pointer(_cret)))
+	_userContentManager = wrapUserContentManager(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _userContentManager
 }
 
-// WebsiteDataManager: get the KitWebsiteDataManager associated to web_view. If
-// web_view is not ephemeral, the returned KitWebsiteDataManager will be the
+// WebExtensionMode: get the view's KitWebExtensionMode.
+//
+// The function returns the following values:
+//
+//   - webExtensionMode: KitWebExtensionMode.
+//
+func (webView *WebView) WebExtensionMode() WebExtensionMode {
+	var _arg0 *C.WebKitWebView         // out
+	var _cret C.WebKitWebExtensionMode // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+
+	_cret = C.webkit_web_view_get_web_extension_mode(_arg0)
+	runtime.KeepAlive(webView)
+
+	var _webExtensionMode WebExtensionMode // out
+
+	_webExtensionMode = WebExtensionMode(_cret)
+
+	return _webExtensionMode
+}
+
+// WebsiteDataManager: get the KitWebsiteDataManager associated to web_view.
+//
+// If web_view is not ephemeral, the returned KitWebsiteDataManager will be the
 // same as the KitWebsiteDataManager of web_view's KitWebContext.
 //
 // The function returns the following values:
 //
-//    - websiteDataManager: KitWebsiteDataManager.
+//   - websiteDataManager: KitWebsiteDataManager.
 //
 func (webView *WebView) WebsiteDataManager() *WebsiteDataManager {
 	var _arg0 *C.WebKitWebView            // out
 	var _cret *C.WebKitWebsiteDataManager // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_website_data_manager(_arg0)
 	runtime.KeepAlive(webView)
 
 	var _websiteDataManager *WebsiteDataManager // out
 
-	_websiteDataManager = wrapWebsiteDataManager(externglib.Take(unsafe.Pointer(_cret)))
+	_websiteDataManager = wrapWebsiteDataManager(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _websiteDataManager
 }
 
-// WebsitePolicies gets the default website policies set on construction in the
-// web_view. These can be overridden on a per-origin basis via the
-// KitWebView::decide-policy signal handler.
+// WebsitePolicies gets the default website policies.
+//
+// Gets the default website policies set on construction in the web_view. These
+// can be overridden on a per-origin basis via the KitWebView::decide-policy
+// signal handler.
 //
 // See also webkit_policy_decision_use_with_policies().
 //
 // The function returns the following values:
 //
-//    - websitePolicies: default KitWebsitePolicies associated with the view.
+//   - websitePolicies: default KitWebsitePolicies associated with the view.
 //
 func (webView *WebView) WebsitePolicies() *WebsitePolicies {
 	var _arg0 *C.WebKitWebView         // out
 	var _cret *C.WebKitWebsitePolicies // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_website_policies(_arg0)
 	runtime.KeepAlive(webView)
 
 	var _websitePolicies *WebsitePolicies // out
 
-	_websitePolicies = wrapWebsitePolicies(externglib.Take(unsafe.Pointer(_cret)))
+	_websitePolicies = wrapWebsitePolicies(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _websitePolicies
 }
 
-// WindowProperties: get the KitWindowProperties object containing the
-// properties that the window containing web_view should have.
+// WindowProperties: get the KitWindowProperties object.
+//
+// Get the KitWindowProperties object containing the properties that the window
+// containing web_view should have.
 //
 // The function returns the following values:
 //
-//    - windowProperties of web_view.
+//   - windowProperties of web_view.
 //
 func (webView *WebView) WindowProperties() *WindowProperties {
 	var _arg0 *C.WebKitWebView          // out
 	var _cret *C.WebKitWindowProperties // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_window_properties(_arg0)
 	runtime.KeepAlive(webView)
 
 	var _windowProperties *WindowProperties // out
 
-	_windowProperties = wrapWindowProperties(externglib.Take(unsafe.Pointer(_cret)))
+	_windowProperties = wrapWindowProperties(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _windowProperties
 }
 
-// ZoomLevel: get the zoom level of web_view, i.e. the factor by which the view
-// contents are scaled with respect to their original size.
+// ZoomLevel: set the zoom level of web_view.
+//
+// Get the zoom level of web_view, i.e. the factor by which the view contents
+// are scaled with respect to their original size.
 //
 // The function returns the following values:
 //
-//    - gdouble: current zoom level of web_view.
+//   - gdouble: current zoom level of web_view.
 //
 func (webView *WebView) ZoomLevel() float64 {
 	var _arg0 *C.WebKitWebView // out
 	var _cret C.gdouble        // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_get_zoom_level(_arg0)
 	runtime.KeepAlive(webView)
@@ -3388,41 +2487,47 @@ func (webView *WebView) ZoomLevel() float64 {
 	return _gdouble
 }
 
-// GoBack loads the previous history item. You can monitor the load operation by
-// connecting to KitWebView::load-changed signal.
+// GoBack loads the previous history item.
+//
+// You can monitor the load operation by connecting to KitWebView::load-changed
+// signal.
 func (webView *WebView) GoBack() {
 	var _arg0 *C.WebKitWebView // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	C.webkit_web_view_go_back(_arg0)
 	runtime.KeepAlive(webView)
 }
 
-// GoForward loads the next history item. You can monitor the load operation by
-// connecting to KitWebView::load-changed signal.
+// GoForward loads the next history item.
+//
+// You can monitor the load operation by connecting to KitWebView::load-changed
+// signal.
 func (webView *WebView) GoForward() {
 	var _arg0 *C.WebKitWebView // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	C.webkit_web_view_go_forward(_arg0)
 	runtime.KeepAlive(webView)
 }
 
-// GoToBackForwardListItem loads the specific history item list_item. You can
-// monitor the load operation by connecting to KitWebView::load-changed signal.
+// GoToBackForwardListItem loads the specific history item list_item.
+//
+// You can monitor the load operation by connecting to KitWebView::load-changed
+// signal.
 //
 // The function takes the following parameters:
 //
-//    - listItem: KitBackForwardListItem.
+//   - listItem: KitBackForwardListItem.
 //
 func (webView *WebView) GoToBackForwardListItem(listItem *BackForwardListItem) {
 	var _arg0 *C.WebKitWebView             // out
 	var _arg1 *C.WebKitBackForwardListItem // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	_arg1 = (*C.WebKitBackForwardListItem)(unsafe.Pointer(externglib.InternObject(listItem).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitBackForwardListItem)(unsafe.Pointer(coreglib.InternObject(listItem).Native()))
 
 	C.webkit_web_view_go_to_back_forward_list_item(_arg0, _arg1)
 	runtime.KeepAlive(webView)
@@ -3430,18 +2535,20 @@ func (webView *WebView) GoToBackForwardListItem(listItem *BackForwardListItem) {
 }
 
 // IsControlledByAutomation: get whether a KitWebView was created with
-// KitWebView:is-controlled-by-automation property enabled. Only KitWebView<!--
-// -->s controlled by automation can be used in an automation session.
+// KitWebView:is-controlled-by-automation property enabled.
+//
+// Only KitWebView<!-- -->s controlled by automation can be used in an
+// automation session.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if web_view is controlled by automation, or FALSE otherwise.
+//   - ok: TRUE if web_view is controlled by automation, or FALSE otherwise.
 //
 func (webView *WebView) IsControlledByAutomation() bool {
 	var _arg0 *C.WebKitWebView // out
 	var _cret C.gboolean       // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_is_controlled_by_automation(_arg0)
 	runtime.KeepAlive(webView)
@@ -3455,13 +2562,22 @@ func (webView *WebView) IsControlledByAutomation() bool {
 	return _ok
 }
 
+// IsEditable gets whether the user is allowed to edit the HTML document.
+//
+// When web_view is not editable an element in the HTML document can only be
+// edited if the CONTENTEDITABLE attribute has been set on the element or one of
+// its parent elements. By default a KitWebView is not editable.
+//
 // The function returns the following values:
+//
+//   - ok: TRUE if the user is allowed to edit the HTML document, or FALSE
+//     otherwise.
 //
 func (webView *WebView) IsEditable() bool {
 	var _arg0 *C.WebKitWebView // out
 	var _cret C.gboolean       // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_is_editable(_arg0)
 	runtime.KeepAlive(webView)
@@ -3475,21 +2591,22 @@ func (webView *WebView) IsEditable() bool {
 	return _ok
 }
 
-// IsEphemeral: get whether a KitWebView is ephemeral. To create an ephemeral
-// KitWebView you need to use g_object_new() and pass is-ephemeral property with
-// TRUE value. See KitWebView:is-ephemeral for more details. If web_view was
-// created with a ephemeral KitWebView:related-view or an ephemeral
-// KitWebView:web-context it will also be ephemeral.
+// IsEphemeral: get whether a KitWebView is ephemeral.
+//
+// To create an ephemeral KitWebView you need to use g_object_new() and pass
+// is-ephemeral property with TRUE value. See KitWebView:is-ephemeral for more
+// details. If web_view was created with a ephemeral KitWebView:related-view or
+// an ephemeral KitWebView:web-context it will also be ephemeral.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if web_view is ephemeral or FALSE otherwise.
+//   - ok: TRUE if web_view is ephemeral or FALSE otherwise.
 //
 func (webView *WebView) IsEphemeral() bool {
 	var _arg0 *C.WebKitWebView // out
 	var _cret C.gboolean       // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_is_ephemeral(_arg0)
 	runtime.KeepAlive(webView)
@@ -3503,8 +2620,9 @@ func (webView *WebView) IsEphemeral() bool {
 	return _ok
 }
 
-// IsLoading gets the value of the KitWebView:is-loading property. You can
-// monitor when a KitWebView is loading a page by connecting to
+// IsLoading gets the value of the KitWebView:is-loading property.
+//
+// You can monitor when a KitWebView is loading a page by connecting to
 // notify::is-loading signal of web_view. This is useful when you are
 // interesting in knowing when the view is loading something but not in the
 // details about the status of the load operation, for example to start a
@@ -3512,13 +2630,13 @@ func (webView *WebView) IsEphemeral() bool {
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if web_view is loading a page or FALSE otherwise.
+//   - ok: TRUE if web_view is loading a page or FALSE otherwise.
 //
 func (webView *WebView) IsLoading() bool {
 	var _arg0 *C.WebKitWebView // out
 	var _cret C.gboolean       // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_is_loading(_arg0)
 	runtime.KeepAlive(webView)
@@ -3533,19 +2651,20 @@ func (webView *WebView) IsLoading() bool {
 }
 
 // IsPlayingAudio gets the value of the KitWebView:is-playing-audio property.
-// You can monitor when a page in a KitWebView is playing audio by connecting to
-// the notify::is-playing-audio signal of web_view. This is useful when the
+//
+// You can monitor when a page in a KitWebView is playing audio by connecting
+// to the notify::is-playing-audio signal of web_view. This is useful when the
 // application wants to provide visual feedback when a page is producing sound.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if a page in web_view is playing audio or FALSE otherwise.
+//   - ok: TRUE if a page in web_view is playing audio or FALSE otherwise.
 //
 func (webView *WebView) IsPlayingAudio() bool {
 	var _arg0 *C.WebKitWebView // out
 	var _cret C.gboolean       // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	_cret = C.webkit_web_view_is_playing_audio(_arg0)
 	runtime.KeepAlive(webView)
@@ -3560,17 +2679,18 @@ func (webView *WebView) IsPlayingAudio() bool {
 }
 
 // LoadAlternateHtml: load the given content string for the URI content_uri.
-// This allows clients to display page-loading errors in the KitWebView itself.
-// When this method is called from KitWebView::load-failed signal to show an
-// error page, then the back-forward list is maintained appropriately. For
-// everything else this method works the same way as
+//
+// This allows clients to display page-loading errors in the KitWebView
+// itself. When this method is called from KitWebView::load-failed
+// signal to show an error page, then the back-forward list is maintained
+// appropriately. For everything else this method works the same way as
 // webkit_web_view_load_html().
 //
 // The function takes the following parameters:
 //
-//    - content: new content to display as the main page of the web_view.
-//    - contentUri: URI for the alternate page content.
-//    - baseUri (optional): base URI for relative locations or NULL.
+//   - content: new content to display as the main page of the web_view.
+//   - contentUri: URI for the alternate page content.
+//   - baseUri (optional): base URI for relative locations or NULL.
 //
 func (webView *WebView) LoadAlternateHtml(content, contentUri, baseUri string) {
 	var _arg0 *C.WebKitWebView // out
@@ -3578,7 +2698,7 @@ func (webView *WebView) LoadAlternateHtml(content, contentUri, baseUri string) {
 	var _arg2 *C.gchar         // out
 	var _arg3 *C.gchar         // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(content)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(contentUri)))
@@ -3596,17 +2716,19 @@ func (webView *WebView) LoadAlternateHtml(content, contentUri, baseUri string) {
 }
 
 // LoadBytes: load the specified bytes into web_view using the given mime_type
-// and encoding. When mime_type is NULL, it defaults to "text/html". When
-// encoding is NULL, it defaults to "UTF-8". When base_uri is NULL, it defaults
-// to "about:blank". You can monitor the load operation by connecting to
-// KitWebView::load-changed signal.
+// and encoding.
+//
+// When mime_type is NULL, it defaults to "text/html". When encoding is NULL,
+// it defaults to "UTF-8". When base_uri is NULL, it defaults to "about:blank".
+// You can monitor the load operation by connecting to KitWebView::load-changed
+// signal.
 //
 // The function takes the following parameters:
 //
-//    - bytes: input data to load.
-//    - mimeType (optional): MIME type of bytes, or NULL.
-//    - encoding (optional): character encoding of bytes, or NULL.
-//    - baseUri (optional): base URI for relative locations or NULL.
+//   - bytes: input data to load.
+//   - mimeType (optional): MIME type of bytes, or NULL.
+//   - encoding (optional): character encoding of bytes, or NULL.
+//   - baseUri (optional): base URI for relative locations or NULL.
 //
 func (webView *WebView) LoadBytes(bytes *glib.Bytes, mimeType, encoding, baseUri string) {
 	var _arg0 *C.WebKitWebView // out
@@ -3615,7 +2737,7 @@ func (webView *WebView) LoadBytes(bytes *glib.Bytes, mimeType, encoding, baseUri
 	var _arg3 *C.gchar         // out
 	var _arg4 *C.gchar         // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 	_arg1 = (*C.GBytes)(gextras.StructNative(unsafe.Pointer(bytes)))
 	if mimeType != "" {
 		_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(mimeType)))
@@ -3638,27 +2760,28 @@ func (webView *WebView) LoadBytes(bytes *glib.Bytes, mimeType, encoding, baseUri
 	runtime.KeepAlive(baseUri)
 }
 
-// LoadHtml: load the given content string with the specified base_uri. If
-// base_uri is not NULL, relative URLs in the content will be resolved against
-// base_uri and absolute local paths must be children of the base_uri. For
-// security reasons absolute local paths that are not children of base_uri will
-// cause the web process to terminate. If you need to include URLs in content
-// that are local paths in a different directory than base_uri you can build a
-// data URI for them. When base_uri is NULL, it defaults to "about:blank". The
-// mime type of the document will be "text/html". You can monitor the load
-// operation by connecting to KitWebView::load-changed signal.
+// LoadHtml: load the given content string with the specified base_uri.
+//
+// If base_uri is not NULL, relative URLs in the content will be resolved
+// against base_uri and absolute local paths must be children of the base_uri.
+// For security reasons absolute local paths that are not children of base_uri
+// will cause the web process to terminate. If you need to include URLs in
+// content that are local paths in a different directory than base_uri you
+// can build a data URI for them. When base_uri is NULL, it defaults to
+// "about:blank". The mime type of the document will be "text/html". You can
+// monitor the load operation by connecting to KitWebView::load-changed signal.
 //
 // The function takes the following parameters:
 //
-//    - content: HTML string to load.
-//    - baseUri (optional): base URI for relative locations or NULL.
+//   - content: HTML string to load.
+//   - baseUri (optional): base URI for relative locations or NULL.
 //
 func (webView *WebView) LoadHtml(content, baseUri string) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.gchar         // out
 	var _arg2 *C.gchar         // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(content)))
 	defer C.free(unsafe.Pointer(_arg1))
 	if baseUri != "" {
@@ -3672,19 +2795,20 @@ func (webView *WebView) LoadHtml(content, baseUri string) {
 	runtime.KeepAlive(baseUri)
 }
 
-// LoadPlainText: load the specified plain_text string into web_view. The mime
-// type of document will be "text/plain". You can monitor the load operation by
-// connecting to KitWebView::load-changed signal.
+// LoadPlainText: load the specified plain_text string into web_view.
+//
+// The mime type of document will be "text/plain". You can monitor the load
+// operation by connecting to KitWebView::load-changed signal.
 //
 // The function takes the following parameters:
 //
-//    - plainText: plain text to load.
+//   - plainText: plain text to load.
 //
 func (webView *WebView) LoadPlainText(plainText string) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.gchar         // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(plainText)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -3693,37 +2817,41 @@ func (webView *WebView) LoadPlainText(plainText string) {
 	runtime.KeepAlive(plainText)
 }
 
-// LoadRequest requests loading of the specified KitURIRequest. You can monitor
-// the load operation by connecting to KitWebView::load-changed signal.
+// LoadRequest requests loading of the specified KitURIRequest.
+//
+// You can monitor the load operation by connecting to KitWebView::load-changed
+// signal.
 //
 // The function takes the following parameters:
 //
-//    - request to load.
+//   - request to load.
 //
 func (webView *WebView) LoadRequest(request *URIRequest) {
 	var _arg0 *C.WebKitWebView    // out
 	var _arg1 *C.WebKitURIRequest // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	_arg1 = (*C.WebKitURIRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitURIRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
 
 	C.webkit_web_view_load_request(_arg0, _arg1)
 	runtime.KeepAlive(webView)
 	runtime.KeepAlive(request)
 }
 
-// LoadURI requests loading of the specified URI string. You can monitor the
-// load operation by connecting to KitWebView::load-changed signal.
+// LoadURI requests loading of the specified URI string.
+//
+// You can monitor the load operation by connecting to KitWebView::load-changed
+// signal.
 //
 // The function takes the following parameters:
 //
-//    - uri: URI string.
+//   - uri: URI string.
 //
 func (webView *WebView) LoadURI(uri string) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.gchar         // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(uri)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -3732,12 +2860,13 @@ func (webView *WebView) LoadURI(uri string) {
 	runtime.KeepAlive(uri)
 }
 
-// Reload reloads the current contents of web_view. See also
-// webkit_web_view_reload_bypass_cache().
+// Reload reloads the current contents of web_view.
+//
+// See also webkit_web_view_reload_bypass_cache().
 func (webView *WebView) Reload() {
 	var _arg0 *C.WebKitWebView // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	C.webkit_web_view_reload(_arg0)
 	runtime.KeepAlive(webView)
@@ -3748,7 +2877,7 @@ func (webView *WebView) Reload() {
 func (webView *WebView) ReloadBypassCache() {
 	var _arg0 *C.WebKitWebView // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	C.webkit_web_view_reload_bypass_cache(_arg0)
 	runtime.KeepAlive(webView)
@@ -3758,58 +2887,18 @@ func (webView *WebView) ReloadBypassCache() {
 //
 // The function takes the following parameters:
 //
-//    - state: KitWebViewSessionState.
+//   - state: KitWebViewSessionState.
 //
 func (webView *WebView) RestoreSessionState(state *WebViewSessionState) {
 	var _arg0 *C.WebKitWebView             // out
 	var _arg1 *C.WebKitWebViewSessionState // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 	_arg1 = (*C.WebKitWebViewSessionState)(gextras.StructNative(unsafe.Pointer(state)))
 
 	C.webkit_web_view_restore_session_state(_arg0, _arg1)
 	runtime.KeepAlive(webView)
 	runtime.KeepAlive(state)
-}
-
-// RunJavascript: asynchronously run script in the context of the current page
-// in web_view. If WebKitSettings:enable-javascript is FALSE, this method will
-// do nothing.
-//
-// When the operation is finished, callback will be called. You can then call
-// webkit_web_view_run_javascript_finish() to get the result of the operation.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional) or NULL to ignore.
-//    - script to run.
-//    - callback (optional) to call when the script finished.
-//
-func (webView *WebView) RunJavascript(ctx context.Context, script string, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.WebKitWebView      // out
-	var _arg2 *C.GCancellable       // out
-	var _arg1 *C.gchar              // out
-	var _arg3 C.GAsyncReadyCallback // out
-	var _arg4 C.gpointer
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(script)))
-	defer C.free(unsafe.Pointer(_arg1))
-	if callback != nil {
-		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg4 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.webkit_web_view_run_javascript(_arg0, _arg1, _arg2, _arg3, _arg4)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(script)
-	runtime.KeepAlive(callback)
 }
 
 // RunJavascriptFinish: finish an asynchronous operation started with
@@ -3818,53 +2907,56 @@ func (webView *WebView) RunJavascript(ctx context.Context, script string, callba
 // This is an example of using webkit_web_view_run_javascript() with a script
 // returning a string:
 //
-// <informalexample><programlisting> static void web_view_javascript_finished
-// (GObject *object, GAsyncResult *result, gpointer user_data) {
-// WebKitJavascriptResult *js_result; JSCValue *value; GError *error = NULL;
+//    static void
+//    web_view_javascript_finished (GObject      *object,
+//                                  GAsyncResult *result,
+//                                  gpointer      user_data)
+//    {
+//        WebKitJavascriptResult *js_result;
+//        JSCValue               *value;
+//        GError                 *error = NULL;
 //
-//    js_result = webkit_web_view_run_javascript_finish (WEBKIT_WEB_VIEW (object), result, &error);
-//    if (!js_result) {
-//        g_warning ("Error running javascript: s", error->message);
-//        g_error_free (error);
-//        return;
+//        js_result = webkit_web_view_run_javascript_finish (WEBKIT_WEB_VIEW (object), result, &error);
+//        if (!js_result) {
+//            g_warning ("Error running javascript: s", error->message);
+//            g_error_free (error);
+//            return;
+//        }
+//
+//        value = webkit_javascript_result_get_js_value (js_result);
+//        if (jsc_value_is_string (value)) {
+//            gchar        *str_value = jsc_value_to_string (value);
+//            JSCException *exception = jsc_context_get_exception (jsc_value_get_context (value));
+//            if (exception)
+//                g_warning ("Error running javascript: s", jsc_exception_get_message (exception));
+//            else
+//                g_print ("Script result: s\n", str_value);
+//            g_free (str_value);
+//        } else {
+//            g_warning ("Error running javascript: unexpected return value");
+//        }
+//        webkit_javascript_result_unref (js_result);
 //    }
 //
-//    value = webkit_javascript_result_get_js_value (js_result);
-//    if (jsc_value_is_string (value)) {
-//        JSCException *exception;
-//        gchar        *str_value;
-//
-//        str_value = jsc_value_to_string (value);
-//        exception = jsc_context_get_exception (jsc_value_get_context (value));
-//        if (exception)
-//            g_warning ("Error running javascript: s", jsc_exception_get_message (exception));
-//        else
-//            g_print ("Script result: s\n", str_value);
-//        g_free (str_value);
-//    } else {
-//        g_warning ("Error running javascript: unexpected return value");
+//    static void
+//    web_view_get_link_url (WebKitWebView *web_view,
+//                           const gchar   *link_id)
+//    {
+//        gchar *script = g_strdup_printf ("window.document.getElementById('s').href;", link_id);
+//        webkit_web_view_run_javascript (web_view, script, NULL, web_view_javascript_finished, NULL);
+//        g_free (script);
 //    }
-//    webkit_javascript_result_unref (js_result);
 //
-// }
-//
-// static void web_view_get_link_url (WebKitWebView *web_view, const gchar
-// *link_id) { gchar *script;
-//
-//    script = g_strdup_printf ("window.document.getElementById('s').href;", link_id);
-//    webkit_web_view_run_javascript (web_view, script, NULL, web_view_javascript_finished, NULL);
-//    g_free (script);
-//
-// } </programlisting></informalexample>.
+// Deprecated: Use webkit_web_view_evaluate_javascript_finish() instead.
 //
 // The function takes the following parameters:
 //
-//    - result: Result.
+//   - result: Result.
 //
 // The function returns the following values:
 //
-//    - javascriptResult with the result of the last executed statement in script
-//      or NULL in case of error.
+//   - javascriptResult with the result of the last executed statement in script
+//     or NULL in case of error.
 //
 func (webView *WebView) RunJavascriptFinish(result gio.AsyncResulter) (*JavascriptResult, error) {
 	var _arg0 *C.WebKitWebView          // out
@@ -3872,8 +2964,8 @@ func (webView *WebView) RunJavascriptFinish(result gio.AsyncResulter) (*Javascri
 	var _cret *C.WebKitJavascriptResult // in
 	var _cerr *C.GError                 // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(result).Native()))
 
 	_cret = C.webkit_web_view_run_javascript_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(webView)
@@ -3896,59 +2988,21 @@ func (webView *WebView) RunJavascriptFinish(result gio.AsyncResulter) (*Javascri
 	return _javascriptResult, _goerr
 }
 
-// RunJavascriptFromGresource: asynchronously run the script from resource in
-// the context of the current page in web_view.
-//
-// When the operation is finished, callback will be called. You can then call
-// webkit_web_view_run_javascript_from_gresource_finish() to get the result of
-// the operation.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional) or NULL to ignore.
-//    - resource: location of the resource to load.
-//    - callback (optional) to call when the script finished.
-//
-func (webView *WebView) RunJavascriptFromGresource(ctx context.Context, resource string, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.WebKitWebView      // out
-	var _arg2 *C.GCancellable       // out
-	var _arg1 *C.gchar              // out
-	var _arg3 C.GAsyncReadyCallback // out
-	var _arg4 C.gpointer
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(resource)))
-	defer C.free(unsafe.Pointer(_arg1))
-	if callback != nil {
-		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg4 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.webkit_web_view_run_javascript_from_gresource(_arg0, _arg1, _arg2, _arg3, _arg4)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(resource)
-	runtime.KeepAlive(callback)
-}
-
 // RunJavascriptFromGresourceFinish: finish an asynchronous operation started
 // with webkit_web_view_run_javascript_from_gresource().
 //
 // Check webkit_web_view_run_javascript_finish() for a usage example.
 //
+// Deprecated: Use webkit_web_view_evaluate_javascript_finish() instead.
+//
 // The function takes the following parameters:
 //
-//    - result: Result.
+//   - result: Result.
 //
 // The function returns the following values:
 //
-//    - javascriptResult with the result of the last executed statement in script
-//      or NULL in case of error.
+//   - javascriptResult with the result of the last executed statement in script
+//     or NULL in case of error.
 //
 func (webView *WebView) RunJavascriptFromGresourceFinish(result gio.AsyncResulter) (*JavascriptResult, error) {
 	var _arg0 *C.WebKitWebView          // out
@@ -3956,8 +3010,8 @@ func (webView *WebView) RunJavascriptFromGresourceFinish(result gio.AsyncResulte
 	var _cret *C.WebKitJavascriptResult // in
 	var _cerr *C.GError                 // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(result).Native()))
 
 	_cret = C.webkit_web_view_run_javascript_from_gresource_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(webView)
@@ -3980,63 +3034,20 @@ func (webView *WebView) RunJavascriptFromGresourceFinish(result gio.AsyncResulte
 	return _javascriptResult, _goerr
 }
 
-// RunJavascriptInWorld: asynchronously run script in the script world with name
-// world_name of the current page context in web_view. If
-// WebKitSettings:enable-javascript is FALSE, this method will do nothing.
-//
-// When the operation is finished, callback will be called. You can then call
-// webkit_web_view_run_javascript_in_world_finish() to get the result of the
-// operation.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional) or NULL to ignore.
-//    - script to run.
-//    - worldName: name of a KitScriptWorld.
-//    - callback (optional) to call when the script finished.
-//
-func (webView *WebView) RunJavascriptInWorld(ctx context.Context, script, worldName string, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.WebKitWebView      // out
-	var _arg3 *C.GCancellable       // out
-	var _arg1 *C.gchar              // out
-	var _arg2 *C.gchar              // out
-	var _arg4 C.GAsyncReadyCallback // out
-	var _arg5 C.gpointer
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(script)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(worldName)))
-	defer C.free(unsafe.Pointer(_arg2))
-	if callback != nil {
-		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg5 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.webkit_web_view_run_javascript_in_world(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(script)
-	runtime.KeepAlive(worldName)
-	runtime.KeepAlive(callback)
-}
-
 // RunJavascriptInWorldFinish: finish an asynchronous operation started with
 // webkit_web_view_run_javascript_in_world().
 //
+// Deprecated: Use webkit_web_view_call_async_javascript_function_finish()
+// instead.
+//
 // The function takes the following parameters:
 //
-//    - result: Result.
+//   - result: Result.
 //
 // The function returns the following values:
 //
-//    - javascriptResult with the result of the last executed statement in script
-//      or NULL in case of error.
+//   - javascriptResult with the result of the last executed statement in script
+//     or NULL in case of error.
 //
 func (webView *WebView) RunJavascriptInWorldFinish(result gio.AsyncResulter) (*JavascriptResult, error) {
 	var _arg0 *C.WebKitWebView          // out
@@ -4044,8 +3055,8 @@ func (webView *WebView) RunJavascriptInWorldFinish(result gio.AsyncResulter) (*J
 	var _cret *C.WebKitJavascriptResult // in
 	var _cerr *C.GError                 // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(result).Native()))
 
 	_cret = C.webkit_web_view_run_javascript_in_world_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(webView)
@@ -4068,55 +3079,17 @@ func (webView *WebView) RunJavascriptInWorldFinish(result gio.AsyncResulter) (*J
 	return _javascriptResult, _goerr
 }
 
-// Save: asynchronously save the current web page associated to the KitWebView
-// into a self-contained format using the mode specified in save_mode.
-//
-// When the operation is finished, callback will be called. You can then call
-// webkit_web_view_save_finish() to get the result of the operation.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional) or NULL to ignore.
-//    - saveMode specifying how the web page should be saved.
-//    - callback (optional) to call when the request is satisfied.
-//
-func (webView *WebView) Save(ctx context.Context, saveMode SaveMode, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.WebKitWebView      // out
-	var _arg2 *C.GCancellable       // out
-	var _arg1 C.WebKitSaveMode      // out
-	var _arg3 C.GAsyncReadyCallback // out
-	var _arg4 C.gpointer
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = C.WebKitSaveMode(saveMode)
-	if callback != nil {
-		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg4 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.webkit_web_view_save(_arg0, _arg1, _arg2, _arg3, _arg4)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(saveMode)
-	runtime.KeepAlive(callback)
-}
-
 // SaveFinish: finish an asynchronous operation started with
 // webkit_web_view_save().
 //
 // The function takes the following parameters:
 //
-//    - result: Result.
+//   - result: Result.
 //
 // The function returns the following values:
 //
-//    - inputStream with the result of saving the current web page or NULL in
-//      case of error.
+//   - inputStream with the result of saving the current web page or NULL in
+//     case of error.
 //
 func (webView *WebView) SaveFinish(result gio.AsyncResulter) (gio.InputStreamer, error) {
 	var _arg0 *C.WebKitWebView // out
@@ -4124,8 +3097,8 @@ func (webView *WebView) SaveFinish(result gio.AsyncResulter) (gio.InputStreamer,
 	var _cret *C.GInputStream  // in
 	var _cerr *C.GError        // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(result).Native()))
 
 	_cret = C.webkit_web_view_save_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(webView)
@@ -4140,8 +3113,8 @@ func (webView *WebView) SaveFinish(result gio.AsyncResulter) (gio.InputStreamer,
 			panic("object of type gio.InputStreamer is nil")
 		}
 
-		object := externglib.AssumeOwnership(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
+		object := coreglib.AssumeOwnership(objptr)
+		casted := object.WalkCast(func(obj coreglib.Objector) bool {
 			_, ok := obj.(gio.InputStreamer)
 			return ok
 		})
@@ -4158,63 +3131,20 @@ func (webView *WebView) SaveFinish(result gio.AsyncResulter) (gio.InputStreamer,
 	return _inputStream, _goerr
 }
 
-// SaveToFile: asynchronously save the current web page associated to the
-// KitWebView into a self-contained format using the mode specified in save_mode
-// and writing it to file.
-//
-// When the operation is finished, callback will be called. You can then call
-// webkit_web_view_save_to_file_finish() to get the result of the operation.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional) or NULL to ignore.
-//    - file where the current web page should be saved to.
-//    - saveMode specifying how the web page should be saved.
-//    - callback (optional) to call when the request is satisfied.
-//
-func (webView *WebView) SaveToFile(ctx context.Context, file gio.Filer, saveMode SaveMode, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.WebKitWebView      // out
-	var _arg3 *C.GCancellable       // out
-	var _arg1 *C.GFile              // out
-	var _arg2 C.WebKitSaveMode      // out
-	var _arg4 C.GAsyncReadyCallback // out
-	var _arg5 C.gpointer
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.GFile)(unsafe.Pointer(externglib.InternObject(file).Native()))
-	_arg2 = C.WebKitSaveMode(saveMode)
-	if callback != nil {
-		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg5 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.webkit_web_view_save_to_file(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(file)
-	runtime.KeepAlive(saveMode)
-	runtime.KeepAlive(callback)
-}
-
 // SaveToFileFinish: finish an asynchronous operation started with
 // webkit_web_view_save_to_file().
 //
 // The function takes the following parameters:
 //
-//    - result: Result.
+//   - result: Result.
 //
 func (webView *WebView) SaveToFileFinish(result gio.AsyncResulter) error {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.GAsyncResult  // out
 	var _cerr *C.GError        // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(result).Native()))
 
 	C.webkit_web_view_save_to_file_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(webView)
@@ -4229,57 +3159,16 @@ func (webView *WebView) SaveToFileFinish(result gio.AsyncResulter) error {
 	return _goerr
 }
 
-// SendMessageToPage: send message to the KitWebPage corresponding to web_view.
-// If message is floating, it's consumed.
-//
-// If you don't expect any reply, or you simply want to ignore it, you can pass
-// NULL as callback. When the operation is finished, callback will be called.
-// You can then call webkit_web_view_send_message_to_page_finish() to get the
-// message reply.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional) or NULL to ignore.
-//    - message: KitUserMessage.
-//    - callback (optional): (nullable): A ReadyCallback to call when the request
-//      is satisfied or NULL.
-//
-func (webView *WebView) SendMessageToPage(ctx context.Context, message *UserMessage, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.WebKitWebView      // out
-	var _arg2 *C.GCancellable       // out
-	var _arg1 *C.WebKitUserMessage  // out
-	var _arg3 C.GAsyncReadyCallback // out
-	var _arg4 C.gpointer
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.WebKitUserMessage)(unsafe.Pointer(externglib.InternObject(message).Native()))
-	if callback != nil {
-		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg4 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.webkit_web_view_send_message_to_page(_arg0, _arg1, _arg2, _arg3, _arg4)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(message)
-	runtime.KeepAlive(callback)
-}
-
 // SendMessageToPageFinish: finish an asynchronous operation started with
 // webkit_web_view_send_message_to_page().
 //
 // The function takes the following parameters:
 //
-//    - result: Result.
+//   - result: Result.
 //
 // The function returns the following values:
 //
-//    - userMessage with the reply or NULL in case of error.
+//   - userMessage with the reply or NULL in case of error.
 //
 func (webView *WebView) SendMessageToPageFinish(result gio.AsyncResulter) (*UserMessage, error) {
 	var _arg0 *C.WebKitWebView     // out
@@ -4287,8 +3176,8 @@ func (webView *WebView) SendMessageToPageFinish(result gio.AsyncResulter) (*User
 	var _cret *C.WebKitUserMessage // in
 	var _cerr *C.GError            // in
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(result).Native()))
 
 	_cret = C.webkit_web_view_send_message_to_page_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(webView)
@@ -4297,7 +3186,7 @@ func (webView *WebView) SendMessageToPageFinish(result gio.AsyncResulter) (*User
 	var _userMessage *UserMessage // out
 	var _goerr error              // out
 
-	_userMessage = wrapUserMessage(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_userMessage = wrapUserMessage(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 	if _cerr != nil {
 		_goerr = gerror.Take(unsafe.Pointer(_cerr))
 	}
@@ -4306,38 +3195,41 @@ func (webView *WebView) SendMessageToPageFinish(result gio.AsyncResulter) (*User
 }
 
 // SetBackgroundColor sets the color that will be used to draw the web_view
-// background before the actual contents are rendered. Note that if the web page
-// loaded in web_view specifies a background color, it will take precedence over
-// the rgba color. By default the web_view background color is opaque white.
-// Note that the parent window must have a RGBA visual and Widget:app-paintable
-// property set to TRUE for backgrounds colors to work.
+// background.
 //
-// <informalexample><programlisting> static void
-// browser_window_set_background_color (BrowserWindow *window, const GdkRGBA
-// *rgba) { WebKitWebView *web_view; GdkScreen *screen = gtk_window_get_screen
-// (GTK_WINDOW (window)); GdkVisual *rgba_visual = gdk_screen_get_rgba_visual
-// (screen);
+// Sets the color that will be used to draw the web_view background before the
+// actual contents are rendered. Note that if the web page loaded in web_view
+// specifies a background color, it will take precedence over the rgba color.
+// By default the web_view background color is opaque white. Note that the
+// parent window must have a RGBA visual and Widget:app-paintable property set
+// to TRUE for backgrounds colors to work.
 //
-//    if (!rgba_visual)
-//         return;
+//    static void browser_window_set_background_color (BrowserWindow *window,
+//                                                     const GdkRGBA *rgba)
+//    {
+//        WebKitWebView *web_view;
+//        GdkScreen *screen = gtk_window_get_screen (GTK_WINDOW (window));
+//        GdkVisual *rgba_visual = gdk_screen_get_rgba_visual (screen);
 //
-//    gtk_widget_set_visual (GTK_WIDGET (window), rgba_visual);
-//    gtk_widget_set_app_paintable (GTK_WIDGET (window), TRUE);
+//        if (!rgba_visual)
+//             return;
 //
-//    web_view = browser_window_get_web_view (window);
-//    webkit_web_view_set_background_color (web_view, rgba);
+//        gtk_widget_set_visual (GTK_WIDGET (window), rgba_visual);
+//        gtk_widget_set_app_paintable (GTK_WIDGET (window), TRUE);
 //
-// } </programlisting></informalexample>.
+//        web_view = browser_window_get_web_view (window);
+//        webkit_web_view_set_background_color (web_view, rgba);
+//    }.
 //
 // The function takes the following parameters:
 //
-//    - rgba: RGBA.
+//   - rgba: RGBA.
 //
 func (webView *WebView) SetBackgroundColor(rgba *gdk.RGBA) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.GdkRGBA       // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 	_arg1 = (*C.GdkRGBA)(gextras.StructNative(unsafe.Pointer(rgba)))
 
 	C.webkit_web_view_set_background_color(_arg0, _arg1)
@@ -4345,21 +3237,90 @@ func (webView *WebView) SetBackgroundColor(rgba *gdk.RGBA) {
 	runtime.KeepAlive(rgba)
 }
 
-// SetCustomCharset sets the current custom character encoding override of
-// web_view. The custom character encoding will override any text encoding
-// detected via HTTP headers or META tags. Calling this method will stop any
-// current load operation and reload the current page. Setting the custom
-// character encoding to NULL removes the character encoding override.
+// SetCameraCaptureState: set the camera capture state of a KitWebView.
+//
+// If KitSettings:enable-mediastream is FALSE, this method will have
+// no visible effect. Once the state of the device has been set to
+// WEBKIT_MEDIA_CAPTURE_STATE_NONE it cannot be changed anymore. The page can
+// however request capture again using the mediaDevices API.
 //
 // The function takes the following parameters:
 //
-//    - charset (optional): character encoding name or NULL.
+//   - state: KitMediaCaptureState.
+//
+func (webView *WebView) SetCameraCaptureState(state MediaCaptureState) {
+	var _arg0 *C.WebKitWebView          // out
+	var _arg1 C.WebKitMediaCaptureState // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = C.WebKitMediaCaptureState(state)
+
+	C.webkit_web_view_set_camera_capture_state(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(state)
+}
+
+// SetCorsAllowlist sets the allowlist for CORS.
+//
+// Sets the allowlist for which Cross-Origin Resource Sharing
+// (https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) checks are disabled
+// in web_view. URI patterns must be of the form [protocol]://[host]/path,
+// each component may contain the wildcard character (*) to represent zero or
+// more other characters. All three components are required and must not be
+// omitted from the URI patterns.
+//
+// Disabling CORS checks permits resources from other origins to load
+// allowlisted resources. It does not permit the allowlisted resources to load
+// resources from other origins.
+//
+// If this function is called multiple times, only the allowlist set by the most
+// recent call will be effective.
+//
+// The function takes the following parameters:
+//
+//   - allowlist (optional) of URI patterns, or NULL.
+//
+func (webView *WebView) SetCorsAllowlist(allowlist []string) {
+	var _arg0 *C.WebKitWebView // out
+	var _arg1 **C.gchar        // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	{
+		_arg1 = (**C.gchar)(C.calloc(C.size_t((len(allowlist) + 1)), C.size_t(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg1))
+		{
+			out := unsafe.Slice(_arg1, len(allowlist)+1)
+			var zero *C.gchar
+			out[len(allowlist)] = zero
+			for i := range allowlist {
+				out[i] = (*C.gchar)(unsafe.Pointer(C.CString(allowlist[i])))
+				defer C.free(unsafe.Pointer(out[i]))
+			}
+		}
+	}
+
+	C.webkit_web_view_set_cors_allowlist(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(allowlist)
+}
+
+// SetCustomCharset sets the current custom character encoding override of
+// web_view.
+//
+// The custom character encoding will override any text encoding detected via
+// HTTP headers or META tags. Calling this method will stop any current load
+// operation and reload the current page. Setting the custom character encoding
+// to NULL removes the character encoding override.
+//
+// The function takes the following parameters:
+//
+//   - charset (optional): character encoding name or NULL.
 //
 func (webView *WebView) SetCustomCharset(charset string) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 *C.gchar         // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 	if charset != "" {
 		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(charset)))
 		defer C.free(unsafe.Pointer(_arg1))
@@ -4370,11 +3331,34 @@ func (webView *WebView) SetCustomCharset(charset string) {
 	runtime.KeepAlive(charset)
 }
 
+// SetDisplayCaptureState: set the display capture state of a KitWebView.
+//
+// If KitSettings:enable-mediastream is FALSE, this method will have
+// no visible effect. Once the state of the device has been set to
+// WEBKIT_MEDIA_CAPTURE_STATE_NONE it cannot be changed anymore. The page can
+// however request capture again using the mediaDevices API.
+//
+// The function takes the following parameters:
+//
+//   - state: KitMediaCaptureState.
+//
+func (webView *WebView) SetDisplayCaptureState(state MediaCaptureState) {
+	var _arg0 *C.WebKitWebView          // out
+	var _arg1 C.WebKitMediaCaptureState // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = C.WebKitMediaCaptureState(state)
+
+	C.webkit_web_view_set_display_capture_state(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(state)
+}
+
 // SetEditable sets whether the user is allowed to edit the HTML document.
 //
-// If editable is TRUE, web_view allows the user to edit the HTML document. If
-// editable is FALSE, an element in web_view's document can only be edited if
-// the CONTENTEDITABLE attribute has been set on the element or one of its
+// If editable is TRUE, web_view allows the user to edit the HTML document.
+// If editable is FALSE, an element in web_view's document can only be edited
+// if the CONTENTEDITABLE attribute has been set on the element or one of its
 // parent elements. By default a KitWebView is not editable.
 //
 // Normally, a HTML document is not editable unless the elements within the
@@ -4383,13 +3367,13 @@ func (webView *WebView) SetCustomCharset(charset string) {
 //
 // The function takes the following parameters:
 //
-//    - editable indicating the editable state.
+//   - editable indicating the editable state.
 //
 func (webView *WebView) SetEditable(editable bool) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 C.gboolean       // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 	if editable {
 		_arg1 = C.TRUE
 	}
@@ -4399,21 +3383,23 @@ func (webView *WebView) SetEditable(editable bool) {
 	runtime.KeepAlive(editable)
 }
 
-// SetInputMethodContext: set the KitInputMethodContext to be used by web_view,
-// or NULL to not use any input method. Note that the same KitInputMethodContext
-// can't be set on more than one KitWebView at the same time.
+// SetInputMethodContext: set the KitInputMethodContext to be used by web_view.
+//
+// Set the KitInputMethodContext to be used by web_view, or NULL to not use any
+// input method. Note that the same KitInputMethodContext can't be set on more
+// than one KitWebView at the same time.
 //
 // The function takes the following parameters:
 //
-//    - context (optional) to set, or NULL.
+//   - context (optional) to set, or NULL.
 //
 func (webView *WebView) SetInputMethodContext(context InputMethodContexter) {
 	var _arg0 *C.WebKitWebView            // out
 	var _arg1 *C.WebKitInputMethodContext // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 	if context != nil {
-		_arg1 = (*C.WebKitInputMethodContext)(unsafe.Pointer(externglib.InternObject(context).Native()))
+		_arg1 = (*C.WebKitInputMethodContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
 	}
 
 	C.webkit_web_view_set_input_method_context(_arg0, _arg1)
@@ -4425,13 +3411,13 @@ func (webView *WebView) SetInputMethodContext(context InputMethodContexter) {
 //
 // The function takes the following parameters:
 //
-//    - muted: mute flag.
+//   - muted: mute flag.
 //
 func (webView *WebView) SetIsMuted(muted bool) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 C.gboolean       // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 	if muted {
 		_arg1 = C.TRUE
 	}
@@ -4441,39 +3427,65 @@ func (webView *WebView) SetIsMuted(muted bool) {
 	runtime.KeepAlive(muted)
 }
 
-// SetSettings sets the KitSettings to be applied to web_view. The existing
-// KitSettings of web_view will be replaced by settings. New settings are
-// applied immediately on web_view. The same KitSettings object can be shared by
-// multiple KitWebView<!-- -->s.
+// SetMicrophoneCaptureState: set the microphone capture state of a KitWebView.
+//
+// If KitSettings:enable-mediastream is FALSE, this method will have
+// no visible effect. Once the state of the device has been set to
+// WEBKIT_MEDIA_CAPTURE_STATE_NONE it cannot be changed anymore. The page can
+// however request capture again using the mediaDevices API.
 //
 // The function takes the following parameters:
 //
-//    - settings: KitSettings.
+//   - state: KitMediaCaptureState.
+//
+func (webView *WebView) SetMicrophoneCaptureState(state MediaCaptureState) {
+	var _arg0 *C.WebKitWebView          // out
+	var _arg1 C.WebKitMediaCaptureState // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = C.WebKitMediaCaptureState(state)
+
+	C.webkit_web_view_set_microphone_capture_state(_arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(state)
+}
+
+// SetSettings sets the KitSettings to be applied to web_view.
+//
+// The existing KitSettings of web_view will be replaced by settings. New
+// settings are applied immediately on web_view. The same KitSettings object can
+// be shared by multiple KitWebView<!-- -->s.
+//
+// The function takes the following parameters:
+//
+//   - settings: KitSettings.
 //
 func (webView *WebView) SetSettings(settings *Settings) {
 	var _arg0 *C.WebKitWebView  // out
 	var _arg1 *C.WebKitSettings // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
-	_arg1 = (*C.WebKitSettings)(unsafe.Pointer(externglib.InternObject(settings).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitSettings)(unsafe.Pointer(coreglib.InternObject(settings).Native()))
 
 	C.webkit_web_view_set_settings(_arg0, _arg1)
 	runtime.KeepAlive(webView)
 	runtime.KeepAlive(settings)
 }
 
-// SetZoomLevel: set the zoom level of web_view, i.e. the factor by which the
-// view contents are scaled with respect to their original size.
+// SetZoomLevel: set the zoom level of web_view.
+//
+// Set the zoom level of web_view, i.e. the factor by which the view contents
+// are scaled with respect to their original size.
 //
 // The function takes the following parameters:
 //
-//    - zoomLevel: zoom level.
+//   - zoomLevel: zoom level.
 //
 func (webView *WebView) SetZoomLevel(zoomLevel float64) {
 	var _arg0 *C.WebKitWebView // out
 	var _arg1 C.gdouble        // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 	_arg1 = C.gdouble(zoomLevel)
 
 	C.webkit_web_view_set_zoom_level(_arg0, _arg1)
@@ -4481,28 +3493,735 @@ func (webView *WebView) SetZoomLevel(zoomLevel float64) {
 	runtime.KeepAlive(zoomLevel)
 }
 
-// StopLoading stops any ongoing loading operation in web_view. This method does
-// nothing if no content is being loaded. If there is a loading operation in
-// progress, it will be cancelled and KitWebView::load-failed signal will be
-// emitted with WEBKIT_NETWORK_ERROR_CANCELLED error.
+// StopLoading stops any ongoing loading operation in web_view.
+//
+// This method does nothing if no content is being loaded. If there is a loading
+// operation in progress, it will be cancelled and KitWebView::load-failed
+// signal will be emitted with WEBKIT_NETWORK_ERROR_CANCELLED error.
 func (webView *WebView) StopLoading() {
 	var _arg0 *C.WebKitWebView // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	C.webkit_web_view_stop_loading(_arg0)
 	runtime.KeepAlive(webView)
 }
 
-// TryClose tries to close the web_view. This will fire the onbeforeunload event
-// to ask the user for confirmation to close the page. If there isn't an
-// onbeforeunload event handler or the user confirms to close the page, the
-// KitWebView::close signal is emitted, otherwise nothing happens.
+// TerminateWebProcess terminates the web process associated to web_view.
+//
+// When the web process gets terminated using this method,
+// the KitWebView::web-process-terminated signal is emitted with
+// WEBKIT_WEB_PROCESS_TERMINATED_BY_API as the reason for termination.
+func (webView *WebView) TerminateWebProcess() {
+	var _arg0 *C.WebKitWebView // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+
+	C.webkit_web_view_terminate_web_process(_arg0)
+	runtime.KeepAlive(webView)
+}
+
+// TryClose tries to close the web_view.
+//
+// This will fire the onbeforeunload event to ask the user for confirmation
+// to close the page. If there isn't an onbeforeunload event handler or the
+// user confirms to close the page, the KitWebView::close signal is emitted,
+// otherwise nothing happens.
 func (webView *WebView) TryClose() {
 	var _arg0 *C.WebKitWebView // out
 
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(externglib.InternObject(webView).Native()))
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	C.webkit_web_view_try_close(_arg0)
 	runtime.KeepAlive(webView)
+}
+
+// The function takes the following parameters:
+//
+// The function returns the following values:
+//
+func (webView *WebView) authenticate(request *AuthenticationRequest) bool {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.authenticate
+
+	var _arg0 *C.WebKitWebView               // out
+	var _arg1 *C.WebKitAuthenticationRequest // out
+	var _cret C.gboolean                     // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitAuthenticationRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
+
+	_cret = C._gotk4_webkit24_WebView_virtual_authenticate(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(request)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+func (webView *WebView) close() {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.close
+
+	var _arg0 *C.WebKitWebView // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+
+	C._gotk4_webkit24_WebView_virtual_close(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(webView)
+}
+
+// The function takes the following parameters:
+//
+//   - contextMenu
+//   - event
+//   - hitTestResult
+//
+// The function returns the following values:
+//
+func (webView *WebView) contextMenu(contextMenu *ContextMenu, event *gdk.Event, hitTestResult *HitTestResult) bool {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.context_menu
+
+	var _arg0 *C.WebKitWebView       // out
+	var _arg1 *C.WebKitContextMenu   // out
+	var _arg2 *C.GdkEvent            // out
+	var _arg3 *C.WebKitHitTestResult // out
+	var _cret C.gboolean             // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitContextMenu)(unsafe.Pointer(coreglib.InternObject(contextMenu).Native()))
+	_arg2 = (*C.GdkEvent)(gextras.StructNative(unsafe.Pointer(event)))
+	_arg3 = (*C.WebKitHitTestResult)(unsafe.Pointer(coreglib.InternObject(hitTestResult).Native()))
+
+	_cret = C._gotk4_webkit24_WebView_virtual_context_menu(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(contextMenu)
+	runtime.KeepAlive(event)
+	runtime.KeepAlive(hitTestResult)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+func (webView *WebView) contextMenuDismissed() {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.context_menu_dismissed
+
+	var _arg0 *C.WebKitWebView // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+
+	C._gotk4_webkit24_WebView_virtual_context_menu_dismissed(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(webView)
+}
+
+// The function takes the following parameters:
+//
+//   - decision
+//   - typ
+//
+// The function returns the following values:
+//
+func (webView *WebView) decidePolicy(decision PolicyDecisioner, typ PolicyDecisionType) bool {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.decide_policy
+
+	var _arg0 *C.WebKitWebView           // out
+	var _arg1 *C.WebKitPolicyDecision    // out
+	var _arg2 C.WebKitPolicyDecisionType // out
+	var _cret C.gboolean                 // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitPolicyDecision)(unsafe.Pointer(coreglib.InternObject(decision).Native()))
+	_arg2 = C.WebKitPolicyDecisionType(typ)
+
+	_cret = C._gotk4_webkit24_WebView_virtual_decide_policy(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(decision)
+	runtime.KeepAlive(typ)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// The function returns the following values:
+//
+func (webView *WebView) enterFullscreen() bool {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.enter_fullscreen
+
+	var _arg0 *C.WebKitWebView // out
+	var _cret C.gboolean       // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+
+	_cret = C._gotk4_webkit24_WebView_virtual_enter_fullscreen(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(webView)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// The function takes the following parameters:
+//
+func (webView *WebView) insecureContentDetected(event InsecureContentEvent) {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.insecure_content_detected
+
+	var _arg0 *C.WebKitWebView             // out
+	var _arg1 C.WebKitInsecureContentEvent // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = C.WebKitInsecureContentEvent(event)
+
+	C._gotk4_webkit24_WebView_virtual_insecure_content_detected(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(event)
+}
+
+// The function returns the following values:
+//
+func (webView *WebView) leaveFullscreen() bool {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.leave_fullscreen
+
+	var _arg0 *C.WebKitWebView // out
+	var _cret C.gboolean       // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+
+	_cret = C._gotk4_webkit24_WebView_virtual_leave_fullscreen(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(webView)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// The function takes the following parameters:
+//
+func (webView *WebView) loadChanged(loadEvent LoadEvent) {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.load_changed
+
+	var _arg0 *C.WebKitWebView  // out
+	var _arg1 C.WebKitLoadEvent // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = C.WebKitLoadEvent(loadEvent)
+
+	C._gotk4_webkit24_WebView_virtual_load_changed(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(loadEvent)
+}
+
+// The function takes the following parameters:
+//
+//   - loadEvent
+//   - failingUri
+//   - err
+//
+// The function returns the following values:
+//
+func (webView *WebView) loadFailed(loadEvent LoadEvent, failingUri string, err error) bool {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.load_failed
+
+	var _arg0 *C.WebKitWebView  // out
+	var _arg1 C.WebKitLoadEvent // out
+	var _arg2 *C.gchar          // out
+	var _arg3 *C.GError         // out
+	var _cret C.gboolean        // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = C.WebKitLoadEvent(loadEvent)
+	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(failingUri)))
+	defer C.free(unsafe.Pointer(_arg2))
+	if err != nil {
+		_arg3 = (*C.GError)(gerror.New(err))
+	}
+
+	_cret = C._gotk4_webkit24_WebView_virtual_load_failed(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(loadEvent)
+	runtime.KeepAlive(failingUri)
+	runtime.KeepAlive(err)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// The function takes the following parameters:
+//
+//   - failingUri
+//   - certificate
+//   - errors
+//
+// The function returns the following values:
+//
+func (webView *WebView) loadFailedWithTLSErrors(failingUri string, certificate gio.TLSCertificater, errors gio.TLSCertificateFlags) bool {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.load_failed_with_tls_errors
+
+	var _arg0 *C.WebKitWebView       // out
+	var _arg1 *C.gchar               // out
+	var _arg2 *C.GTlsCertificate     // out
+	var _arg3 C.GTlsCertificateFlags // out
+	var _cret C.gboolean             // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(failingUri)))
+	defer C.free(unsafe.Pointer(_arg1))
+	_arg2 = (*C.GTlsCertificate)(unsafe.Pointer(coreglib.InternObject(certificate).Native()))
+	_arg3 = C.GTlsCertificateFlags(errors)
+
+	_cret = C._gotk4_webkit24_WebView_virtual_load_failed_with_tls_errors(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(failingUri)
+	runtime.KeepAlive(certificate)
+	runtime.KeepAlive(errors)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// The function takes the following parameters:
+//
+//   - hitTestResult
+//   - modifiers
+//
+func (webView *WebView) mouseTargetChanged(hitTestResult *HitTestResult, modifiers uint) {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.mouse_target_changed
+
+	var _arg0 *C.WebKitWebView       // out
+	var _arg1 *C.WebKitHitTestResult // out
+	var _arg2 C.guint                // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitHitTestResult)(unsafe.Pointer(coreglib.InternObject(hitTestResult).Native()))
+	_arg2 = C.guint(modifiers)
+
+	C._gotk4_webkit24_WebView_virtual_mouse_target_changed(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(hitTestResult)
+	runtime.KeepAlive(modifiers)
+}
+
+// The function takes the following parameters:
+//
+// The function returns the following values:
+//
+func (webView *WebView) permissionRequest(permissionRequest PermissionRequester) bool {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.permission_request
+
+	var _arg0 *C.WebKitWebView           // out
+	var _arg1 *C.WebKitPermissionRequest // out
+	var _cret C.gboolean                 // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitPermissionRequest)(unsafe.Pointer(coreglib.InternObject(permissionRequest).Native()))
+
+	_cret = C._gotk4_webkit24_WebView_virtual_permission_request(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(permissionRequest)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// The function takes the following parameters:
+//
+// The function returns the following values:
+//
+func (webView *WebView) print(printOperation *PrintOperation) bool {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.print
+
+	var _arg0 *C.WebKitWebView        // out
+	var _arg1 *C.WebKitPrintOperation // out
+	var _cret C.gboolean              // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitPrintOperation)(unsafe.Pointer(coreglib.InternObject(printOperation).Native()))
+
+	_cret = C._gotk4_webkit24_WebView_virtual_print(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(printOperation)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// The function takes the following parameters:
+//
+// The function returns the following values:
+//
+func (webView *WebView) queryPermissionState(query *PermissionStateQuery) bool {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.query_permission_state
+
+	var _arg0 *C.WebKitWebView              // out
+	var _arg1 *C.WebKitPermissionStateQuery // out
+	var _cret C.gboolean                    // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitPermissionStateQuery)(gextras.StructNative(unsafe.Pointer(query)))
+
+	_cret = C._gotk4_webkit24_WebView_virtual_query_permission_state(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(query)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+func (webView *WebView) readyToShow() {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.ready_to_show
+
+	var _arg0 *C.WebKitWebView // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+
+	C._gotk4_webkit24_WebView_virtual_ready_to_show(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(webView)
+}
+
+// The function takes the following parameters:
+//
+//   - resource
+//   - request
+//
+func (webView *WebView) resourceLoadStarted(resource *WebResource, request *URIRequest) {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.resource_load_started
+
+	var _arg0 *C.WebKitWebView     // out
+	var _arg1 *C.WebKitWebResource // out
+	var _arg2 *C.WebKitURIRequest  // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitWebResource)(unsafe.Pointer(coreglib.InternObject(resource).Native()))
+	_arg2 = (*C.WebKitURIRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
+
+	C._gotk4_webkit24_WebView_virtual_resource_load_started(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(resource)
+	runtime.KeepAlive(request)
+}
+
+func (webView *WebView) runAsModal() {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.run_as_modal
+
+	var _arg0 *C.WebKitWebView // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+
+	C._gotk4_webkit24_WebView_virtual_run_as_modal(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(webView)
+}
+
+// The function takes the following parameters:
+//
+// The function returns the following values:
+//
+func (webView *WebView) runColorChooser(request *ColorChooserRequest) bool {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.run_color_chooser
+
+	var _arg0 *C.WebKitWebView             // out
+	var _arg1 *C.WebKitColorChooserRequest // out
+	var _cret C.gboolean                   // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitColorChooserRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
+
+	_cret = C._gotk4_webkit24_WebView_virtual_run_color_chooser(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(request)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// The function takes the following parameters:
+//
+// The function returns the following values:
+//
+func (webView *WebView) runFileChooser(request *FileChooserRequest) bool {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.run_file_chooser
+
+	var _arg0 *C.WebKitWebView            // out
+	var _arg1 *C.WebKitFileChooserRequest // out
+	var _cret C.gboolean                  // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitFileChooserRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
+
+	_cret = C._gotk4_webkit24_WebView_virtual_run_file_chooser(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(request)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// The function takes the following parameters:
+//
+// The function returns the following values:
+//
+func (webView *WebView) scriptDialog(dialog *ScriptDialog) bool {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.script_dialog
+
+	var _arg0 *C.WebKitWebView      // out
+	var _arg1 *C.WebKitScriptDialog // out
+	var _cret C.gboolean            // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitScriptDialog)(gextras.StructNative(unsafe.Pointer(dialog)))
+
+	_cret = C._gotk4_webkit24_WebView_virtual_script_dialog(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(dialog)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// The function takes the following parameters:
+//
+// The function returns the following values:
+//
+func (webView *WebView) showNotification(notification *Notification) bool {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.show_notification
+
+	var _arg0 *C.WebKitWebView      // out
+	var _arg1 *C.WebKitNotification // out
+	var _cret C.gboolean            // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitNotification)(unsafe.Pointer(coreglib.InternObject(notification).Native()))
+
+	_cret = C._gotk4_webkit24_WebView_virtual_show_notification(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(notification)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// The function takes the following parameters:
+//
+//   - menu
+//   - event
+//   - rectangle
+//
+// The function returns the following values:
+//
+func (webView *WebView) showOptionMenu(menu *OptionMenu, event *gdk.Event, rectangle *gdk.Rectangle) bool {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.show_option_menu
+
+	var _arg0 *C.WebKitWebView    // out
+	var _arg1 *C.WebKitOptionMenu // out
+	var _arg2 *C.GdkEvent         // out
+	var _arg3 *C.GdkRectangle     // out
+	var _cret C.gboolean          // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitOptionMenu)(unsafe.Pointer(coreglib.InternObject(menu).Native()))
+	_arg2 = (*C.GdkEvent)(gextras.StructNative(unsafe.Pointer(event)))
+	_arg3 = (*C.GdkRectangle)(gextras.StructNative(unsafe.Pointer(rectangle)))
+
+	_cret = C._gotk4_webkit24_WebView_virtual_show_option_menu(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(menu)
+	runtime.KeepAlive(event)
+	runtime.KeepAlive(rectangle)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// The function takes the following parameters:
+//
+func (webView *WebView) submitForm(request *FormSubmissionRequest) {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.submit_form
+
+	var _arg0 *C.WebKitWebView               // out
+	var _arg1 *C.WebKitFormSubmissionRequest // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitFormSubmissionRequest)(unsafe.Pointer(coreglib.InternObject(request).Native()))
+
+	C._gotk4_webkit24_WebView_virtual_submit_form(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(request)
+}
+
+// The function takes the following parameters:
+//
+// The function returns the following values:
+//
+func (webView *WebView) userMessageReceived(message *UserMessage) bool {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.user_message_received
+
+	var _arg0 *C.WebKitWebView     // out
+	var _arg1 *C.WebKitUserMessage // out
+	var _cret C.gboolean           // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = (*C.WebKitUserMessage)(unsafe.Pointer(coreglib.InternObject(message).Native()))
+
+	_cret = C._gotk4_webkit24_WebView_virtual_user_message_received(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(message)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// The function returns the following values:
+//
+func (webView *WebView) webProcessCrashed() bool {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.web_process_crashed
+
+	var _arg0 *C.WebKitWebView // out
+	var _cret C.gboolean       // in
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+
+	_cret = C._gotk4_webkit24_WebView_virtual_web_process_crashed(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(webView)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// The function takes the following parameters:
+//
+func (webView *WebView) webProcessTerminated(reason WebProcessTerminationReason) {
+	gclass := (*C.WebKitWebViewClass)(coreglib.PeekParentClass(webView))
+	fnarg := gclass.web_process_terminated
+
+	var _arg0 *C.WebKitWebView                    // out
+	var _arg1 C.WebKitWebProcessTerminationReason // out
+
+	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
+	_arg1 = C.WebKitWebProcessTerminationReason(reason)
+
+	C._gotk4_webkit24_WebView_virtual_web_process_terminated(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(webView)
+	runtime.KeepAlive(reason)
+}
+
+// WebViewClass: instance of this type is always passed by reference.
+type WebViewClass struct {
+	*webViewClass
+}
+
+// webViewClass is the struct that's finalized.
+type webViewClass struct {
+	native *C.WebKitWebViewClass
+}
+
+func (w *WebViewClass) Parent() *WebViewBaseClass {
+	valptr := &w.native.parent
+	var _v *WebViewBaseClass // out
+	_v = (*WebViewBaseClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
+	return _v
 }

@@ -4,7 +4,6 @@ package soup
 
 import (
 	"context"
-	"fmt"
 	"runtime"
 	"unsafe"
 
@@ -12,7 +11,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
@@ -20,67 +19,64 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
-// extern guint _gotk4_soup2_SessionClass_send_message(SoupSession*, SoupMessage*);
-// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
-// extern void _gotk4_soup2_AddressCallback(SoupAddress*, guint, gpointer);
-// extern void _gotk4_soup2_SessionCallback(SoupSession*, SoupMessage*, gpointer);
-// extern void _gotk4_soup2_SessionClass_auth_required(SoupSession*, SoupMessage*, SoupAuth*, gboolean);
-// extern void _gotk4_soup2_SessionClass_authenticate(SoupSession*, SoupMessage*, SoupAuth*, gboolean);
-// extern void _gotk4_soup2_SessionClass_cancel_message(SoupSession*, SoupMessage*, guint);
-// extern void _gotk4_soup2_SessionClass_flush_queue(SoupSession*);
-// extern void _gotk4_soup2_SessionClass_kick(SoupSession*);
-// extern void _gotk4_soup2_SessionClass_request_started(SoupSession*, SoupMessage*, SoupSocket*);
-// extern void _gotk4_soup2_SessionClass_requeue_message(SoupSession*, SoupMessage*);
-// extern void _gotk4_soup2_SessionConnectProgressCallback(SoupSession*, GSocketClientEvent, GIOStream*, gpointer);
-// extern void _gotk4_soup2_Session_ConnectAuthenticate(gpointer, SoupMessage*, SoupAuth*, gboolean, guintptr);
-// extern void _gotk4_soup2_Session_ConnectConnectionCreated(gpointer, GObject, guintptr);
-// extern void _gotk4_soup2_Session_ConnectRequestQueued(gpointer, SoupMessage*, guintptr);
-// extern void _gotk4_soup2_Session_ConnectRequestStarted(gpointer, SoupMessage*, SoupSocket*, guintptr);
-// extern void _gotk4_soup2_Session_ConnectRequestUnqueued(gpointer, SoupMessage*, guintptr);
 // extern void _gotk4_soup2_Session_ConnectTunneling(gpointer, GObject, guintptr);
+// extern void _gotk4_soup2_Session_ConnectRequestUnqueued(gpointer, SoupMessage*, guintptr);
+// extern void _gotk4_soup2_Session_ConnectRequestStarted(gpointer, SoupMessage*, SoupSocket*, guintptr);
+// extern void _gotk4_soup2_Session_ConnectRequestQueued(gpointer, SoupMessage*, guintptr);
+// extern void _gotk4_soup2_Session_ConnectConnectionCreated(gpointer, GObject, guintptr);
+// extern void _gotk4_soup2_Session_ConnectAuthenticate(gpointer, SoupMessage*, SoupAuth*, gboolean, guintptr);
+// extern void _gotk4_soup2_SessionClass_requeue_message(SoupSession*, SoupMessage*);
+// extern void _gotk4_soup2_SessionClass_request_started(SoupSession*, SoupMessage*, SoupSocket*);
+// extern void _gotk4_soup2_SessionClass_kick(SoupSession*);
+// extern void _gotk4_soup2_SessionClass_flush_queue(SoupSession*);
+// extern void _gotk4_soup2_SessionClass_cancel_message(SoupSession*, SoupMessage*, guint);
+// extern void _gotk4_soup2_SessionClass_authenticate(SoupSession*, SoupMessage*, SoupAuth*, gboolean);
+// extern void _gotk4_soup2_SessionClass_auth_required(SoupSession*, SoupMessage*, SoupAuth*, gboolean);
+// extern void _gotk4_soup2_SessionCallback(SoupSession*, SoupMessage*, gpointer);
+// extern void _gotk4_soup2_AddressCallback(SoupAddress*, guint, gpointer);
+// extern guint _gotk4_soup2_SessionClass_send_message(SoupSession*, SoupMessage*);
+// guint _gotk4_soup2_Session_virtual_send_message(void* fnptr, SoupSession* arg0, SoupMessage* arg1) {
+//   return ((guint (*)(SoupSession*, SoupMessage*))(fnptr))(arg0, arg1);
+// };
+// void _gotk4_soup2_Session_virtual_auth_required(void* fnptr, SoupSession* arg0, SoupMessage* arg1, SoupAuth* arg2, gboolean arg3) {
+//   ((void (*)(SoupSession*, SoupMessage*, SoupAuth*, gboolean))(fnptr))(arg0, arg1, arg2, arg3);
+// };
+// void _gotk4_soup2_Session_virtual_authenticate(void* fnptr, SoupSession* arg0, SoupMessage* arg1, SoupAuth* arg2, gboolean arg3) {
+//   ((void (*)(SoupSession*, SoupMessage*, SoupAuth*, gboolean))(fnptr))(arg0, arg1, arg2, arg3);
+// };
+// void _gotk4_soup2_Session_virtual_cancel_message(void* fnptr, SoupSession* arg0, SoupMessage* arg1, guint arg2) {
+//   ((void (*)(SoupSession*, SoupMessage*, guint))(fnptr))(arg0, arg1, arg2);
+// };
+// void _gotk4_soup2_Session_virtual_flush_queue(void* fnptr, SoupSession* arg0) {
+//   ((void (*)(SoupSession*))(fnptr))(arg0);
+// };
+// void _gotk4_soup2_Session_virtual_kick(void* fnptr, SoupSession* arg0) {
+//   ((void (*)(SoupSession*))(fnptr))(arg0);
+// };
+// void _gotk4_soup2_Session_virtual_queue_message(void* fnptr, SoupSession* arg0, SoupMessage* arg1, SoupSessionCallback arg2, gpointer arg3) {
+//   ((void (*)(SoupSession*, SoupMessage*, SoupSessionCallback, gpointer))(fnptr))(arg0, arg1, arg2, arg3);
+// };
+// void _gotk4_soup2_Session_virtual_request_started(void* fnptr, SoupSession* arg0, SoupMessage* arg1, SoupSocket* arg2) {
+//   ((void (*)(SoupSession*, SoupMessage*, SoupSocket*))(fnptr))(arg0, arg1, arg2);
+// };
+// void _gotk4_soup2_Session_virtual_requeue_message(void* fnptr, SoupSession* arg0, SoupMessage* arg1) {
+//   ((void (*)(SoupSession*, SoupMessage*))(fnptr))(arg0, arg1);
+// };
 import "C"
 
-// glib.Type values for soup-session.go.
+// GType values.
 var (
-	GTypeRequestError = externglib.Type(C.soup_request_error_get_type())
-	GTypeSession      = externglib.Type(C.soup_session_get_type())
+	GTypeSession = coreglib.Type(C.soup_session_get_type())
 )
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeRequestError, F: marshalRequestError},
-		{T: GTypeSession, F: marshalSession},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeSession, F: marshalSession},
 	})
 }
 
-// SESSION_ACCEPT_LANGUAGE alias for the Session:accept-language property, qv.
-const SESSION_ACCEPT_LANGUAGE = "accept-language"
-
-// SESSION_ACCEPT_LANGUAGE_AUTO alias for the Session:accept-language-auto
-// property, qv.
-const SESSION_ACCEPT_LANGUAGE_AUTO = "accept-language-auto"
-
-// SESSION_ADD_FEATURE alias for the Session:add-feature property, qv.
-const SESSION_ADD_FEATURE = "add-feature"
-
-// SESSION_ADD_FEATURE_BY_TYPE alias for the Session:add-feature-by-type
-// property, qv.
-const SESSION_ADD_FEATURE_BY_TYPE = "add-feature-by-type"
-
 // SESSION_ASYNC_CONTEXT alias for the Session:async-context property, qv.
 const SESSION_ASYNC_CONTEXT = "async-context"
-
-// SESSION_HTTPS_ALIASES alias for the Session:https-aliases property, qv.
-const SESSION_HTTPS_ALIASES = "https-aliases"
-
-// SESSION_HTTP_ALIASES alias for the Session:http-aliases property, qv.
-const SESSION_HTTP_ALIASES = "http-aliases"
-
-// SESSION_IDLE_TIMEOUT alias for the Session:idle-timeout property, qv.
-const SESSION_IDLE_TIMEOUT = "idle-timeout"
-
-// SESSION_LOCAL_ADDRESS alias for the Session:local-address property, qv.
-const SESSION_LOCAL_ADDRESS = "local-address"
 
 // SESSION_MAX_CONNS alias for the Session:max-conns property, qv.
 const SESSION_MAX_CONNS = "max-conns"
@@ -95,28 +91,11 @@ const SESSION_PROXY_RESOLVER = "proxy-resolver"
 // SESSION_PROXY_URI alias for the Session:proxy-uri property, qv.
 const SESSION_PROXY_URI = "proxy-uri"
 
-// SESSION_REMOVE_FEATURE_BY_TYPE alias for the Session:remove-feature-by-type
-// property, qv.
-const SESSION_REMOVE_FEATURE_BY_TYPE = "remove-feature-by-type"
-
 // SESSION_SSL_CA_FILE alias for the Session:ssl-ca-file property, qv.
 const SESSION_SSL_CA_FILE = "ssl-ca-file"
 
-// SESSION_SSL_STRICT alias for the Session:ssl-strict property, qv.
-const SESSION_SSL_STRICT = "ssl-strict"
-
-// SESSION_SSL_USE_SYSTEM_CA_FILE alias for the Session:ssl-use-system-ca-file
-// property, qv.
-const SESSION_SSL_USE_SYSTEM_CA_FILE = "ssl-use-system-ca-file"
-
 // SESSION_TIMEOUT alias for the Session:timeout property, qv.
 const SESSION_TIMEOUT = "timeout"
-
-// SESSION_TLS_DATABASE alias for the Session:tls-database property, qv.
-const SESSION_TLS_DATABASE = "tls-database"
-
-// SESSION_TLS_INTERACTION alias for the Session:tls-interaction property, qv.
-const SESSION_TLS_INTERACTION = "tls-interaction"
 
 // SESSION_USER_AGENT alias for the Session:user-agent property, qv.
 const SESSION_USER_AGENT = "user-agent"
@@ -124,134 +103,33 @@ const SESSION_USER_AGENT = "user-agent"
 // SESSION_USE_NTLM alias for the Session:use-ntlm property, qv.
 const SESSION_USE_NTLM = "use-ntlm"
 
-// SESSION_USE_THREAD_CONTEXT alias for the Session:use-thread-context property,
-// qv.
-const SESSION_USE_THREAD_CONTEXT = "use-thread-context"
-
-// RequestError: Request error.
-type RequestError C.gint
-
-const (
-	// RequestErrorBadURI: URI could not be parsed.
-	RequestErrorBadURI RequestError = iota
-	// RequestErrorUnsupportedURIScheme: URI scheme is not supported by this
-	// Session.
-	RequestErrorUnsupportedURIScheme
-	// RequestErrorParsing server's response could not be parsed.
-	RequestErrorParsing
-	// RequestErrorEncoding server's response was in an unsupported format.
-	RequestErrorEncoding
-)
-
-func marshalRequestError(p uintptr) (interface{}, error) {
-	return RequestError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
-}
-
-// String returns the name in string for RequestError.
-func (r RequestError) String() string {
-	switch r {
-	case RequestErrorBadURI:
-		return "BadURI"
-	case RequestErrorUnsupportedURIScheme:
-		return "UnsupportedURIScheme"
-	case RequestErrorParsing:
-		return "Parsing"
-	case RequestErrorEncoding:
-		return "Encoding"
-	default:
-		return fmt.Sprintf("RequestError(%d)", r)
-	}
-}
-
 // SessionCallback: prototype for the callback passed to
 // soup_session_queue_message(), qv.
 type SessionCallback func(session *Session, msg *Message)
 
-//export _gotk4_soup2_SessionCallback
-func _gotk4_soup2_SessionCallback(arg1 *C.SoupSession, arg2 *C.SoupMessage, arg3 C.gpointer) {
-	var fn SessionCallback
-	{
-		v := gbox.Get(uintptr(arg3))
-		if v == nil {
-			panic(`callback not found`)
-		}
-		fn = v.(SessionCallback)
-	}
-
-	var _session *Session // out
-	var _msg *Message     // out
-
-	_session = wrapSession(externglib.Take(unsafe.Pointer(arg1)))
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg2)))
-
-	fn(_session, _msg)
-}
-
-// SessionConnectProgressCallback: prototype for the progress callback passed to
-// soup_session_connect_async().
-type SessionConnectProgressCallback func(session *Session, event gio.SocketClientEvent, connection gio.IOStreamer)
-
-//export _gotk4_soup2_SessionConnectProgressCallback
-func _gotk4_soup2_SessionConnectProgressCallback(arg1 *C.SoupSession, arg2 C.GSocketClientEvent, arg3 *C.GIOStream, arg4 C.gpointer) {
-	var fn SessionConnectProgressCallback
-	{
-		v := gbox.Get(uintptr(arg4))
-		if v == nil {
-			panic(`callback not found`)
-		}
-		fn = v.(SessionConnectProgressCallback)
-	}
-
-	var _session *Session            // out
-	var _event gio.SocketClientEvent // out
-	var _connection gio.IOStreamer   // out
-
-	_session = wrapSession(externglib.Take(unsafe.Pointer(arg1)))
-	_event = gio.SocketClientEvent(arg2)
-	{
-		objptr := unsafe.Pointer(arg3)
-		if objptr == nil {
-			panic("object of type gio.IOStreamer is nil")
-		}
-
-		object := externglib.Take(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
-			_, ok := obj.(gio.IOStreamer)
-			return ok
-		})
-		rv, ok := casted.(gio.IOStreamer)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.IOStreamer")
-		}
-		_connection = rv
-	}
-
-	fn(_session, _event, _connection)
-}
-
-// SessionOverrider contains methods that are overridable.
-type SessionOverrider interface {
+// SessionOverrides contains methods that are overridable.
+type SessionOverrides struct {
 	// The function takes the following parameters:
 	//
-	//    - msg
-	//    - auth
-	//    - retrying
+	//   - msg
+	//   - auth
+	//   - retrying
 	//
-	AuthRequired(msg *Message, auth Auther, retrying bool)
+	AuthRequired func(msg *Message, auth Auther, retrying bool)
 	// The function takes the following parameters:
 	//
-	//    - msg
-	//    - auth
-	//    - retrying
+	//   - msg
+	//   - auth
+	//   - retrying
 	//
-	Authenticate(msg *Message, auth Auther, retrying bool)
-	// CancelMessage causes session to immediately finish processing msg
-	// (regardless of its current state) with a final status_code of
-	// status_code. You may call this at any time after handing msg off to
-	// session; if session has started sending the request but has not yet
-	// received the complete response, then it will close the request's
-	// connection. Note that with requests that have side effects (eg,
-	// <literal>POST</literal>, <literal>PUT</literal>,
+	Authenticate func(msg *Message, auth Auther, retrying bool)
+	// CancelMessage causes session to immediately finish processing
+	// msg (regardless of its current state) with a final status_code
+	// of status_code. You may call this at any time after handing msg
+	// off to session; if session has started sending the request but
+	// has not yet received the complete response, then it will close
+	// the request's connection. Note that with requests that have side
+	// effects (eg, <literal>POST</literal>, <literal>PUT</literal>,
 	// <literal>DELETE</literal>) it is possible that you might cancel the
 	// request after the server acts on it, but before it returns a response,
 	// leaving the remote resource in an unknown state.
@@ -268,27 +146,27 @@ type SessionOverrider interface {
 	//
 	// The function takes the following parameters:
 	//
-	//    - msg: message to cancel.
-	//    - statusCode status code to set on msg (generally
-	//      SOUP_STATUS_CANCELLED).
+	//   - msg: message to cancel.
+	//   - statusCode status code to set on msg (generally
+	//     SOUP_STATUS_CANCELLED).
 	//
-	CancelMessage(msg *Message, statusCode uint)
-	FlushQueue()
-	Kick()
+	CancelMessage func(msg *Message, statusCode uint)
+	FlushQueue    func()
+	Kick          func()
 	// The function takes the following parameters:
 	//
-	//    - msg
-	//    - socket
+	//   - msg
+	//   - socket
 	//
-	RequestStarted(msg *Message, socket *Socket)
+	RequestStarted func(msg *Message, socket *Socket)
 	// RequeueMessage: this causes msg to be placed back on the queue to be
 	// attempted again.
 	//
 	// The function takes the following parameters:
 	//
-	//    - msg: message to requeue.
+	//   - msg: message to requeue.
 	//
-	RequeueMessage(msg *Message)
+	RequeueMessage func(msg *Message)
 	// SendMessage: synchronously send msg. This call will not return until the
 	// transfer is finished successfully or there is an unrecoverable error.
 	//
@@ -304,280 +182,101 @@ type SessionOverrider interface {
 	//
 	// The function takes the following parameters:
 	//
-	//    - msg: message to send.
+	//   - msg: message to send.
 	//
 	// The function returns the following values:
 	//
-	//    - guint: HTTP status code of the response.
+	//   - guint: HTTP status code of the response.
 	//
-	SendMessage(msg *Message) uint
+	SendMessage func(msg *Message) uint
+}
+
+func defaultSessionOverrides(v *Session) SessionOverrides {
+	return SessionOverrides{
+		AuthRequired:   v.authRequired,
+		Authenticate:   v.authenticate,
+		CancelMessage:  v.cancelMessage,
+		FlushQueue:     v.flushQueue,
+		Kick:           v.kick,
+		RequestStarted: v.requestStarted,
+		RequeueMessage: v.requeueMessage,
+		SendMessage:    v.sendMessage,
+	}
 }
 
 type Session struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 }
 
 var (
-	_ externglib.Objector = (*Session)(nil)
+	_ coreglib.Objector = (*Session)(nil)
 )
 
-func classInitSessioner(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
+func init() {
+	coreglib.RegisterClassInfo[*Session, *SessionClass, SessionOverrides](
+		GTypeSession,
+		initSessionClass,
+		wrapSession,
+		defaultSessionOverrides,
+	)
+}
 
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
+func initSessionClass(gclass unsafe.Pointer, overrides SessionOverrides, classInitFunc func(*SessionClass)) {
+	pclass := (*C.SoupSessionClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeSession))))
 
-	goval := gbox.Get(uintptr(data))
-	pclass := (*C.SoupSessionClass)(unsafe.Pointer(gclassPtr))
-	// gclass := (*C.GTypeClass)(unsafe.Pointer(gclassPtr))
-	// pclass := (*C.SoupSessionClass)(unsafe.Pointer(C.g_type_class_peek_parent(gclass)))
-
-	if _, ok := goval.(interface {
-		AuthRequired(msg *Message, auth Auther, retrying bool)
-	}); ok {
+	if overrides.AuthRequired != nil {
 		pclass.auth_required = (*[0]byte)(C._gotk4_soup2_SessionClass_auth_required)
 	}
 
-	if _, ok := goval.(interface {
-		Authenticate(msg *Message, auth Auther, retrying bool)
-	}); ok {
+	if overrides.Authenticate != nil {
 		pclass.authenticate = (*[0]byte)(C._gotk4_soup2_SessionClass_authenticate)
 	}
 
-	if _, ok := goval.(interface {
-		CancelMessage(msg *Message, statusCode uint)
-	}); ok {
+	if overrides.CancelMessage != nil {
 		pclass.cancel_message = (*[0]byte)(C._gotk4_soup2_SessionClass_cancel_message)
 	}
 
-	if _, ok := goval.(interface{ FlushQueue() }); ok {
+	if overrides.FlushQueue != nil {
 		pclass.flush_queue = (*[0]byte)(C._gotk4_soup2_SessionClass_flush_queue)
 	}
 
-	if _, ok := goval.(interface{ Kick() }); ok {
+	if overrides.Kick != nil {
 		pclass.kick = (*[0]byte)(C._gotk4_soup2_SessionClass_kick)
 	}
 
-	if _, ok := goval.(interface {
-		RequestStarted(msg *Message, socket *Socket)
-	}); ok {
+	if overrides.RequestStarted != nil {
 		pclass.request_started = (*[0]byte)(C._gotk4_soup2_SessionClass_request_started)
 	}
 
-	if _, ok := goval.(interface{ RequeueMessage(msg *Message) }); ok {
+	if overrides.RequeueMessage != nil {
 		pclass.requeue_message = (*[0]byte)(C._gotk4_soup2_SessionClass_requeue_message)
 	}
 
-	if _, ok := goval.(interface{ SendMessage(msg *Message) uint }); ok {
+	if overrides.SendMessage != nil {
 		pclass.send_message = (*[0]byte)(C._gotk4_soup2_SessionClass_send_message)
 	}
-}
 
-//export _gotk4_soup2_SessionClass_auth_required
-func _gotk4_soup2_SessionClass_auth_required(arg0 *C.SoupSession, arg1 *C.SoupMessage, arg2 *C.SoupAuth, arg3 C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		AuthRequired(msg *Message, auth Auther, retrying bool)
-	})
-
-	var _msg *Message  // out
-	var _auth Auther   // out
-	var _retrying bool // out
-
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-	{
-		objptr := unsafe.Pointer(arg2)
-		if objptr == nil {
-			panic("object of type soup.Auther is nil")
-		}
-
-		object := externglib.Take(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
-			_, ok := obj.(Auther)
-			return ok
-		})
-		rv, ok := casted.(Auther)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.Auther")
-		}
-		_auth = rv
+	if classInitFunc != nil {
+		class := (*SessionClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
 	}
-	if arg3 != 0 {
-		_retrying = true
-	}
-
-	iface.AuthRequired(_msg, _auth, _retrying)
 }
 
-//export _gotk4_soup2_SessionClass_authenticate
-func _gotk4_soup2_SessionClass_authenticate(arg0 *C.SoupSession, arg1 *C.SoupMessage, arg2 *C.SoupAuth, arg3 C.gboolean) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		Authenticate(msg *Message, auth Auther, retrying bool)
-	})
-
-	var _msg *Message  // out
-	var _auth Auther   // out
-	var _retrying bool // out
-
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-	{
-		objptr := unsafe.Pointer(arg2)
-		if objptr == nil {
-			panic("object of type soup.Auther is nil")
-		}
-
-		object := externglib.Take(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
-			_, ok := obj.(Auther)
-			return ok
-		})
-		rv, ok := casted.(Auther)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.Auther")
-		}
-		_auth = rv
-	}
-	if arg3 != 0 {
-		_retrying = true
-	}
-
-	iface.Authenticate(_msg, _auth, _retrying)
-}
-
-//export _gotk4_soup2_SessionClass_cancel_message
-func _gotk4_soup2_SessionClass_cancel_message(arg0 *C.SoupSession, arg1 *C.SoupMessage, arg2 C.guint) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		CancelMessage(msg *Message, statusCode uint)
-	})
-
-	var _msg *Message    // out
-	var _statusCode uint // out
-
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-	_statusCode = uint(arg2)
-
-	iface.CancelMessage(_msg, _statusCode)
-}
-
-//export _gotk4_soup2_SessionClass_flush_queue
-func _gotk4_soup2_SessionClass_flush_queue(arg0 *C.SoupSession) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ FlushQueue() })
-
-	iface.FlushQueue()
-}
-
-//export _gotk4_soup2_SessionClass_kick
-func _gotk4_soup2_SessionClass_kick(arg0 *C.SoupSession) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ Kick() })
-
-	iface.Kick()
-}
-
-//export _gotk4_soup2_SessionClass_request_started
-func _gotk4_soup2_SessionClass_request_started(arg0 *C.SoupSession, arg1 *C.SoupMessage, arg2 *C.SoupSocket) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface {
-		RequestStarted(msg *Message, socket *Socket)
-	})
-
-	var _msg *Message   // out
-	var _socket *Socket // out
-
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-	_socket = wrapSocket(externglib.Take(unsafe.Pointer(arg2)))
-
-	iface.RequestStarted(_msg, _socket)
-}
-
-//export _gotk4_soup2_SessionClass_requeue_message
-func _gotk4_soup2_SessionClass_requeue_message(arg0 *C.SoupSession, arg1 *C.SoupMessage) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ RequeueMessage(msg *Message) })
-
-	var _msg *Message // out
-
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-
-	iface.RequeueMessage(_msg)
-}
-
-//export _gotk4_soup2_SessionClass_send_message
-func _gotk4_soup2_SessionClass_send_message(arg0 *C.SoupSession, arg1 *C.SoupMessage) (cret C.guint) {
-	goval := externglib.GoPrivateFromObject(unsafe.Pointer(arg0))
-	iface := goval.(interface{ SendMessage(msg *Message) uint })
-
-	var _msg *Message // out
-
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-
-	guint := iface.SendMessage(_msg)
-
-	cret = C.guint(guint)
-
-	return cret
-}
-
-func wrapSession(obj *externglib.Object) *Session {
+func wrapSession(obj *coreglib.Object) *Session {
 	return &Session{
 		Object: obj,
 	}
 }
 
 func marshalSession(p uintptr) (interface{}, error) {
-	return wrapSession(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapSession(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-//export _gotk4_soup2_Session_ConnectAuthenticate
-func _gotk4_soup2_Session_ConnectAuthenticate(arg0 C.gpointer, arg1 *C.SoupMessage, arg2 *C.SoupAuth, arg3 C.gboolean, arg4 C.guintptr) {
-	var f func(msg *Message, auth Auther, retrying bool)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg4))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(msg *Message, auth Auther, retrying bool))
-	}
-
-	var _msg *Message  // out
-	var _auth Auther   // out
-	var _retrying bool // out
-
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-	{
-		objptr := unsafe.Pointer(arg2)
-		if objptr == nil {
-			panic("object of type soup.Auther is nil")
-		}
-
-		object := externglib.Take(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
-			_, ok := obj.(Auther)
-			return ok
-		})
-		rv, ok := casted.(Auther)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.Auther")
-		}
-		_auth = rv
-	}
-	if arg3 != 0 {
-		_retrying = true
-	}
-
-	f(_msg, _auth, _retrying)
-}
-
-// ConnectAuthenticate is emitted when the session requires authentication. If
-// credentials are available call soup_auth_authenticate() on auth. If these
-// credentials fail, the signal will be emitted again, with retrying set to
-// TRUE, which will continue until you return without calling
+// ConnectAuthenticate is emitted when the session requires authentication.
+// If credentials are available call soup_auth_authenticate() on auth.
+// If these credentials fail, the signal will be emitted again, with retrying
+// set to TRUE, which will continue until you return without calling
 // soup_auth_authenticate() on auth.
 //
 // Note that this may be emitted before msg's body has been fully read.
@@ -586,68 +285,28 @@ func _gotk4_soup2_Session_ConnectAuthenticate(arg0 C.gpointer, arg1 *C.SoupMessa
 // can authenticate auth asynchronously (as long as you g_object_ref() it to
 // make sure it doesn't get destroyed), and then unpause msg when you are ready
 // for it to continue.
-func (session *Session) ConnectAuthenticate(f func(msg *Message, auth Auther, retrying bool)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(session, "authenticate", false, unsafe.Pointer(C._gotk4_soup2_Session_ConnectAuthenticate), f)
+func (session *Session) ConnectAuthenticate(f func(msg *Message, auth Auther, retrying bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(session, "authenticate", false, unsafe.Pointer(C._gotk4_soup2_Session_ConnectAuthenticate), f)
 }
 
-//export _gotk4_soup2_Session_ConnectConnectionCreated
-func _gotk4_soup2_Session_ConnectConnectionCreated(arg0 C.gpointer, arg1 C.GObject, arg2 C.guintptr) {
-	var f func(connection *externglib.Object)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(connection *externglib.Object))
-	}
-
-	var _connection *externglib.Object // out
-
-	_connection = externglib.Take(unsafe.Pointer(&arg1))
-
-	f(_connection)
+// ConnectConnectionCreated is emitted when a new connection is created.
+// This is an internal signal intended only to be used for debugging purposes,
+// and may go away in the future.
+func (session *Session) ConnectConnectionCreated(f func(connection *coreglib.Object)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(session, "connection-created", false, unsafe.Pointer(C._gotk4_soup2_Session_ConnectConnectionCreated), f)
 }
 
-// ConnectConnectionCreated is emitted when a new connection is created. This is
-// an internal signal intended only to be used for debugging purposes, and may
-// go away in the future.
-func (session *Session) ConnectConnectionCreated(f func(connection *externglib.Object)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(session, "connection-created", false, unsafe.Pointer(C._gotk4_soup2_Session_ConnectConnectionCreated), f)
-}
-
-//export _gotk4_soup2_Session_ConnectRequestQueued
-func _gotk4_soup2_Session_ConnectRequestQueued(arg0 C.gpointer, arg1 *C.SoupMessage, arg2 C.guintptr) {
-	var f func(msg *Message)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(msg *Message))
-	}
-
-	var _msg *Message // out
-
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-
-	f(_msg)
-}
-
-// ConnectRequestQueued is emitted when a request is queued on session. (Note
-// that "queued" doesn't just mean soup_session_queue_message();
+// ConnectRequestQueued is emitted when a request is queued on session.
+// (Note that "queued" doesn't just mean soup_session_queue_message();
 // soup_session_send_message() implicitly queues the message as well.)
 //
 // When sending a request, first Session::request_queued is emitted, indicating
 // that the session has become aware of the request.
 //
-// Once a connection is available to send the request on, the session emits
-// Session::request_started. Then, various Message signals are emitted as the
-// message is processed. If the message is requeued, it will emit
-// Message::restarted, which will then be followed by another
+// Once a connection is available to send the request on, the session
+// emits Session::request_started. Then, various Message signals are
+// emitted as the message is processed. If the message is requeued,
+// it will emit Message::restarted, which will then be followed by another
 // Session::request_started and another set of Message signals when the message
 // is re-sent.
 //
@@ -665,98 +324,36 @@ func _gotk4_soup2_Session_ConnectRequestQueued(arg0 C.gpointer, arg1 *C.SoupMess
 // guaranteed to be emitted exactly once, but Session::request_started and
 // Message::finished (and all of the other Message signals) may be invoked
 // multiple times for a given message.
-func (session *Session) ConnectRequestQueued(f func(msg *Message)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(session, "request-queued", false, unsafe.Pointer(C._gotk4_soup2_Session_ConnectRequestQueued), f)
-}
-
-//export _gotk4_soup2_Session_ConnectRequestStarted
-func _gotk4_soup2_Session_ConnectRequestStarted(arg0 C.gpointer, arg1 *C.SoupMessage, arg2 *C.SoupSocket, arg3 C.guintptr) {
-	var f func(msg *Message, socket *Socket)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(msg *Message, socket *Socket))
-	}
-
-	var _msg *Message   // out
-	var _socket *Socket // out
-
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-	_socket = wrapSocket(externglib.Take(unsafe.Pointer(arg2)))
-
-	f(_msg, _socket)
+func (session *Session) ConnectRequestQueued(f func(msg *Message)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(session, "request-queued", false, unsafe.Pointer(C._gotk4_soup2_Session_ConnectRequestQueued), f)
 }
 
 // ConnectRequestStarted is emitted just before a request is sent. See
 // Session::request_queued for a detailed description of the message lifecycle
 // within a session.
-func (session *Session) ConnectRequestStarted(f func(msg *Message, socket *Socket)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(session, "request-started", false, unsafe.Pointer(C._gotk4_soup2_Session_ConnectRequestStarted), f)
-}
-
-//export _gotk4_soup2_Session_ConnectRequestUnqueued
-func _gotk4_soup2_Session_ConnectRequestUnqueued(arg0 C.gpointer, arg1 *C.SoupMessage, arg2 C.guintptr) {
-	var f func(msg *Message)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(msg *Message))
-	}
-
-	var _msg *Message // out
-
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg1)))
-
-	f(_msg)
+func (session *Session) ConnectRequestStarted(f func(msg *Message, socket *Socket)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(session, "request-started", false, unsafe.Pointer(C._gotk4_soup2_Session_ConnectRequestStarted), f)
 }
 
 // ConnectRequestUnqueued is emitted when a request is removed from session's
 // queue, indicating that session is done with it. See Session::request_queued
 // for a detailed description of the message lifecycle within a session.
-func (session *Session) ConnectRequestUnqueued(f func(msg *Message)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(session, "request-unqueued", false, unsafe.Pointer(C._gotk4_soup2_Session_ConnectRequestUnqueued), f)
-}
-
-//export _gotk4_soup2_Session_ConnectTunneling
-func _gotk4_soup2_Session_ConnectTunneling(arg0 C.gpointer, arg1 C.GObject, arg2 C.guintptr) {
-	var f func(connection *externglib.Object)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(connection *externglib.Object))
-	}
-
-	var _connection *externglib.Object // out
-
-	_connection = externglib.Take(unsafe.Pointer(&arg1))
-
-	f(_connection)
+func (session *Session) ConnectRequestUnqueued(f func(msg *Message)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(session, "request-unqueued", false, unsafe.Pointer(C._gotk4_soup2_Session_ConnectRequestUnqueued), f)
 }
 
 // ConnectTunneling is emitted when an SSL tunnel is being created on a proxy
 // connection. This is an internal signal intended only to be used for debugging
 // purposes, and may go away in the future.
-func (session *Session) ConnectTunneling(f func(connection *externglib.Object)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(session, "tunneling", false, unsafe.Pointer(C._gotk4_soup2_Session_ConnectTunneling), f)
+func (session *Session) ConnectTunneling(f func(connection *coreglib.Object)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(session, "tunneling", false, unsafe.Pointer(C._gotk4_soup2_Session_ConnectTunneling), f)
 }
 
 // NewSession creates a Session with the default options.
 //
 // The function returns the following values:
 //
-//    - session: new session.
+//   - session: new session.
 //
 func NewSession() *Session {
 	var _cret *C.SoupSession // in
@@ -765,7 +362,7 @@ func NewSession() *Session {
 
 	var _session *Session // out
 
-	_session = wrapSession(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_session = wrapSession(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _session
 }
@@ -780,14 +377,14 @@ func NewSession() *Session {
 func (session *Session) Abort() {
 	var _arg0 *C.SoupSession // out
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
 
 	C.soup_session_abort(_arg0)
 	runtime.KeepAlive(session)
 }
 
-// AddFeature adds feature's functionality to session. You can also add a
-// feature to the session at construct time by using the
+// AddFeature adds feature's functionality to session. You can
+// also add a feature to the session at construct time by using the
 // SOUP_SESSION_ADD_FEATURE property.
 //
 // See the main Session documentation for information on what features are
@@ -795,14 +392,14 @@ func (session *Session) Abort() {
 //
 // The function takes the following parameters:
 //
-//    - feature: object that implements SessionFeature.
+//   - feature: object that implements SessionFeature.
 //
 func (session *Session) AddFeature(feature SessionFeaturer) {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 *C.SoupSessionFeature // out
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
-	_arg1 = (*C.SoupSessionFeature)(unsafe.Pointer(externglib.InternObject(feature).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupSessionFeature)(unsafe.Pointer(coreglib.InternObject(feature).Native()))
 
 	C.soup_session_add_feature(_arg0, _arg1)
 	runtime.KeepAlive(session)
@@ -815,8 +412,8 @@ func (session *Session) AddFeature(feature SessionFeaturer) {
 // need to customize the new feature in any way.
 //
 // If feature_type is not a SessionFeature type, this gives each existing
-// feature on session the chance to accept feature_type as a "subfeature". This
-// can be used to add new Auth or Request types, for instance.
+// feature on session the chance to accept feature_type as a "subfeature".
+// This can be used to add new Auth or Request types, for instance.
 //
 // You can also add a feature to the session at construct time by using the
 // SOUP_SESSION_ADD_FEATURE_BY_TYPE property.
@@ -826,13 +423,13 @@ func (session *Session) AddFeature(feature SessionFeaturer) {
 //
 // The function takes the following parameters:
 //
-//    - featureType: #GType.
+//   - featureType: #GType.
 //
-func (session *Session) AddFeatureByType(featureType externglib.Type) {
+func (session *Session) AddFeatureByType(featureType coreglib.Type) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 C.GType        // out
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
 	_arg1 = C.GType(featureType)
 
 	C.soup_session_add_feature_by_type(_arg0, _arg1)
@@ -841,11 +438,11 @@ func (session *Session) AddFeatureByType(featureType externglib.Type) {
 }
 
 // CancelMessage causes session to immediately finish processing msg (regardless
-// of its current state) with a final status_code of status_code. You may call
-// this at any time after handing msg off to session; if session has started
-// sending the request but has not yet received the complete response, then it
-// will close the request's connection. Note that with requests that have side
-// effects (eg, <literal>POST</literal>, <literal>PUT</literal>,
+// of its current state) with a final status_code of status_code. You may
+// call this at any time after handing msg off to session; if session has
+// started sending the request but has not yet received the complete response,
+// then it will close the request's connection. Note that with requests that
+// have side effects (eg, <literal>POST</literal>, <literal>PUT</literal>,
 // <literal>DELETE</literal>) it is possible that you might cancel the request
 // after the server acts on it, but before it returns a response, leaving the
 // remote resource in an unknown state.
@@ -862,16 +459,16 @@ func (session *Session) AddFeatureByType(featureType externglib.Type) {
 //
 // The function takes the following parameters:
 //
-//    - msg: message to cancel.
-//    - statusCode status code to set on msg (generally SOUP_STATUS_CANCELLED).
+//   - msg: message to cancel.
+//   - statusCode status code to set on msg (generally SOUP_STATUS_CANCELLED).
 //
 func (session *Session) CancelMessage(msg *Message, statusCode uint) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
 	var _arg2 C.guint        // out
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg2 = C.guint(statusCode)
 
 	C.soup_session_cancel_message(_arg0, _arg1, _arg2)
@@ -880,61 +477,16 @@ func (session *Session) CancelMessage(msg *Message, statusCode uint) {
 	runtime.KeepAlive(statusCode)
 }
 
-// ConnectAsync: start a connection to uri. The operation can be monitored by
-// providing a progress_callback and finishes when the connection is done or an
-// error ocurred.
-//
-// Call soup_session_connect_finish() to get the OStream to communicate with the
-// server.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional): #GCancellable.
-//    - uri to connect to.
-//    - progressCallback (optional) which will be called for every network event
-//      that occurs during the connection.
-//    - callback (optional) to invoke when the operation finishes.
-//
-func (session *Session) ConnectAsync(ctx context.Context, uri *URI, progressCallback SessionConnectProgressCallback, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.SoupSession                       // out
-	var _arg2 *C.GCancellable                      // out
-	var _arg1 *C.SoupURI                           // out
-	var _arg3 C.SoupSessionConnectProgressCallback // out
-	var _arg4 C.GAsyncReadyCallback                // out
-	var _arg5 C.gpointer
-
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
-	if progressCallback != nil {
-	}
-	if callback != nil {
-		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg5 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.soup_session_connect_async(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
-	runtime.KeepAlive(session)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(uri)
-	runtime.KeepAlive(progressCallback)
-	runtime.KeepAlive(callback)
-}
-
 // ConnectFinish gets the OStream created for the connection to communicate with
 // the server.
 //
 // The function takes the following parameters:
 //
-//    - result passed to your callback.
+//   - result passed to your callback.
 //
 // The function returns the following values:
 //
-//    - ioStream: new OStream, or NULL on error.
+//   - ioStream: new OStream, or NULL on error.
 //
 func (session *Session) ConnectFinish(result gio.AsyncResulter) (gio.IOStreamer, error) {
 	var _arg0 *C.SoupSession  // out
@@ -942,8 +494,8 @@ func (session *Session) ConnectFinish(result gio.AsyncResulter) (gio.IOStreamer,
 	var _cret *C.GIOStream    // in
 	var _cerr *C.GError       // in
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(result).Native()))
 
 	_cret = C.soup_session_connect_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(session)
@@ -958,8 +510,8 @@ func (session *Session) ConnectFinish(result gio.AsyncResulter) (gio.IOStreamer,
 			panic("object of type gio.IOStreamer is nil")
 		}
 
-		object := externglib.AssumeOwnership(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
+		object := coreglib.AssumeOwnership(objptr)
+		casted := object.WalkCast(func(obj coreglib.Objector) bool {
 			_, ok := obj.(gio.IOStreamer)
 			return ok
 		})
@@ -985,13 +537,13 @@ func (session *Session) ConnectFinish(result gio.AsyncResulter) (gio.IOStreamer,
 //
 // The function returns the following values:
 //
-//    - mainContext (optional) session's Context, which may be NULL.
+//   - mainContext (optional) session's Context, which may be NULL.
 //
 func (session *Session) AsyncContext() *glib.MainContext {
 	var _arg0 *C.SoupSession  // out
 	var _cret *C.GMainContext // in
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
 
 	_cret = C.soup_session_get_async_context(_arg0)
 	runtime.KeepAlive(session)
@@ -1012,24 +564,24 @@ func (session *Session) AsyncContext() *glib.MainContext {
 	return _mainContext
 }
 
-// Feature gets the first feature in session of type feature_type. For features
-// where there may be more than one feature of a given type, use
-// soup_session_get_features().
+// Feature gets the first feature in session of type feature_type.
+// For features where there may be more than one feature of a given type,
+// use soup_session_get_features().
 //
 // The function takes the following parameters:
 //
-//    - featureType of the feature to get.
+//   - featureType of the feature to get.
 //
 // The function returns the following values:
 //
-//    - sessionFeature (optional) or NULL. The feature is owned by session.
+//   - sessionFeature (optional) or NULL. The feature is owned by session.
 //
-func (session *Session) Feature(featureType externglib.Type) *SessionFeature {
+func (session *Session) Feature(featureType coreglib.Type) *SessionFeature {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 C.GType               // out
 	var _cret *C.SoupSessionFeature // in
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
 	_arg1 = C.GType(featureType)
 
 	_cret = C.soup_session_get_feature(_arg0, _arg1)
@@ -1039,7 +591,7 @@ func (session *Session) Feature(featureType externglib.Type) *SessionFeature {
 	var _sessionFeature *SessionFeature // out
 
 	if _cret != nil {
-		_sessionFeature = wrapSessionFeature(externglib.Take(unsafe.Pointer(_cret)))
+		_sessionFeature = wrapSessionFeature(coreglib.Take(unsafe.Pointer(_cret)))
 	}
 
 	return _sessionFeature
@@ -1054,22 +606,22 @@ func (session *Session) Feature(featureType externglib.Type) *SessionFeature {
 //
 // The function takes the following parameters:
 //
-//    - featureType of the feature to get.
-//    - msg: Message.
+//   - featureType of the feature to get.
+//   - msg: Message.
 //
 // The function returns the following values:
 //
-//    - sessionFeature (optional) or NULL. The feature is owned by session.
+//   - sessionFeature (optional) or NULL. The feature is owned by session.
 //
-func (session *Session) FeatureForMessage(featureType externglib.Type, msg *Message) *SessionFeature {
+func (session *Session) FeatureForMessage(featureType coreglib.Type, msg *Message) *SessionFeature {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 C.GType               // out
 	var _arg2 *C.SoupMessage        // out
 	var _cret *C.SoupSessionFeature // in
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
 	_arg1 = C.GType(featureType)
-	_arg2 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg2 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_session_get_feature_for_message(_arg0, _arg1, _arg2)
 	runtime.KeepAlive(session)
@@ -1079,30 +631,30 @@ func (session *Session) FeatureForMessage(featureType externglib.Type, msg *Mess
 	var _sessionFeature *SessionFeature // out
 
 	if _cret != nil {
-		_sessionFeature = wrapSessionFeature(externglib.Take(unsafe.Pointer(_cret)))
+		_sessionFeature = wrapSessionFeature(coreglib.Take(unsafe.Pointer(_cret)))
 	}
 
 	return _sessionFeature
 }
 
-// Features generates a list of session's features of type feature_type. (If you
-// want to see all features, you can pass SOUP_TYPE_SESSION_FEATURE for
+// Features generates a list of session's features of type feature_type.
+// (If you want to see all features, you can pass SOUP_TYPE_SESSION_FEATURE for
 // feature_type.).
 //
 // The function takes the following parameters:
 //
-//    - featureType of the class of features to get.
+//   - featureType of the class of features to get.
 //
 // The function returns the following values:
 //
-//    - sList: a list of features. You must free the list, but not its contents.
+//   - sList: a list of features. You must free the list, but not its contents.
 //
-func (session *Session) Features(featureType externglib.Type) []*SessionFeature {
+func (session *Session) Features(featureType coreglib.Type) []*SessionFeature {
 	var _arg0 *C.SoupSession // out
 	var _arg1 C.GType        // out
 	var _cret *C.GSList      // in
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
 	_arg1 = C.GType(featureType)
 
 	_cret = C.soup_session_get_features(_arg0, _arg1)
@@ -1115,31 +667,31 @@ func (session *Session) Features(featureType externglib.Type) []*SessionFeature 
 	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
 		src := (*C.SoupSessionFeature)(v)
 		var dst *SessionFeature // out
-		dst = wrapSessionFeature(externglib.Take(unsafe.Pointer(src)))
+		dst = wrapSessionFeature(coreglib.Take(unsafe.Pointer(src)))
 		_sList = append(_sList, dst)
 	})
 
 	return _sList
 }
 
-// HasFeature tests if session has at a feature of type feature_type (which can
-// be the type of either a SessionFeature, or else a subtype of some class
+// HasFeature tests if session has at a feature of type feature_type (which
+// can be the type of either a SessionFeature, or else a subtype of some class
 // managed by another feature, such as Auth or Request).
 //
 // The function takes the following parameters:
 //
-//    - featureType of the class of features to check for.
+//   - featureType of the class of features to check for.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE or FALSE.
+//   - ok: TRUE or FALSE.
 //
-func (session *Session) HasFeature(featureType externglib.Type) bool {
+func (session *Session) HasFeature(featureType coreglib.Type) bool {
 	var _arg0 *C.SoupSession // out
 	var _arg1 C.GType        // out
 	var _cret C.gboolean     // in
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
 	_arg1 = C.GType(featureType)
 
 	_cret = C.soup_session_has_feature(_arg0, _arg1)
@@ -1163,14 +715,14 @@ func (session *Session) HasFeature(featureType externglib.Type) bool {
 //
 // The function takes the following parameters:
 //
-//    - msg currently running on session.
+//   - msg currently running on session.
 //
 func (session *Session) PauseMessage(msg *Message) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	C.soup_session_pause_message(_arg0, _arg1)
 	runtime.KeepAlive(session)
@@ -1178,8 +730,8 @@ func (session *Session) PauseMessage(msg *Message) {
 }
 
 // PrefetchDns tells session that an URI from the given hostname may be
-// requested shortly, and so the session can try to prepare by resolving the
-// domain name in advance, in order to work more quickly once the URI is
+// requested shortly, and so the session can try to prepare by resolving
+// the domain name in advance, in order to work more quickly once the URI is
 // actually requested.
 //
 // If cancellable is non-NULL, it can be used to cancel the resolution. callback
@@ -1187,9 +739,9 @@ func (session *Session) PauseMessage(msg *Message) {
 //
 // The function takes the following parameters:
 //
-//    - ctx (optional) object, or NULL.
-//    - hostname to be resolved.
-//    - callback (optional) to call with the result, or NULL.
+//   - ctx (optional) object, or NULL.
+//   - hostname to be resolved.
+//   - callback (optional) to call with the result, or NULL.
 //
 func (session *Session) PrefetchDns(ctx context.Context, hostname string, callback AddressCallback) {
 	var _arg0 *C.SoupSession        // out
@@ -1198,7 +750,7 @@ func (session *Session) PrefetchDns(ctx context.Context, hostname string, callba
 	var _arg3 C.SoupAddressCallback // out
 	var _arg4 C.gpointer
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -1227,13 +779,13 @@ func (session *Session) PrefetchDns(ctx context.Context, hostname string, callba
 //
 // The function takes the following parameters:
 //
-//    - uri which may be required.
+//   - uri which may be required.
 //
 func (session *Session) PrepareForURI(uri *URI) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupURI     // out
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	C.soup_session_prepare_for_uri(_arg0, _arg1)
@@ -1247,8 +799,8 @@ func (session *Session) PrepareForURI(uri *URI) {
 // freed.
 //
 // Upon message completion, the callback specified in callback will be invoked.
-// If after returning from this callback the message has not been requeued, msg
-// will be unreffed.
+// If after returning from this callback the message has not been requeued,
+// msg will be unreffed.
 //
 // (The behavior above applies to a plain Session; if you are using SessionAsync
 // or SessionSync, then the Context that is used depends on the settings of
@@ -1262,9 +814,9 @@ func (session *Session) PrepareForURI(uri *URI) {
 //
 // The function takes the following parameters:
 //
-//    - msg: message to queue.
-//    - callback (optional) which will be called after the message completes or
-//      when an unrecoverable error occurs.
+//   - msg: message to queue.
+//   - callback (optional) which will be called after the message completes or
+//     when an unrecoverable error occurs.
 //
 func (session *Session) QueueMessage(msg *Message, callback SessionCallback) {
 	var _arg0 *C.SoupSession        // out
@@ -1272,9 +824,9 @@ func (session *Session) QueueMessage(msg *Message, callback SessionCallback) {
 	var _arg2 C.SoupSessionCallback // out
 	var _arg3 C.gpointer
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
-	C.g_object_ref(C.gpointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+	C.g_object_ref(C.gpointer(coreglib.InternObject(msg).Native()))
 	if callback != nil {
 		_arg2 = (*[0]byte)(C._gotk4_soup2_SessionCallback)
 		_arg3 = C.gpointer(gbox.AssignOnce(callback))
@@ -1286,8 +838,8 @@ func (session *Session) QueueMessage(msg *Message, callback SessionCallback) {
 	runtime.KeepAlive(callback)
 }
 
-// RedirectMessage updates msg's URI according to its status code and "Location"
-// header, and requeues it on session. Use this when you have set
+// RedirectMessage updates msg's URI according to its status code and
+// "Location" header, and requeues it on session. Use this when you have set
 // SOUP_MESSAGE_NO_REDIRECT on a message, but have decided to allow a particular
 // redirection to occur, or if you want to allow a redirection that Session will
 // not perform automatically (eg, redirecting a non-safe method such as DELETE).
@@ -1300,20 +852,20 @@ func (session *Session) QueueMessage(msg *Message, callback SessionCallback) {
 //
 // The function takes the following parameters:
 //
-//    - msg that has received a 3xx response.
+//   - msg that has received a 3xx response.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if a redirection was applied, FALSE if not (eg, because there
-//      was no Location header, or it could not be parsed).
+//   - ok: TRUE if a redirection was applied, FALSE if not (eg, because there
+//     was no Location header, or it could not be parsed).
 //
 func (session *Session) RedirectMessage(msg *Message) bool {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
 	var _cret C.gboolean     // in
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_session_redirect_message(_arg0, _arg1)
 	runtime.KeepAlive(session)
@@ -1332,34 +884,34 @@ func (session *Session) RedirectMessage(msg *Message) bool {
 //
 // The function takes the following parameters:
 //
-//    - feature that has previously been added to session.
+//   - feature that has previously been added to session.
 //
 func (session *Session) RemoveFeature(feature SessionFeaturer) {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 *C.SoupSessionFeature // out
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
-	_arg1 = (*C.SoupSessionFeature)(unsafe.Pointer(externglib.InternObject(feature).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupSessionFeature)(unsafe.Pointer(coreglib.InternObject(feature).Native()))
 
 	C.soup_session_remove_feature(_arg0, _arg1)
 	runtime.KeepAlive(session)
 	runtime.KeepAlive(feature)
 }
 
-// RemoveFeatureByType removes all features of type feature_type (or any
-// subclass of feature_type) from session. You can also remove standard features
-// from the session at construct time by using the
+// RemoveFeatureByType removes all features of type feature_type (or
+// any subclass of feature_type) from session. You can also remove
+// standard features from the session at construct time by using the
 // SOUP_SESSION_REMOVE_FEATURE_BY_TYPE property.
 //
 // The function takes the following parameters:
 //
-//    - featureType: #GType.
+//   - featureType: #GType.
 //
-func (session *Session) RemoveFeatureByType(featureType externglib.Type) {
+func (session *Session) RemoveFeatureByType(featureType coreglib.Type) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 C.GType        // out
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
 	_arg1 = C.GType(featureType)
 
 	C.soup_session_remove_feature_by_type(_arg0, _arg1)
@@ -1371,11 +923,11 @@ func (session *Session) RemoveFeatureByType(featureType externglib.Type) {
 //
 // The function takes the following parameters:
 //
-//    - uriString: URI, in string form.
+//   - uriString: URI, in string form.
 //
 // The function returns the following values:
 //
-//    - request: new Request, or NULL on error.
+//   - request: new Request, or NULL on error.
 //
 func (session *Session) Request(uriString string) (*Request, error) {
 	var _arg0 *C.SoupSession // out
@@ -1383,7 +935,7 @@ func (session *Session) Request(uriString string) (*Request, error) {
 	var _cret *C.SoupRequest // in
 	var _cerr *C.GError      // in
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(uriString)))
 	defer C.free(unsafe.Pointer(_arg1))
 
@@ -1394,7 +946,7 @@ func (session *Session) Request(uriString string) (*Request, error) {
 	var _request *Request // out
 	var _goerr error      // out
 
-	_request = wrapRequest(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_request = wrapRequest(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 	if _cerr != nil {
 		_goerr = gerror.Take(unsafe.Pointer(_cerr))
 	}
@@ -1402,18 +954,18 @@ func (session *Session) Request(uriString string) (*Request, error) {
 	return _request, _goerr
 }
 
-// RequestHTTP creates a Request for retrieving uri_string, which must be an
-// "http" or "https" URI (or another protocol listed in session's
+// RequestHTTP creates a Request for retrieving uri_string, which must
+// be an "http" or "https" URI (or another protocol listed in session's
 // Session:http-aliases or Session:https-aliases).
 //
 // The function takes the following parameters:
 //
-//    - method: HTTP method.
-//    - uriString: URI, in string form.
+//   - method: HTTP method.
+//   - uriString: URI, in string form.
 //
 // The function returns the following values:
 //
-//    - requestHTTP: new RequestHTTP, or NULL on error.
+//   - requestHTTP: new RequestHTTP, or NULL on error.
 //
 func (session *Session) RequestHTTP(method, uriString string) (*RequestHTTP, error) {
 	var _arg0 *C.SoupSession     // out
@@ -1422,7 +974,7 @@ func (session *Session) RequestHTTP(method, uriString string) (*RequestHTTP, err
 	var _cret *C.SoupRequestHTTP // in
 	var _cerr *C.GError          // in
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(method)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.char)(unsafe.Pointer(C.CString(uriString)))
@@ -1436,7 +988,7 @@ func (session *Session) RequestHTTP(method, uriString string) (*RequestHTTP, err
 	var _requestHTTP *RequestHTTP // out
 	var _goerr error              // out
 
-	_requestHTTP = wrapRequestHTTP(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_requestHTTP = wrapRequestHTTP(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 	if _cerr != nil {
 		_goerr = gerror.Take(unsafe.Pointer(_cerr))
 	}
@@ -1450,21 +1002,21 @@ func (session *Session) RequestHTTP(method, uriString string) (*RequestHTTP, err
 //
 // The function takes the following parameters:
 //
-//    - method: HTTP method.
-//    - uri representing the URI to retrieve.
+//   - method: HTTP method.
+//   - uri representing the URI to retrieve.
 //
 // The function returns the following values:
 //
-//    - requestHTTP: new RequestHTTP, or NULL on error.
+//   - requestHTTP: new RequestHTTP, or NULL on error.
 //
-func (session *Session) RequestHTTPUri(method string, uri *URI) (*RequestHTTP, error) {
+func (session *Session) RequestHTTPURI(method string, uri *URI) (*RequestHTTP, error) {
 	var _arg0 *C.SoupSession     // out
 	var _arg1 *C.char            // out
 	var _arg2 *C.SoupURI         // out
 	var _cret *C.SoupRequestHTTP // in
 	var _cerr *C.GError          // in
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
 	_arg1 = (*C.char)(unsafe.Pointer(C.CString(method)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
@@ -1477,7 +1029,7 @@ func (session *Session) RequestHTTPUri(method string, uri *URI) (*RequestHTTP, e
 	var _requestHTTP *RequestHTTP // out
 	var _goerr error              // out
 
-	_requestHTTP = wrapRequestHTTP(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_requestHTTP = wrapRequestHTTP(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 	if _cerr != nil {
 		_goerr = gerror.Take(unsafe.Pointer(_cerr))
 	}
@@ -1489,11 +1041,11 @@ func (session *Session) RequestHTTPUri(method string, uri *URI) (*RequestHTTP, e
 //
 // The function takes the following parameters:
 //
-//    - uri representing the URI to retrieve.
+//   - uri representing the URI to retrieve.
 //
 // The function returns the following values:
 //
-//    - request: new Request, or NULL on error.
+//   - request: new Request, or NULL on error.
 //
 func (session *Session) RequestURI(uri *URI) (*Request, error) {
 	var _arg0 *C.SoupSession // out
@@ -1501,7 +1053,7 @@ func (session *Session) RequestURI(uri *URI) (*Request, error) {
 	var _cret *C.SoupRequest // in
 	var _cerr *C.GError      // in
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
 	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
 
 	_cret = C.soup_session_request_uri(_arg0, _arg1, &_cerr)
@@ -1511,7 +1063,7 @@ func (session *Session) RequestURI(uri *URI) (*Request, error) {
 	var _request *Request // out
 	var _goerr error      // out
 
-	_request = wrapRequest(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_request = wrapRequest(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 	if _cerr != nil {
 		_goerr = gerror.Take(unsafe.Pointer(_cerr))
 	}
@@ -1524,29 +1076,29 @@ func (session *Session) RequestURI(uri *URI) (*Request, error) {
 //
 // The function takes the following parameters:
 //
-//    - msg: message to requeue.
+//   - msg: message to requeue.
 //
 func (session *Session) RequeueMessage(msg *Message) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	C.soup_session_requeue_message(_arg0, _arg1)
 	runtime.KeepAlive(session)
 	runtime.KeepAlive(msg)
 }
 
-// Send: synchronously sends msg and waits for the beginning of a response. On
-// success, a Stream will be returned which you can use to read the response
+// Send: synchronously sends msg and waits for the beginning of a response.
+// On success, a Stream will be returned which you can use to read the response
 // body. ("Success" here means only that an HTTP response was received and
 // understood; it does not necessarily mean that a 2xx class status code was
 // received.)
 //
 // If non-NULL, cancellable can be used to cancel the request;
-// soup_session_send() will return a G_IO_ERROR_CANCELLED error. Note that with
-// requests that have side effects (eg, <literal>POST</literal>,
+// soup_session_send() will return a G_IO_ERROR_CANCELLED error. Note that
+// with requests that have side effects (eg, <literal>POST</literal>,
 // <literal>PUT</literal>, <literal>DELETE</literal>) it is possible that you
 // might cancel the request after the server acts on it, but before it returns a
 // response, leaving the remote resource in an unknown state.
@@ -1564,12 +1116,12 @@ func (session *Session) RequeueMessage(msg *Message) {
 //
 // The function takes the following parameters:
 //
-//    - ctx (optional): #GCancellable.
-//    - msg: Message.
+//   - ctx (optional): #GCancellable.
+//   - msg: Message.
 //
 // The function returns the following values:
 //
-//    - inputStream for reading the response body, or NULL on error.
+//   - inputStream for reading the response body, or NULL on error.
 //
 func (session *Session) Send(ctx context.Context, msg *Message) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupSession  // out
@@ -1578,13 +1130,13 @@ func (session *Session) Send(ctx context.Context, msg *Message) (gio.InputStream
 	var _cret *C.GInputStream // in
 	var _cerr *C.GError       // in
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
 		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
 	}
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_session_send(_arg0, _arg1, _arg2, &_cerr)
 	runtime.KeepAlive(session)
@@ -1600,8 +1152,8 @@ func (session *Session) Send(ctx context.Context, msg *Message) (gio.InputStream
 			panic("object of type gio.InputStreamer is nil")
 		}
 
-		object := externglib.AssumeOwnership(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
+		object := coreglib.AssumeOwnership(objptr)
+		casted := object.WalkCast(func(obj coreglib.Objector) bool {
 			_, ok := obj.(gio.InputStreamer)
 			return ok
 		})
@@ -1618,63 +1170,16 @@ func (session *Session) Send(ctx context.Context, msg *Message) (gio.InputStream
 	return _inputStream, _goerr
 }
 
-// SendAsync: asynchronously sends msg and waits for the beginning of a
-// response. When callback is called, then either msg has been sent, and its
-// response headers received, or else an error has occurred. Call
-// soup_session_send_finish() to get a Stream for reading the response body.
-//
-// See soup_session_send() for more details on the general semantics.
-//
-// Contrast this method with soup_session_queue_message(), which also
-// asynchronously sends a Message, but doesn't invoke its callback until the
-// response has been completely read.
-//
-// (Note that this method cannot be called on the deprecated SessionSync
-// subclass, and can only be called on SessionAsync if you have set the
-// Session:use-thread-context property.).
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional): #GCancellable.
-//    - msg: Message.
-//    - callback (optional) to invoke.
-//
-func (session *Session) SendAsync(ctx context.Context, msg *Message, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.SoupSession        // out
-	var _arg2 *C.GCancellable       // out
-	var _arg1 *C.SoupMessage        // out
-	var _arg3 C.GAsyncReadyCallback // out
-	var _arg4 C.gpointer
-
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
-	if callback != nil {
-		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg4 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.soup_session_send_async(_arg0, _arg1, _arg2, _arg3, _arg4)
-	runtime.KeepAlive(session)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(callback)
-}
-
 // SendFinish gets the response to a soup_session_send_async() call and (if
 // successful), returns a Stream that can be used to read the response body.
 //
 // The function takes the following parameters:
 //
-//    - result passed to your callback.
+//   - result passed to your callback.
 //
 // The function returns the following values:
 //
-//    - inputStream for reading the response body, or NULL on error.
+//   - inputStream for reading the response body, or NULL on error.
 //
 func (session *Session) SendFinish(result gio.AsyncResulter) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupSession  // out
@@ -1682,8 +1187,8 @@ func (session *Session) SendFinish(result gio.AsyncResulter) (gio.InputStreamer,
 	var _cret *C.GInputStream // in
 	var _cerr *C.GError       // in
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(result).Native()))
 
 	_cret = C.soup_session_send_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(session)
@@ -1698,8 +1203,8 @@ func (session *Session) SendFinish(result gio.AsyncResulter) (gio.InputStreamer,
 			panic("object of type gio.InputStreamer is nil")
 		}
 
-		object := externglib.AssumeOwnership(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
+		object := coreglib.AssumeOwnership(objptr)
+		casted := object.WalkCast(func(obj coreglib.Objector) bool {
 			_, ok := obj.(gio.InputStreamer)
 			return ok
 		})
@@ -1731,19 +1236,19 @@ func (session *Session) SendFinish(result gio.AsyncResulter) (gio.InputStreamer,
 //
 // The function takes the following parameters:
 //
-//    - msg: message to send.
+//   - msg: message to send.
 //
 // The function returns the following values:
 //
-//    - guint: HTTP status code of the response.
+//   - guint: HTTP status code of the response.
 //
 func (session *Session) SendMessage(msg *Message) uint {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
 	var _cret C.guint        // in
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_session_send_message(_arg0, _arg1)
 	runtime.KeepAlive(session)
@@ -1757,8 +1262,8 @@ func (session *Session) SendMessage(msg *Message) uint {
 }
 
 // StealConnection: "Steals" the HTTP connection associated with msg from
-// session. This happens immediately, regardless of the current state of the
-// connection, and msg's callback will not be called. You can steal the
+// session. This happens immediately, regardless of the current state of
+// the connection, and msg's callback will not be called. You can steal the
 // connection from a Message signal handler if you need to wait for part or all
 // of the response to be received first.
 //
@@ -1767,21 +1272,21 @@ func (session *Session) SendMessage(msg *Message) uint {
 //
 // The function takes the following parameters:
 //
-//    - msg: message whose connection is to be stolen.
+//   - msg: message whose connection is to be stolen.
 //
 // The function returns the following values:
 //
-//    - ioStream formerly associated with msg (or NULL if msg was no longer
-//      associated with a connection). No guarantees are made about what kind of
-//      OStream is returned.
+//   - ioStream formerly associated with msg (or NULL if msg was no longer
+//     associated with a connection). No guarantees are made about what kind of
+//     OStream is returned.
 //
 func (session *Session) StealConnection(msg *Message) gio.IOStreamer {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
 	var _cret *C.GIOStream   // in
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_session_steal_connection(_arg0, _arg1)
 	runtime.KeepAlive(session)
@@ -1795,8 +1300,8 @@ func (session *Session) StealConnection(msg *Message) gio.IOStreamer {
 			panic("object of type gio.IOStreamer is nil")
 		}
 
-		object := externglib.AssumeOwnership(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
+		object := coreglib.AssumeOwnership(objptr)
+		casted := object.WalkCast(func(obj coreglib.Objector) bool {
 			_, ok := obj.(gio.IOStreamer)
 			return ok
 		})
@@ -1822,90 +1327,18 @@ func (session *Session) StealConnection(msg *Message) gio.IOStreamer {
 //
 // The function takes the following parameters:
 //
-//    - msg currently running on session.
+//   - msg currently running on session.
 //
 func (session *Session) UnpauseMessage(msg *Message) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	C.soup_session_unpause_message(_arg0, _arg1)
 	runtime.KeepAlive(session)
 	runtime.KeepAlive(msg)
-}
-
-// WebsocketConnectAsync: asynchronously creates a WebsocketConnection to
-// communicate with a remote server.
-//
-// All necessary WebSocket-related headers will be added to msg, and it will
-// then be sent and asynchronously processed normally (including handling of
-// redirection and HTTP authentication).
-//
-// If the server returns "101 Switching Protocols", then msg's status code and
-// response headers will be updated, and then the WebSocket handshake will be
-// completed. On success, soup_session_websocket_connect_finish() will return a
-// new WebsocketConnection. On failure it will return a #GError.
-//
-// If the server returns a status other than "101 Switching Protocols", then msg
-// will contain the complete response headers and body from the server's
-// response, and soup_session_websocket_connect_finish() will return
-// SOUP_WEBSOCKET_ERROR_NOT_WEBSOCKET.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional): #GCancellable.
-//    - msg indicating the WebSocket server to connect to.
-//    - origin (optional) of the connection.
-//    - protocols (optional): a NULL-terminated array of protocols supported.
-//    - callback (optional) to invoke.
-//
-func (session *Session) WebsocketConnectAsync(ctx context.Context, msg *Message, origin string, protocols []string, callback gio.AsyncReadyCallback) {
-	var _arg0 *C.SoupSession        // out
-	var _arg4 *C.GCancellable       // out
-	var _arg1 *C.SoupMessage        // out
-	var _arg2 *C.char               // out
-	var _arg3 **C.char              // out
-	var _arg5 C.GAsyncReadyCallback // out
-	var _arg6 C.gpointer
-
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg4 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
-	if origin != "" {
-		_arg2 = (*C.char)(unsafe.Pointer(C.CString(origin)))
-		defer C.free(unsafe.Pointer(_arg2))
-	}
-	{
-		_arg3 = (**C.char)(C.calloc(C.size_t((len(protocols) + 1)), C.size_t(unsafe.Sizeof(uint(0)))))
-		defer C.free(unsafe.Pointer(_arg3))
-		{
-			out := unsafe.Slice(_arg3, len(protocols)+1)
-			var zero *C.char
-			out[len(protocols)] = zero
-			for i := range protocols {
-				out[i] = (*C.char)(unsafe.Pointer(C.CString(protocols[i])))
-				defer C.free(unsafe.Pointer(out[i]))
-			}
-		}
-	}
-	if callback != nil {
-		_arg5 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg6 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.soup_session_websocket_connect_async(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6)
-	runtime.KeepAlive(session)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(origin)
-	runtime.KeepAlive(protocols)
-	runtime.KeepAlive(callback)
 }
 
 // WebsocketConnectFinish gets the WebsocketConnection response to a
@@ -1914,11 +1347,11 @@ func (session *Session) WebsocketConnectAsync(ctx context.Context, msg *Message,
 //
 // The function takes the following parameters:
 //
-//    - result passed to your callback.
+//   - result passed to your callback.
 //
 // The function returns the following values:
 //
-//    - websocketConnection: new WebsocketConnection, or NULL on error.
+//   - websocketConnection: new WebsocketConnection, or NULL on error.
 //
 func (session *Session) WebsocketConnectFinish(result gio.AsyncResulter) (*WebsocketConnection, error) {
 	var _arg0 *C.SoupSession             // out
@@ -1926,8 +1359,8 @@ func (session *Session) WebsocketConnectFinish(result gio.AsyncResulter) (*Webso
 	var _cret *C.SoupWebsocketConnection // in
 	var _cerr *C.GError                  // in
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(externglib.InternObject(result).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(result).Native()))
 
 	_cret = C.soup_session_websocket_connect_finish(_arg0, _arg1, &_cerr)
 	runtime.KeepAlive(session)
@@ -1936,7 +1369,7 @@ func (session *Session) WebsocketConnectFinish(result gio.AsyncResulter) (*Webso
 	var _websocketConnection *WebsocketConnection // out
 	var _goerr error                              // out
 
-	_websocketConnection = wrapWebsocketConnection(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_websocketConnection = wrapWebsocketConnection(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 	if _cerr != nil {
 		_goerr = gerror.Take(unsafe.Pointer(_cerr))
 	}
@@ -1944,25 +1377,25 @@ func (session *Session) WebsocketConnectFinish(result gio.AsyncResulter) (*Webso
 	return _websocketConnection, _goerr
 }
 
-// WouldRedirect checks if msg contains a response that would cause session to
-// redirect it to a new URL (ignoring msg's SOUP_MESSAGE_NO_REDIRECT flag, and
-// the number of times it has already been redirected).
+// WouldRedirect checks if msg contains a response that would cause session
+// to redirect it to a new URL (ignoring msg's SOUP_MESSAGE_NO_REDIRECT flag,
+// and the number of times it has already been redirected).
 //
 // The function takes the following parameters:
 //
-//    - msg that has response headers.
+//   - msg that has response headers.
 //
 // The function returns the following values:
 //
-//    - ok: whether msg would be redirected.
+//   - ok: whether msg would be redirected.
 //
 func (session *Session) WouldRedirect(msg *Message) bool {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.SoupMessage // out
 	var _cret C.gboolean     // in
 
-	_arg0 = (*C.SoupSession)(unsafe.Pointer(externglib.InternObject(session).Native()))
-	_arg1 = (*C.SoupMessage)(unsafe.Pointer(externglib.InternObject(msg).Native()))
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 
 	_cret = C.soup_session_would_redirect(_arg0, _arg1)
 	runtime.KeepAlive(session)
@@ -1975,4 +1408,275 @@ func (session *Session) WouldRedirect(msg *Message) bool {
 	}
 
 	return _ok
+}
+
+// The function takes the following parameters:
+//
+//   - msg
+//   - auth
+//   - retrying
+//
+func (session *Session) authRequired(msg *Message, auth Auther, retrying bool) {
+	gclass := (*C.SoupSessionClass)(coreglib.PeekParentClass(session))
+	fnarg := gclass.auth_required
+
+	var _arg0 *C.SoupSession // out
+	var _arg1 *C.SoupMessage // out
+	var _arg2 *C.SoupAuth    // out
+	var _arg3 C.gboolean     // out
+
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+	_arg2 = (*C.SoupAuth)(unsafe.Pointer(coreglib.InternObject(auth).Native()))
+	if retrying {
+		_arg3 = C.TRUE
+	}
+
+	C._gotk4_soup2_Session_virtual_auth_required(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(auth)
+	runtime.KeepAlive(retrying)
+}
+
+// The function takes the following parameters:
+//
+//   - msg
+//   - auth
+//   - retrying
+//
+func (session *Session) authenticate(msg *Message, auth Auther, retrying bool) {
+	gclass := (*C.SoupSessionClass)(coreglib.PeekParentClass(session))
+	fnarg := gclass.authenticate
+
+	var _arg0 *C.SoupSession // out
+	var _arg1 *C.SoupMessage // out
+	var _arg2 *C.SoupAuth    // out
+	var _arg3 C.gboolean     // out
+
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+	_arg2 = (*C.SoupAuth)(unsafe.Pointer(coreglib.InternObject(auth).Native()))
+	if retrying {
+		_arg3 = C.TRUE
+	}
+
+	C._gotk4_soup2_Session_virtual_authenticate(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(auth)
+	runtime.KeepAlive(retrying)
+}
+
+// cancelMessage causes session to immediately finish processing msg (regardless
+// of its current state) with a final status_code of status_code. You may
+// call this at any time after handing msg off to session; if session has
+// started sending the request but has not yet received the complete response,
+// then it will close the request's connection. Note that with requests that
+// have side effects (eg, <literal>POST</literal>, <literal>PUT</literal>,
+// <literal>DELETE</literal>) it is possible that you might cancel the request
+// after the server acts on it, but before it returns a response, leaving the
+// remote resource in an unknown state.
+//
+// If the message is cancelled while its response body is being read, then the
+// response body in msg will be left partially-filled-in. The response headers,
+// on the other hand, will always be either empty or complete.
+//
+// Beware that with the deprecated SessionAsync, messages queued with
+// soup_session_queue_message() will have their callbacks invoked before
+// soup_session_cancel_message() returns. The plain Session does not have this
+// behavior; cancelling an asynchronous message will merely queue its callback
+// to be run after returning to the main loop.
+//
+// The function takes the following parameters:
+//
+//   - msg: message to cancel.
+//   - statusCode status code to set on msg (generally SOUP_STATUS_CANCELLED).
+//
+func (session *Session) cancelMessage(msg *Message, statusCode uint) {
+	gclass := (*C.SoupSessionClass)(coreglib.PeekParentClass(session))
+	fnarg := gclass.cancel_message
+
+	var _arg0 *C.SoupSession // out
+	var _arg1 *C.SoupMessage // out
+	var _arg2 C.guint        // out
+
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+	_arg2 = C.guint(statusCode)
+
+	C._gotk4_soup2_Session_virtual_cancel_message(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(statusCode)
+}
+
+func (session *Session) flushQueue() {
+	gclass := (*C.SoupSessionClass)(coreglib.PeekParentClass(session))
+	fnarg := gclass.flush_queue
+
+	var _arg0 *C.SoupSession // out
+
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+
+	C._gotk4_soup2_Session_virtual_flush_queue(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(session)
+}
+
+func (session *Session) kick() {
+	gclass := (*C.SoupSessionClass)(coreglib.PeekParentClass(session))
+	fnarg := gclass.kick
+
+	var _arg0 *C.SoupSession // out
+
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+
+	C._gotk4_soup2_Session_virtual_kick(unsafe.Pointer(fnarg), _arg0)
+	runtime.KeepAlive(session)
+}
+
+// queueMessage queues the message msg for asynchronously sending the request
+// and receiving a response in the current thread-default Context. If msg has
+// been processed before, any resources related to the time it was last sent are
+// freed.
+//
+// Upon message completion, the callback specified in callback will be invoked.
+// If after returning from this callback the message has not been requeued,
+// msg will be unreffed.
+//
+// (The behavior above applies to a plain Session; if you are using SessionAsync
+// or SessionSync, then the Context that is used depends on the settings of
+// Session:async-context and Session:use-thread-context, and for SessionSync,
+// the message will actually be sent and processed in another thread, with only
+// the final callback occurring in the indicated Context.)
+//
+// Contrast this method with soup_session_send_async(), which also
+// asynchronously sends a message, but returns before reading the response body,
+// and allows you to read the response via a Stream.
+//
+// The function takes the following parameters:
+//
+//   - msg: message to queue.
+//   - callback (optional) which will be called after the message completes or
+//     when an unrecoverable error occurs.
+//
+func (session *Session) queueMessage(msg *Message, callback SessionCallback) {
+	gclass := (*C.SoupSessionClass)(coreglib.PeekParentClass(session))
+	fnarg := gclass.queue_message
+
+	var _arg0 *C.SoupSession        // out
+	var _arg1 *C.SoupMessage        // out
+	var _arg2 C.SoupSessionCallback // out
+	var _arg3 C.gpointer
+
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+	C.g_object_ref(C.gpointer(coreglib.InternObject(msg).Native()))
+	if callback != nil {
+		_arg2 = (*[0]byte)(C._gotk4_soup2_SessionCallback)
+		_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C._gotk4_soup2_Session_virtual_queue_message(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(callback)
+}
+
+// The function takes the following parameters:
+//
+//   - msg
+//   - socket
+//
+func (session *Session) requestStarted(msg *Message, socket *Socket) {
+	gclass := (*C.SoupSessionClass)(coreglib.PeekParentClass(session))
+	fnarg := gclass.request_started
+
+	var _arg0 *C.SoupSession // out
+	var _arg1 *C.SoupMessage // out
+	var _arg2 *C.SoupSocket  // out
+
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+	_arg2 = (*C.SoupSocket)(unsafe.Pointer(coreglib.InternObject(socket).Native()))
+
+	C._gotk4_soup2_Session_virtual_request_started(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(socket)
+}
+
+// requeueMessage: this causes msg to be placed back on the queue to be
+// attempted again.
+//
+// The function takes the following parameters:
+//
+//   - msg: message to requeue.
+//
+func (session *Session) requeueMessage(msg *Message) {
+	gclass := (*C.SoupSessionClass)(coreglib.PeekParentClass(session))
+	fnarg := gclass.requeue_message
+
+	var _arg0 *C.SoupSession // out
+	var _arg1 *C.SoupMessage // out
+
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+
+	C._gotk4_soup2_Session_virtual_requeue_message(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(msg)
+}
+
+// sendMessage: synchronously send msg. This call will not return until the
+// transfer is finished successfully or there is an unrecoverable error.
+//
+// Unlike with soup_session_queue_message(), msg is not freed upon return.
+//
+// (Note that if you call this method on a SessionAsync, it will still use
+// asynchronous I/O internally, running the glib main loop to process the
+// message, which may also cause other events to be processed.)
+//
+// Contrast this method with soup_session_send(), which also synchronously sends
+// a message, but returns before reading the response body, and allows you to
+// read the response via a Stream.
+//
+// The function takes the following parameters:
+//
+//   - msg: message to send.
+//
+// The function returns the following values:
+//
+//   - guint: HTTP status code of the response.
+//
+func (session *Session) sendMessage(msg *Message) uint {
+	gclass := (*C.SoupSessionClass)(coreglib.PeekParentClass(session))
+	fnarg := gclass.send_message
+
+	var _arg0 *C.SoupSession // out
+	var _arg1 *C.SoupMessage // out
+	var _cret C.guint        // in
+
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+
+	_cret = C._gotk4_soup2_Session_virtual_send_message(unsafe.Pointer(fnarg), _arg0, _arg1)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(msg)
+
+	var _guint uint // out
+
+	_guint = uint(_cret)
+
+	return _guint
+}
+
+// SessionClass: instance of this type is always passed by reference.
+type SessionClass struct {
+	*sessionClass
+}
+
+// sessionClass is the struct that's finalized.
+type sessionClass struct {
+	native *C.SoupSessionClass
 }

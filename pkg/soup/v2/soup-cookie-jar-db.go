@@ -6,7 +6,8 @@ import (
 	"runtime"
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -14,12 +15,14 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup-cookie-jar-db.go.
-var GTypeCookieJarDB = externglib.Type(C.soup_cookie_jar_db_get_type())
+// GType values.
+var (
+	GTypeCookieJarDB = coreglib.Type(C.soup_cookie_jar_db_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeCookieJarDB, F: marshalCookieJarDB},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeCookieJarDB, F: marshalCookieJarDB},
 	})
 }
 
@@ -27,8 +30,12 @@ func init() {
 // cookie-storage filename.).
 const COOKIE_JAR_DB_FILENAME = "filename"
 
-// CookieJarDBOverrider contains methods that are overridable.
-type CookieJarDBOverrider interface {
+// CookieJarDBOverrides contains methods that are overridable.
+type CookieJarDBOverrides struct {
+}
+
+func defaultCookieJarDBOverrides(v *CookieJarDB) CookieJarDBOverrides {
+	return CookieJarDBOverrides{}
 }
 
 type CookieJarDB struct {
@@ -37,18 +44,26 @@ type CookieJarDB struct {
 }
 
 var (
-	_ externglib.Objector = (*CookieJarDB)(nil)
+	_ coreglib.Objector = (*CookieJarDB)(nil)
 )
 
-func classInitCookieJarDBer(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*CookieJarDB, *CookieJarDBClass, CookieJarDBOverrides](
+		GTypeCookieJarDB,
+		initCookieJarDBClass,
+		wrapCookieJarDB,
+		defaultCookieJarDBOverrides,
+	)
 }
 
-func wrapCookieJarDB(obj *externglib.Object) *CookieJarDB {
+func initCookieJarDBClass(gclass unsafe.Pointer, overrides CookieJarDBOverrides, classInitFunc func(*CookieJarDBClass)) {
+	if classInitFunc != nil {
+		class := (*CookieJarDBClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapCookieJarDB(obj *coreglib.Object) *CookieJarDB {
 	return &CookieJarDB{
 		CookieJar: CookieJar{
 			Object: obj,
@@ -60,7 +75,7 @@ func wrapCookieJarDB(obj *externglib.Object) *CookieJarDB {
 }
 
 func marshalCookieJarDB(p uintptr) (interface{}, error) {
-	return wrapCookieJarDB(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapCookieJarDB(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewCookieJarDB creates a CookieJarDB.
@@ -73,12 +88,12 @@ func marshalCookieJarDB(p uintptr) (interface{}, error) {
 //
 // The function takes the following parameters:
 //
-//    - filename to read to/write from, or NULL.
-//    - readOnly: TRUE if filename is read-only.
+//   - filename to read to/write from, or NULL.
+//   - readOnly: TRUE if filename is read-only.
 //
 // The function returns the following values:
 //
-//    - cookieJarDB: new CookieJar.
+//   - cookieJarDB: new CookieJar.
 //
 func NewCookieJarDB(filename string, readOnly bool) *CookieJarDB {
 	var _arg1 *C.char          // out
@@ -97,7 +112,24 @@ func NewCookieJarDB(filename string, readOnly bool) *CookieJarDB {
 
 	var _cookieJarDB *CookieJarDB // out
 
-	_cookieJarDB = wrapCookieJarDB(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_cookieJarDB = wrapCookieJarDB(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _cookieJarDB
+}
+
+// CookieJarDBClass: instance of this type is always passed by reference.
+type CookieJarDBClass struct {
+	*cookieJarDBClass
+}
+
+// cookieJarDBClass is the struct that's finalized.
+type cookieJarDBClass struct {
+	native *C.SoupCookieJarDBClass
+}
+
+func (c *CookieJarDBClass) ParentClass() *CookieJarClass {
+	valptr := &c.native.parent_class
+	var _v *CookieJarClass // out
+	_v = (*CookieJarClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
+	return _v
 }

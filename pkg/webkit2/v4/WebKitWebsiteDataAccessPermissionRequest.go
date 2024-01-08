@@ -2,104 +2,17 @@
 
 package webkit2
 
-import (
-	"runtime"
-	"unsafe"
-
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
-)
-
 // #include <stdlib.h>
-// #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitWebsiteDataAccessPermissionRequest.go.
-var GTypeWebsiteDataAccessPermissionRequest = externglib.Type(C.webkit_website_data_access_permission_request_get_type())
-
-func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeWebsiteDataAccessPermissionRequest, F: marshalWebsiteDataAccessPermissionRequest},
-	})
+// WebsiteDataAccessPermissionRequestClass: instance of this type is always
+// passed by reference.
+type WebsiteDataAccessPermissionRequestClass struct {
+	*websiteDataAccessPermissionRequestClass
 }
 
-// WebsiteDataAccessPermissionRequestOverrider contains methods that are overridable.
-type WebsiteDataAccessPermissionRequestOverrider interface {
-}
-
-type WebsiteDataAccessPermissionRequest struct {
-	_ [0]func() // equal guard
-	*externglib.Object
-
-	PermissionRequest
-}
-
-var (
-	_ externglib.Objector = (*WebsiteDataAccessPermissionRequest)(nil)
-)
-
-func classInitWebsiteDataAccessPermissionRequester(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
-}
-
-func wrapWebsiteDataAccessPermissionRequest(obj *externglib.Object) *WebsiteDataAccessPermissionRequest {
-	return &WebsiteDataAccessPermissionRequest{
-		Object: obj,
-		PermissionRequest: PermissionRequest{
-			Object: obj,
-		},
-	}
-}
-
-func marshalWebsiteDataAccessPermissionRequest(p uintptr) (interface{}, error) {
-	return wrapWebsiteDataAccessPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// CurrentDomain: get the current domain being browsed.
-//
-// The function returns the following values:
-//
-//    - utf8: current domain name.
-//
-func (request *WebsiteDataAccessPermissionRequest) CurrentDomain() string {
-	var _arg0 *C.WebKitWebsiteDataAccessPermissionRequest // out
-	var _cret *C.char                                     // in
-
-	_arg0 = (*C.WebKitWebsiteDataAccessPermissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
-
-	_cret = C.webkit_website_data_access_permission_request_get_current_domain(_arg0)
-	runtime.KeepAlive(request)
-
-	var _utf8 string // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-
-	return _utf8
-}
-
-// RequestingDomain: get the domain requesting permission to access its cookies
-// while browsing the current domain.
-//
-// The function returns the following values:
-//
-//    - utf8: requesting domain name.
-//
-func (request *WebsiteDataAccessPermissionRequest) RequestingDomain() string {
-	var _arg0 *C.WebKitWebsiteDataAccessPermissionRequest // out
-	var _cret *C.char                                     // in
-
-	_arg0 = (*C.WebKitWebsiteDataAccessPermissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
-
-	_cret = C.webkit_website_data_access_permission_request_get_requesting_domain(_arg0)
-	runtime.KeepAlive(request)
-
-	var _utf8 string // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-
-	return _utf8
+// websiteDataAccessPermissionRequestClass is the struct that's finalized.
+type websiteDataAccessPermissionRequestClass struct {
+	native *C.WebKitWebsiteDataAccessPermissionRequestClass
 }

@@ -10,67 +10,36 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
-// extern guint _gotk4_soup2_ProxyURIResolverInterface_get_proxy_uri_sync(SoupProxyURIResolver*, SoupURI*, GCancellable*, SoupURI**);
 // extern void _gotk4_soup2_ProxyURIResolverCallback(SoupProxyURIResolver*, guint, SoupURI*, gpointer);
+// guint _gotk4_soup2_ProxyURIResolver_virtual_get_proxy_uri_sync(void* fnptr, SoupProxyURIResolver* arg0, SoupURI* arg1, GCancellable* arg2, SoupURI** arg3) {
+//   return ((guint (*)(SoupProxyURIResolver*, SoupURI*, GCancellable*, SoupURI**))(fnptr))(arg0, arg1, arg2, arg3);
+// };
+// void _gotk4_soup2_ProxyURIResolver_virtual_get_proxy_uri_async(void* fnptr, SoupProxyURIResolver* arg0, SoupURI* arg1, GMainContext* arg2, GCancellable* arg3, SoupProxyURIResolverCallback arg4, gpointer arg5) {
+//   ((void (*)(SoupProxyURIResolver*, SoupURI*, GMainContext*, GCancellable*, SoupProxyURIResolverCallback, gpointer))(fnptr))(arg0, arg1, arg2, arg3, arg4, arg5);
+// };
 import "C"
 
-// glib.Type values for soup-proxy-uri-resolver.go.
-var GTypeProxyURIResolver = externglib.Type(C.soup_proxy_uri_resolver_get_type())
+// GType values.
+var (
+	GTypeProxyURIResolver = coreglib.Type(C.soup_proxy_uri_resolver_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeProxyURIResolver, F: marshalProxyURIResolver},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeProxyURIResolver, F: marshalProxyURIResolver},
 	})
 }
 
 // ProxyURIResolverCallback: callback for
 // soup_proxy_uri_resolver_get_proxy_uri_async().
 type ProxyURIResolverCallback func(resolver ProxyURIResolverer, status uint, proxyUri *URI)
-
-//export _gotk4_soup2_ProxyURIResolverCallback
-func _gotk4_soup2_ProxyURIResolverCallback(arg1 *C.SoupProxyURIResolver, arg2 C.guint, arg3 *C.SoupURI, arg4 C.gpointer) {
-	var fn ProxyURIResolverCallback
-	{
-		v := gbox.Get(uintptr(arg4))
-		if v == nil {
-			panic(`callback not found`)
-		}
-		fn = v.(ProxyURIResolverCallback)
-	}
-
-	var _resolver ProxyURIResolverer // out
-	var _status uint                 // out
-	var _proxyUri *URI               // out
-
-	{
-		objptr := unsafe.Pointer(arg1)
-		if objptr == nil {
-			panic("object of type soup.ProxyURIResolverer is nil")
-		}
-
-		object := externglib.Take(objptr)
-		casted := object.WalkCast(func(obj externglib.Objector) bool {
-			_, ok := obj.(ProxyURIResolverer)
-			return ok
-		})
-		rv, ok := casted.(ProxyURIResolverer)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching soup.ProxyURIResolverer")
-		}
-		_resolver = rv
-	}
-	_status = uint(arg2)
-	_proxyUri = (*URI)(gextras.NewStructNative(unsafe.Pointer(arg3)))
-
-	fn(_resolver, _status, _proxyUri)
-}
 
 //
 // ProxyURIResolver wraps an interface. This means the user can get the
@@ -84,7 +53,7 @@ var ()
 
 // ProxyURIResolverer describes ProxyURIResolver's interface methods.
 type ProxyURIResolverer interface {
-	externglib.Objector
+	coreglib.Objector
 
 	// ProxyUriAsync: asynchronously determines a proxy URI to use for msg and
 	// calls callback.
@@ -95,7 +64,7 @@ type ProxyURIResolverer interface {
 
 var _ ProxyURIResolverer = (*ProxyURIResolver)(nil)
 
-func wrapProxyURIResolver(obj *externglib.Object) *ProxyURIResolver {
+func wrapProxyURIResolver(obj *coreglib.Object) *ProxyURIResolver {
 	return &ProxyURIResolver{
 		SessionFeature: SessionFeature{
 			Object: obj,
@@ -104,7 +73,7 @@ func wrapProxyURIResolver(obj *externglib.Object) *ProxyURIResolver {
 }
 
 func marshalProxyURIResolver(p uintptr) (interface{}, error) {
-	return wrapProxyURIResolver(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapProxyURIResolver(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // ProxyUriAsync: asynchronously determines a proxy URI to use for msg and calls
@@ -114,10 +83,10 @@ func marshalProxyURIResolver(p uintptr) (interface{}, error) {
 //
 // The function takes the following parameters:
 //
-//    - ctx (optional) or NULL.
-//    - uri you want a proxy for.
-//    - asyncContext (optional) to invoke callback in.
-//    - callback to invoke with the proxy address.
+//   - ctx (optional) or NULL.
+//   - uri you want a proxy for.
+//   - asyncContext (optional) to invoke callback in.
+//   - callback to invoke with the proxy address.
 //
 func (proxyUriResolver *ProxyURIResolver) ProxyUriAsync(ctx context.Context, uri *URI, asyncContext *glib.MainContext, callback ProxyURIResolverCallback) {
 	var _arg0 *C.SoupProxyURIResolver        // out
@@ -127,7 +96,7 @@ func (proxyUriResolver *ProxyURIResolver) ProxyUriAsync(ctx context.Context, uri
 	var _arg4 C.SoupProxyURIResolverCallback // out
 	var _arg5 C.gpointer
 
-	_arg0 = (*C.SoupProxyURIResolver)(unsafe.Pointer(externglib.InternObject(proxyUriResolver).Native()))
+	_arg0 = (*C.SoupProxyURIResolver)(unsafe.Pointer(coreglib.InternObject(proxyUriResolver).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -156,13 +125,13 @@ func (proxyUriResolver *ProxyURIResolver) ProxyUriAsync(ctx context.Context, uri
 //
 // The function takes the following parameters:
 //
-//    - ctx (optional) or NULL.
-//    - uri you want a proxy for.
+//   - ctx (optional) or NULL.
+//   - uri you want a proxy for.
 //
 // The function returns the following values:
 //
-//    - proxyUri: on return, will contain the proxy URI.
-//    - guint: SOUP_STATUS_OK if successful, or a transport-level error.
+//   - proxyUri: on return, will contain the proxy URI.
+//   - guint: SOUP_STATUS_OK if successful, or a transport-level error.
 //
 func (proxyUriResolver *ProxyURIResolver) ProxyUriSync(ctx context.Context, uri *URI) (*URI, uint) {
 	var _arg0 *C.SoupProxyURIResolver // out
@@ -171,7 +140,7 @@ func (proxyUriResolver *ProxyURIResolver) ProxyUriSync(ctx context.Context, uri 
 	var _arg3 *C.SoupURI              // in
 	var _cret C.guint                 // in
 
-	_arg0 = (*C.SoupProxyURIResolver)(unsafe.Pointer(externglib.InternObject(proxyUriResolver).Native()))
+	_arg0 = (*C.SoupProxyURIResolver)(unsafe.Pointer(coreglib.InternObject(proxyUriResolver).Native()))
 	{
 		cancellable := gcancel.GCancellableFromContext(ctx)
 		defer runtime.KeepAlive(cancellable)
@@ -197,4 +166,113 @@ func (proxyUriResolver *ProxyURIResolver) ProxyUriSync(ctx context.Context, uri 
 	_guint = uint(_cret)
 
 	return _proxyUri, _guint
+}
+
+// proXYUriAsync: asynchronously determines a proxy URI to use for msg and calls
+// callback.
+//
+// Deprecated: ProxyURIResolver is deprecated in favor of Resolver.
+//
+// The function takes the following parameters:
+//
+//   - ctx (optional) or NULL.
+//   - uri you want a proxy for.
+//   - asyncContext (optional) to invoke callback in.
+//   - callback to invoke with the proxy address.
+//
+func (proxyUriResolver *ProxyURIResolver) proxyUriAsync(ctx context.Context, uri *URI, asyncContext *glib.MainContext, callback ProxyURIResolverCallback) {
+	gclass := (*C.SoupProxyURIResolverInterface)(coreglib.PeekParentClass(proxyUriResolver))
+	fnarg := gclass.get_proxy_uri_async
+
+	var _arg0 *C.SoupProxyURIResolver        // out
+	var _arg3 *C.GCancellable                // out
+	var _arg1 *C.SoupURI                     // out
+	var _arg2 *C.GMainContext                // out
+	var _arg4 C.SoupProxyURIResolverCallback // out
+	var _arg5 C.gpointer
+
+	_arg0 = (*C.SoupProxyURIResolver)(unsafe.Pointer(coreglib.InternObject(proxyUriResolver).Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
+	if asyncContext != nil {
+		_arg2 = (*C.GMainContext)(gextras.StructNative(unsafe.Pointer(asyncContext)))
+	}
+	_arg4 = (*[0]byte)(C._gotk4_soup2_ProxyURIResolverCallback)
+	_arg5 = C.gpointer(gbox.AssignOnce(callback))
+
+	C._gotk4_soup2_ProxyURIResolver_virtual_get_proxy_uri_async(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(proxyUriResolver)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(uri)
+	runtime.KeepAlive(asyncContext)
+	runtime.KeepAlive(callback)
+}
+
+// proXYUriSync: synchronously determines a proxy URI to use for uri. If uri
+// should be sent via proxy, *proxy_uri will be set to the URI of the proxy,
+// else it will be set to NULL.
+//
+// Deprecated: ProxyURIResolver is deprecated in favor of Resolver.
+//
+// The function takes the following parameters:
+//
+//   - ctx (optional) or NULL.
+//   - uri you want a proxy for.
+//
+// The function returns the following values:
+//
+//   - proxyUri: on return, will contain the proxy URI.
+//   - guint: SOUP_STATUS_OK if successful, or a transport-level error.
+//
+func (proxyUriResolver *ProxyURIResolver) proxyUriSync(ctx context.Context, uri *URI) (*URI, uint) {
+	gclass := (*C.SoupProxyURIResolverInterface)(coreglib.PeekParentClass(proxyUriResolver))
+	fnarg := gclass.get_proxy_uri_sync
+
+	var _arg0 *C.SoupProxyURIResolver // out
+	var _arg2 *C.GCancellable         // out
+	var _arg1 *C.SoupURI              // out
+	var _arg3 *C.SoupURI              // in
+	var _cret C.guint                 // in
+
+	_arg0 = (*C.SoupProxyURIResolver)(unsafe.Pointer(coreglib.InternObject(proxyUriResolver).Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = (*C.SoupURI)(gextras.StructNative(unsafe.Pointer(uri)))
+
+	_cret = C._gotk4_soup2_ProxyURIResolver_virtual_get_proxy_uri_sync(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2, &_arg3)
+	runtime.KeepAlive(proxyUriResolver)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(uri)
+
+	var _proxyUri *URI // out
+	var _guint uint    // out
+
+	_proxyUri = (*URI)(gextras.NewStructNative(unsafe.Pointer(_arg3)))
+	runtime.SetFinalizer(
+		gextras.StructIntern(unsafe.Pointer(_proxyUri)),
+		func(intern *struct{ C unsafe.Pointer }) {
+			C.soup_uri_free((*C.SoupURI)(intern.C))
+		},
+	)
+	_guint = uint(_cret)
+
+	return _proxyUri, _guint
+}
+
+// ProxyURIResolverInterface: instance of this type is always passed by
+// reference.
+type ProxyURIResolverInterface struct {
+	*proxyURIResolverInterface
+}
+
+// proxyURIResolverInterface is the struct that's finalized.
+type proxyURIResolverInterface struct {
+	native *C.SoupProxyURIResolverInterface
 }

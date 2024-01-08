@@ -7,7 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -15,16 +15,20 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitMimeInfo.go.
-var GTypeMIMEInfo = externglib.Type(C.webkit_mime_info_get_type())
+// GType values.
+var (
+	GTypeMIMEInfo = coreglib.Type(C.webkit_mime_info_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeMIMEInfo, F: marshalMIMEInfo},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeMIMEInfo, F: marshalMIMEInfo},
 	})
 }
 
-// MIMEInfo: instance of this type is always passed by reference.
+// MIMEInfo: information about a MIME type.
+//
+// An instance of this type is always passed by reference.
 type MIMEInfo struct {
 	*mimeInfo
 }
@@ -35,15 +39,17 @@ type mimeInfo struct {
 }
 
 func marshalMIMEInfo(p uintptr) (interface{}, error) {
-	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	b := coreglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
 	return &MIMEInfo{&mimeInfo{(*C.WebKitMimeInfo)(b)}}, nil
 }
 
-// Description: deprecated: since version 2.32.
+// Description gets the description of the MIME type.
+//
+// Deprecated: since version 2.32.
 //
 // The function returns the following values:
 //
-//    - utf8: description of the MIME type of info.
+//   - utf8 (optional): description, as a string.
 //
 func (info *MIMEInfo) Description() string {
 	var _arg0 *C.WebKitMimeInfo // out
@@ -56,19 +62,20 @@ func (info *MIMEInfo) Description() string {
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
 
-// Extensions: get the list of file extensions associated to the MIME type of
-// info
+// Extensions: get the list of file extensions associated to the MIME type.
 //
 // Deprecated: since version 2.32.
 //
 // The function returns the following values:
 //
-//    - utf8s: a NULL-terminated array of strings.
+//   - utf8s: a NULL-terminated array of strings.
 //
 func (info *MIMEInfo) Extensions() []string {
 	var _arg0 *C.WebKitMimeInfo // out
@@ -98,11 +105,13 @@ func (info *MIMEInfo) Extensions() []string {
 	return _utf8s
 }
 
-// MIMEType: deprecated: since version 2.32.
+// MIMEType gets the MIME type.
+//
+// Deprecated: since version 2.32.
 //
 // The function returns the following values:
 //
-//    - utf8: MIME type of info.
+//   - utf8: MIME type, as a string.
 //
 func (info *MIMEInfo) MIMEType() string {
 	var _arg0 *C.WebKitMimeInfo // out

@@ -5,7 +5,8 @@ package soup
 import (
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
@@ -14,17 +15,23 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup-request-data.go.
-var GTypeRequestData = externglib.Type(C.soup_request_data_get_type())
+// GType values.
+var (
+	GTypeRequestData = coreglib.Type(C.soup_request_data_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeRequestData, F: marshalRequestData},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeRequestData, F: marshalRequestData},
 	})
 }
 
-// RequestDataOverrider contains methods that are overridable.
-type RequestDataOverrider interface {
+// RequestDataOverrides contains methods that are overridable.
+type RequestDataOverrides struct {
+}
+
+func defaultRequestDataOverrides(v *RequestData) RequestDataOverrides {
+	return RequestDataOverrides{}
 }
 
 type RequestData struct {
@@ -33,18 +40,26 @@ type RequestData struct {
 }
 
 var (
-	_ externglib.Objector = (*RequestData)(nil)
+	_ coreglib.Objector = (*RequestData)(nil)
 )
 
-func classInitRequestDatar(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*RequestData, *RequestDataClass, RequestDataOverrides](
+		GTypeRequestData,
+		initRequestDataClass,
+		wrapRequestData,
+		defaultRequestDataOverrides,
+	)
 }
 
-func wrapRequestData(obj *externglib.Object) *RequestData {
+func initRequestDataClass(gclass unsafe.Pointer, overrides RequestDataOverrides, classInitFunc func(*RequestDataClass)) {
+	if classInitFunc != nil {
+		class := (*RequestDataClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapRequestData(obj *coreglib.Object) *RequestData {
 	return &RequestData{
 		Request: Request{
 			Object: obj,
@@ -56,5 +71,22 @@ func wrapRequestData(obj *externglib.Object) *RequestData {
 }
 
 func marshalRequestData(p uintptr) (interface{}, error) {
-	return wrapRequestData(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapRequestData(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+// RequestDataClass: instance of this type is always passed by reference.
+type RequestDataClass struct {
+	*requestDataClass
+}
+
+// requestDataClass is the struct that's finalized.
+type requestDataClass struct {
+	native *C.SoupRequestDataClass
+}
+
+func (r *RequestDataClass) Parent() *RequestClass {
+	valptr := &r.native.parent
+	var _v *RequestClass // out
+	_v = (*RequestClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
+	return _v
 }

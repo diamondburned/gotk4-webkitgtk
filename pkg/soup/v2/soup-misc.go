@@ -4,7 +4,6 @@ package soup
 
 import (
 	"runtime"
-	"runtime/cgo"
 	"unsafe"
 )
 
@@ -22,14 +21,14 @@ const CHAR_URI_SUB_DELIMS = 4
 //
 // The function takes the following parameters:
 //
-//    - v1 (optional): ASCII string.
-//    - v2 (optional): another ASCII string.
+//   - v1 (optional): ASCII string.
+//   - v2 (optional): another ASCII string.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if they are equal (modulo case).
+//   - ok: TRUE if they are equal (modulo case).
 //
-func StrCaseEqual(v1, v2 cgo.Handle) bool {
+func StrCaseEqual(v1, v2 unsafe.Pointer) bool {
 	var _arg1 C.gconstpointer // out
 	var _arg2 C.gconstpointer // out
 	var _cret C.gboolean      // in
@@ -54,13 +53,13 @@ func StrCaseEqual(v1, v2 cgo.Handle) bool {
 //
 // The function takes the following parameters:
 //
-//    - key (optional): ASCII string to hash.
+//   - key (optional): ASCII string to hash.
 //
 // The function returns the following values:
 //
-//    - guint: hash code.
+//   - guint: hash code.
 //
-func StrCaseHash(key cgo.Handle) uint {
+func StrCaseHash(key unsafe.Pointer) uint {
 	var _arg1 C.gconstpointer // out
 	var _cret C.guint         // in
 

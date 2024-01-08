@@ -2,111 +2,17 @@
 
 package webkit2
 
-import (
-	"runtime"
-	"unsafe"
-
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
-)
-
 // #include <stdlib.h>
-// #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitUserMediaPermissionRequest.go.
-var GTypeUserMediaPermissionRequest = externglib.Type(C.webkit_user_media_permission_request_get_type())
-
-func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeUserMediaPermissionRequest, F: marshalUserMediaPermissionRequest},
-	})
+// UserMediaPermissionRequestClass: instance of this type is always passed by
+// reference.
+type UserMediaPermissionRequestClass struct {
+	*userMediaPermissionRequestClass
 }
 
-// The function takes the following parameters:
-//
-//    - request: KitUserMediaPermissionRequest.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if access to an audio device was requested.
-//
-func UserMediaPermissionIsForAudioDevice(request *UserMediaPermissionRequest) bool {
-	var _arg1 *C.WebKitUserMediaPermissionRequest // out
-	var _cret C.gboolean                          // in
-
-	_arg1 = (*C.WebKitUserMediaPermissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
-
-	_cret = C.webkit_user_media_permission_is_for_audio_device(_arg1)
-	runtime.KeepAlive(request)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// The function takes the following parameters:
-//
-//    - request: KitUserMediaPermissionRequest.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if access to a video device was requested.
-//
-func UserMediaPermissionIsForVideoDevice(request *UserMediaPermissionRequest) bool {
-	var _arg1 *C.WebKitUserMediaPermissionRequest // out
-	var _cret C.gboolean                          // in
-
-	_arg1 = (*C.WebKitUserMediaPermissionRequest)(unsafe.Pointer(externglib.InternObject(request).Native()))
-
-	_cret = C.webkit_user_media_permission_is_for_video_device(_arg1)
-	runtime.KeepAlive(request)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// UserMediaPermissionRequestOverrider contains methods that are overridable.
-type UserMediaPermissionRequestOverrider interface {
-}
-
-type UserMediaPermissionRequest struct {
-	_ [0]func() // equal guard
-	*externglib.Object
-
-	PermissionRequest
-}
-
-var (
-	_ externglib.Objector = (*UserMediaPermissionRequest)(nil)
-)
-
-func classInitUserMediaPermissionRequester(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
-}
-
-func wrapUserMediaPermissionRequest(obj *externglib.Object) *UserMediaPermissionRequest {
-	return &UserMediaPermissionRequest{
-		Object: obj,
-		PermissionRequest: PermissionRequest{
-			Object: obj,
-		},
-	}
-}
-
-func marshalUserMediaPermissionRequest(p uintptr) (interface{}, error) {
-	return wrapUserMediaPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+// userMediaPermissionRequestClass is the struct that's finalized.
+type userMediaPermissionRequestClass struct {
+	native *C.WebKitUserMediaPermissionRequestClass
 }

@@ -6,7 +6,8 @@ import (
 	"runtime"
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -14,19 +15,31 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitResponsePolicyDecision.go.
-var GTypeResponsePolicyDecision = externglib.Type(C.webkit_response_policy_decision_get_type())
+// GType values.
+var (
+	GTypeResponsePolicyDecision = coreglib.Type(C.webkit_response_policy_decision_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeResponsePolicyDecision, F: marshalResponsePolicyDecision},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeResponsePolicyDecision, F: marshalResponsePolicyDecision},
 	})
 }
 
-// ResponsePolicyDecisionOverrider contains methods that are overridable.
-type ResponsePolicyDecisionOverrider interface {
+// ResponsePolicyDecisionOverrides contains methods that are overridable.
+type ResponsePolicyDecisionOverrides struct {
 }
 
+func defaultResponsePolicyDecisionOverrides(v *ResponsePolicyDecision) ResponsePolicyDecisionOverrides {
+	return ResponsePolicyDecisionOverrides{}
+}
+
+// ResponsePolicyDecision: policy decision for resource responses.
+//
+// WebKitResponsePolicyDecision represents a policy decision for a resource
+// response, whether from the network or the local system. A very common use
+// case for these types of decision is deciding whether or not to download a
+// particular resource or to load it normally.
 type ResponsePolicyDecision struct {
 	_ [0]func() // equal guard
 	PolicyDecision
@@ -36,15 +49,23 @@ var (
 	_ PolicyDecisioner = (*ResponsePolicyDecision)(nil)
 )
 
-func classInitResponsePolicyDecisioner(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*ResponsePolicyDecision, *ResponsePolicyDecisionClass, ResponsePolicyDecisionOverrides](
+		GTypeResponsePolicyDecision,
+		initResponsePolicyDecisionClass,
+		wrapResponsePolicyDecision,
+		defaultResponsePolicyDecisionOverrides,
+	)
 }
 
-func wrapResponsePolicyDecision(obj *externglib.Object) *ResponsePolicyDecision {
+func initResponsePolicyDecisionClass(gclass unsafe.Pointer, overrides ResponsePolicyDecisionOverrides, classInitFunc func(*ResponsePolicyDecisionClass)) {
+	if classInitFunc != nil {
+		class := (*ResponsePolicyDecisionClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapResponsePolicyDecision(obj *coreglib.Object) *ResponsePolicyDecision {
 	return &ResponsePolicyDecision{
 		PolicyDecision: PolicyDecision{
 			Object: obj,
@@ -53,32 +74,33 @@ func wrapResponsePolicyDecision(obj *externglib.Object) *ResponsePolicyDecision 
 }
 
 func marshalResponsePolicyDecision(p uintptr) (interface{}, error) {
-	return wrapResponsePolicyDecision(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapResponsePolicyDecision(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Request: return the KitURIRequest associated with the response decision.
-// Modifications to the returned object are <emphasis>not</emphasis> taken into
-// account when the request is sent over the network, and is intended only to
-// aid in evaluating whether a response decision should be taken or not. To
-// modify requests before they are sent over the network the
+//
+// Modifications to the returned object are <emphasis>not</emphasis> taken
+// into account when the request is sent over the network, and is intended
+// only to aid in evaluating whether a response decision should be taken
+// or not. To modify requests before they are sent over the network the
 // KitPage::send-request signal can be used instead.
 //
 // The function returns the following values:
 //
-//    - uriRequest: URI request that is associated with this policy decision.
+//   - uriRequest: URI request that is associated with this policy decision.
 //
 func (decision *ResponsePolicyDecision) Request() *URIRequest {
 	var _arg0 *C.WebKitResponsePolicyDecision // out
 	var _cret *C.WebKitURIRequest             // in
 
-	_arg0 = (*C.WebKitResponsePolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
+	_arg0 = (*C.WebKitResponsePolicyDecision)(unsafe.Pointer(coreglib.InternObject(decision).Native()))
 
 	_cret = C.webkit_response_policy_decision_get_request(_arg0)
 	runtime.KeepAlive(decision)
 
 	var _uriRequest *URIRequest // out
 
-	_uriRequest = wrapURIRequest(externglib.Take(unsafe.Pointer(_cret)))
+	_uriRequest = wrapURIRequest(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _uriRequest
 }
@@ -87,38 +109,67 @@ func (decision *ResponsePolicyDecision) Request() *URIRequest {
 //
 // The function returns the following values:
 //
-//    - uriResponse: URI response that is associated with this policy decision.
+//   - uriResponse: URI response that is associated with this policy decision.
 //
 func (decision *ResponsePolicyDecision) Response() *URIResponse {
 	var _arg0 *C.WebKitResponsePolicyDecision // out
 	var _cret *C.WebKitURIResponse            // in
 
-	_arg0 = (*C.WebKitResponsePolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
+	_arg0 = (*C.WebKitResponsePolicyDecision)(unsafe.Pointer(coreglib.InternObject(decision).Native()))
 
 	_cret = C.webkit_response_policy_decision_get_response(_arg0)
 	runtime.KeepAlive(decision)
 
 	var _uriResponse *URIResponse // out
 
-	_uriResponse = wrapURIResponse(externglib.Take(unsafe.Pointer(_cret)))
+	_uriResponse = wrapURIResponse(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _uriResponse
 }
 
-// IsMIMETypeSupported gets whether the MIME type of the response can be
-// displayed in the KitWebView that triggered this policy decision request. See
-// also webkit_web_view_can_show_mime_type().
+// IsMainFrameMainResource gets whether the request is the main frame main
+// resource.
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if the MIME type of the response is supported or FALSE
-//      otherwise.
+//   - ok: TRUE if the request is the main frame main resouce or FALSE
+//     otherwise.
+//
+func (decision *ResponsePolicyDecision) IsMainFrameMainResource() bool {
+	var _arg0 *C.WebKitResponsePolicyDecision // out
+	var _cret C.gboolean                      // in
+
+	_arg0 = (*C.WebKitResponsePolicyDecision)(unsafe.Pointer(coreglib.InternObject(decision).Native()))
+
+	_cret = C.webkit_response_policy_decision_is_main_frame_main_resource(_arg0)
+	runtime.KeepAlive(decision)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
+// IsMIMETypeSupported gets whether the MIME type of the response can be
+// displayed in the KitWebView.
+//
+// Gets whether the MIME type of the response can be displayed in the
+// KitWebView that triggered this policy decision request. See also
+// webkit_web_view_can_show_mime_type().
+//
+// The function returns the following values:
+//
+//   - ok: TRUE if the MIME type of the response is supported or FALSE
+//     otherwise.
 //
 func (decision *ResponsePolicyDecision) IsMIMETypeSupported() bool {
 	var _arg0 *C.WebKitResponsePolicyDecision // out
 	var _cret C.gboolean                      // in
 
-	_arg0 = (*C.WebKitResponsePolicyDecision)(unsafe.Pointer(externglib.InternObject(decision).Native()))
+	_arg0 = (*C.WebKitResponsePolicyDecision)(unsafe.Pointer(coreglib.InternObject(decision).Native()))
 
 	_cret = C.webkit_response_policy_decision_is_mime_type_supported(_arg0)
 	runtime.KeepAlive(decision)
@@ -130,4 +181,22 @@ func (decision *ResponsePolicyDecision) IsMIMETypeSupported() bool {
 	}
 
 	return _ok
+}
+
+// ResponsePolicyDecisionClass: instance of this type is always passed by
+// reference.
+type ResponsePolicyDecisionClass struct {
+	*responsePolicyDecisionClass
+}
+
+// responsePolicyDecisionClass is the struct that's finalized.
+type responsePolicyDecisionClass struct {
+	native *C.WebKitResponsePolicyDecisionClass
+}
+
+func (r *ResponsePolicyDecisionClass) ParentClass() *PolicyDecisionClass {
+	valptr := &r.native.parent_class
+	var _v *PolicyDecisionClass // out
+	_v = (*PolicyDecisionClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
+	return _v
 }

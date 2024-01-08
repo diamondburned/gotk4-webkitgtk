@@ -8,7 +8,7 @@ import (
 
 	"github.com/diamondburned/gotk4-webkitgtk/pkg/javascriptcore/v4"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -16,16 +16,20 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitJavascriptResult.go.
-var GTypeJavascriptResult = externglib.Type(C.webkit_javascript_result_get_type())
+// GType values.
+var (
+	GTypeJavascriptResult = coreglib.Type(C.webkit_javascript_result_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeJavascriptResult, F: marshalJavascriptResult},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeJavascriptResult, F: marshalJavascriptResult},
 	})
 }
 
-// JavascriptResult: instance of this type is always passed by reference.
+// JavascriptResult: result of JavaScript evaluation in a web view.
+//
+// An instance of this type is always passed by reference.
 type JavascriptResult struct {
 	*javascriptResult
 }
@@ -36,7 +40,7 @@ type javascriptResult struct {
 }
 
 func marshalJavascriptResult(p uintptr) (interface{}, error) {
-	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	b := coreglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
 	return &JavascriptResult{&javascriptResult{(*C.WebKitJavascriptResult)(b)}}, nil
 }
 
@@ -44,7 +48,7 @@ func marshalJavascriptResult(p uintptr) (interface{}, error) {
 //
 // The function returns the following values:
 //
-//    - value of the KitJavascriptResult.
+//   - value of the KitJavascriptResult.
 //
 func (jsResult *JavascriptResult) JsValue() *javascriptcore.Value {
 	var _arg0 *C.WebKitJavascriptResult // out
@@ -58,7 +62,7 @@ func (jsResult *JavascriptResult) JsValue() *javascriptcore.Value {
 	var _value *javascriptcore.Value // out
 
 	{
-		obj := externglib.Take(unsafe.Pointer(_cret))
+		obj := coreglib.Take(unsafe.Pointer(_cret))
 		_value = &javascriptcore.Value{
 			Object: obj,
 		}

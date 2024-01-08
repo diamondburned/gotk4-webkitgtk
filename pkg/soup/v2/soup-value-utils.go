@@ -7,7 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -22,11 +22,11 @@ import "C"
 //
 // The function takes the following parameters:
 //
-//    - hash: value hash.
-//    - key: key.
-//    - value: value.
+//   - hash: value hash.
+//   - key: key.
+//   - value: value.
 //
-func ValueHashInsertValue(hash map[string]externglib.Value, key string, value *externglib.Value) {
+func ValueHashInsertValue(hash map[string]coreglib.Value, key string, value *coreglib.Value) {
 	var _arg1 *C.GHashTable // out
 	var _arg2 *C.char       // out
 	var _arg3 *C.GValue     // out
@@ -58,25 +58,25 @@ func ValueHashInsertValue(hash map[string]externglib.Value, key string, value *e
 //
 // The function returns the following values:
 //
-//    - hashTable: new empty Table.
+//   - hashTable: new empty Table.
 //
-func NewValueHash() map[string]externglib.Value {
+func NewValueHash() map[string]coreglib.Value {
 	var _cret *C.GHashTable // in
 
 	_cret = C.soup_value_hash_new()
 
-	var _hashTable map[string]externglib.Value // out
+	var _hashTable map[string]coreglib.Value // out
 
-	_hashTable = make(map[string]externglib.Value, gextras.HashTableSize(unsafe.Pointer(_cret)))
+	_hashTable = make(map[string]coreglib.Value, gextras.HashTableSize(unsafe.Pointer(_cret)))
 	gextras.MoveHashTable(unsafe.Pointer(_cret), true, func(k, v unsafe.Pointer) {
 		ksrc := *(**C.gchar)(k)
 		vsrc := *(**C.GValue)(v)
-		var kdst string           // out
-		var vdst externglib.Value // out
+		var kdst string         // out
+		var vdst coreglib.Value // out
 		kdst = C.GoString((*C.gchar)(unsafe.Pointer(ksrc)))
 		defer C.free(unsafe.Pointer(ksrc))
-		vdst = *externglib.ValueFromNative(unsafe.Pointer(vsrc))
-		runtime.SetFinalizer(vdst, func(v *externglib.Value) {
+		vdst = *coreglib.ValueFromNative(unsafe.Pointer(vsrc))
+		runtime.SetFinalizer(vdst, func(v *coreglib.Value) {
 			C.g_value_unset((*C.GValue)(unsafe.Pointer(v.Native())))
 		})
 		_hashTable[kdst] = vdst

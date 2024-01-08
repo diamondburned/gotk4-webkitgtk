@@ -5,7 +5,8 @@ package soup
 import (
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -13,17 +14,23 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup-session-sync.go.
-var GTypeSessionSync = externglib.Type(C.soup_session_sync_get_type())
+// GType values.
+var (
+	GTypeSessionSync = coreglib.Type(C.soup_session_sync_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeSessionSync, F: marshalSessionSync},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeSessionSync, F: marshalSessionSync},
 	})
 }
 
-// SessionSyncOverrider contains methods that are overridable.
-type SessionSyncOverrider interface {
+// SessionSyncOverrides contains methods that are overridable.
+type SessionSyncOverrides struct {
+}
+
+func defaultSessionSyncOverrides(v *SessionSync) SessionSyncOverrides {
+	return SessionSyncOverrides{}
 }
 
 type SessionSync struct {
@@ -32,18 +39,26 @@ type SessionSync struct {
 }
 
 var (
-	_ externglib.Objector = (*SessionSync)(nil)
+	_ coreglib.Objector = (*SessionSync)(nil)
 )
 
-func classInitSessionSyncer(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*SessionSync, *SessionSyncClass, SessionSyncOverrides](
+		GTypeSessionSync,
+		initSessionSyncClass,
+		wrapSessionSync,
+		defaultSessionSyncOverrides,
+	)
 }
 
-func wrapSessionSync(obj *externglib.Object) *SessionSync {
+func initSessionSyncClass(gclass unsafe.Pointer, overrides SessionSyncOverrides, classInitFunc func(*SessionSyncClass)) {
+	if classInitFunc != nil {
+		class := (*SessionSyncClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapSessionSync(obj *coreglib.Object) *SessionSync {
 	return &SessionSync{
 		Session: Session{
 			Object: obj,
@@ -52,7 +67,7 @@ func wrapSessionSync(obj *externglib.Object) *SessionSync {
 }
 
 func marshalSessionSync(p uintptr) (interface{}, error) {
-	return wrapSessionSync(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapSessionSync(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewSessionSync creates an synchronous Session with the default options.
@@ -63,7 +78,7 @@ func marshalSessionSync(p uintptr) (interface{}, error) {
 //
 // The function returns the following values:
 //
-//    - sessionSync: new session.
+//   - sessionSync: new session.
 //
 func NewSessionSync() *SessionSync {
 	var _cret *C.SoupSession // in
@@ -72,7 +87,24 @@ func NewSessionSync() *SessionSync {
 
 	var _sessionSync *SessionSync // out
 
-	_sessionSync = wrapSessionSync(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_sessionSync = wrapSessionSync(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _sessionSync
+}
+
+// SessionSyncClass: instance of this type is always passed by reference.
+type SessionSyncClass struct {
+	*sessionSyncClass
+}
+
+// sessionSyncClass is the struct that's finalized.
+type sessionSyncClass struct {
+	native *C.SoupSessionSyncClass
+}
+
+func (s *SessionSyncClass) ParentClass() *SessionClass {
+	valptr := &s.native.parent_class
+	var _v *SessionClass // out
+	_v = (*SessionClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
+	return _v
 }

@@ -6,7 +6,8 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gtk/v3"
 )
 
@@ -15,17 +16,23 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitWebViewBase.go.
-var GTypeWebViewBase = externglib.Type(C.webkit_web_view_base_get_type())
+// GType values.
+var (
+	GTypeWebViewBase = coreglib.Type(C.webkit_web_view_base_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeWebViewBase, F: marshalWebViewBase},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeWebViewBase, F: marshalWebViewBase},
 	})
 }
 
-// WebViewBaseOverrider contains methods that are overridable.
-type WebViewBaseOverrider interface {
+// WebViewBaseOverrides contains methods that are overridable.
+type WebViewBaseOverrides struct {
+}
+
+func defaultWebViewBaseOverrides(v *WebViewBase) WebViewBaseOverrides {
+	return WebViewBaseOverrides{}
 }
 
 type WebViewBase struct {
@@ -37,19 +44,27 @@ var (
 	_ gtk.Containerer = (*WebViewBase)(nil)
 )
 
-func classInitWebViewBaser(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*WebViewBase, *WebViewBaseClass, WebViewBaseOverrides](
+		GTypeWebViewBase,
+		initWebViewBaseClass,
+		wrapWebViewBase,
+		defaultWebViewBaseOverrides,
+	)
 }
 
-func wrapWebViewBase(obj *externglib.Object) *WebViewBase {
+func initWebViewBaseClass(gclass unsafe.Pointer, overrides WebViewBaseOverrides, classInitFunc func(*WebViewBaseClass)) {
+	if classInitFunc != nil {
+		class := (*WebViewBaseClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapWebViewBase(obj *coreglib.Object) *WebViewBase {
 	return &WebViewBase{
 		Container: gtk.Container{
 			Widget: gtk.Widget{
-				InitiallyUnowned: externglib.InitiallyUnowned{
+				InitiallyUnowned: coreglib.InitiallyUnowned{
 					Object: obj,
 				},
 				Object: obj,
@@ -65,5 +80,22 @@ func wrapWebViewBase(obj *externglib.Object) *WebViewBase {
 }
 
 func marshalWebViewBase(p uintptr) (interface{}, error) {
-	return wrapWebViewBase(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapWebViewBase(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+// WebViewBaseClass: instance of this type is always passed by reference.
+type WebViewBaseClass struct {
+	*webViewBaseClass
+}
+
+// webViewBaseClass is the struct that's finalized.
+type webViewBaseClass struct {
+	native *C.WebKitWebViewBaseClass
+}
+
+func (w *WebViewBaseClass) ParentClass() *gtk.ContainerClass {
+	valptr := &w.native.parentClass
+	var _v *gtk.ContainerClass // out
+	_v = (*gtk.ContainerClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
+	return _v
 }

@@ -5,7 +5,8 @@ package soup
 import (
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -13,39 +14,53 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup-proxy-resolver-default.go.
-var GTypeProxyResolverDefault = externglib.Type(C.soup_proxy_resolver_default_get_type())
+// GType values.
+var (
+	GTypeProxyResolverDefault = coreglib.Type(C.soup_proxy_resolver_default_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeProxyResolverDefault, F: marshalProxyResolverDefault},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeProxyResolverDefault, F: marshalProxyResolverDefault},
 	})
 }
 
-// ProxyResolverDefaultOverrider contains methods that are overridable.
-type ProxyResolverDefaultOverrider interface {
+// ProxyResolverDefaultOverrides contains methods that are overridable.
+type ProxyResolverDefaultOverrides struct {
+}
+
+func defaultProxyResolverDefaultOverrides(v *ProxyResolverDefault) ProxyResolverDefaultOverrides {
+	return ProxyResolverDefaultOverrides{}
 }
 
 type ProxyResolverDefault struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 
 	ProxyURIResolver
 }
 
 var (
-	_ externglib.Objector = (*ProxyResolverDefault)(nil)
+	_ coreglib.Objector = (*ProxyResolverDefault)(nil)
 )
 
-func classInitProxyResolverDefaulter(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*ProxyResolverDefault, *ProxyResolverDefaultClass, ProxyResolverDefaultOverrides](
+		GTypeProxyResolverDefault,
+		initProxyResolverDefaultClass,
+		wrapProxyResolverDefault,
+		defaultProxyResolverDefaultOverrides,
+	)
 }
 
-func wrapProxyResolverDefault(obj *externglib.Object) *ProxyResolverDefault {
+func initProxyResolverDefaultClass(gclass unsafe.Pointer, overrides ProxyResolverDefaultOverrides, classInitFunc func(*ProxyResolverDefaultClass)) {
+	if classInitFunc != nil {
+		class := (*ProxyResolverDefaultClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapProxyResolverDefault(obj *coreglib.Object) *ProxyResolverDefault {
 	return &ProxyResolverDefault{
 		Object: obj,
 		ProxyURIResolver: ProxyURIResolver{
@@ -57,5 +72,16 @@ func wrapProxyResolverDefault(obj *externglib.Object) *ProxyResolverDefault {
 }
 
 func marshalProxyResolverDefault(p uintptr) (interface{}, error) {
-	return wrapProxyResolverDefault(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapProxyResolverDefault(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+// ProxyResolverDefaultClass: instance of this type is always passed by
+// reference.
+type ProxyResolverDefaultClass struct {
+	*proxyResolverDefaultClass
+}
+
+// proxyResolverDefaultClass is the struct that's finalized.
+type proxyResolverDefaultClass struct {
+	native *C.SoupProxyResolverDefaultClass
 }

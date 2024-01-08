@@ -6,7 +6,8 @@ import (
 	"runtime"
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -14,19 +15,25 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup-hsts-enforcer-db.go.
-var GTypeHSTSEnforcerDB = externglib.Type(C.soup_hsts_enforcer_db_get_type())
+// GType values.
+var (
+	GTypeHSTSEnforcerDB = coreglib.Type(C.soup_hsts_enforcer_db_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeHSTSEnforcerDB, F: marshalHSTSEnforcerDB},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeHSTSEnforcerDB, F: marshalHSTSEnforcerDB},
 	})
 }
 
 const HSTS_ENFORCER_DB_FILENAME = "filename"
 
-// HSTSEnforcerDBOverrider contains methods that are overridable.
-type HSTSEnforcerDBOverrider interface {
+// HSTSEnforcerDBOverrides contains methods that are overridable.
+type HSTSEnforcerDBOverrides struct {
+}
+
+func defaultHSTSEnforcerDBOverrides(v *HSTSEnforcerDB) HSTSEnforcerDBOverrides {
+	return HSTSEnforcerDBOverrides{}
 }
 
 type HSTSEnforcerDB struct {
@@ -35,18 +42,26 @@ type HSTSEnforcerDB struct {
 }
 
 var (
-	_ externglib.Objector = (*HSTSEnforcerDB)(nil)
+	_ coreglib.Objector = (*HSTSEnforcerDB)(nil)
 )
 
-func classInitHSTSEnforcerDBer(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*HSTSEnforcerDB, *HSTSEnforcerDBClass, HSTSEnforcerDBOverrides](
+		GTypeHSTSEnforcerDB,
+		initHSTSEnforcerDBClass,
+		wrapHSTSEnforcerDB,
+		defaultHSTSEnforcerDBOverrides,
+	)
 }
 
-func wrapHSTSEnforcerDB(obj *externglib.Object) *HSTSEnforcerDB {
+func initHSTSEnforcerDBClass(gclass unsafe.Pointer, overrides HSTSEnforcerDBOverrides, classInitFunc func(*HSTSEnforcerDBClass)) {
+	if classInitFunc != nil {
+		class := (*HSTSEnforcerDBClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapHSTSEnforcerDB(obj *coreglib.Object) *HSTSEnforcerDB {
 	return &HSTSEnforcerDB{
 		HSTSEnforcer: HSTSEnforcer{
 			Object: obj,
@@ -58,24 +73,24 @@ func wrapHSTSEnforcerDB(obj *externglib.Object) *HSTSEnforcerDB {
 }
 
 func marshalHSTSEnforcerDB(p uintptr) (interface{}, error) {
-	return wrapHSTSEnforcerDB(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapHSTSEnforcerDB(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // NewHSTSEnforcerDB creates a HSTSEnforcerDB.
 //
 // filename will be read in during the initialization of a HSTSEnforcerDB, in
-// order to create an initial set of HSTS policies. If the file doesn't exist, a
-// new database will be created and initialized. Changes to the policies during
-// the lifetime of a HSTSEnforcerDB will be written to filename when
+// order to create an initial set of HSTS policies. If the file doesn't exist,
+// a new database will be created and initialized. Changes to the policies
+// during the lifetime of a HSTSEnforcerDB will be written to filename when
 // HSTSEnforcer::changed is emitted.
 //
 // The function takes the following parameters:
 //
-//    - filename of the database to read/write from.
+//   - filename of the database to read/write from.
 //
 // The function returns the following values:
 //
-//    - hstsEnforcerDB: new HSTSEnforcer.
+//   - hstsEnforcerDB: new HSTSEnforcer.
 //
 func NewHSTSEnforcerDB(filename string) *HSTSEnforcerDB {
 	var _arg1 *C.char             // out
@@ -89,7 +104,24 @@ func NewHSTSEnforcerDB(filename string) *HSTSEnforcerDB {
 
 	var _hstsEnforcerDB *HSTSEnforcerDB // out
 
-	_hstsEnforcerDB = wrapHSTSEnforcerDB(externglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	_hstsEnforcerDB = wrapHSTSEnforcerDB(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _hstsEnforcerDB
+}
+
+// HSTSEnforcerDBClass: instance of this type is always passed by reference.
+type HSTSEnforcerDBClass struct {
+	*hstsEnforcerDBClass
+}
+
+// hstsEnforcerDBClass is the struct that's finalized.
+type hstsEnforcerDBClass struct {
+	native *C.SoupHSTSEnforcerDBClass
+}
+
+func (h *HSTSEnforcerDBClass) ParentClass() *HSTSEnforcerClass {
+	valptr := &h.native.parent_class
+	var _v *HSTSEnforcerClass // out
+	_v = (*HSTSEnforcerClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
+	return _v
 }

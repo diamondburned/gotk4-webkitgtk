@@ -8,27 +8,28 @@ import (
 	"strings"
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
-// extern void _gotk4_webkit24_FindController_ConnectCountedMatches(gpointer, guint, guintptr);
-// extern void _gotk4_webkit24_FindController_ConnectFailedToFindText(gpointer, guintptr);
 // extern void _gotk4_webkit24_FindController_ConnectFoundText(gpointer, guint, guintptr);
+// extern void _gotk4_webkit24_FindController_ConnectFailedToFindText(gpointer, guintptr);
+// extern void _gotk4_webkit24_FindController_ConnectCountedMatches(gpointer, guint, guintptr);
 import "C"
 
-// glib.Type values for WebKitFindController.go.
+// GType values.
 var (
-	GTypeFindOptions    = externglib.Type(C.webkit_find_options_get_type())
-	GTypeFindController = externglib.Type(C.webkit_find_controller_get_type())
+	GTypeFindOptions    = coreglib.Type(C.webkit_find_options_get_type())
+	GTypeFindController = coreglib.Type(C.webkit_find_controller_get_type())
 )
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeFindOptions, F: marshalFindOptions},
-		{T: GTypeFindController, F: marshalFindController},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeFindOptions, F: marshalFindOptions},
+		coreglib.TypeMarshaler{T: GTypeFindController, F: marshalFindController},
 	})
 }
 
@@ -54,7 +55,7 @@ const (
 )
 
 func marshalFindOptions(p uintptr) (interface{}, error) {
-	return FindOptions(externglib.ValueFromNative(unsafe.Pointer(p)).Flags()), nil
+	return FindOptions(coreglib.ValueFromNative(unsafe.Pointer(p)).Flags()), nil
 }
 
 // String returns the names in string for FindOptions.
@@ -98,126 +99,94 @@ func (f FindOptions) Has(other FindOptions) bool {
 	return (f & other) == other
 }
 
-// FindControllerOverrider contains methods that are overridable.
-type FindControllerOverrider interface {
+// FindControllerOverrides contains methods that are overridable.
+type FindControllerOverrides struct {
 }
 
+func defaultFindControllerOverrides(v *FindController) FindControllerOverrides {
+	return FindControllerOverrides{}
+}
+
+// FindController controls text search in a KitWebView.
+//
+// A KitFindController is used to search text in a KitWebView.
+// You can get a KitWebView<!-- -->'s KitFindController with
+// webkit_web_view_get_find_controller(), and later use it to search
+// for text using webkit_find_controller_search(), or get the
+// number of matches using webkit_find_controller_count_matches().
+// The operations are asynchronous and trigger signals when ready, such as
+// KitFindController::found-text, KitFindController::failed-to-find-text or
+// KitFindController::counted-matches<!-- -->.
 type FindController struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 }
 
 var (
-	_ externglib.Objector = (*FindController)(nil)
+	_ coreglib.Objector = (*FindController)(nil)
 )
 
-func classInitFindControllerer(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*FindController, *FindControllerClass, FindControllerOverrides](
+		GTypeFindController,
+		initFindControllerClass,
+		wrapFindController,
+		defaultFindControllerOverrides,
+	)
 }
 
-func wrapFindController(obj *externglib.Object) *FindController {
+func initFindControllerClass(gclass unsafe.Pointer, overrides FindControllerOverrides, classInitFunc func(*FindControllerClass)) {
+	if classInitFunc != nil {
+		class := (*FindControllerClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapFindController(obj *coreglib.Object) *FindController {
 	return &FindController{
 		Object: obj,
 	}
 }
 
 func marshalFindController(p uintptr) (interface{}, error) {
-	return wrapFindController(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapFindController(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-//export _gotk4_webkit24_FindController_ConnectCountedMatches
-func _gotk4_webkit24_FindController_ConnectCountedMatches(arg0 C.gpointer, arg1 C.guint, arg2 C.guintptr) {
-	var f func(matchCount uint)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(matchCount uint))
-	}
-
-	var _matchCount uint // out
-
-	_matchCount = uint(arg1)
-
-	f(_matchCount)
-}
-
-// ConnectCountedMatches: this signal is emitted when the KitFindController has
-// counted the number of matches for a given text after a call to
+// ConnectCountedMatches: this signal is emitted when the KitFindController
+// has counted the number of matches for a given text after a call to
 // webkit_find_controller_count_matches().
-func (findController *FindController) ConnectCountedMatches(f func(matchCount uint)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(findController, "counted-matches", false, unsafe.Pointer(C._gotk4_webkit24_FindController_ConnectCountedMatches), f)
+func (findController *FindController) ConnectCountedMatches(f func(matchCount uint)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(findController, "counted-matches", false, unsafe.Pointer(C._gotk4_webkit24_FindController_ConnectCountedMatches), f)
 }
 
-//export _gotk4_webkit24_FindController_ConnectFailedToFindText
-func _gotk4_webkit24_FindController_ConnectFailedToFindText(arg0 C.gpointer, arg1 C.guintptr) {
-	var f func()
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg1))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func())
-	}
-
-	f()
-}
-
-// ConnectFailedToFindText: this signal is emitted when a search operation does
-// not find any result for the given text. It will be issued if the text is not
-// found asynchronously after a call to webkit_find_controller_search(),
-// webkit_find_controller_search_next() or
+// ConnectFailedToFindText: this signal is emitted when a search
+// operation does not find any result for the given text. It will
+// be issued if the text is not found asynchronously after a call to
+// webkit_find_controller_search(), webkit_find_controller_search_next() or
 // webkit_find_controller_search_previous().
-func (findController *FindController) ConnectFailedToFindText(f func()) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(findController, "failed-to-find-text", false, unsafe.Pointer(C._gotk4_webkit24_FindController_ConnectFailedToFindText), f)
-}
-
-//export _gotk4_webkit24_FindController_ConnectFoundText
-func _gotk4_webkit24_FindController_ConnectFoundText(arg0 C.gpointer, arg1 C.guint, arg2 C.guintptr) {
-	var f func(matchCount uint)
-	{
-		closure := externglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(matchCount uint))
-	}
-
-	var _matchCount uint // out
-
-	_matchCount = uint(arg1)
-
-	f(_matchCount)
+func (findController *FindController) ConnectFailedToFindText(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(findController, "failed-to-find-text", false, unsafe.Pointer(C._gotk4_webkit24_FindController_ConnectFailedToFindText), f)
 }
 
 // ConnectFoundText: this signal is emitted when a given text is found in the
 // web page text. It will be issued if the text is found asynchronously after a
 // call to webkit_find_controller_search(), webkit_find_controller_search_next()
 // or webkit_find_controller_search_previous().
-func (findController *FindController) ConnectFoundText(f func(matchCount uint)) externglib.SignalHandle {
-	return externglib.ConnectGeneratedClosure(findController, "found-text", false, unsafe.Pointer(C._gotk4_webkit24_FindController_ConnectFoundText), f)
+func (findController *FindController) ConnectFoundText(f func(matchCount uint)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(findController, "found-text", false, unsafe.Pointer(C._gotk4_webkit24_FindController_ConnectFoundText), f)
 }
 
-// CountMatches counts the number of matches for search_text found in the
-// KitWebView with the provided find_options. The number of matches will be
-// provided by the KitFindController::counted-matches signal.
+// CountMatches counts the number of matches for search_text.
+//
+// Counts the number of matches for search_text found in the KitWebView with
+// the provided find_options. The number of matches will be provided by the
+// KitFindController::counted-matches signal.
 //
 // The function takes the following parameters:
 //
-//    - searchText: text to look for.
-//    - findOptions: bitmask with the KitFindOptions used in the search.
-//    - maxMatchCount: maximum number of matches allowed in the search.
+//   - searchText: text to look for.
+//   - findOptions: bitmask with the KitFindOptions used in the search.
+//   - maxMatchCount: maximum number of matches allowed in the search.
 //
 func (findController *FindController) CountMatches(searchText string, findOptions uint32, maxMatchCount uint) {
 	var _arg0 *C.WebKitFindController // out
@@ -225,7 +194,7 @@ func (findController *FindController) CountMatches(searchText string, findOption
 	var _arg2 C.guint32               // out
 	var _arg3 C.guint                 // out
 
-	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(externglib.InternObject(findController).Native()))
+	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(coreglib.InternObject(findController).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(searchText)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.guint32(findOptions)
@@ -238,19 +207,21 @@ func (findController *FindController) CountMatches(searchText string, findOption
 	runtime.KeepAlive(maxMatchCount)
 }
 
-// MaxMatchCount gets the maximum number of matches to report during a text
-// lookup. This number is passed as the last argument of
-// webkit_find_controller_search() or webkit_find_controller_count_matches().
+// MaxMatchCount gets the maximum number of matches to report.
+//
+// Gets the maximum number of matches to report during a text lookup. This
+// number is passed as the last argument of webkit_find_controller_search() or
+// webkit_find_controller_count_matches().
 //
 // The function returns the following values:
 //
-//    - guint: maximum number of matches to report.
+//   - guint: maximum number of matches to report.
 //
 func (findController *FindController) MaxMatchCount() uint {
 	var _arg0 *C.WebKitFindController // out
 	var _cret C.guint                 // in
 
-	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(externglib.InternObject(findController).Native()))
+	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(coreglib.InternObject(findController).Native()))
 
 	_cret = C.webkit_find_controller_get_max_match_count(_arg0)
 	runtime.KeepAlive(findController)
@@ -262,19 +233,21 @@ func (findController *FindController) MaxMatchCount() uint {
 	return _guint
 }
 
-// Options gets a bitmask containing the KitFindOptions associated with the
-// current search.
+// Options gets the KitFindOptions for the current search.
+//
+// Gets a bitmask containing the KitFindOptions associated with the current
+// search.
 //
 // The function returns the following values:
 //
-//    - guint32: bitmask containing the KitFindOptions associated with the
-//      current search.
+//   - guint32: bitmask containing the KitFindOptions associated with the
+//     current search.
 //
 func (findController *FindController) Options() uint32 {
 	var _arg0 *C.WebKitFindController // out
 	var _cret C.guint32               // in
 
-	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(externglib.InternObject(findController).Native()))
+	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(coreglib.InternObject(findController).Native()))
 
 	_cret = C.webkit_find_controller_get_options(_arg0)
 	runtime.KeepAlive(findController)
@@ -286,19 +259,21 @@ func (findController *FindController) Options() uint32 {
 	return _guint32
 }
 
-// SearchText gets the text that find_controller is currently searching for.
+// SearchText gets the text that find_controller is searching for.
+//
+// Gets the text that find_controller is currently searching for.
 // This text is passed to either webkit_find_controller_search() or
 // webkit_find_controller_count_matches().
 //
 // The function returns the following values:
 //
-//    - utf8: text to look for in the KitWebView.
+//   - utf8: text to look for in the KitWebView.
 //
 func (findController *FindController) SearchText() string {
 	var _arg0 *C.WebKitFindController // out
 	var _cret *C.gchar                // in
 
-	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(externglib.InternObject(findController).Native()))
+	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(coreglib.InternObject(findController).Native()))
 
 	_cret = C.webkit_find_controller_get_search_text(_arg0)
 	runtime.KeepAlive(findController)
@@ -310,37 +285,41 @@ func (findController *FindController) SearchText() string {
 	return _utf8
 }
 
-// WebView gets the KitWebView this find controller is associated to. Do not
-// dereference the returned instance as it belongs to the KitFindController.
+// WebView gets the KitWebView this find controller is associated to.
+//
+// Do not dereference the returned instance as it belongs to the
+// KitFindController.
 //
 // The function returns the following values:
 //
-//    - webView: KitWebView.
+//   - webView: KitWebView.
 //
 func (findController *FindController) WebView() *WebView {
 	var _arg0 *C.WebKitFindController // out
 	var _cret *C.WebKitWebView        // in
 
-	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(externglib.InternObject(findController).Native()))
+	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(coreglib.InternObject(findController).Native()))
 
 	_cret = C.webkit_find_controller_get_web_view(_arg0)
 	runtime.KeepAlive(findController)
 
 	var _webView *WebView // out
 
-	_webView = wrapWebView(externglib.Take(unsafe.Pointer(_cret)))
+	_webView = wrapWebView(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _webView
 }
 
-// Search looks for search_text in the KitWebView associated with
-// find_controller since the beginning of the document highlighting up to
-// max_match_count matches. The outcome of the search will be asynchronously
-// provided by the KitFindController::found-text and
-// KitFindController::failed-to-find-text signals.
+// Search looks for search_text associated with find_controller.
 //
-// To look for the next or previous occurrences of the same text with the same
-// find options use webkit_find_controller_search_next() and/or
+// Looks for search_text in the KitWebView associated with find_controller
+// since the beginning of the document highlighting up to max_match_count
+// matches. The outcome of the search will be asynchronously provided by the
+// KitFindController::found-text and KitFindController::failed-to-find-text
+// signals.
+//
+// To look for the next or previous occurrences of the same text with
+// the same find options use webkit_find_controller_search_next() and/or
 // webkit_find_controller_search_previous(). The KitFindController will use the
 // same text and options for the following searches unless they are modified by
 // another call to this method.
@@ -354,9 +333,9 @@ func (findController *FindController) WebView() *WebView {
 //
 // The function takes the following parameters:
 //
-//    - searchText: text to look for.
-//    - findOptions: bitmask with the KitFindOptions used in the search.
-//    - maxMatchCount: maximum number of matches allowed in the search.
+//   - searchText: text to look for.
+//   - findOptions: bitmask with the KitFindOptions used in the search.
+//   - maxMatchCount: maximum number of matches allowed in the search.
 //
 func (findController *FindController) Search(searchText string, findOptions uint32, maxMatchCount uint) {
 	var _arg0 *C.WebKitFindController // out
@@ -364,7 +343,7 @@ func (findController *FindController) Search(searchText string, findOptions uint
 	var _arg2 C.guint32               // out
 	var _arg3 C.guint                 // out
 
-	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(externglib.InternObject(findController).Native()))
+	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(coreglib.InternObject(findController).Native()))
 	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(searchText)))
 	defer C.free(unsafe.Pointer(_arg1))
 	_arg2 = C.guint32(findOptions)
@@ -377,16 +356,17 @@ func (findController *FindController) Search(searchText string, findOptions uint
 	runtime.KeepAlive(maxMatchCount)
 }
 
-// SearchFinish finishes a find operation started by
-// webkit_find_controller_search(). It will basically unhighlight every text
-// match found.
+// SearchFinish finishes a find operation.
+//
+// Finishes a find operation started by webkit_find_controller_search().
+// It will basically unhighlight every text match found.
 //
 // This method will be typically called when the search UI is closed/hidden by
 // the client application.
 func (findController *FindController) SearchFinish() {
 	var _arg0 *C.WebKitFindController // out
 
-	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(externglib.InternObject(findController).Native()))
+	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(coreglib.InternObject(findController).Native()))
 
 	C.webkit_find_controller_search_finish(_arg0)
 	runtime.KeepAlive(findController)
@@ -399,7 +379,7 @@ func (findController *FindController) SearchFinish() {
 func (findController *FindController) SearchNext() {
 	var _arg0 *C.WebKitFindController // out
 
-	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(externglib.InternObject(findController).Native()))
+	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(coreglib.InternObject(findController).Native()))
 
 	C.webkit_find_controller_search_next(_arg0)
 	runtime.KeepAlive(findController)
@@ -412,8 +392,18 @@ func (findController *FindController) SearchNext() {
 func (findController *FindController) SearchPrevious() {
 	var _arg0 *C.WebKitFindController // out
 
-	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(externglib.InternObject(findController).Native()))
+	_arg0 = (*C.WebKitFindController)(unsafe.Pointer(coreglib.InternObject(findController).Native()))
 
 	C.webkit_find_controller_search_previous(_arg0)
 	runtime.KeepAlive(findController)
+}
+
+// FindControllerClass: instance of this type is always passed by reference.
+type FindControllerClass struct {
+	*findControllerClass
+}
+
+// findControllerClass is the struct that's finalized.
+type findControllerClass struct {
+	native *C.WebKitFindControllerClass
 }

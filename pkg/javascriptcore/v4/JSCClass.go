@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -14,57 +14,52 @@ import (
 // #include <jsc/jsc.h>
 import "C"
 
-// glib.Type values for JSCClass.go.
-var GTypeClass = externglib.Type(C.jsc_class_get_type())
+// GType values.
+var (
+	GTypeClass = coreglib.Type(C.jsc_class_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeClass, F: marshalClass},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeClass, F: marshalClass},
 	})
 }
 
-// ClassOverrider contains methods that are overridable.
-type ClassOverrider interface {
-}
-
+// Class represents a custom JavaScript class registered by the user in a
+// CContext. It allows to create new JavaScripts objects whose instances are
+// created by the user using this API. It's possible to add constructors,
+// properties and methods for a JSSClass by providing #GCallback<!-- -->s to
+// implement them.
 type Class struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 }
 
 var (
-	_ externglib.Objector = (*Class)(nil)
+	_ coreglib.Objector = (*Class)(nil)
 )
 
-func classInitClasser(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
-}
-
-func wrapClass(obj *externglib.Object) *Class {
+func wrapClass(obj *coreglib.Object) *Class {
 	return &Class{
 		Object: obj,
 	}
 }
 
 func marshalClass(p uintptr) (interface{}, error) {
-	return wrapClass(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapClass(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Name: get the class name of jsc_class.
 //
 // The function returns the following values:
 //
-//    - utf8: name of jsc_class.
+//   - utf8: name of jsc_class.
 //
 func (jscClass *Class) Name() string {
 	var _arg0 *C.JSCClass // out
 	var _cret *C.char     // in
 
-	_arg0 = (*C.JSCClass)(unsafe.Pointer(externglib.InternObject(jscClass).Native()))
+	_arg0 = (*C.JSCClass)(unsafe.Pointer(coreglib.InternObject(jscClass).Native()))
 
 	_cret = C.jsc_class_get_name(_arg0)
 	runtime.KeepAlive(jscClass)
@@ -80,20 +75,20 @@ func (jscClass *Class) Name() string {
 //
 // The function returns the following values:
 //
-//    - class: parent class of jsc_class.
+//   - class: parent class of jsc_class.
 //
 func (jscClass *Class) Parent() *Class {
 	var _arg0 *C.JSCClass // out
 	var _cret *C.JSCClass // in
 
-	_arg0 = (*C.JSCClass)(unsafe.Pointer(externglib.InternObject(jscClass).Native()))
+	_arg0 = (*C.JSCClass)(unsafe.Pointer(coreglib.InternObject(jscClass).Native()))
 
 	_cret = C.jsc_class_get_parent(_arg0)
 	runtime.KeepAlive(jscClass)
 
 	var _class *Class // out
 
-	_class = wrapClass(externglib.Take(unsafe.Pointer(_cret)))
+	_class = wrapClass(coreglib.Take(unsafe.Pointer(_cret)))
 
 	return _class
 }

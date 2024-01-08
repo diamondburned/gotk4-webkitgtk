@@ -5,7 +5,8 @@ package soup
 import (
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -13,39 +14,53 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup-websocket-extension-manager.go.
-var GTypeWebsocketExtensionManager = externglib.Type(C.soup_websocket_extension_manager_get_type())
+// GType values.
+var (
+	GTypeWebsocketExtensionManager = coreglib.Type(C.soup_websocket_extension_manager_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeWebsocketExtensionManager, F: marshalWebsocketExtensionManager},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeWebsocketExtensionManager, F: marshalWebsocketExtensionManager},
 	})
 }
 
-// WebsocketExtensionManagerOverrider contains methods that are overridable.
-type WebsocketExtensionManagerOverrider interface {
+// WebsocketExtensionManagerOverrides contains methods that are overridable.
+type WebsocketExtensionManagerOverrides struct {
+}
+
+func defaultWebsocketExtensionManagerOverrides(v *WebsocketExtensionManager) WebsocketExtensionManagerOverrides {
+	return WebsocketExtensionManagerOverrides{}
 }
 
 type WebsocketExtensionManager struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 
 	SessionFeature
 }
 
 var (
-	_ externglib.Objector = (*WebsocketExtensionManager)(nil)
+	_ coreglib.Objector = (*WebsocketExtensionManager)(nil)
 )
 
-func classInitWebsocketExtensionManagerer(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*WebsocketExtensionManager, *WebsocketExtensionManagerClass, WebsocketExtensionManagerOverrides](
+		GTypeWebsocketExtensionManager,
+		initWebsocketExtensionManagerClass,
+		wrapWebsocketExtensionManager,
+		defaultWebsocketExtensionManagerOverrides,
+	)
 }
 
-func wrapWebsocketExtensionManager(obj *externglib.Object) *WebsocketExtensionManager {
+func initWebsocketExtensionManagerClass(gclass unsafe.Pointer, overrides WebsocketExtensionManagerOverrides, classInitFunc func(*WebsocketExtensionManagerClass)) {
+	if classInitFunc != nil {
+		class := (*WebsocketExtensionManagerClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapWebsocketExtensionManager(obj *coreglib.Object) *WebsocketExtensionManager {
 	return &WebsocketExtensionManager{
 		Object: obj,
 		SessionFeature: SessionFeature{
@@ -55,5 +70,16 @@ func wrapWebsocketExtensionManager(obj *externglib.Object) *WebsocketExtensionMa
 }
 
 func marshalWebsocketExtensionManager(p uintptr) (interface{}, error) {
-	return wrapWebsocketExtensionManager(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapWebsocketExtensionManager(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+// WebsocketExtensionManagerClass: instance of this type is always passed by
+// reference.
+type WebsocketExtensionManagerClass struct {
+	*websocketExtensionManagerClass
+}
+
+// websocketExtensionManagerClass is the struct that's finalized.
+type websocketExtensionManagerClass struct {
+	native *C.SoupWebsocketExtensionManagerClass
 }

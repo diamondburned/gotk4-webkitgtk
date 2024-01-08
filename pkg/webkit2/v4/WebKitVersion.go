@@ -6,23 +6,24 @@ package webkit2
 // #include <webkit2/webkit2.h>
 import "C"
 
-// MAJOR_VERSION: like webkit_get_major_version(), but from the headers used at
-// application compile time, rather than from the library linked against at
+// MAJOR_VERSION: like webkit_get_major_version(), but from the headers used
+// at application compile time, rather than from the library linked against at
 // application run time.
 const MAJOR_VERSION = 2
 
-// MICRO_VERSION: like webkit_get_micro_version(), but from the headers used at
-// application compile time, rather than from the library linked against at
+// MICRO_VERSION: like webkit_get_micro_version(), but from the headers used
+// at application compile time, rather than from the library linked against at
 // application run time.
-const MICRO_VERSION = 1
+const MICRO_VERSION = 4
 
-// MINOR_VERSION: like webkit_get_minor_version(), but from the headers used at
-// application compile time, rather than from the library linked against at
+// MINOR_VERSION: like webkit_get_minor_version(), but from the headers used
+// at application compile time, rather than from the library linked against at
 // application run time.
-const MINOR_VERSION = 32
+const MINOR_VERSION = 42
 
-// GetMajorVersion returns the major version number of the WebKit library. (e.g.
-// in WebKit version 1.8.3 this is 1.)
+// GetMajorVersion returns the major version number of the WebKit library.
+//
+// (e.g. in WebKit version 1.8.3 this is 1.)
 //
 // This function is in the library, so it represents the WebKit library your
 // code is running against. Contrast with the BKIT_MAJOR_VERSION macro, which
@@ -31,7 +32,7 @@ const MINOR_VERSION = 32
 //
 // The function returns the following values:
 //
-//    - guint: major version number of the WebKit library.
+//   - guint: major version number of the WebKit library.
 //
 func GetMajorVersion() uint {
 	var _cret C.guint // in
@@ -45,8 +46,9 @@ func GetMajorVersion() uint {
 	return _guint
 }
 
-// GetMicroVersion returns the micro version number of the WebKit library. (e.g.
-// in WebKit version 1.8.3 this is 3.)
+// GetMicroVersion returns the micro version number of the WebKit library.
+//
+// (e.g. in WebKit version 1.8.3 this is 3.)
 //
 // This function is in the library, so it represents the WebKit library your
 // code is running against. Contrast with the BKIT_MICRO_VERSION macro, which
@@ -55,7 +57,7 @@ func GetMajorVersion() uint {
 //
 // The function returns the following values:
 //
-//    - guint: micro version number of the WebKit library.
+//   - guint: micro version number of the WebKit library.
 //
 func GetMicroVersion() uint {
 	var _cret C.guint // in
@@ -69,8 +71,9 @@ func GetMicroVersion() uint {
 	return _guint
 }
 
-// GetMinorVersion returns the minor version number of the WebKit library. (e.g.
-// in WebKit version 1.8.3 this is 8.)
+// GetMinorVersion returns the minor version number of the WebKit library.
+//
+// (e.g. in WebKit version 1.8.3 this is 8.)
 //
 // This function is in the library, so it represents the WebKit library your
 // code is running against. Contrast with the BKIT_MINOR_VERSION macro, which
@@ -79,7 +82,7 @@ func GetMicroVersion() uint {
 //
 // The function returns the following values:
 //
-//    - guint: minor version number of the WebKit library.
+//   - guint: minor version number of the WebKit library.
 //
 func GetMinorVersion() uint {
 	var _cret C.guint // in

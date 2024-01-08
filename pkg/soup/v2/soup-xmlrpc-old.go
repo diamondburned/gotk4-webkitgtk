@@ -7,7 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -19,8 +19,8 @@ import "C"
 // string. This is the low-level method that soup_xmlrpc_request_new() is built
 // on.
 //
-// params is an array of #GValue representing the parameters to method. (It is
-// *not* a Array, although if you have a Array, you can just pass its
+// params is an array of #GValue representing the parameters to method.
+// (It is *not* a Array, although if you have a Array, you can just pass its
 // <literal>values</literal>f and <literal>n_values</literal> fields.)
 //
 // The correspondence between glib types and XML-RPC types is:
@@ -41,14 +41,14 @@ import "C"
 //
 // The function takes the following parameters:
 //
-//    - methodName: name of the XML-RPC method.
-//    - params arguments to method.
+//   - methodName: name of the XML-RPC method.
+//   - params arguments to method.
 //
 // The function returns the following values:
 //
-//    - utf8 (optional): text of the methodCall, or NULL on error.
+//   - utf8 (optional): text of the methodCall, or NULL on error.
 //
-func XmlrpcBuildMethodCall(methodName string, params []externglib.Value) string {
+func XmlrpcBuildMethodCall(methodName string, params []coreglib.Value) string {
 	var _arg1 *C.char   // out
 	var _arg2 *C.GValue // out
 	var _arg3 C.int
@@ -80,9 +80,9 @@ func XmlrpcBuildMethodCall(methodName string, params []externglib.Value) string 
 	return _utf8
 }
 
-// XmlrpcBuildMethodResponse: this creates a (successful) XML-RPC methodResponse
-// and returns it as a string. To create a fault response, use
-// soup_xmlrpc_build_fault().
+// XmlrpcBuildMethodResponse: this creates a (successful) XML-RPC
+// methodResponse and returns it as a string. To create a fault response,
+// use soup_xmlrpc_build_fault().
 //
 // The glib type to XML-RPC type mapping is as with
 // soup_xmlrpc_build_method_call(), qv.
@@ -91,13 +91,13 @@ func XmlrpcBuildMethodCall(methodName string, params []externglib.Value) string 
 //
 // The function takes the following parameters:
 //
-//    - value: return value.
+//   - value: return value.
 //
 // The function returns the following values:
 //
-//    - utf8 (optional): text of the methodResponse, or NULL on error.
+//   - utf8 (optional): text of the methodResponse, or NULL on error.
 //
-func XmlrpcBuildMethodResponse(value *externglib.Value) string {
+func XmlrpcBuildMethodResponse(value *coreglib.Value) string {
 	var _arg1 *C.GValue // out
 	var _cret *C.char   // in
 
@@ -116,11 +116,11 @@ func XmlrpcBuildMethodResponse(value *externglib.Value) string {
 	return _utf8
 }
 
-// XmlrpcParseMethodResponse parses method_response and returns the return value
-// in value. If method_response is a fault, value will be unchanged, and error
-// will be set to an error of type SOUP_XMLRPC_FAULT, with the error #code
-// containing the fault code, and the error #message containing the fault
-// string. (If method_response cannot be parsed at all,
+// XmlrpcParseMethodResponse parses method_response and returns the return
+// value in value. If method_response is a fault, value will be unchanged,
+// and error will be set to an error of type SOUP_XMLRPC_FAULT,
+// with the error #code containing the fault code, and the error #message
+// containing the fault string. (If method_response cannot be parsed at all,
 // soup_xmlrpc_parse_method_response() will return FALSE, but error will be
 // unset.)
 //
@@ -128,14 +128,14 @@ func XmlrpcBuildMethodResponse(value *externglib.Value) string {
 //
 // The function takes the following parameters:
 //
-//    - methodResponse: XML-RPC methodResponse string.
-//    - length of method_response, or -1 if it is NUL-terminated.
+//   - methodResponse: XML-RPC methodResponse string.
+//   - length of method_response, or -1 if it is NUL-terminated.
 //
 // The function returns the following values:
 //
-//    - value: on return, the return value from method_call.
+//   - value: on return, the return value from method_call.
 //
-func XmlrpcParseMethodResponse(methodResponse string, length int) (externglib.Value, error) {
+func XmlrpcParseMethodResponse(methodResponse string, length int) (coreglib.Value, error) {
 	var _arg1 *C.char   // out
 	var _arg2 C.int     // out
 	var _arg3 C.GValue  // in
@@ -149,10 +149,10 @@ func XmlrpcParseMethodResponse(methodResponse string, length int) (externglib.Va
 	runtime.KeepAlive(methodResponse)
 	runtime.KeepAlive(length)
 
-	var _value externglib.Value // out
-	var _goerr error            // out
+	var _value coreglib.Value // out
+	var _goerr error          // out
 
-	_value = *externglib.ValueFromNative(unsafe.Pointer((&_arg3)))
+	_value = *coreglib.ValueFromNative(unsafe.Pointer((&_arg3)))
 	if _cerr != nil {
 		_goerr = gerror.Take(unsafe.Pointer(_cerr))
 	}

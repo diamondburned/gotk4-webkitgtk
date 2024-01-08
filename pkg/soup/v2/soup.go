@@ -8,7 +8,7 @@ import (
 	"strings"
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
@@ -19,34 +19,34 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup.go.
+// GType values.
 var (
-	GTypeCacheResponse   = externglib.Type(C.soup_cache_response_get_type())
-	GTypeConnectionState = externglib.Type(C.soup_connection_state_get_type())
-	GTypeKnownStatusCode = externglib.Type(C.soup_known_status_code_get_type())
-	GTypeRequesterError  = externglib.Type(C.soup_requester_error_get_type())
-	GTypeSameSitePolicy  = externglib.Type(C.soup_same_site_policy_get_type())
-	GTypeXMLRPCError     = externglib.Type(C.soup_xmlrpc_error_get_type())
-	GTypeCacheability    = externglib.Type(C.soup_cacheability_get_type())
-	GTypeAuthBasic       = externglib.Type(C.soup_auth_basic_get_type())
-	GTypeAuthDigest      = externglib.Type(C.soup_auth_digest_get_type())
-	GTypeAuthNTLM        = externglib.Type(C.soup_auth_ntlm_get_type())
-	GTypeAuthNegotiate   = externglib.Type(C.soup_auth_negotiate_get_type())
+	GTypeCacheResponse   = coreglib.Type(C.soup_cache_response_get_type())
+	GTypeConnectionState = coreglib.Type(C.soup_connection_state_get_type())
+	GTypeKnownStatusCode = coreglib.Type(C.soup_known_status_code_get_type())
+	GTypeRequesterError  = coreglib.Type(C.soup_requester_error_get_type())
+	GTypeSameSitePolicy  = coreglib.Type(C.soup_same_site_policy_get_type())
+	GTypeXMLRPCError     = coreglib.Type(C.soup_xmlrpc_error_get_type())
+	GTypeCacheability    = coreglib.Type(C.soup_cacheability_get_type())
+	GTypeAuthBasic       = coreglib.Type(C.soup_auth_basic_get_type())
+	GTypeAuthDigest      = coreglib.Type(C.soup_auth_digest_get_type())
+	GTypeAuthNTLM        = coreglib.Type(C.soup_auth_ntlm_get_type())
+	GTypeAuthNegotiate   = coreglib.Type(C.soup_auth_negotiate_get_type())
 )
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeCacheResponse, F: marshalCacheResponse},
-		{T: GTypeConnectionState, F: marshalConnectionState},
-		{T: GTypeKnownStatusCode, F: marshalKnownStatusCode},
-		{T: GTypeRequesterError, F: marshalRequesterError},
-		{T: GTypeSameSitePolicy, F: marshalSameSitePolicy},
-		{T: GTypeXMLRPCError, F: marshalXMLRPCError},
-		{T: GTypeCacheability, F: marshalCacheability},
-		{T: GTypeAuthBasic, F: marshalAuthBasic},
-		{T: GTypeAuthDigest, F: marshalAuthDigest},
-		{T: GTypeAuthNTLM, F: marshalAuthNTLM},
-		{T: GTypeAuthNegotiate, F: marshalAuthNegotiate},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeCacheResponse, F: marshalCacheResponse},
+		coreglib.TypeMarshaler{T: GTypeConnectionState, F: marshalConnectionState},
+		coreglib.TypeMarshaler{T: GTypeKnownStatusCode, F: marshalKnownStatusCode},
+		coreglib.TypeMarshaler{T: GTypeRequesterError, F: marshalRequesterError},
+		coreglib.TypeMarshaler{T: GTypeSameSitePolicy, F: marshalSameSitePolicy},
+		coreglib.TypeMarshaler{T: GTypeXMLRPCError, F: marshalXMLRPCError},
+		coreglib.TypeMarshaler{T: GTypeCacheability, F: marshalCacheability},
+		coreglib.TypeMarshaler{T: GTypeAuthBasic, F: marshalAuthBasic},
+		coreglib.TypeMarshaler{T: GTypeAuthDigest, F: marshalAuthDigest},
+		coreglib.TypeMarshaler{T: GTypeAuthNTLM, F: marshalAuthNTLM},
+		coreglib.TypeMarshaler{T: GTypeAuthNegotiate, F: marshalAuthNegotiate},
 	})
 }
 
@@ -59,7 +59,7 @@ const (
 )
 
 func marshalCacheResponse(p uintptr) (interface{}, error) {
-	return CacheResponse(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return CacheResponse(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for CacheResponse.
@@ -88,7 +88,7 @@ const (
 )
 
 func marshalConnectionState(p uintptr) (interface{}, error) {
-	return ConnectionState(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return ConnectionState(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for ConnectionState.
@@ -180,7 +180,7 @@ const (
 )
 
 func marshalKnownStatusCode(p uintptr) (interface{}, error) {
-	return KnownStatusCode(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return KnownStatusCode(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for KnownStatusCode.
@@ -321,6 +321,8 @@ func RequestErrorQuark() glib.Quark {
 	var _quark glib.Quark // out
 
 	_quark = uint32(_cret)
+	type _ = glib.Quark
+	type _ = uint32
 
 	return _quark
 }
@@ -333,7 +335,7 @@ const (
 )
 
 func marshalRequesterError(p uintptr) (interface{}, error) {
-	return RequesterError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return RequesterError(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for RequesterError.
@@ -362,7 +364,7 @@ const (
 )
 
 func marshalSameSitePolicy(p uintptr) (interface{}, error) {
-	return SameSitePolicy(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return SameSitePolicy(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for SameSitePolicy.
@@ -389,6 +391,8 @@ func TLDErrorQuark() glib.Quark {
 	var _quark glib.Quark // out
 
 	_quark = uint32(_cret)
+	type _ = glib.Quark
+	type _ = uint32
 
 	return _quark
 }
@@ -401,7 +405,7 @@ const (
 )
 
 func marshalXMLRPCError(p uintptr) (interface{}, error) {
-	return XMLRPCError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return XMLRPCError(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for XMLRPCError.
@@ -426,6 +430,8 @@ func XMLRPCErrorQuark() glib.Quark {
 	var _quark glib.Quark // out
 
 	_quark = uint32(_cret)
+	type _ = glib.Quark
+	type _ = uint32
 
 	return _quark
 }
@@ -440,7 +446,7 @@ const (
 )
 
 func marshalCacheability(p uintptr) (interface{}, error) {
-	return Cacheability(externglib.ValueFromNative(unsafe.Pointer(p)).Flags()), nil
+	return Cacheability(coreglib.ValueFromNative(unsafe.Pointer(p)).Flags()), nil
 }
 
 // String returns the names in string for Cacheability.
@@ -490,6 +496,8 @@ func HTTPErrorQuark() glib.Quark {
 	var _quark glib.Quark // out
 
 	_quark = uint32(_cret)
+	type _ = glib.Quark
+	type _ = uint32
 
 	return _quark
 }
@@ -503,7 +511,7 @@ var (
 	_ Auther = (*AuthBasic)(nil)
 )
 
-func wrapAuthBasic(obj *externglib.Object) *AuthBasic {
+func wrapAuthBasic(obj *coreglib.Object) *AuthBasic {
 	return &AuthBasic{
 		Auth: Auth{
 			Object: obj,
@@ -512,7 +520,7 @@ func wrapAuthBasic(obj *externglib.Object) *AuthBasic {
 }
 
 func marshalAuthBasic(p uintptr) (interface{}, error) {
-	return wrapAuthBasic(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapAuthBasic(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 type AuthDigest struct {
@@ -524,7 +532,7 @@ var (
 	_ Auther = (*AuthDigest)(nil)
 )
 
-func wrapAuthDigest(obj *externglib.Object) *AuthDigest {
+func wrapAuthDigest(obj *coreglib.Object) *AuthDigest {
 	return &AuthDigest{
 		Auth: Auth{
 			Object: obj,
@@ -533,7 +541,7 @@ func wrapAuthDigest(obj *externglib.Object) *AuthDigest {
 }
 
 func marshalAuthDigest(p uintptr) (interface{}, error) {
-	return wrapAuthDigest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapAuthDigest(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 type AuthNTLM struct {
@@ -545,7 +553,7 @@ var (
 	_ Auther = (*AuthNTLM)(nil)
 )
 
-func wrapAuthNTLM(obj *externglib.Object) *AuthNTLM {
+func wrapAuthNTLM(obj *coreglib.Object) *AuthNTLM {
 	return &AuthNTLM{
 		Auth: Auth{
 			Object: obj,
@@ -554,7 +562,7 @@ func wrapAuthNTLM(obj *externglib.Object) *AuthNTLM {
 }
 
 func marshalAuthNTLM(p uintptr) (interface{}, error) {
-	return wrapAuthNTLM(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapAuthNTLM(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 type AuthNegotiate struct {
@@ -566,7 +574,7 @@ var (
 	_ Auther = (*AuthNegotiate)(nil)
 )
 
-func wrapAuthNegotiate(obj *externglib.Object) *AuthNegotiate {
+func wrapAuthNegotiate(obj *coreglib.Object) *AuthNegotiate {
 	return &AuthNegotiate{
 		Auth: Auth{
 			Object: obj,
@@ -575,5 +583,5 @@ func wrapAuthNegotiate(obj *externglib.Object) *AuthNegotiate {
 }
 
 func marshalAuthNegotiate(p uintptr) (interface{}, error) {
-	return wrapAuthNegotiate(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapAuthNegotiate(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }

@@ -8,7 +8,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
@@ -17,16 +17,16 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup-date.go.
+// GType values.
 var (
-	GTypeDateFormat = externglib.Type(C.soup_date_format_get_type())
-	GTypeDate       = externglib.Type(C.soup_date_get_type())
+	GTypeDateFormat = coreglib.Type(C.soup_date_format_get_type())
+	GTypeDate       = coreglib.Type(C.soup_date_get_type())
 )
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeDateFormat, F: marshalDateFormat},
-		{T: GTypeDate, F: marshalDate},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeDateFormat, F: marshalDateFormat},
+		coreglib.TypeMarshaler{T: GTypeDate, F: marshalDate},
 	})
 }
 
@@ -41,8 +41,8 @@ func init() {
 type DateFormat C.gint
 
 const (
-	// DateHTTP: RFC 1123 format, used by the HTTP "Date" header. Eg "Sun, 06
-	// Nov 1994 08:49:37 GMT".
+	// DateHTTP: RFC 1123 format, used by the HTTP "Date" header. Eg "Sun,
+	// 06 Nov 1994 08:49:37 GMT".
 	DateHTTP DateFormat = 1
 	// DateCookie: format for the "Expires" timestamp in the Netscape cookie
 	// specification. Eg, "Sun, 06-Nov-1994 08:49:37 GMT".
@@ -63,7 +63,7 @@ const (
 )
 
 func marshalDateFormat(p uintptr) (interface{}, error) {
-	return DateFormat(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return DateFormat(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for DateFormat.
@@ -87,10 +87,10 @@ func (d DateFormat) String() string {
 }
 
 // Date: date and time. The date is assumed to be in the (proleptic) Gregorian
-// calendar. The time is in UTC if utc is TRUE. Otherwise, the time is a local
-// time, and offset gives the offset from UTC in minutes (such that adding
-// offset to the time would give the correct UTC time). If utc is FALSE and
-// offset is 0, then the SoupDate represents a "floating" time with no
+// calendar. The time is in UTC if utc is TRUE. Otherwise, the time is a
+// local time, and offset gives the offset from UTC in minutes (such that
+// adding offset to the time would give the correct UTC time). If utc is FALSE
+// and offset is 0, then the SoupDate represents a "floating" time with no
 // associated timezone information.
 //
 // An instance of this type is always passed by reference.
@@ -104,7 +104,7 @@ type date struct {
 }
 
 func marshalDate(p uintptr) (interface{}, error) {
-	b := externglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
+	b := coreglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
 	return &Date{&date{(*C.SoupDate)(b)}}, nil
 }
 
@@ -248,7 +248,7 @@ func (date *Date) Copy() *Date {
 //
 // The function returns the following values:
 //
-//    - gint date's day.
+//   - gint date's day.
 //
 func (date *Date) Day() int {
 	var _arg0 *C.SoupDate // out
@@ -270,7 +270,7 @@ func (date *Date) Day() int {
 //
 // The function returns the following values:
 //
-//    - gint date's hour.
+//   - gint date's hour.
 //
 func (date *Date) Hour() int {
 	var _arg0 *C.SoupDate // out
@@ -292,7 +292,7 @@ func (date *Date) Hour() int {
 //
 // The function returns the following values:
 //
-//    - gint date's minute.
+//   - gint date's minute.
 //
 func (date *Date) Minute() int {
 	var _arg0 *C.SoupDate // out
@@ -314,7 +314,7 @@ func (date *Date) Minute() int {
 //
 // The function returns the following values:
 //
-//    - gint date's month.
+//   - gint date's month.
 //
 func (date *Date) Month() int {
 	var _arg0 *C.SoupDate // out
@@ -336,9 +336,9 @@ func (date *Date) Month() int {
 //
 // The function returns the following values:
 //
-//    - gint date's offset from UTC. If soup_date_get_utc() returns FALSE but
-//      soup_date_get_offset() returns 0, that means the date is a "floating"
-//      time with no associated offset information.
+//   - gint date's offset from UTC. If soup_date_get_utc() returns FALSE but
+//     soup_date_get_offset() returns 0, that means the date is a "floating"
+//     time with no associated offset information.
 //
 func (date *Date) Offset() int {
 	var _arg0 *C.SoupDate // out
@@ -360,7 +360,7 @@ func (date *Date) Offset() int {
 //
 // The function returns the following values:
 //
-//    - gint date's second.
+//   - gint date's second.
 //
 func (date *Date) Second() int {
 	var _arg0 *C.SoupDate // out
@@ -382,7 +382,7 @@ func (date *Date) Second() int {
 //
 // The function returns the following values:
 //
-//    - gint: TRUE if date is UTC.
+//   - gint: TRUE if date is UTC.
 //
 func (date *Date) UTC() int {
 	var _arg0 *C.SoupDate // out
@@ -404,7 +404,7 @@ func (date *Date) UTC() int {
 //
 // The function returns the following values:
 //
-//    - gint date's year.
+//   - gint date's year.
 //
 func (date *Date) Year() int {
 	var _arg0 *C.SoupDate // out
@@ -426,7 +426,7 @@ func (date *Date) Year() int {
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if date is in the past.
+//   - ok: TRUE if date is in the past.
 //
 func (date *Date) IsPast() bool {
 	var _arg0 *C.SoupDate // out
@@ -450,11 +450,11 @@ func (date *Date) IsPast() bool {
 //
 // The function takes the following parameters:
 //
-//    - format to generate the date in.
+//   - format to generate the date in.
 //
 // The function returns the following values:
 //
-//    - utf8: date as a string.
+//   - utf8: date as a string.
 //
 func (date *Date) String(format DateFormat) string {
 	var _arg0 *C.SoupDate      // out
@@ -484,7 +484,7 @@ func (date *Date) String(format DateFormat) string {
 //
 // The function returns the following values:
 //
-//    - glong: date as a <type>time_t</type>.
+//   - glong: date as a <type>time_t</type>.
 //
 func (date *Date) ToTimeT() int32 {
 	var _arg0 *C.SoupDate // out
@@ -508,7 +508,7 @@ func (date *Date) ToTimeT() int32 {
 //
 // The function returns the following values:
 //
-//    - time structure in which to store the converted time.
+//   - time structure in which to store the converted time.
 //
 func (date *Date) ToTimeval() *glib.TimeVal {
 	var _arg0 *C.SoupDate // out

@@ -5,7 +5,8 @@ package soup
 import (
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -13,39 +14,53 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup-content-decoder.go.
-var GTypeContentDecoder = externglib.Type(C.soup_content_decoder_get_type())
+// GType values.
+var (
+	GTypeContentDecoder = coreglib.Type(C.soup_content_decoder_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeContentDecoder, F: marshalContentDecoder},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeContentDecoder, F: marshalContentDecoder},
 	})
 }
 
-// ContentDecoderOverrider contains methods that are overridable.
-type ContentDecoderOverrider interface {
+// ContentDecoderOverrides contains methods that are overridable.
+type ContentDecoderOverrides struct {
+}
+
+func defaultContentDecoderOverrides(v *ContentDecoder) ContentDecoderOverrides {
+	return ContentDecoderOverrides{}
 }
 
 type ContentDecoder struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 
 	SessionFeature
 }
 
 var (
-	_ externglib.Objector = (*ContentDecoder)(nil)
+	_ coreglib.Objector = (*ContentDecoder)(nil)
 )
 
-func classInitContentDecoderer(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*ContentDecoder, *ContentDecoderClass, ContentDecoderOverrides](
+		GTypeContentDecoder,
+		initContentDecoderClass,
+		wrapContentDecoder,
+		defaultContentDecoderOverrides,
+	)
 }
 
-func wrapContentDecoder(obj *externglib.Object) *ContentDecoder {
+func initContentDecoderClass(gclass unsafe.Pointer, overrides ContentDecoderOverrides, classInitFunc func(*ContentDecoderClass)) {
+	if classInitFunc != nil {
+		class := (*ContentDecoderClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapContentDecoder(obj *coreglib.Object) *ContentDecoder {
 	return &ContentDecoder{
 		Object: obj,
 		SessionFeature: SessionFeature{
@@ -55,5 +70,15 @@ func wrapContentDecoder(obj *externglib.Object) *ContentDecoder {
 }
 
 func marshalContentDecoder(p uintptr) (interface{}, error) {
-	return wrapContentDecoder(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapContentDecoder(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+}
+
+// ContentDecoderClass: instance of this type is always passed by reference.
+type ContentDecoderClass struct {
+	*contentDecoderClass
+}
+
+// contentDecoderClass is the struct that's finalized.
+type contentDecoderClass struct {
+	native *C.SoupContentDecoderClass
 }

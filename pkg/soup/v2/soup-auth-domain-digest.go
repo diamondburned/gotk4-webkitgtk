@@ -7,22 +7,25 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <libsoup/soup.h>
-// extern char* _gotk4_soup2_AuthDomainDigestAuthCallback(SoupAuthDomain*, SoupMessage*, char*, gpointer);
 // extern void callbackDelete(gpointer);
+// extern char* _gotk4_soup2_AuthDomainDigestAuthCallback(SoupAuthDomain*, SoupMessage*, char*, gpointer);
 import "C"
 
-// glib.Type values for soup-auth-domain-digest.go.
-var GTypeAuthDomainDigest = externglib.Type(C.soup_auth_domain_digest_get_type())
+// GType values.
+var (
+	GTypeAuthDomainDigest = coreglib.Type(C.soup_auth_domain_digest_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeAuthDomainDigest, F: marshalAuthDomainDigest},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeAuthDomainDigest, F: marshalAuthDomainDigest},
 	})
 }
 
@@ -40,36 +43,12 @@ const AUTH_DOMAIN_DIGEST_AUTH_DATA = "auth-data"
 // soup_auth_domain_digest_encode_password()).
 type AuthDomainDigestAuthCallback func(domain *AuthDomainDigest, msg *Message, username string) (utf8 string)
 
-//export _gotk4_soup2_AuthDomainDigestAuthCallback
-func _gotk4_soup2_AuthDomainDigestAuthCallback(arg1 *C.SoupAuthDomain, arg2 *C.SoupMessage, arg3 *C.char, arg4 C.gpointer) (cret *C.char) {
-	var fn AuthDomainDigestAuthCallback
-	{
-		v := gbox.Get(uintptr(arg4))
-		if v == nil {
-			panic(`callback not found`)
-		}
-		fn = v.(AuthDomainDigestAuthCallback)
-	}
-
-	var _domain *AuthDomainDigest // out
-	var _msg *Message             // out
-	var _username string          // out
-
-	_domain = wrapAuthDomainDigest(externglib.Take(unsafe.Pointer(arg1)))
-	_msg = wrapMessage(externglib.Take(unsafe.Pointer(arg2)))
-	_username = C.GoString((*C.gchar)(unsafe.Pointer(arg3)))
-
-	utf8 := fn(_domain, _msg, _username)
-
-	if utf8 != "" {
-		cret = (*C.char)(unsafe.Pointer(C.CString(utf8)))
-	}
-
-	return cret
+// AuthDomainDigestOverrides contains methods that are overridable.
+type AuthDomainDigestOverrides struct {
 }
 
-// AuthDomainDigestOverrider contains methods that are overridable.
-type AuthDomainDigestOverrider interface {
+func defaultAuthDomainDigestOverrides(v *AuthDomainDigest) AuthDomainDigestOverrides {
+	return AuthDomainDigestOverrides{}
 }
 
 type AuthDomainDigest struct {
@@ -81,15 +60,23 @@ var (
 	_ AuthDomainer = (*AuthDomainDigest)(nil)
 )
 
-func classInitAuthDomainDigester(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*AuthDomainDigest, *AuthDomainDigestClass, AuthDomainDigestOverrides](
+		GTypeAuthDomainDigest,
+		initAuthDomainDigestClass,
+		wrapAuthDomainDigest,
+		defaultAuthDomainDigestOverrides,
+	)
 }
 
-func wrapAuthDomainDigest(obj *externglib.Object) *AuthDomainDigest {
+func initAuthDomainDigestClass(gclass unsafe.Pointer, overrides AuthDomainDigestOverrides, classInitFunc func(*AuthDomainDigestClass)) {
+	if classInitFunc != nil {
+		class := (*AuthDomainDigestClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapAuthDomainDigest(obj *coreglib.Object) *AuthDomainDigest {
 	return &AuthDomainDigest{
 		AuthDomain: AuthDomain{
 			Object: obj,
@@ -98,7 +85,7 @@ func wrapAuthDomainDigest(obj *externglib.Object) *AuthDomainDigest {
 }
 
 func marshalAuthDomainDigest(p uintptr) (interface{}, error) {
-	return wrapAuthDomainDigest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapAuthDomainDigest(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // SetAuthCallback sets the callback that domain will use to authenticate
@@ -112,7 +99,7 @@ func marshalAuthDomainDigest(p uintptr) (interface{}, error) {
 //
 // The function takes the following parameters:
 //
-//    - callback: callback.
+//   - callback: callback.
 //
 func (domain *AuthDomainDigest) SetAuthCallback(callback AuthDomainDigestAuthCallback) {
 	var _arg0 *C.SoupAuthDomain                  // out
@@ -120,7 +107,7 @@ func (domain *AuthDomainDigest) SetAuthCallback(callback AuthDomainDigestAuthCal
 	var _arg2 C.gpointer
 	var _arg3 C.GDestroyNotify
 
-	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(externglib.InternObject(domain).Native()))
+	_arg0 = (*C.SoupAuthDomain)(unsafe.Pointer(coreglib.InternObject(domain).Native()))
 	_arg1 = (*[0]byte)(C._gotk4_soup2_AuthDomainDigestAuthCallback)
 	_arg2 = C.gpointer(gbox.Assign(callback))
 	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
@@ -144,13 +131,13 @@ func (domain *AuthDomainDigest) SetAuthCallback(callback AuthDomainDigestAuthCal
 //
 // The function takes the following parameters:
 //
-//    - username: username.
-//    - realm: auth realm name.
-//    - password for username in realm.
+//   - username: username.
+//   - realm: auth realm name.
+//   - password for username in realm.
 //
 // The function returns the following values:
 //
-//    - utf8: encoded password.
+//   - utf8: encoded password.
 //
 func AuthDomainDigestEncodePassword(username, realm, password string) string {
 	var _arg1 *C.char // out
@@ -176,4 +163,21 @@ func AuthDomainDigestEncodePassword(username, realm, password string) string {
 	defer C.free(unsafe.Pointer(_cret))
 
 	return _utf8
+}
+
+// AuthDomainDigestClass: instance of this type is always passed by reference.
+type AuthDomainDigestClass struct {
+	*authDomainDigestClass
+}
+
+// authDomainDigestClass is the struct that's finalized.
+type authDomainDigestClass struct {
+	native *C.SoupAuthDomainDigestClass
+}
+
+func (a *AuthDomainDigestClass) ParentClass() *AuthDomainClass {
+	valptr := &a.native.parent_class
+	var _v *AuthDomainClass // out
+	_v = (*AuthDomainClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
+	return _v
 }

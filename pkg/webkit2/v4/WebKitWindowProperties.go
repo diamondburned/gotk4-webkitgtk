@@ -7,7 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v3"
 )
 
@@ -16,44 +16,110 @@ import (
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitWindowProperties.go.
-var GTypeWindowProperties = externglib.Type(C.webkit_window_properties_get_type())
+// GType values.
+var (
+	GTypeWindowProperties = coreglib.Type(C.webkit_window_properties_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeWindowProperties, F: marshalWindowProperties},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeWindowProperties, F: marshalWindowProperties},
 	})
 }
 
-// WindowPropertiesOverrider contains methods that are overridable.
-type WindowPropertiesOverrider interface {
+// WindowPropertiesOverrides contains methods that are overridable.
+type WindowPropertiesOverrides struct {
 }
 
+func defaultWindowPropertiesOverrides(v *WindowProperties) WindowPropertiesOverrides {
+	return WindowPropertiesOverrides{}
+}
+
+// WindowProperties: window properties of a KitWebView.
+//
+// The content of a KitWebView can request to change certain properties of the
+// window containing the view. This can include the x, y position of the window,
+// the width and height but also if a toolbar, scrollbar, statusbar, locationbar
+// should be visible to the user, and the request to show the KitWebView
+// fullscreen.
+//
+// The KitWebView::ready-to-show signal handler is the proper place to apply the
+// initial window properties. Then you can monitor the KitWindowProperties by
+// connecting to ::notify signal.
+//
+//    static void ready_to_show_cb (WebKitWebView *web_view, gpointer user_data)
+//    {
+//        GtkWidget *window;
+//        WebKitWindowProperties *window_properties;
+//        gboolean visible;
+//
+//        // Create the window to contain the WebKitWebView.
+//        window = browser_window_new ();
+//        gtk_container_add (GTK_CONTAINER (window), GTK_WIDGET (web_view));
+//        gtk_widget_show (GTK_WIDGET (web_view));
+//
+//        // Get the WebKitWindowProperties of the web view and monitor it.
+//        window_properties = webkit_web_view_get_window_properties (web_view);
+//        g_signal_connect (window_properties, "notify::geometry",
+//                          G_CALLBACK (window_geometry_changed), window);
+//        g_signal_connect (window_properties, "notify::toolbar-visible",
+//                          G_CALLBACK (window_toolbar_visibility_changed), window);
+//        g_signal_connect (window_properties, "notify::menubar-visible",
+//                          G_CALLBACK (window_menubar_visibility_changed), window);
+//
+//        // Apply the window properties before showing the window.
+//        visible = webkit_window_properties_get_toolbar_visible (window_properties);
+//        browser_window_set_toolbar_visible (BROWSER_WINDOW (window), visible);
+//        visible = webkit_window_properties_get_menubar_visible (window_properties);
+//        browser_window_set_menubar_visible (BROWSER_WINDOW (window), visible);
+//
+//        if (webkit_window_properties_get_fullscreen (window_properties)) {
+//            gtk_window_fullscreen (GTK_WINDOW (window));
+//        } else {
+//            GdkRectangle geometry;
+//
+//            gtk_window_set_resizable (GTK_WINDOW (window),
+//                                      webkit_window_properties_get_resizable (window_properties));
+//            webkit_window_properties_get_geometry (window_properties, &geometry);
+//            gtk_window_move (GTK_WINDOW (window), geometry.x, geometry.y);
+//            gtk_window_resize (GTK_WINDOW (window), geometry.width, geometry.height);
+//        }
+//
+//        gtk_widget_show (window);
+//    }.
 type WindowProperties struct {
 	_ [0]func() // equal guard
-	*externglib.Object
+	*coreglib.Object
 }
 
 var (
-	_ externglib.Objector = (*WindowProperties)(nil)
+	_ coreglib.Objector = (*WindowProperties)(nil)
 )
 
-func classInitWindowPropertieser(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
+func init() {
+	coreglib.RegisterClassInfo[*WindowProperties, *WindowPropertiesClass, WindowPropertiesOverrides](
+		GTypeWindowProperties,
+		initWindowPropertiesClass,
+		wrapWindowProperties,
+		defaultWindowPropertiesOverrides,
+	)
 }
 
-func wrapWindowProperties(obj *externglib.Object) *WindowProperties {
+func initWindowPropertiesClass(gclass unsafe.Pointer, overrides WindowPropertiesOverrides, classInitFunc func(*WindowPropertiesClass)) {
+	if classInitFunc != nil {
+		class := (*WindowPropertiesClass)(gextras.NewStructNative(gclass))
+		classInitFunc(class)
+	}
+}
+
+func wrapWindowProperties(obj *coreglib.Object) *WindowProperties {
 	return &WindowProperties{
 		Object: obj,
 	}
 }
 
 func marshalWindowProperties(p uintptr) (interface{}, error) {
-	return wrapWindowProperties(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+	return wrapWindowProperties(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
 // Fullscreen: get whether the window should be shown in fullscreen state or
@@ -61,13 +127,13 @@ func marshalWindowProperties(p uintptr) (interface{}, error) {
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if the window should be fullscreen or FALSE otherwise.
+//   - ok: TRUE if the window should be fullscreen or FALSE otherwise.
 //
 func (windowProperties *WindowProperties) Fullscreen() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
 
-	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(externglib.InternObject(windowProperties).Native()))
+	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(coreglib.InternObject(windowProperties).Native()))
 
 	_cret = C.webkit_window_properties_get_fullscreen(_arg0)
 	runtime.KeepAlive(windowProperties)
@@ -85,13 +151,13 @@ func (windowProperties *WindowProperties) Fullscreen() bool {
 //
 // The function returns the following values:
 //
-//    - geometry: return location for the window geometry.
+//   - geometry: return location for the window geometry.
 //
 func (windowProperties *WindowProperties) Geometry() *gdk.Rectangle {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _arg1 C.GdkRectangle            // in
 
-	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(externglib.InternObject(windowProperties).Native()))
+	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(coreglib.InternObject(windowProperties).Native()))
 
 	C.webkit_window_properties_get_geometry(_arg0, &_arg1)
 	runtime.KeepAlive(windowProperties)
@@ -108,13 +174,13 @@ func (windowProperties *WindowProperties) Geometry() *gdk.Rectangle {
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if locationbar should be visible or FALSE otherwise.
+//   - ok: TRUE if locationbar should be visible or FALSE otherwise.
 //
 func (windowProperties *WindowProperties) LocationbarVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
 
-	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(externglib.InternObject(windowProperties).Native()))
+	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(coreglib.InternObject(windowProperties).Native()))
 
 	_cret = C.webkit_window_properties_get_locationbar_visible(_arg0)
 	runtime.KeepAlive(windowProperties)
@@ -133,13 +199,13 @@ func (windowProperties *WindowProperties) LocationbarVisible() bool {
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if menubar should be visible or FALSE otherwise.
+//   - ok: TRUE if menubar should be visible or FALSE otherwise.
 //
 func (windowProperties *WindowProperties) MenubarVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
 
-	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(externglib.InternObject(windowProperties).Native()))
+	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(coreglib.InternObject(windowProperties).Native()))
 
 	_cret = C.webkit_window_properties_get_menubar_visible(_arg0)
 	runtime.KeepAlive(windowProperties)
@@ -157,13 +223,13 @@ func (windowProperties *WindowProperties) MenubarVisible() bool {
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if the window should be resizable or FALSE otherwise.
+//   - ok: TRUE if the window should be resizable or FALSE otherwise.
 //
 func (windowProperties *WindowProperties) Resizable() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
 
-	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(externglib.InternObject(windowProperties).Native()))
+	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(coreglib.InternObject(windowProperties).Native()))
 
 	_cret = C.webkit_window_properties_get_resizable(_arg0)
 	runtime.KeepAlive(windowProperties)
@@ -182,13 +248,13 @@ func (windowProperties *WindowProperties) Resizable() bool {
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if scrollbars should be visible or FALSE otherwise.
+//   - ok: TRUE if scrollbars should be visible or FALSE otherwise.
 //
 func (windowProperties *WindowProperties) ScrollbarsVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
 
-	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(externglib.InternObject(windowProperties).Native()))
+	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(coreglib.InternObject(windowProperties).Native()))
 
 	_cret = C.webkit_window_properties_get_scrollbars_visible(_arg0)
 	runtime.KeepAlive(windowProperties)
@@ -207,13 +273,13 @@ func (windowProperties *WindowProperties) ScrollbarsVisible() bool {
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if statusbar should be visible or FALSE otherwise.
+//   - ok: TRUE if statusbar should be visible or FALSE otherwise.
 //
 func (windowProperties *WindowProperties) StatusbarVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
 
-	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(externglib.InternObject(windowProperties).Native()))
+	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(coreglib.InternObject(windowProperties).Native()))
 
 	_cret = C.webkit_window_properties_get_statusbar_visible(_arg0)
 	runtime.KeepAlive(windowProperties)
@@ -232,13 +298,13 @@ func (windowProperties *WindowProperties) StatusbarVisible() bool {
 //
 // The function returns the following values:
 //
-//    - ok: TRUE if toolbar should be visible or FALSE otherwise.
+//   - ok: TRUE if toolbar should be visible or FALSE otherwise.
 //
 func (windowProperties *WindowProperties) ToolbarVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
 
-	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(externglib.InternObject(windowProperties).Native()))
+	_arg0 = (*C.WebKitWindowProperties)(unsafe.Pointer(coreglib.InternObject(windowProperties).Native()))
 
 	_cret = C.webkit_window_properties_get_toolbar_visible(_arg0)
 	runtime.KeepAlive(windowProperties)
@@ -250,4 +316,14 @@ func (windowProperties *WindowProperties) ToolbarVisible() bool {
 	}
 
 	return _ok
+}
+
+// WindowPropertiesClass: instance of this type is always passed by reference.
+type WindowPropertiesClass struct {
+	*windowPropertiesClass
+}
+
+// windowPropertiesClass is the struct that's finalized.
+type windowPropertiesClass struct {
+	native *C.WebKitWindowPropertiesClass
 }

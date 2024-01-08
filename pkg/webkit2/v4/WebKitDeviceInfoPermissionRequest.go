@@ -2,58 +2,17 @@
 
 package webkit2
 
-import (
-	"unsafe"
-
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
-)
-
 // #include <stdlib.h>
-// #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitDeviceInfoPermissionRequest.go.
-var GTypeDeviceInfoPermissionRequest = externglib.Type(C.webkit_device_info_permission_request_get_type())
-
-func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeDeviceInfoPermissionRequest, F: marshalDeviceInfoPermissionRequest},
-	})
+// DeviceInfoPermissionRequestClass: instance of this type is always passed by
+// reference.
+type DeviceInfoPermissionRequestClass struct {
+	*deviceInfoPermissionRequestClass
 }
 
-// DeviceInfoPermissionRequestOverrider contains methods that are overridable.
-type DeviceInfoPermissionRequestOverrider interface {
-}
-
-type DeviceInfoPermissionRequest struct {
-	_ [0]func() // equal guard
-	*externglib.Object
-
-	PermissionRequest
-}
-
-var (
-	_ externglib.Objector = (*DeviceInfoPermissionRequest)(nil)
-)
-
-func classInitDeviceInfoPermissionRequester(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
-}
-
-func wrapDeviceInfoPermissionRequest(obj *externglib.Object) *DeviceInfoPermissionRequest {
-	return &DeviceInfoPermissionRequest{
-		Object: obj,
-		PermissionRequest: PermissionRequest{
-			Object: obj,
-		},
-	}
-}
-
-func marshalDeviceInfoPermissionRequest(p uintptr) (interface{}, error) {
-	return wrapDeviceInfoPermissionRequest(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
+// deviceInfoPermissionRequestClass is the struct that's finalized.
+type deviceInfoPermissionRequestClass struct {
+	native *C.WebKitDeviceInfoPermissionRequestClass
 }

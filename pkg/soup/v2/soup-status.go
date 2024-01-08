@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"unsafe"
 
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
 // #include <stdlib.h>
@@ -15,12 +15,14 @@ import (
 // #include <libsoup/soup.h>
 import "C"
 
-// glib.Type values for soup-status.go.
-var GTypeStatus = externglib.Type(C.soup_status_get_type())
+// GType values.
+var (
+	GTypeStatus = coreglib.Type(C.soup_status_get_type())
+)
 
 func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeStatus, F: marshalStatus},
+	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
+		coreglib.TypeMarshaler{T: GTypeStatus, F: marshalStatus},
 	})
 }
 
@@ -172,7 +174,7 @@ const (
 )
 
 func marshalStatus(p uintptr) (interface{}, error) {
-	return Status(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
+	return Status(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
 }
 
 // String returns the name in string for Status.
@@ -309,22 +311,22 @@ func (s Status) String() string {
 // used by soup_message_set_status() to get the correct text to go with a given
 // status code.
 //
-// <emphasis>There is no reason for you to ever use this function.</emphasis> If
-// you wanted the textual description for the Message:status_code of a given
-// Message, you should just look at the message's Message:reason_phrase.
+// <emphasis>There is no reason for you to ever use this function.</emphasis>
+// If you wanted the textual description for the Message:status_code of a
+// given Message, you should just look at the message's Message:reason_phrase.
 // However, you should only do that for use in debugging messages; HTTP reason
-// phrases are not localized, and are not generally very descriptive anyway, and
-// so they should never be presented to the user directly. Instead, you should
-// create you own error messages based on the status code, and on what you were
-// trying to do.
+// phrases are not localized, and are not generally very descriptive anyway,
+// and so they should never be presented to the user directly. Instead,
+// you should create you own error messages based on the status code, and on
+// what you were trying to do.
 //
 // The function takes the following parameters:
 //
-//    - statusCode: HTTP status code.
+//   - statusCode: HTTP status code.
 //
 // The function returns the following values:
 //
-//    - utf8: (terse, English) description of status_code.
+//   - utf8: (terse, English) description of status_code.
 //
 func StatusGetPhrase(statusCode uint) string {
 	var _arg1 C.guint // out
@@ -340,33 +342,4 @@ func StatusGetPhrase(statusCode uint) string {
 	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
 
 	return _utf8
-}
-
-// StatusProxify turns SOUP_STATUS_CANT_RESOLVE into
-// SOUP_STATUS_CANT_RESOLVE_PROXY and SOUP_STATUS_CANT_CONNECT into
-// SOUP_STATUS_CANT_CONNECT_PROXY. Other status codes are passed through
-// unchanged.
-//
-// The function takes the following parameters:
-//
-//    - statusCode status code.
-//
-// The function returns the following values:
-//
-//    - guint: "proxified" equivalent of status_code.
-//
-func StatusProxify(statusCode uint) uint {
-	var _arg1 C.guint // out
-	var _cret C.guint // in
-
-	_arg1 = C.guint(statusCode)
-
-	_cret = C.soup_status_proxify(_arg1)
-	runtime.KeepAlive(statusCode)
-
-	var _guint uint // out
-
-	_guint = uint(_cret)
-
-	return _guint
 }

@@ -6,7 +6,7 @@ import (
 	_ "runtime/cgo"
 )
 
-// #cgo pkg-config: javascriptcoregtk-4.0 webkit2gtk-4.0
+// #cgo pkg-config: javascriptcoregtk-4.1 webkit2gtk-4.1
 // #cgo CFLAGS: -Wno-deprecated-declarations
 // #include <stdlib.h>
 // #include <jsc/jsc.h>

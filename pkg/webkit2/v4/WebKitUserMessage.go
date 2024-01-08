@@ -3,188 +3,39 @@
 package webkit2
 
 import (
-	"fmt"
-	"runtime"
-	"unsafe"
-
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	externglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
 // #include <stdlib.h>
-// #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 import "C"
 
-// glib.Type values for WebKitUserMessage.go.
-var (
-	GTypeUserMessageError = externglib.Type(C.webkit_user_message_error_get_type())
-	GTypeUserMessage      = externglib.Type(C.webkit_user_message_get_type())
-)
-
-func init() {
-	externglib.RegisterGValueMarshalers([]externglib.TypeMarshaler{
-		{T: GTypeUserMessageError, F: marshalUserMessageError},
-		{T: GTypeUserMessage, F: marshalUserMessage},
-	})
-}
-
-// UserMessageError: enum values used to denote errors happening when sending
-// user messages.
-type UserMessageError C.gint
-
-const (
-	// UserMessageUnhandledMessage: message was not handled by the receiver.
-	UserMessageUnhandledMessage UserMessageError = iota
-)
-
-func marshalUserMessageError(p uintptr) (interface{}, error) {
-	return UserMessageError(externglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
-}
-
-// String returns the name in string for UserMessageError.
-func (u UserMessageError) String() string {
-	switch u {
-	case UserMessageUnhandledMessage:
-		return "Message"
-	default:
-		return fmt.Sprintf("UserMessageError(%d)", u)
-	}
-}
-
-// UserMessageOverrider contains methods that are overridable.
-type UserMessageOverrider interface {
-}
-
-type UserMessage struct {
-	_ [0]func() // equal guard
-	externglib.InitiallyUnowned
-}
-
-var ()
-
-func classInitUserMessager(gclassPtr, data C.gpointer) {
-	C.g_type_class_add_private(gclassPtr, C.gsize(unsafe.Sizeof(uintptr(0))))
-
-	goffset := C.g_type_class_get_instance_private_offset(gclassPtr)
-	*(*C.gpointer)(unsafe.Add(unsafe.Pointer(gclassPtr), goffset)) = data
-
-}
-
-func wrapUserMessage(obj *externglib.Object) *UserMessage {
-	return &UserMessage{
-		InitiallyUnowned: externglib.InitiallyUnowned{
-			Object: obj,
-		},
-	}
-}
-
-func marshalUserMessage(p uintptr) (interface{}, error) {
-	return wrapUserMessage(externglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewUserMessage: create a new KitUserMessage with name.
-//
-// The function takes the following parameters:
-//
-//    - name: message name.
-//    - parameters (optional): message parameters as a #GVariant, or NULL.
+// UserMessageErrorQuark gets the quark for the domain of user message errors.
 //
 // The function returns the following values:
 //
-//    - userMessage: newly created KitUserMessage object.
+//   - quark: user message error domain.
 //
-func NewUserMessage(name string, parameters *glib.Variant) *UserMessage {
-	var _arg1 *C.char              // out
-	var _arg2 *C.GVariant          // out
-	var _cret *C.WebKitUserMessage // in
+func UserMessageErrorQuark() glib.Quark {
+	var _cret C.GQuark // in
 
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
-	defer C.free(unsafe.Pointer(_arg1))
-	if parameters != nil {
-		_arg2 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(parameters)))
-	}
+	_cret = C.webkit_user_message_error_quark()
 
-	_cret = C.webkit_user_message_new(_arg1, _arg2)
-	runtime.KeepAlive(name)
-	runtime.KeepAlive(parameters)
+	var _quark glib.Quark // out
 
-	var _userMessage *UserMessage // out
+	_quark = uint32(_cret)
+	type _ = glib.Quark
+	type _ = uint32
 
-	_userMessage = wrapUserMessage(externglib.Take(unsafe.Pointer(_cret)))
-
-	return _userMessage
+	return _quark
 }
 
-// Name: get the message name.
-//
-// The function returns the following values:
-//
-//    - utf8: message name.
-//
-func (message *UserMessage) Name() string {
-	var _arg0 *C.WebKitUserMessage // out
-	var _cret *C.char              // in
-
-	_arg0 = (*C.WebKitUserMessage)(unsafe.Pointer(externglib.InternObject(message).Native()))
-
-	_cret = C.webkit_user_message_get_name(_arg0)
-	runtime.KeepAlive(message)
-
-	var _utf8 string // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-
-	return _utf8
+// UserMessageClass: instance of this type is always passed by reference.
+type UserMessageClass struct {
+	*userMessageClass
 }
 
-// Parameters: get the message parameters.
-//
-// The function returns the following values:
-//
-//    - variant (optional): message parameters.
-//
-func (message *UserMessage) Parameters() *glib.Variant {
-	var _arg0 *C.WebKitUserMessage // out
-	var _cret *C.GVariant          // in
-
-	_arg0 = (*C.WebKitUserMessage)(unsafe.Pointer(externglib.InternObject(message).Native()))
-
-	_cret = C.webkit_user_message_get_parameters(_arg0)
-	runtime.KeepAlive(message)
-
-	var _variant *glib.Variant // out
-
-	if _cret != nil {
-		_variant = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-		C.g_variant_ref(_cret)
-		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(_variant)),
-			func(intern *struct{ C unsafe.Pointer }) {
-				C.g_variant_unref((*C.GVariant)(intern.C))
-			},
-		)
-	}
-
-	return _variant
-}
-
-// SendReply: send a reply to message. If reply is floating, it's consumed. You
-// can only send a reply to a KitUserMessage that has been received.
-//
-// The function takes the following parameters:
-//
-//    - reply to send as reply.
-//
-func (message *UserMessage) SendReply(reply *UserMessage) {
-	var _arg0 *C.WebKitUserMessage // out
-	var _arg1 *C.WebKitUserMessage // out
-
-	_arg0 = (*C.WebKitUserMessage)(unsafe.Pointer(externglib.InternObject(message).Native()))
-	_arg1 = (*C.WebKitUserMessage)(unsafe.Pointer(externglib.InternObject(reply).Native()))
-
-	C.webkit_user_message_send_reply(_arg0, _arg1)
-	runtime.KeepAlive(message)
-	runtime.KeepAlive(reply)
+// userMessageClass is the struct that's finalized.
+type userMessageClass struct {
+	native *C.WebKitUserMessageClass
 }
