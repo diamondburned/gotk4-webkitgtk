@@ -167,27 +167,6 @@ func _gotk4_webkit24_InputMethodContextClass_notify_focus_out(arg0 *C.WebKitInpu
 	overrides.NotifyFocusOut()
 }
 
-//export _gotk4_webkit24_InputMethodContextClass_notify_surrounding
-func _gotk4_webkit24_InputMethodContextClass_notify_surrounding(arg0 *C.WebKitInputMethodContext, arg1 *C.gchar, arg2 C.guint, arg3 C.guint, arg4 C.guint) {
-	instance0 := coreglib.Take(unsafe.Pointer(arg0))
-	overrides := coreglib.OverridesFromObj[InputMethodContextOverrides](instance0)
-	if overrides.NotifySurrounding == nil {
-		panic("gotk4: " + instance0.TypeFromInstance().String() + ": expected InputMethodContextOverrides.NotifySurrounding, got none")
-	}
-
-	var _text string         // out
-	var _length uint         // out
-	var _cursorIndex uint    // out
-	var _selectionIndex uint // out
-
-	_text = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
-	_length = uint(arg2)
-	_cursorIndex = uint(arg3)
-	_selectionIndex = uint(arg4)
-
-	overrides.NotifySurrounding(_text, _length, _cursorIndex, _selectionIndex)
-}
-
 //export _gotk4_webkit24_InputMethodContextClass_preedit_changed
 func _gotk4_webkit24_InputMethodContextClass_preedit_changed(arg0 *C.WebKitInputMethodContext) {
 	instance0 := coreglib.Take(unsafe.Pointer(arg0))

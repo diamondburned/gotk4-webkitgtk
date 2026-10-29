@@ -66,7 +66,6 @@ type AuthOverrides struct {
 	//
 	//   - username provided by the user or client.
 	//   - password provided by the user or client.
-	//
 	Authenticate func(username, password string)
 	// CanAuthenticate tests if auth is able to authenticate by providing
 	// credentials to the auth.Authenticate.
@@ -74,7 +73,6 @@ type AuthOverrides struct {
 	// The function returns the following values:
 	//
 	//   - ok: TRUE if auth is able to accept credentials.
-	//
 	CanAuthenticate func() bool
 	// Authorization generates an appropriate "Authorization" header for msg.
 	//
@@ -87,7 +85,6 @@ type AuthOverrides struct {
 	// The function returns the following values:
 	//
 	//   - utf8: "Authorization" header, which must be freed.
-	//
 	Authorization func(msg *Message) string
 	// ProtectionSpace returns a list of paths on the server which auth extends
 	// over.
@@ -103,14 +100,12 @@ type AuthOverrides struct {
 	//
 	//   - sList: list of paths, which can be freed with
 	//     auth.FreeProtectionSpace.
-	//
 	ProtectionSpace func(sourceUri *glib.URI) []string
 	// IsAuthenticated tests if auth has been given a username and password.
 	//
 	// The function returns the following values:
 	//
 	//   - ok: TRUE if auth has been given a username and password.
-	//
 	IsAuthenticated func() bool
 	// IsReady tests if auth is ready to make a request for msg with.
 	//
@@ -125,7 +120,6 @@ type AuthOverrides struct {
 	// The function returns the following values:
 	//
 	//   - ok: TRUE if auth is ready to make a request with.
-	//
 	IsReady func(msg *Message) bool
 	// Update updates auth with the information from msg and auth_header,
 	// possibly un-authenticating it.
@@ -140,9 +134,8 @@ type AuthOverrides struct {
 	// The function returns the following values:
 	//
 	//   - ok: TRUE if auth is still a valid (but potentially unauthenticated)
-	//     Auth. FALSE if something about auth_params could not be parsed or
+	//     auth. FALSE if something about auth_params could not be parsed or
 	//     incorporated into auth at all.
-	//
 	Update func(msg *Message, authHeader map[unsafe.Pointer]unsafe.Pointer) bool
 }
 
@@ -164,7 +157,7 @@ func defaultAuthOverrides(v *Auth) AuthOverrides {
 // but applications never need to be aware of the specific subclasses being
 // used.
 //
-// Auth objects store the authentication data associated with a given bit of web
+// auth objects store the authentication data associated with a given bit of web
 // space. They are created automatically by session.
 type Auth struct {
 	_ [0]func() // equal guard
@@ -251,21 +244,20 @@ func BaseAuth(obj Auther) *Auth {
 	return obj.baseAuth()
 }
 
-// NewAuth creates a new Auth of type type with the information from msg and
+// NewAuth creates a new auth of type type with the information from msg and
 // auth_header.
 //
 // This is called by session; you will normally not create auths yourself.
 //
 // The function takes the following parameters:
 //
-//   - typ: type of auth to create (a subtype of Auth).
+//   - typ: type of auth to create (a subtype of auth).
 //   - msg the auth is being created for.
 //   - authHeader: WWW-Authenticate/Proxy-Authenticate header.
 //
 // The function returns the following values:
 //
-//   - auth (optional): new Auth, or NULL if it could not be created.
-//
+//   - auth (optional): new auth, or NULL if it could not be created.
 func NewAuth(typ coreglib.Type, msg *Message, authHeader string) *Auth {
 	var _arg1 C.GType        // out
 	var _arg2 *C.SoupMessage // out
@@ -300,7 +292,6 @@ func NewAuth(typ coreglib.Type, msg *Message, authHeader string) *Auth {
 //
 //   - username provided by the user or client.
 //   - password provided by the user or client.
-//
 func (auth *Auth) Authenticate(username, password string) {
 	var _arg0 *C.SoupAuth // out
 	var _arg1 *C.char     // out
@@ -324,7 +315,6 @@ func (auth *Auth) Authenticate(username, password string) {
 // The function returns the following values:
 //
 //   - ok: TRUE if auth is able to accept credentials.
-//
 func (auth *Auth) CanAuthenticate() bool {
 	var _arg0 *C.SoupAuth // out
 	var _cret C.gboolean  // in
@@ -346,8 +336,8 @@ func (auth *Auth) CanAuthenticate() bool {
 // Cancel: call this on an auth to cancel it.
 //
 // You need to cancel an auth to complete an asynchronous authenticate operation
-// when no credentials are provided (auth.Authenticate is not called). The Auth
-// will be cancelled on dispose if it hans't been authenticated.
+// when no credentials are provided (auth.Authenticate is not called). The auth
+// will be cancelled on dispose if it hasn't been authenticated.
 func (auth *Auth) Cancel() {
 	var _arg0 *C.SoupAuth // out
 
@@ -362,7 +352,6 @@ func (auth *Auth) Cancel() {
 // The function returns the following values:
 //
 //   - utf8: authority.
-//
 func (auth *Auth) Authority() string {
 	var _arg0 *C.SoupAuth // out
 	var _cret *C.char     // in
@@ -390,7 +379,6 @@ func (auth *Auth) Authority() string {
 // The function returns the following values:
 //
 //   - utf8: "Authorization" header, which must be freed.
-//
 func (auth *Auth) Authorization(msg *Message) string {
 	var _arg0 *C.SoupAuth    // out
 	var _arg1 *C.SoupMessage // out
@@ -413,14 +401,13 @@ func (auth *Auth) Authorization(msg *Message) string {
 
 // Info gets an opaque identifier for auth.
 //
-// The identifier can be used as a hash key or the like. Auth objects from the
+// The identifier can be used as a hash key or the like. auth objects from the
 // same server with the same identifier refer to the same authentication domain
 // (eg, the URLs associated with them take the same usernames and passwords).
 //
 // The function returns the following values:
 //
 //   - utf8: identifier.
-//
 func (auth *Auth) Info() string {
 	var _arg0 *C.SoupAuth // out
 	var _cret *C.char     // in
@@ -451,7 +438,6 @@ func (auth *Auth) Info() string {
 // The function returns the following values:
 //
 //   - sList: list of paths, which can be freed with auth.FreeProtectionSpace.
-//
 func (auth *Auth) ProtectionSpace(sourceUri *glib.URI) []string {
 	var _arg0 *C.SoupAuth // out
 	var _arg1 *C.GUri     // out
@@ -487,7 +473,6 @@ func (auth *Auth) ProtectionSpace(sourceUri *glib.URI) []string {
 // The function returns the following values:
 //
 //   - utf8: realm name.
-//
 func (auth *Auth) Realm() string {
 	var _arg0 *C.SoupAuth // out
 	var _cret *C.char     // in
@@ -511,7 +496,6 @@ func (auth *Auth) Realm() string {
 // The function returns the following values:
 //
 //   - utf8: scheme name.
-//
 func (auth *Auth) SchemeName() string {
 	var _arg0 *C.SoupAuth // out
 	var _cret *C.char     // in
@@ -533,7 +517,6 @@ func (auth *Auth) SchemeName() string {
 // The function returns the following values:
 //
 //   - ok: TRUE if auth has been given a username and password.
-//
 func (auth *Auth) IsAuthenticated() bool {
 	var _arg0 *C.SoupAuth // out
 	var _cret C.gboolean  // in
@@ -557,7 +540,6 @@ func (auth *Auth) IsAuthenticated() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if auth has been cancelled.
-//
 func (auth *Auth) IsCancelled() bool {
 	var _arg0 *C.SoupAuth // out
 	var _cret C.gboolean  // in
@@ -582,7 +564,6 @@ func (auth *Auth) IsCancelled() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE or FALSE.
-//
 func (auth *Auth) IsForProxy() bool {
 	var _arg0 *C.SoupAuth // out
 	var _cret C.gboolean  // in
@@ -614,7 +595,6 @@ func (auth *Auth) IsForProxy() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if auth is ready to make a request with.
-//
 func (auth *Auth) IsReady(msg *Message) bool {
 	var _arg0 *C.SoupAuth    // out
 	var _arg1 *C.SoupMessage // out
@@ -648,10 +628,9 @@ func (auth *Auth) IsReady(msg *Message) bool {
 //
 // The function returns the following values:
 //
-//   - ok: TRUE if auth is still a valid (but potentially unauthenticated) Auth.
+//   - ok: TRUE if auth is still a valid (but potentially unauthenticated) auth.
 //     FALSE if something about auth_params could not be parsed or incorporated
 //     into auth at all.
-//
 func (auth *Auth) Update(msg *Message, authHeader string) bool {
 	var _arg0 *C.SoupAuth    // out
 	var _arg1 *C.SoupMessage // out
@@ -686,7 +665,6 @@ func (auth *Auth) Update(msg *Message, authHeader string) bool {
 //
 //   - username provided by the user or client.
 //   - password provided by the user or client.
-//
 func (auth *Auth) authenticate(username, password string) {
 	gclass := (*C.SoupAuthClass)(coreglib.PeekParentClass(auth))
 	fnarg := gclass.authenticate
@@ -713,7 +691,6 @@ func (auth *Auth) authenticate(username, password string) {
 // The function returns the following values:
 //
 //   - ok: TRUE if auth is able to accept credentials.
-//
 func (auth *Auth) canAuthenticate() bool {
 	gclass := (*C.SoupAuthClass)(coreglib.PeekParentClass(auth))
 	fnarg := gclass.can_authenticate
@@ -746,7 +723,6 @@ func (auth *Auth) canAuthenticate() bool {
 // The function returns the following values:
 //
 //   - utf8: "Authorization" header, which must be freed.
-//
 func (auth *Auth) authorization(msg *Message) string {
 	gclass := (*C.SoupAuthClass)(coreglib.PeekParentClass(auth))
 	fnarg := gclass.get_authorization
@@ -783,7 +759,6 @@ func (auth *Auth) authorization(msg *Message) string {
 // The function returns the following values:
 //
 //   - sList: list of paths, which can be freed with auth.FreeProtectionSpace.
-//
 func (auth *Auth) protectionSpace(sourceUri *glib.URI) []string {
 	gclass := (*C.SoupAuthClass)(coreglib.PeekParentClass(auth))
 	fnarg := gclass.get_protection_space
@@ -818,7 +793,6 @@ func (auth *Auth) protectionSpace(sourceUri *glib.URI) []string {
 // The function returns the following values:
 //
 //   - ok: TRUE if auth has been given a username and password.
-//
 func (auth *Auth) isAuthenticated() bool {
 	gclass := (*C.SoupAuthClass)(coreglib.PeekParentClass(auth))
 	fnarg := gclass.is_authenticated
@@ -853,7 +827,6 @@ func (auth *Auth) isAuthenticated() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if auth is ready to make a request with.
-//
 func (auth *Auth) isReady(msg *Message) bool {
 	gclass := (*C.SoupAuthClass)(coreglib.PeekParentClass(auth))
 	fnarg := gclass.is_ready
@@ -890,10 +863,9 @@ func (auth *Auth) isReady(msg *Message) bool {
 //
 // The function returns the following values:
 //
-//   - ok: TRUE if auth is still a valid (but potentially unauthenticated) Auth.
+//   - ok: TRUE if auth is still a valid (but potentially unauthenticated) auth.
 //     FALSE if something about auth_params could not be parsed or incorporated
 //     into auth at all.
-//
 func (auth *Auth) update(msg *Message, authHeader map[unsafe.Pointer]unsafe.Pointer) bool {
 	gclass := (*C.SoupAuthClass)(coreglib.PeekParentClass(auth))
 	fnarg := gclass.update
@@ -907,10 +879,10 @@ func (auth *Auth) update(msg *Message, authHeader map[unsafe.Pointer]unsafe.Poin
 	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
 	_arg2 = C.g_hash_table_new_full(nil, nil, (*[0]byte)(C.free), (*[0]byte)(C.free))
 	for ksrc, vsrc := range authHeader {
-		var kdst *C.gpointer // out
-		var vdst *C.gpointer // out
-		kdst = (*C.gpointer)(unsafe.Pointer(ksrc))
-		vdst = (*C.gpointer)(unsafe.Pointer(vsrc))
+		var kdst C.gpointer // out
+		var vdst C.gpointer // out
+		kdst = (C.gpointer)(unsafe.Pointer(ksrc))
+		vdst = (C.gpointer)(unsafe.Pointer(vsrc))
 		C.g_hash_table_insert(_arg2, C.gpointer(unsafe.Pointer(kdst)), C.gpointer(unsafe.Pointer(vdst)))
 	}
 	defer C.g_hash_table_unref(_arg2)
@@ -939,7 +911,6 @@ func (auth *Auth) update(msg *Message, authHeader map[unsafe.Pointer]unsafe.Poin
 // The function returns the following values:
 //
 //   - ok: TRUE if supported otherwise FALSE.
-//
 func AuthNegotiateSupported() bool {
 	var _cret C.gboolean // in
 
@@ -982,7 +953,7 @@ func (a *AuthClass) Padding() [6]unsafe.Pointer {
 	valptr := &a.native.padding
 	var _v [6]unsafe.Pointer // out
 	{
-		src := &*valptr
+		src := unsafe.Slice(&(*valptr)[0], 6)
 		for i := 0; i < 6; i++ {
 			_v[i] = (unsafe.Pointer)(unsafe.Pointer(src[i]))
 		}

@@ -86,7 +86,6 @@ func marshalNavigationPolicyDecision(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: name of the new frame this navigation action targets or NULL.
-//
 func (decision *NavigationPolicyDecision) FrameName() string {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret *C.gchar                          // in
@@ -112,7 +111,6 @@ func (decision *NavigationPolicyDecision) FrameName() string {
 // The function returns the following values:
 //
 //   - guint modifiers active if this decision was triggered by a mouse event.
-//
 func (decision *NavigationPolicyDecision) Modifiers() uint {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret C.guint                           // in
@@ -139,7 +137,6 @@ func (decision *NavigationPolicyDecision) Modifiers() uint {
 //
 //   - guint: mouse button used if this decision was triggered by a mouse event
 //     or 0 otherwise.
-//
 func (decision *NavigationPolicyDecision) MouseButton() uint {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret C.guint                           // in
@@ -162,7 +159,6 @@ func (decision *NavigationPolicyDecision) MouseButton() uint {
 // The function returns the following values:
 //
 //   - navigationAction triggering this policy decision.
-//
 func (decision *NavigationPolicyDecision) NavigationAction() *NavigationAction {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret *C.WebKitNavigationAction         // in
@@ -188,7 +184,6 @@ func (decision *NavigationPolicyDecision) NavigationAction() *NavigationAction {
 // The function returns the following values:
 //
 //   - navigationType: type of navigation triggering this policy decision.
-//
 func (decision *NavigationPolicyDecision) NavigationType() NavigationType {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret C.WebKitNavigationType            // in
@@ -213,7 +208,6 @@ func (decision *NavigationPolicyDecision) NavigationType() NavigationType {
 // The function returns the following values:
 //
 //   - uriRequest: URI request that is associated with this navigation.
-//
 func (decision *NavigationPolicyDecision) Request() *URIRequest {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret *C.WebKitURIRequest               // in

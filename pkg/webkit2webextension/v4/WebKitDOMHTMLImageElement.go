@@ -86,7 +86,6 @@ func marshalDOMHTMLImageElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLImageElement) Align() string {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret *C.gchar                     // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLImageElement) Align() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLImageElement) Alt() string {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret *C.gchar                     // in
@@ -132,7 +130,6 @@ func (self *DOMHTMLImageElement) Alt() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLImageElement) Border() string {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret *C.gchar                     // in
@@ -155,7 +152,6 @@ func (self *DOMHTMLImageElement) Border() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLImageElement) Complete() bool {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret C.gboolean                   // in
@@ -179,7 +175,6 @@ func (self *DOMHTMLImageElement) Complete() bool {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLImageElement) Height() int32 {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret C.glong                      // in
@@ -201,7 +196,6 @@ func (self *DOMHTMLImageElement) Height() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLImageElement) Hspace() int32 {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret C.glong                      // in
@@ -223,7 +217,6 @@ func (self *DOMHTMLImageElement) Hspace() int32 {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLImageElement) IsMap() bool {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret C.gboolean                   // in
@@ -247,7 +240,6 @@ func (self *DOMHTMLImageElement) IsMap() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLImageElement) LongDesc() string {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret *C.gchar                     // in
@@ -270,7 +262,6 @@ func (self *DOMHTMLImageElement) LongDesc() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLImageElement) Lowsrc() string {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret *C.gchar                     // in
@@ -293,7 +284,6 @@ func (self *DOMHTMLImageElement) Lowsrc() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLImageElement) Name() string {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret *C.gchar                     // in
@@ -316,7 +306,6 @@ func (self *DOMHTMLImageElement) Name() string {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLImageElement) NaturalHeight() int32 {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret C.glong                      // in
@@ -338,7 +327,6 @@ func (self *DOMHTMLImageElement) NaturalHeight() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLImageElement) NaturalWidth() int32 {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret C.glong                      // in
@@ -360,7 +348,6 @@ func (self *DOMHTMLImageElement) NaturalWidth() int32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLImageElement) Src() string {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret *C.gchar                     // in
@@ -383,7 +370,6 @@ func (self *DOMHTMLImageElement) Src() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLImageElement) UseMap() string {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret *C.gchar                     // in
@@ -406,7 +392,6 @@ func (self *DOMHTMLImageElement) UseMap() string {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLImageElement) Vspace() int32 {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret C.glong                      // in
@@ -428,7 +413,6 @@ func (self *DOMHTMLImageElement) Vspace() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLImageElement) Width() int32 {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret C.glong                      // in
@@ -450,7 +434,6 @@ func (self *DOMHTMLImageElement) Width() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLImageElement) X() int32 {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret C.glong                      // in
@@ -472,7 +455,6 @@ func (self *DOMHTMLImageElement) X() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLImageElement) Y() int32 {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _cret C.glong                      // in
@@ -494,7 +476,6 @@ func (self *DOMHTMLImageElement) Y() int32 {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLImageElement) SetAlign(value string) {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _arg1 *C.gchar                     // out
@@ -513,7 +494,6 @@ func (self *DOMHTMLImageElement) SetAlign(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLImageElement) SetAlt(value string) {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _arg1 *C.gchar                     // out
@@ -532,7 +512,6 @@ func (self *DOMHTMLImageElement) SetAlt(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLImageElement) SetBorder(value string) {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _arg1 *C.gchar                     // out
@@ -551,7 +530,6 @@ func (self *DOMHTMLImageElement) SetBorder(value string) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLImageElement) SetHeight(value int32) {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _arg1 C.glong                      // out
@@ -569,7 +547,6 @@ func (self *DOMHTMLImageElement) SetHeight(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLImageElement) SetHspace(value int32) {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _arg1 C.glong                      // out
@@ -587,7 +564,6 @@ func (self *DOMHTMLImageElement) SetHspace(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLImageElement) SetIsMap(value bool) {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _arg1 C.gboolean                   // out
@@ -607,7 +583,6 @@ func (self *DOMHTMLImageElement) SetIsMap(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLImageElement) SetLongDesc(value string) {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _arg1 *C.gchar                     // out
@@ -626,7 +601,6 @@ func (self *DOMHTMLImageElement) SetLongDesc(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLImageElement) SetLowsrc(value string) {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _arg1 *C.gchar                     // out
@@ -645,7 +619,6 @@ func (self *DOMHTMLImageElement) SetLowsrc(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLImageElement) SetName(value string) {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _arg1 *C.gchar                     // out
@@ -664,7 +637,6 @@ func (self *DOMHTMLImageElement) SetName(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLImageElement) SetSrc(value string) {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _arg1 *C.gchar                     // out
@@ -683,7 +655,6 @@ func (self *DOMHTMLImageElement) SetSrc(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLImageElement) SetUseMap(value string) {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _arg1 *C.gchar                     // out
@@ -702,7 +673,6 @@ func (self *DOMHTMLImageElement) SetUseMap(value string) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLImageElement) SetVspace(value int32) {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _arg1 C.glong                      // out
@@ -720,7 +690,6 @@ func (self *DOMHTMLImageElement) SetVspace(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLImageElement) SetWidth(value int32) {
 	var _arg0 *C.WebKitDOMHTMLImageElement // out
 	var _arg1 C.glong                      // out

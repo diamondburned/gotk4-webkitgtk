@@ -110,7 +110,6 @@ func marshalUserMessage(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - userMessage: newly created KitUserMessage object.
-//
 func NewUserMessage(name string, parameters *glib.Variant) *UserMessage {
 	var _arg1 *C.char              // out
 	var _arg2 *C.GVariant          // out
@@ -138,7 +137,6 @@ func NewUserMessage(name string, parameters *glib.Variant) *UserMessage {
 // The function returns the following values:
 //
 //   - utf8: message name.
-//
 func (message *UserMessage) Name() string {
 	var _arg0 *C.WebKitUserMessage // out
 	var _cret *C.char              // in
@@ -160,7 +158,6 @@ func (message *UserMessage) Name() string {
 // The function returns the following values:
 //
 //   - variant (optional): message parameters.
-//
 func (message *UserMessage) Parameters() *glib.Variant {
 	var _arg0 *C.WebKitUserMessage // out
 	var _cret *C.GVariant          // in
@@ -194,7 +191,6 @@ func (message *UserMessage) Parameters() *glib.Variant {
 // The function takes the following parameters:
 //
 //   - reply to send as reply.
-//
 func (message *UserMessage) SendReply(reply *UserMessage) {
 	var _arg0 *C.WebKitUserMessage // out
 	var _arg1 *C.WebKitUserMessage // out

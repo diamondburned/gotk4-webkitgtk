@@ -121,7 +121,6 @@ func NewCookie(name string, value string, domain string, path string, maxAge int
 // The function returns the following values:
 //
 //   - ok: TRUE if cookie should be sent to uri, FALSE if not.
-//
 func (cookie *Cookie) AppliesToURI(uri *glib.URI) bool {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.GUri       // out
@@ -148,7 +147,6 @@ func (cookie *Cookie) AppliesToURI(uri *glib.URI) bool {
 // The function returns the following values:
 //
 //   - ret: copy of cookie.
-//
 func (cookie *Cookie) Copy() *Cookie {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.SoupCookie // in
@@ -183,7 +181,6 @@ func (cookie *Cookie) Copy() *Cookie {
 // The function returns the following values:
 //
 //   - ok: TRUE if the domains match, FALSE otherwise.
-//
 func (cookie *Cookie) DomainMatches(host string) bool {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.char       // out
@@ -218,7 +215,6 @@ func (cookie *Cookie) DomainMatches(host string) bool {
 // The function returns the following values:
 //
 //   - ok: whether the cookies are equal.
-//
 func (cookie1 *Cookie) Equal(cookie2 *Cookie) bool {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.SoupCookie // out
@@ -245,7 +241,6 @@ func (cookie1 *Cookie) Equal(cookie2 *Cookie) bool {
 // The function returns the following values:
 //
 //   - utf8 cookie's domain.
-//
 func (cookie *Cookie) Domain() string {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.char       // in
@@ -268,7 +263,6 @@ func (cookie *Cookie) Domain() string {
 //
 //   - dateTime (optional) cookie's expiration time, which is owned by cookie
 //     and should not be modified or freed.
-//
 func (cookie *Cookie) Expires() *glib.DateTime {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.GDateTime  // in
@@ -299,7 +293,6 @@ func (cookie *Cookie) Expires() *glib.DateTime {
 // The function returns the following values:
 //
 //   - ok cookie's HttpOnly attribute.
-//
 func (cookie *Cookie) HTTPOnly() bool {
 	var _arg0 *C.SoupCookie // out
 	var _cret C.gboolean    // in
@@ -323,7 +316,6 @@ func (cookie *Cookie) HTTPOnly() bool {
 // The function returns the following values:
 //
 //   - utf8 cookie's name.
-//
 func (cookie *Cookie) Name() string {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.char       // in
@@ -345,7 +337,6 @@ func (cookie *Cookie) Name() string {
 // The function returns the following values:
 //
 //   - utf8 cookie's path.
-//
 func (cookie *Cookie) Path() string {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.char       // in
@@ -367,7 +358,6 @@ func (cookie *Cookie) Path() string {
 // The function returns the following values:
 //
 //   - sameSitePolicy: SameSitePolicy.
-//
 func (cookie *Cookie) SameSitePolicy() SameSitePolicy {
 	var _arg0 *C.SoupCookie        // out
 	var _cret C.SoupSameSitePolicy // in
@@ -389,7 +379,6 @@ func (cookie *Cookie) SameSitePolicy() SameSitePolicy {
 // The function returns the following values:
 //
 //   - ok cookie's secure attribute.
-//
 func (cookie *Cookie) Secure() bool {
 	var _arg0 *C.SoupCookie // out
 	var _cret C.gboolean    // in
@@ -413,7 +402,6 @@ func (cookie *Cookie) Secure() bool {
 // The function returns the following values:
 //
 //   - utf8 cookie's value.
-//
 func (cookie *Cookie) Value() string {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.char       // in
@@ -435,7 +423,6 @@ func (cookie *Cookie) Value() string {
 // The function takes the following parameters:
 //
 //   - domain: new domain.
-//
 func (cookie *Cookie) SetDomain(domain string) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.char       // out
@@ -459,7 +446,6 @@ func (cookie *Cookie) SetDomain(domain string) {
 // The function takes the following parameters:
 //
 //   - expires: new expiration time, or NULL.
-//
 func (cookie *Cookie) SetExpires(expires *glib.DateTime) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.GDateTime  // out
@@ -480,7 +466,6 @@ func (cookie *Cookie) SetExpires(expires *glib.DateTime) {
 // The function takes the following parameters:
 //
 //   - httpOnly: new value for the HttpOnly attribute.
-//
 func (cookie *Cookie) SetHTTPOnly(httpOnly bool) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 C.gboolean    // out
@@ -510,7 +495,6 @@ func (cookie *Cookie) SetHTTPOnly(httpOnly bool) {
 // The function takes the following parameters:
 //
 //   - maxAge: new max age.
-//
 func (cookie *Cookie) SetMaxAge(maxAge int) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 C.int         // out
@@ -528,7 +512,6 @@ func (cookie *Cookie) SetMaxAge(maxAge int) {
 // The function takes the following parameters:
 //
 //   - name: new name.
-//
 func (cookie *Cookie) SetName(name string) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.char       // out
@@ -547,7 +530,6 @@ func (cookie *Cookie) SetName(name string) {
 // The function takes the following parameters:
 //
 //   - path: new path.
-//
 func (cookie *Cookie) SetPath(path string) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.char       // out
@@ -568,7 +550,6 @@ func (cookie *Cookie) SetPath(path string) {
 // The function takes the following parameters:
 //
 //   - policy: SameSitePolicy.
-//
 func (cookie *Cookie) SetSameSitePolicy(policy SameSitePolicy) {
 	var _arg0 *C.SoupCookie        // out
 	var _arg1 C.SoupSameSitePolicy // out
@@ -589,7 +570,6 @@ func (cookie *Cookie) SetSameSitePolicy(policy SameSitePolicy) {
 // The function takes the following parameters:
 //
 //   - secure: new value for the secure attribute.
-//
 func (cookie *Cookie) SetSecure(secure bool) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 C.gboolean    // out
@@ -609,7 +589,6 @@ func (cookie *Cookie) SetSecure(secure bool) {
 // The function takes the following parameters:
 //
 //   - value: new value.
-//
 func (cookie *Cookie) SetValue(value string) {
 	var _arg0 *C.SoupCookie // out
 	var _arg1 *C.char       // out
@@ -629,7 +608,6 @@ func (cookie *Cookie) SetValue(value string) {
 // The function returns the following values:
 //
 //   - utf8: header.
-//
 func (cookie *Cookie) ToCookieHeader() string {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.char       // in
@@ -655,7 +633,6 @@ func (cookie *Cookie) ToCookieHeader() string {
 // The function returns the following values:
 //
 //   - utf8: header.
-//
 func (cookie *Cookie) ToSetCookieHeader() string {
 	var _arg0 *C.SoupCookie // out
 	var _cret *C.char       // in
@@ -673,7 +650,7 @@ func (cookie *Cookie) ToSetCookieHeader() string {
 	return _utf8
 }
 
-// HSTSPolicy implements HTTP policies, as described by RFC 6797
+// HSTSPolicy: hstspolicy implements HTTP policies, as described by RFC 6797
 // (http://tools.ietf.org/html/rfc6797).
 //
 // domain represents the host that this policy applies to. The domain must be
@@ -830,7 +807,6 @@ func NewHSTSPolicySessionPolicy(domain string, includeSubdomains bool) *HSTSPoli
 // The function returns the following values:
 //
 //   - hstsPolicy: copy of policy.
-//
 func (policy *HSTSPolicy) Copy() *HSTSPolicy {
 	var _arg0 *C.SoupHSTSPolicy // out
 	var _cret *C.SoupHSTSPolicy // in
@@ -862,7 +838,6 @@ func (policy *HSTSPolicy) Copy() *HSTSPolicy {
 // The function returns the following values:
 //
 //   - ok: whether the policies are equal.
-//
 func (policy1 *HSTSPolicy) Equal(policy2 *HSTSPolicy) bool {
 	var _arg0 *C.SoupHSTSPolicy // out
 	var _arg1 *C.SoupHSTSPolicy // out
@@ -889,7 +864,6 @@ func (policy1 *HSTSPolicy) Equal(policy2 *HSTSPolicy) bool {
 // The function returns the following values:
 //
 //   - utf8 policy's domain.
-//
 func (policy *HSTSPolicy) Domain() string {
 	var _arg0 *C.SoupHSTSPolicy // out
 	var _cret *C.char           // in
@@ -911,7 +885,6 @@ func (policy *HSTSPolicy) Domain() string {
 // The function returns the following values:
 //
 //   - dateTime or NULL if unset.
-//
 func (policy *HSTSPolicy) Expires() *glib.DateTime {
 	var _arg0 *C.SoupHSTSPolicy // out
 	var _cret *C.GDateTime      // in
@@ -939,7 +912,6 @@ func (policy *HSTSPolicy) Expires() *glib.DateTime {
 // The function returns the following values:
 //
 //   - gulong: max age in seconds.
-//
 func (policy *HSTSPolicy) MaxAge() uint32 {
 	var _arg0 *C.SoupHSTSPolicy // out
 	var _cret C.gulong          // in
@@ -961,7 +933,6 @@ func (policy *HSTSPolicy) MaxAge() uint32 {
 // The function returns the following values:
 //
 //   - ok: TRUE if policy includes subdomains, FALSE otherwise.
-//
 func (policy *HSTSPolicy) IncludesSubdomains() bool {
 	var _arg0 *C.SoupHSTSPolicy // out
 	var _cret C.gboolean        // in
@@ -987,7 +958,6 @@ func (policy *HSTSPolicy) IncludesSubdomains() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if policy is expired, FALSE otherwise.
-//
 func (policy *HSTSPolicy) IsExpired() bool {
 	var _arg0 *C.SoupHSTSPolicy // out
 	var _cret C.gboolean        // in
@@ -1014,7 +984,6 @@ func (policy *HSTSPolicy) IsExpired() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if policy is permanent, FALSE otherwise.
-//
 func (policy *HSTSPolicy) IsSessionPolicy() bool {
 	var _arg0 *C.SoupHSTSPolicy // out
 	var _cret C.gboolean        // in
@@ -1068,7 +1037,6 @@ func marshalMessageMetrics(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - messageMetrics: copy of metrics.
-//
 func (metrics *MessageMetrics) Copy() *MessageMetrics {
 	var _arg0 *C.SoupMessageMetrics // out
 	var _cret *C.SoupMessageMetrics // in
@@ -1102,7 +1070,6 @@ func (metrics *MessageMetrics) Copy() *MessageMetrics {
 // The function returns the following values:
 //
 //   - guint64: connection end time.
-//
 func (metrics *MessageMetrics) ConnectEnd() uint64 {
 	var _arg0 *C.SoupMessageMetrics // out
 	var _cret C.guint64             // in
@@ -1129,7 +1096,6 @@ func (metrics *MessageMetrics) ConnectEnd() uint64 {
 // The function returns the following values:
 //
 //   - guint64: connection start time.
-//
 func (metrics *MessageMetrics) ConnectStart() uint64 {
 	var _arg0 *C.SoupMessageMetrics // out
 	var _cret C.guint64             // in
@@ -1156,7 +1122,6 @@ func (metrics *MessageMetrics) ConnectStart() uint64 {
 // The function returns the following values:
 //
 //   - guint64: domain lookup end time.
-//
 func (metrics *MessageMetrics) DnsEnd() uint64 {
 	var _arg0 *C.SoupMessageMetrics // out
 	var _cret C.guint64             // in
@@ -1183,7 +1148,6 @@ func (metrics *MessageMetrics) DnsEnd() uint64 {
 // The function returns the following values:
 //
 //   - guint64: domain lookup start time.
-//
 func (metrics *MessageMetrics) DnsStart() uint64 {
 	var _arg0 *C.SoupMessageMetrics // out
 	var _cret C.guint64             // in
@@ -1206,7 +1170,6 @@ func (metrics *MessageMetrics) DnsStart() uint64 {
 // The function returns the following values:
 //
 //   - guint64: fetch start time.
-//
 func (metrics *MessageMetrics) FetchStart() uint64 {
 	var _arg0 *C.SoupMessageMetrics // out
 	var _cret C.guint64             // in
@@ -1234,7 +1197,6 @@ func (metrics *MessageMetrics) FetchStart() uint64 {
 // The function returns the following values:
 //
 //   - guint64: request body bytes sent.
-//
 func (metrics *MessageMetrics) RequestBodyBytesSent() uint64 {
 	var _arg0 *C.SoupMessageMetrics // out
 	var _cret C.guint64             // in
@@ -1260,7 +1222,6 @@ func (metrics *MessageMetrics) RequestBodyBytesSent() uint64 {
 // The function returns the following values:
 //
 //   - guint64: request body size.
-//
 func (metrics *MessageMetrics) RequestBodySize() uint64 {
 	var _arg0 *C.SoupMessageMetrics // out
 	var _cret C.guint64             // in
@@ -1286,7 +1247,6 @@ func (metrics *MessageMetrics) RequestBodySize() uint64 {
 // The function returns the following values:
 //
 //   - guint64: request headers bytes sent.
-//
 func (metrics *MessageMetrics) RequestHeaderBytesSent() uint64 {
 	var _arg0 *C.SoupMessageMetrics // out
 	var _cret C.guint64             // in
@@ -1309,7 +1269,6 @@ func (metrics *MessageMetrics) RequestHeaderBytesSent() uint64 {
 // The function returns the following values:
 //
 //   - guint64: request start time.
-//
 func (metrics *MessageMetrics) RequestStart() uint64 {
 	var _arg0 *C.SoupMessageMetrics // out
 	var _cret C.guint64             // in
@@ -1336,7 +1295,6 @@ func (metrics *MessageMetrics) RequestStart() uint64 {
 // The function returns the following values:
 //
 //   - guint64: response body bytes received.
-//
 func (metrics *MessageMetrics) ResponseBodyBytesReceived() uint64 {
 	var _arg0 *C.SoupMessageMetrics // out
 	var _cret C.guint64             // in
@@ -1364,7 +1322,6 @@ func (metrics *MessageMetrics) ResponseBodyBytesReceived() uint64 {
 // The function returns the following values:
 //
 //   - guint64: response body size.
-//
 func (metrics *MessageMetrics) ResponseBodySize() uint64 {
 	var _arg0 *C.SoupMessageMetrics // out
 	var _cret C.guint64             // in
@@ -1390,7 +1347,6 @@ func (metrics *MessageMetrics) ResponseBodySize() uint64 {
 // The function returns the following values:
 //
 //   - guint64: response end time.
-//
 func (metrics *MessageMetrics) ResponseEnd() uint64 {
 	var _arg0 *C.SoupMessageMetrics // out
 	var _cret C.guint64             // in
@@ -1417,7 +1373,6 @@ func (metrics *MessageMetrics) ResponseEnd() uint64 {
 // The function returns the following values:
 //
 //   - guint64: response headers bytes received.
-//
 func (metrics *MessageMetrics) ResponseHeaderBytesReceived() uint64 {
 	var _arg0 *C.SoupMessageMetrics // out
 	var _cret C.guint64             // in
@@ -1440,7 +1395,6 @@ func (metrics *MessageMetrics) ResponseHeaderBytesReceived() uint64 {
 // The function returns the following values:
 //
 //   - guint64: response start time.
-//
 func (metrics *MessageMetrics) ResponseStart() uint64 {
 	var _arg0 *C.SoupMessageMetrics // out
 	var _cret C.guint64             // in
@@ -1467,7 +1421,6 @@ func (metrics *MessageMetrics) ResponseStart() uint64 {
 // The function returns the following values:
 //
 //   - guint64 tls start time.
-//
 func (metrics *MessageMetrics) TLSStart() uint64 {
 	var _arg0 *C.SoupMessageMetrics // out
 	var _cret C.guint64             // in

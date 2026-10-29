@@ -85,7 +85,6 @@ func marshalDOMCSSStyleSheet(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMCSSStyleSheet) AddRule(selector, style string, index uint32) (int32, error) {
 	var _arg0 *C.WebKitDOMCSSStyleSheet // out
 	var _arg1 *C.gchar                  // out
@@ -123,7 +122,6 @@ func (self *DOMCSSStyleSheet) AddRule(selector, style string, index uint32) (int
 // The function takes the following parameters:
 //
 //   - index: #gulong.
-//
 func (self *DOMCSSStyleSheet) DeleteRule(index uint32) error {
 	var _arg0 *C.WebKitDOMCSSStyleSheet // out
 	var _arg1 C.gulong                  // out
@@ -150,7 +148,6 @@ func (self *DOMCSSStyleSheet) DeleteRule(index uint32) error {
 // The function returns the following values:
 //
 //   - domcssRuleList: KitDOMCSSRuleList.
-//
 func (self *DOMCSSStyleSheet) CSSRules() *DOMCSSRuleList {
 	var _arg0 *C.WebKitDOMCSSStyleSheet // out
 	var _cret *C.WebKitDOMCSSRuleList   // in
@@ -172,7 +169,6 @@ func (self *DOMCSSStyleSheet) CSSRules() *DOMCSSRuleList {
 // The function returns the following values:
 //
 //   - domcssRule: KitDOMCSSRule.
-//
 func (self *DOMCSSStyleSheet) OwnerRule() *DOMCSSRule {
 	var _arg0 *C.WebKitDOMCSSStyleSheet // out
 	var _cret *C.WebKitDOMCSSRule       // in
@@ -194,7 +190,6 @@ func (self *DOMCSSStyleSheet) OwnerRule() *DOMCSSRule {
 // The function returns the following values:
 //
 //   - domcssRuleList: KitDOMCSSRuleList.
-//
 func (self *DOMCSSStyleSheet) Rules() *DOMCSSRuleList {
 	var _arg0 *C.WebKitDOMCSSStyleSheet // out
 	var _cret *C.WebKitDOMCSSRuleList   // in
@@ -221,7 +216,6 @@ func (self *DOMCSSStyleSheet) Rules() *DOMCSSRuleList {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMCSSStyleSheet) InsertRule(rule string, index uint32) (uint32, error) {
 	var _arg0 *C.WebKitDOMCSSStyleSheet // out
 	var _arg1 *C.gchar                  // out
@@ -255,7 +249,6 @@ func (self *DOMCSSStyleSheet) InsertRule(rule string, index uint32) (uint32, err
 // The function takes the following parameters:
 //
 //   - index: #gulong.
-//
 func (self *DOMCSSStyleSheet) RemoveRule(index uint32) error {
 	var _arg0 *C.WebKitDOMCSSStyleSheet // out
 	var _arg1 C.gulong                  // out

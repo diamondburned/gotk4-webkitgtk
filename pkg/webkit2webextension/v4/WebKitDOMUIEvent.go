@@ -78,7 +78,6 @@ func marshalDOMUIEvent(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMUIEvent) CharCode() int32 {
 	var _arg0 *C.WebKitDOMUIEvent // out
 	var _cret C.glong             // in
@@ -100,7 +99,6 @@ func (self *DOMUIEvent) CharCode() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMUIEvent) Detail() int32 {
 	var _arg0 *C.WebKitDOMUIEvent // out
 	var _cret C.glong             // in
@@ -122,7 +120,6 @@ func (self *DOMUIEvent) Detail() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMUIEvent) KeyCode() int32 {
 	var _arg0 *C.WebKitDOMUIEvent // out
 	var _cret C.glong             // in
@@ -144,7 +141,6 @@ func (self *DOMUIEvent) KeyCode() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMUIEvent) LayerX() int32 {
 	var _arg0 *C.WebKitDOMUIEvent // out
 	var _cret C.glong             // in
@@ -166,7 +162,6 @@ func (self *DOMUIEvent) LayerX() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMUIEvent) LayerY() int32 {
 	var _arg0 *C.WebKitDOMUIEvent // out
 	var _cret C.glong             // in
@@ -188,7 +183,6 @@ func (self *DOMUIEvent) LayerY() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMUIEvent) PageX() int32 {
 	var _arg0 *C.WebKitDOMUIEvent // out
 	var _cret C.glong             // in
@@ -210,7 +204,6 @@ func (self *DOMUIEvent) PageX() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMUIEvent) PageY() int32 {
 	var _arg0 *C.WebKitDOMUIEvent // out
 	var _cret C.glong             // in
@@ -232,7 +225,6 @@ func (self *DOMUIEvent) PageY() int32 {
 // The function returns the following values:
 //
 //   - domdomWindow: KitDOMDOMWindow.
-//
 func (self *DOMUIEvent) View() *DOMDOMWindow {
 	var _arg0 *C.WebKitDOMUIEvent   // out
 	var _cret *C.WebKitDOMDOMWindow // in
@@ -258,7 +250,6 @@ func (self *DOMUIEvent) View() *DOMDOMWindow {
 //   - cancelable: #gboolean.
 //   - view: KitDOMDOMWindow.
 //   - detail: #glong.
-//
 func (self *DOMUIEvent) InitUiEvent(typ string, canBubble, cancelable bool, view *DOMDOMWindow, detail int32) {
 	var _arg0 *C.WebKitDOMUIEvent   // out
 	var _arg1 *C.gchar              // out

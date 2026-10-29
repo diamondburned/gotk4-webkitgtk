@@ -86,7 +86,6 @@ func marshalDOMHTMLMetaElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLMetaElement) Content() string {
 	var _arg0 *C.WebKitDOMHTMLMetaElement // out
 	var _cret *C.gchar                    // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLMetaElement) Content() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLMetaElement) HTTPEquiv() string {
 	var _arg0 *C.WebKitDOMHTMLMetaElement // out
 	var _cret *C.gchar                    // in
@@ -132,7 +130,6 @@ func (self *DOMHTMLMetaElement) HTTPEquiv() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLMetaElement) Name() string {
 	var _arg0 *C.WebKitDOMHTMLMetaElement // out
 	var _cret *C.gchar                    // in
@@ -155,7 +152,6 @@ func (self *DOMHTMLMetaElement) Name() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLMetaElement) Scheme() string {
 	var _arg0 *C.WebKitDOMHTMLMetaElement // out
 	var _cret *C.gchar                    // in
@@ -178,7 +174,6 @@ func (self *DOMHTMLMetaElement) Scheme() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLMetaElement) SetContent(value string) {
 	var _arg0 *C.WebKitDOMHTMLMetaElement // out
 	var _arg1 *C.gchar                    // out
@@ -197,7 +192,6 @@ func (self *DOMHTMLMetaElement) SetContent(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLMetaElement) SetHTTPEquiv(value string) {
 	var _arg0 *C.WebKitDOMHTMLMetaElement // out
 	var _arg1 *C.gchar                    // out
@@ -216,7 +210,6 @@ func (self *DOMHTMLMetaElement) SetHTTPEquiv(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLMetaElement) SetName(value string) {
 	var _arg0 *C.WebKitDOMHTMLMetaElement // out
 	var _arg1 *C.gchar                    // out
@@ -235,7 +228,6 @@ func (self *DOMHTMLMetaElement) SetName(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLMetaElement) SetScheme(value string) {
 	var _arg0 *C.WebKitDOMHTMLMetaElement // out
 	var _arg1 *C.gchar                    // out

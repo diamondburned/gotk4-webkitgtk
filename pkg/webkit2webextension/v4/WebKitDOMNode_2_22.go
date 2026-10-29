@@ -25,7 +25,6 @@ import "C"
 // The function returns the following values:
 //
 //   - domNode or NULL if value doesn't reference a DOM node.
-//
 func DOMNodeForJsValue(value *javascriptcore.Value) *DOMNode {
 	var _arg1 *C.JSCValue      // out
 	var _cret *C.WebKitDOMNode // in

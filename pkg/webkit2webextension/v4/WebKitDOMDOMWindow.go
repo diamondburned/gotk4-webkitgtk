@@ -83,7 +83,6 @@ func marshalDOMDOMWindow(p uintptr) (interface{}, error) {
 // The function takes the following parameters:
 //
 //   - message: #gchar.
-//
 func (self *DOMDOMWindow) Alert(message string) {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _arg1 *C.gchar              // out
@@ -136,7 +135,6 @@ func (self *DOMDOMWindow) Close() {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDOMWindow) Confirm(message string) bool {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _arg1 *C.gchar              // out
@@ -174,7 +172,6 @@ func (self *DOMDOMWindow) Confirm(message string) bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDOMWindow) Find(str string, caseSensitive, backwards, wrap, wholeWord, searchInFrames, showDialog bool) bool {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _arg1 *C.gchar              // out
@@ -242,7 +239,6 @@ func (self *DOMDOMWindow) Focus() {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDOMWindow) Closed() bool {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret C.gboolean            // in
@@ -271,7 +267,6 @@ func (self *DOMDOMWindow) Closed() bool {
 // The function returns the following values:
 //
 //   - domcssStyleDeclaration: KitDOMCSSStyleDeclaration.
-//
 func (self *DOMDOMWindow) ComputedStyle(element *DOMElement, pseudoElement string) *DOMCSSStyleDeclaration {
 	var _arg0 *C.WebKitDOMDOMWindow           // out
 	var _arg1 *C.WebKitDOMElement             // out
@@ -302,7 +297,6 @@ func (self *DOMDOMWindow) ComputedStyle(element *DOMElement, pseudoElement strin
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDOMWindow) DefaultStatus() string {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret *C.gchar              // in
@@ -325,7 +319,6 @@ func (self *DOMDOMWindow) DefaultStatus() string {
 // The function returns the following values:
 //
 //   - gdouble: #gdouble.
-//
 func (self *DOMDOMWindow) DevicePixelRatio() float64 {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret C.gdouble             // in
@@ -347,7 +340,6 @@ func (self *DOMDOMWindow) DevicePixelRatio() float64 {
 // The function returns the following values:
 //
 //   - domDocument: KitDOMDocument.
-//
 func (self *DOMDOMWindow) Document() *DOMDocument {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret *C.WebKitDOMDocument  // in
@@ -369,7 +361,6 @@ func (self *DOMDOMWindow) Document() *DOMDocument {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDOMWindow) FrameElement() *DOMElement {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret *C.WebKitDOMElement   // in
@@ -391,7 +382,6 @@ func (self *DOMDOMWindow) FrameElement() *DOMElement {
 // The function returns the following values:
 //
 //   - domdomWindow: KitDOMDOMWindow.
-//
 func (self *DOMDOMWindow) Frames() *DOMDOMWindow {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret *C.WebKitDOMDOMWindow // in
@@ -413,7 +403,6 @@ func (self *DOMDOMWindow) Frames() *DOMDOMWindow {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMDOMWindow) InnerHeight() int32 {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret C.glong               // in
@@ -435,7 +424,6 @@ func (self *DOMDOMWindow) InnerHeight() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMDOMWindow) InnerWidth() int32 {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret C.glong               // in
@@ -457,7 +445,6 @@ func (self *DOMDOMWindow) InnerWidth() int32 {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMDOMWindow) Length() uint32 {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret C.gulong              // in
@@ -479,7 +466,6 @@ func (self *DOMDOMWindow) Length() uint32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDOMWindow) Name() string {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret *C.gchar              // in
@@ -502,7 +488,6 @@ func (self *DOMDOMWindow) Name() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDOMWindow) OffscreenBuffering() bool {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret C.gboolean            // in
@@ -526,7 +511,6 @@ func (self *DOMDOMWindow) OffscreenBuffering() bool {
 // The function returns the following values:
 //
 //   - domdomWindow: KitDOMDOMWindow.
-//
 func (self *DOMDOMWindow) Opener() *DOMDOMWindow {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret *C.WebKitDOMDOMWindow // in
@@ -548,7 +532,6 @@ func (self *DOMDOMWindow) Opener() *DOMDOMWindow {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMDOMWindow) Orientation() int32 {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret C.glong               // in
@@ -570,7 +553,6 @@ func (self *DOMDOMWindow) Orientation() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMDOMWindow) OuterHeight() int32 {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret C.glong               // in
@@ -592,7 +574,6 @@ func (self *DOMDOMWindow) OuterHeight() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMDOMWindow) OuterWidth() int32 {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret C.glong               // in
@@ -614,7 +595,6 @@ func (self *DOMDOMWindow) OuterWidth() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMDOMWindow) PageXOffset() int32 {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret C.glong               // in
@@ -636,7 +616,6 @@ func (self *DOMDOMWindow) PageXOffset() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMDOMWindow) PageYOffset() int32 {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret C.glong               // in
@@ -658,7 +637,6 @@ func (self *DOMDOMWindow) PageYOffset() int32 {
 // The function returns the following values:
 //
 //   - domdomWindow: KitDOMDOMWindow.
-//
 func (self *DOMDOMWindow) Parent() *DOMDOMWindow {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret *C.WebKitDOMDOMWindow // in
@@ -680,7 +658,6 @@ func (self *DOMDOMWindow) Parent() *DOMDOMWindow {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMDOMWindow) ScreenLeft() int32 {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret C.glong               // in
@@ -702,7 +679,6 @@ func (self *DOMDOMWindow) ScreenLeft() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMDOMWindow) ScreenTop() int32 {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret C.glong               // in
@@ -724,7 +700,6 @@ func (self *DOMDOMWindow) ScreenTop() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMDOMWindow) ScreenX() int32 {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret C.glong               // in
@@ -746,7 +721,6 @@ func (self *DOMDOMWindow) ScreenX() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMDOMWindow) ScreenY() int32 {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret C.glong               // in
@@ -768,7 +742,6 @@ func (self *DOMDOMWindow) ScreenY() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMDOMWindow) ScrollX() int32 {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret C.glong               // in
@@ -790,7 +763,6 @@ func (self *DOMDOMWindow) ScrollX() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMDOMWindow) ScrollY() int32 {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret C.glong               // in
@@ -812,7 +784,6 @@ func (self *DOMDOMWindow) ScrollY() int32 {
 // The function returns the following values:
 //
 //   - domdomSelection: KitDOMDOMSelection.
-//
 func (self *DOMDOMWindow) Selection() *DOMDOMSelection {
 	var _arg0 *C.WebKitDOMDOMWindow    // out
 	var _cret *C.WebKitDOMDOMSelection // in
@@ -834,7 +805,6 @@ func (self *DOMDOMWindow) Selection() *DOMDOMSelection {
 // The function returns the following values:
 //
 //   - domdomWindow: KitDOMDOMWindow.
-//
 func (self *DOMDOMWindow) Self() *DOMDOMWindow {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret *C.WebKitDOMDOMWindow // in
@@ -856,7 +826,6 @@ func (self *DOMDOMWindow) Self() *DOMDOMWindow {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDOMWindow) Status() string {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret *C.gchar              // in
@@ -879,7 +848,6 @@ func (self *DOMDOMWindow) Status() string {
 // The function returns the following values:
 //
 //   - domdomWindow: KitDOMDOMWindow.
-//
 func (self *DOMDOMWindow) Top() *DOMDOMWindow {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret *C.WebKitDOMDOMWindow // in
@@ -901,7 +869,6 @@ func (self *DOMDOMWindow) Top() *DOMDOMWindow {
 // The function returns the following values:
 //
 //   - domdomWindow: KitDOMDOMWindow.
-//
 func (self *DOMDOMWindow) Window() *DOMDOMWindow {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _cret *C.WebKitDOMDOMWindow // in
@@ -924,7 +891,6 @@ func (self *DOMDOMWindow) Window() *DOMDOMWindow {
 //
 //   - x: #gfloat.
 //   - y: #gfloat.
-//
 func (self *DOMDOMWindow) MoveBy(x, y float32) {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _arg1 C.gfloat              // out
@@ -946,7 +912,6 @@ func (self *DOMDOMWindow) MoveBy(x, y float32) {
 //
 //   - x: #gfloat.
 //   - y: #gfloat.
-//
 func (self *DOMDOMWindow) MoveTo(x, y float32) {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _arg1 C.gfloat              // out
@@ -982,7 +947,6 @@ func (self *DOMDOMWindow) Print() {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDOMWindow) Prompt(message, defaultValue string) string {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _arg1 *C.gchar              // out
@@ -1024,7 +988,6 @@ func (self *DOMDOMWindow) ReleaseEvents() {
 //
 //   - x: #gfloat.
 //   - y: #gfloat.
-//
 func (self *DOMDOMWindow) ResizeBy(x, y float32) {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _arg1 C.gfloat              // out
@@ -1046,7 +1009,6 @@ func (self *DOMDOMWindow) ResizeBy(x, y float32) {
 //
 //   - width: #gfloat.
 //   - height: #gfloat.
-//
 func (self *DOMDOMWindow) ResizeTo(width, height float32) {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _arg1 C.gfloat              // out
@@ -1068,7 +1030,6 @@ func (self *DOMDOMWindow) ResizeTo(width, height float32) {
 //
 //   - x: #gdouble.
 //   - y: #gdouble.
-//
 func (self *DOMDOMWindow) ScrollBy(x, y float64) {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _arg1 C.gdouble             // out
@@ -1090,7 +1051,6 @@ func (self *DOMDOMWindow) ScrollBy(x, y float64) {
 //
 //   - x: #gdouble.
 //   - y: #gdouble.
-//
 func (self *DOMDOMWindow) ScrollTo(x, y float64) {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _arg1 C.gdouble             // out
@@ -1111,7 +1071,6 @@ func (self *DOMDOMWindow) ScrollTo(x, y float64) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMDOMWindow) SetDefaultStatus(value string) {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _arg1 *C.gchar              // out
@@ -1130,7 +1089,6 @@ func (self *DOMDOMWindow) SetDefaultStatus(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMDOMWindow) SetName(value string) {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _arg1 *C.gchar              // out
@@ -1149,7 +1107,6 @@ func (self *DOMDOMWindow) SetName(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMDOMWindow) SetStatus(value string) {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _arg1 *C.gchar              // out
@@ -1173,13 +1130,16 @@ func (self *DOMDOMWindow) Stop() {
 	runtime.KeepAlive(self)
 }
 
+// WebkitMessageHandlersPostMessage: deprecated: Use JavaScriptCore API instead.
+//
 // The function takes the following parameters:
 //
-//   - handler
-//   - message
+//   - handler: name of the user message handler.
+//   - message: javaScript value to be sent.
 //
 // The function returns the following values:
 //
+//   - ok: whether the message was successfully sent.
 func (window *DOMDOMWindow) WebkitMessageHandlersPostMessage(handler, message string) bool {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _arg1 *C.gchar              // out

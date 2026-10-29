@@ -47,46 +47,46 @@ func defaultWindowPropertiesOverrides(v *WindowProperties) WindowPropertiesOverr
 // initial window properties. Then you can monitor the KitWindowProperties by
 // connecting to ::notify signal.
 //
-//    static void ready_to_show_cb (WebKitWebView *web_view, gpointer user_data)
-//    {
-//        GtkWidget *window;
-//        WebKitWindowProperties *window_properties;
-//        gboolean visible;
+//	static void ready_to_show_cb (WebKitWebView *web_view, gpointer user_data)
+//	{
+//	    GtkWidget *window;
+//	    WebKitWindowProperties *window_properties;
+//	    gboolean visible;
 //
-//        // Create the window to contain the WebKitWebView.
-//        window = browser_window_new ();
-//        gtk_container_add (GTK_CONTAINER (window), GTK_WIDGET (web_view));
-//        gtk_widget_show (GTK_WIDGET (web_view));
+//	    // Create the window to contain the WebKitWebView.
+//	    window = browser_window_new ();
+//	    gtk_container_add (GTK_CONTAINER (window), GTK_WIDGET (web_view));
+//	    gtk_widget_show (GTK_WIDGET (web_view));
 //
-//        // Get the WebKitWindowProperties of the web view and monitor it.
-//        window_properties = webkit_web_view_get_window_properties (web_view);
-//        g_signal_connect (window_properties, "notify::geometry",
-//                          G_CALLBACK (window_geometry_changed), window);
-//        g_signal_connect (window_properties, "notify::toolbar-visible",
-//                          G_CALLBACK (window_toolbar_visibility_changed), window);
-//        g_signal_connect (window_properties, "notify::menubar-visible",
-//                          G_CALLBACK (window_menubar_visibility_changed), window);
+//	    // Get the WebKitWindowProperties of the web view and monitor it.
+//	    window_properties = webkit_web_view_get_window_properties (web_view);
+//	    g_signal_connect (window_properties, "notify::geometry",
+//	                      G_CALLBACK (window_geometry_changed), window);
+//	    g_signal_connect (window_properties, "notify::toolbar-visible",
+//	                      G_CALLBACK (window_toolbar_visibility_changed), window);
+//	    g_signal_connect (window_properties, "notify::menubar-visible",
+//	                      G_CALLBACK (window_menubar_visibility_changed), window);
 //
-//        // Apply the window properties before showing the window.
-//        visible = webkit_window_properties_get_toolbar_visible (window_properties);
-//        browser_window_set_toolbar_visible (BROWSER_WINDOW (window), visible);
-//        visible = webkit_window_properties_get_menubar_visible (window_properties);
-//        browser_window_set_menubar_visible (BROWSER_WINDOW (window), visible);
+//	    // Apply the window properties before showing the window.
+//	    visible = webkit_window_properties_get_toolbar_visible (window_properties);
+//	    browser_window_set_toolbar_visible (BROWSER_WINDOW (window), visible);
+//	    visible = webkit_window_properties_get_menubar_visible (window_properties);
+//	    browser_window_set_menubar_visible (BROWSER_WINDOW (window), visible);
 //
-//        if (webkit_window_properties_get_fullscreen (window_properties)) {
-//            gtk_window_fullscreen (GTK_WINDOW (window));
-//        } else {
-//            GdkRectangle geometry;
+//	    if (webkit_window_properties_get_fullscreen (window_properties)) {
+//	        gtk_window_fullscreen (GTK_WINDOW (window));
+//	    } else {
+//	        GdkRectangle geometry;
 //
-//            gtk_window_set_resizable (GTK_WINDOW (window),
-//                                      webkit_window_properties_get_resizable (window_properties));
-//            webkit_window_properties_get_geometry (window_properties, &geometry);
-//            gtk_window_move (GTK_WINDOW (window), geometry.x, geometry.y);
-//            gtk_window_resize (GTK_WINDOW (window), geometry.width, geometry.height);
-//        }
+//	        gtk_window_set_resizable (GTK_WINDOW (window),
+//	                                  webkit_window_properties_get_resizable (window_properties));
+//	        webkit_window_properties_get_geometry (window_properties, &geometry);
+//	        gtk_window_move (GTK_WINDOW (window), geometry.x, geometry.y);
+//	        gtk_window_resize (GTK_WINDOW (window), geometry.width, geometry.height);
+//	    }
 //
-//        gtk_widget_show (window);
-//    }.
+//	    gtk_widget_show (window);
+//	}.
 type WindowProperties struct {
 	_ [0]func() // equal guard
 	*coreglib.Object
@@ -128,7 +128,6 @@ func marshalWindowProperties(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - ok: TRUE if the window should be fullscreen or FALSE otherwise.
-//
 func (windowProperties *WindowProperties) Fullscreen() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
@@ -152,7 +151,6 @@ func (windowProperties *WindowProperties) Fullscreen() bool {
 // The function returns the following values:
 //
 //   - geometry: return location for the window geometry.
-//
 func (windowProperties *WindowProperties) Geometry() *gdk.Rectangle {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _arg1 C.GdkRectangle            // in
@@ -175,7 +173,6 @@ func (windowProperties *WindowProperties) Geometry() *gdk.Rectangle {
 // The function returns the following values:
 //
 //   - ok: TRUE if locationbar should be visible or FALSE otherwise.
-//
 func (windowProperties *WindowProperties) LocationbarVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
@@ -200,7 +197,6 @@ func (windowProperties *WindowProperties) LocationbarVisible() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if menubar should be visible or FALSE otherwise.
-//
 func (windowProperties *WindowProperties) MenubarVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
@@ -224,7 +220,6 @@ func (windowProperties *WindowProperties) MenubarVisible() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if the window should be resizable or FALSE otherwise.
-//
 func (windowProperties *WindowProperties) Resizable() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
@@ -249,7 +244,6 @@ func (windowProperties *WindowProperties) Resizable() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if scrollbars should be visible or FALSE otherwise.
-//
 func (windowProperties *WindowProperties) ScrollbarsVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
@@ -274,7 +268,6 @@ func (windowProperties *WindowProperties) ScrollbarsVisible() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if statusbar should be visible or FALSE otherwise.
-//
 func (windowProperties *WindowProperties) StatusbarVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in
@@ -299,7 +292,6 @@ func (windowProperties *WindowProperties) StatusbarVisible() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if toolbar should be visible or FALSE otherwise.
-//
 func (windowProperties *WindowProperties) ToolbarVisible() bool {
 	var _arg0 *C.WebKitWindowProperties // out
 	var _cret C.gboolean                // in

@@ -83,7 +83,6 @@ func marshalNavigationPolicyDecision(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - navigationAction triggering this policy decision.
-//
 func (decision *NavigationPolicyDecision) NavigationAction() *NavigationAction {
 	var _arg0 *C.WebKitNavigationPolicyDecision // out
 	var _cret *C.WebKitNavigationAction         // in

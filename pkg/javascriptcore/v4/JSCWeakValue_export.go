@@ -16,7 +16,7 @@ func _gotk4_javascriptcore4_WeakValue_ConnectCleared(arg0 C.gpointer, arg1 C.gui
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

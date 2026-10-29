@@ -3,9 +3,12 @@
 package webkitwebprocessextension
 
 import (
+	"context"
 	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
@@ -16,6 +19,9 @@ import (
 // #include <glib-object.h>
 // #include <webkit/webkit-web-process-extension.h>
 // extern void _gotk4_webkitwebprocessextension6_WebPage_ConnectDocumentLoaded(gpointer, guintptr);
+// extern void _gotk4_webkitwebprocessextension6_WebPage_ConnectConsoleMessageSent(gpointer, WebKitConsoleMessage*, guintptr);
+// extern void _gotk4_webkitwebprocessextension6_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
 // extern gboolean _gotk4_webkitwebprocessextension6_WebPage_ConnectUserMessageReceived(gpointer, WebKitUserMessage*, guintptr);
 // extern gboolean _gotk4_webkitwebprocessextension6_WebPage_ConnectSendRequest(gpointer, WebKitURIRequest*, WebKitURIResponse*, guintptr);
 // extern gboolean _gotk4_webkitwebprocessextension6_WebPage_ConnectContextMenu(gpointer, WebKitContextMenu*, WebKitWebHitTestResult*, guintptr);
@@ -76,6 +82,14 @@ func marshalWebPage(p uintptr) (interface{}, error) {
 	return wrapWebPage(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+// ConnectConsoleMessageSent is emitted when a message is sent to the console.
+// This can be a message produced by the use of JavaScript console API,
+// a JavaScript exception, a security error or other errors, warnings, debug or
+// log messages. The console_message contains information about the message.
+func (webPage *WebPage) ConnectConsoleMessageSent(f func(consoleMessage *ConsoleMessage)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(webPage, "console-message-sent", false, unsafe.Pointer(C._gotk4_webkitwebprocessextension6_WebPage_ConnectConsoleMessageSent), f)
+}
+
 // ConnectContextMenu is emitted before a context menu is displayed in the UI
 // Process to give the application a chance to customize the proposed menu,
 // build its own context menu or pass user data to the UI Process. This signal
@@ -103,7 +117,7 @@ func (webPage *WebPage) ConnectDocumentLoaded(f func()) coreglib.SignalHandle {
 // In case of a server redirection this signal is emitted again with the request
 // argument containing the new request to be sent to the server due to the
 // redirection and the redirected_response parameter containing the response
-// received by the server for the initial request.
+// received from the server for the initial request.
 //
 // Modifications to the KitURIRequest and its associated MessageHeaders will be
 // taken into account when the request is sent over the network.
@@ -117,8 +131,8 @@ func (webPage *WebPage) ConnectSendRequest(f func(request *URIRequest, redirecte
 //
 // You can handle the user message asynchronously by calling g_object_ref() on
 // message and returning TRUE. If the last reference of message is removed and
-// the message has been replied, the operation in the KitWebView will finish
-// with error WEBKIT_USER_MESSAGE_UNHANDLED_MESSAGE.
+// the message has not been replied to, the operation in the KitWebView will
+// finish with error WEBKIT_USER_MESSAGE_UNHANDLED_MESSAGE.
 func (webPage *WebPage) ConnectUserMessageReceived(f func(message *UserMessage) (ok bool)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(webPage, "user-message-received", false, unsafe.Pointer(C._gotk4_webkitwebprocessextension6_WebPage_ConnectUserMessageReceived), f)
 }
@@ -128,7 +142,6 @@ func (webPage *WebPage) ConnectUserMessageReceived(f func(message *UserMessage) 
 // The function returns the following values:
 //
 //   - webEditor: KitWebEditor.
-//
 func (webPage *WebPage) Editor() *WebEditor {
 	var _arg0 *C.WebKitWebPage   // out
 	var _cret *C.WebKitWebEditor // in
@@ -154,7 +167,6 @@ func (webPage *WebPage) Editor() *WebEditor {
 // The function returns the following values:
 //
 //   - webFormManager: KitWebFormManager.
-//
 func (webPage *WebPage) FormManager(world *ScriptWorld) *WebFormManager {
 	var _arg0 *C.WebKitWebPage        // out
 	var _arg1 *C.WebKitScriptWorld    // out
@@ -181,7 +193,6 @@ func (webPage *WebPage) FormManager(world *ScriptWorld) *WebFormManager {
 // The function returns the following values:
 //
 //   - guint64: identifier of web_page.
-//
 func (webPage *WebPage) ID() uint64 {
 	var _arg0 *C.WebKitWebPage // out
 	var _cret C.guint64        // in
@@ -200,10 +211,11 @@ func (webPage *WebPage) ID() uint64 {
 
 // MainFrame returns the main frame of a KitWebPage.
 //
+// Deprecated: since version 2.48.
+//
 // The function returns the following values:
 //
 //   - frame that is the main frame of web_page.
-//
 func (webPage *WebPage) MainFrame() *Frame {
 	var _arg0 *C.WebKitWebPage // out
 	var _cret *C.WebKitFrame   // in
@@ -227,9 +239,8 @@ func (webPage *WebPage) MainFrame() *Frame {
 //
 // The function returns the following values:
 //
-//   - utf8: current active URI of web_view or NULL if nothing has been loaded
+//   - utf8: current active URI of web_page or NULL if nothing has been loaded
 //     yet.
-//
 func (webPage *WebPage) URI() string {
 	var _arg0 *C.WebKitWebPage // out
 	var _cret *C.gchar         // in
@@ -246,6 +257,45 @@ func (webPage *WebPage) URI() string {
 	return _utf8
 }
 
+// SendMessageToView: send message to the KitWebView corresponding to web_page.
+// If message is floating, it's consumed.
+//
+// If you don't expect any reply, or you simply want to ignore it, you can pass
+// NULL as callback. When the operation is finished, callback will be called.
+// You can then call webkit_web_page_send_message_to_view_finish() to get the
+// message reply.
+//
+// The function takes the following parameters:
+//
+//   - ctx (optional) or NULL to ignore.
+//   - message: KitUserMessage.
+//   - callback (optional) to call when the request is satisfied or NULL.
+func (webPage *WebPage) SendMessageToView(ctx context.Context, message *UserMessage, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebPage      // out
+	var _arg2 *C.GCancellable       // out
+	var _arg1 *C.WebKitUserMessage  // out
+	var _arg3 C.GAsyncReadyCallback // out
+	var _arg4 C.gpointer
+
+	_arg0 = (*C.WebKitWebPage)(unsafe.Pointer(coreglib.InternObject(webPage).Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = (*C.WebKitUserMessage)(unsafe.Pointer(coreglib.InternObject(message).Native()))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_web_page_send_message_to_view(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(webPage)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(message)
+	runtime.KeepAlive(callback)
+}
+
 // SendMessageToViewFinish: finish an asynchronous operation started with
 // webkit_web_page_send_message_to_view().
 //
@@ -256,7 +306,6 @@ func (webPage *WebPage) URI() string {
 // The function returns the following values:
 //
 //   - userMessage with the reply or NULL in case of error.
-//
 func (webPage *WebPage) SendMessageToViewFinish(result gio.AsyncResulter) (*UserMessage, error) {
 	var _arg0 *C.WebKitWebPage     // out
 	var _arg1 *C.GAsyncResult      // out

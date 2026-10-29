@@ -18,7 +18,7 @@ func _gotk4_webkitwebprocessextension6_WebProcessExtension_ConnectPageCreated(ar
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -38,7 +38,7 @@ func _gotk4_webkitwebprocessextension6_WebProcessExtension_ConnectUserMessageRec
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

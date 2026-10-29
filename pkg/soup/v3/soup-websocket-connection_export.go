@@ -22,7 +22,7 @@ func _gotk4_soup3_WebsocketConnection_ConnectClosed(arg0 C.gpointer, arg1 C.guin
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -38,7 +38,7 @@ func _gotk4_soup3_WebsocketConnection_ConnectClosing(arg0 C.gpointer, arg1 C.gui
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -54,7 +54,7 @@ func _gotk4_soup3_WebsocketConnection_ConnectError(arg0 C.gpointer, arg1 *C.GErr
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -74,7 +74,7 @@ func _gotk4_soup3_WebsocketConnection_ConnectMessage(arg0 C.gpointer, arg1 C.gin
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -103,7 +103,7 @@ func _gotk4_soup3_WebsocketConnection_ConnectPong(arg0 C.gpointer, arg1 *C.GByte
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

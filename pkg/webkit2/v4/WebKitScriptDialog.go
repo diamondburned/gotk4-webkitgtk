@@ -113,7 +113,6 @@ func (dialog *ScriptDialog) Close() {
 // The function takes the following parameters:
 //
 //   - confirmed: whether user confirmed the dialog.
-//
 func (dialog *ScriptDialog) ConfirmSetConfirmed(confirmed bool) {
 	var _arg0 *C.WebKitScriptDialog // out
 	var _arg1 C.gboolean            // out
@@ -133,7 +132,6 @@ func (dialog *ScriptDialog) ConfirmSetConfirmed(confirmed bool) {
 // The function returns the following values:
 //
 //   - scriptDialogType of dialog.
-//
 func (dialog *ScriptDialog) DialogType() ScriptDialogType {
 	var _arg0 *C.WebKitScriptDialog    // out
 	var _cret C.WebKitScriptDialogType // in
@@ -155,7 +153,6 @@ func (dialog *ScriptDialog) DialogType() ScriptDialogType {
 // The function returns the following values:
 //
 //   - utf8: message of dialog.
-//
 func (dialog *ScriptDialog) Message() string {
 	var _arg0 *C.WebKitScriptDialog // out
 	var _cret *C.gchar              // in
@@ -181,7 +178,6 @@ func (dialog *ScriptDialog) Message() string {
 // The function returns the following values:
 //
 //   - utf8: default text of dialog.
-//
 func (dialog *ScriptDialog) PromptGetDefaultText() string {
 	var _arg0 *C.WebKitScriptDialog // out
 	var _cret *C.gchar              // in
@@ -210,7 +206,6 @@ func (dialog *ScriptDialog) PromptGetDefaultText() string {
 // The function takes the following parameters:
 //
 //   - text to set.
-//
 func (dialog *ScriptDialog) PromptSetText(text string) {
 	var _arg0 *C.WebKitScriptDialog // out
 	var _arg1 *C.gchar              // out

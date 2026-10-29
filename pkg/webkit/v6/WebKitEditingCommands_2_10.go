@@ -14,7 +14,7 @@ import "C"
 const EDITING_COMMAND_CREATE_LINK = "CreateLink"
 
 // EDITING_COMMAND_INSERT_IMAGE: insert image command. Creates an image element
-// that is inserted at the current cursor position. It receives an URI as
+// that is inserted at the current cursor position. It receives a URI as
 // argument, that is used as the image source. This command should be executed
 // with webkit_web_view_execute_editing_command_with_argument().
 const EDITING_COMMAND_INSERT_IMAGE = "InsertImage"

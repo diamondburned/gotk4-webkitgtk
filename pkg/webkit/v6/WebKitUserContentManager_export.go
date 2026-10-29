@@ -21,7 +21,7 @@ func _gotk4_webkit6_UserContentManager_ConnectScriptMessageReceived(arg0 C.gpoin
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -46,7 +46,7 @@ func _gotk4_webkit6_UserContentManager_ConnectScriptMessageWithReplyReceived(arg
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

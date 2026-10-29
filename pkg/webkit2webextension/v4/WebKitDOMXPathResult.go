@@ -132,7 +132,6 @@ func (self *DOMXPathResult) BooleanValue() error {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMXPathResult) InvalidIteratorState() bool {
 	var _arg0 *C.WebKitDOMXPathResult // out
 	var _cret C.gboolean              // in
@@ -156,7 +155,6 @@ func (self *DOMXPathResult) InvalidIteratorState() bool {
 // The function returns the following values:
 //
 //   - gdouble: #gdouble.
-//
 func (self *DOMXPathResult) NumberValue() (float64, error) {
 	var _arg0 *C.WebKitDOMXPathResult // out
 	var _cret C.gdouble               // in
@@ -183,7 +181,6 @@ func (self *DOMXPathResult) NumberValue() (float64, error) {
 // The function returns the following values:
 //
 //   - gushort: #gushort.
-//
 func (self *DOMXPathResult) ResultType() uint16 {
 	var _arg0 *C.WebKitDOMXPathResult // out
 	var _cret C.gushort               // in
@@ -205,7 +202,6 @@ func (self *DOMXPathResult) ResultType() uint16 {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMXPathResult) SingleNodeValue() (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMXPathResult // out
 	var _cret *C.WebKitDOMNode        // in
@@ -232,7 +228,6 @@ func (self *DOMXPathResult) SingleNodeValue() (*DOMNode, error) {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMXPathResult) SnapshotLength() (uint32, error) {
 	var _arg0 *C.WebKitDOMXPathResult // out
 	var _cret C.gulong                // in
@@ -259,7 +254,6 @@ func (self *DOMXPathResult) SnapshotLength() (uint32, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMXPathResult) StringValue() (string, error) {
 	var _arg0 *C.WebKitDOMXPathResult // out
 	var _cret *C.gchar                // in
@@ -287,7 +281,6 @@ func (self *DOMXPathResult) StringValue() (string, error) {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMXPathResult) IterateNext() (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMXPathResult // out
 	var _cret *C.WebKitDOMNode        // in
@@ -318,7 +311,6 @@ func (self *DOMXPathResult) IterateNext() (*DOMNode, error) {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMXPathResult) SnapshotItem(index uint32) (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMXPathResult // out
 	var _arg1 C.gulong                // out

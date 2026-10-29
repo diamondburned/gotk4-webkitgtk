@@ -86,7 +86,6 @@ func marshalDOMHTMLFrameSetElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFrameSetElement) Cols() string {
 	var _arg0 *C.WebKitDOMHTMLFrameSetElement // out
 	var _cret *C.gchar                        // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLFrameSetElement) Cols() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFrameSetElement) Rows() string {
 	var _arg0 *C.WebKitDOMHTMLFrameSetElement // out
 	var _cret *C.gchar                        // in
@@ -132,7 +130,6 @@ func (self *DOMHTMLFrameSetElement) Rows() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFrameSetElement) SetCols(value string) {
 	var _arg0 *C.WebKitDOMHTMLFrameSetElement // out
 	var _arg1 *C.gchar                        // out
@@ -151,7 +148,6 @@ func (self *DOMHTMLFrameSetElement) SetCols(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFrameSetElement) SetRows(value string) {
 	var _arg0 *C.WebKitDOMHTMLFrameSetElement // out
 	var _arg1 *C.gchar                        // out

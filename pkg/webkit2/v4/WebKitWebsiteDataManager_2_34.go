@@ -33,7 +33,6 @@ import "C"
 // The function takes the following parameters:
 //
 //   - settings: webKitMemoryPressureSettings.
-//
 func WebsiteDataManagerSetMemoryPressureSettings(settings *MemoryPressureSettings) {
 	var _arg1 *C.WebKitMemoryPressureSettings // out
 

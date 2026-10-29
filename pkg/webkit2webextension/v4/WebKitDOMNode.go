@@ -146,7 +146,6 @@ func marshalDOMNode(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNode) AppendChild(newChild *DOMNode) (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMNode // out
 	var _arg1 *C.WebKitDOMNode // out
@@ -180,7 +179,6 @@ func (self *DOMNode) AppendChild(newChild *DOMNode) (*DOMNode, error) {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNode) CloneNode(deep bool) (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMNode // out
 	var _arg1 C.gboolean       // out
@@ -216,7 +214,6 @@ func (self *DOMNode) CloneNode(deep bool) (*DOMNode, error) {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNode) CloneNodeWithError(deep bool) (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMNode // out
 	var _arg1 C.gboolean       // out
@@ -252,7 +249,6 @@ func (self *DOMNode) CloneNodeWithError(deep bool) (*DOMNode, error) {
 // The function returns the following values:
 //
 //   - gushort: #gushort.
-//
 func (self *DOMNode) CompareDocumentPosition(other *DOMNode) uint16 {
 	var _arg0 *C.WebKitDOMNode // out
 	var _arg1 *C.WebKitDOMNode // out
@@ -281,7 +277,6 @@ func (self *DOMNode) CompareDocumentPosition(other *DOMNode) uint16 {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMNode) Contains(other *DOMNode) bool {
 	var _arg0 *C.WebKitDOMNode // out
 	var _arg1 *C.WebKitDOMNode // out
@@ -308,7 +303,6 @@ func (self *DOMNode) Contains(other *DOMNode) bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMNode) BaseURI() string {
 	var _arg0 *C.WebKitDOMNode // out
 	var _cret *C.gchar         // in
@@ -331,7 +325,6 @@ func (self *DOMNode) BaseURI() string {
 // The function returns the following values:
 //
 //   - domNodeList: KitDOMNodeList.
-//
 func (self *DOMNode) ChildNodes() *DOMNodeList {
 	var _arg0 *C.WebKitDOMNode     // out
 	var _cret *C.WebKitDOMNodeList // in
@@ -353,7 +346,6 @@ func (self *DOMNode) ChildNodes() *DOMNodeList {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNode) FirstChild() *DOMNode {
 	var _arg0 *C.WebKitDOMNode // out
 	var _cret *C.WebKitDOMNode // in
@@ -375,7 +367,6 @@ func (self *DOMNode) FirstChild() *DOMNode {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNode) LastChild() *DOMNode {
 	var _arg0 *C.WebKitDOMNode // out
 	var _cret *C.WebKitDOMNode // in
@@ -398,7 +389,6 @@ func (self *DOMNode) LastChild() *DOMNode {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMNode) LocalName() string {
 	var _arg0 *C.WebKitDOMNode // out
 	var _cret *C.gchar         // in
@@ -422,7 +412,6 @@ func (self *DOMNode) LocalName() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMNode) NamespaceURI() string {
 	var _arg0 *C.WebKitDOMNode // out
 	var _cret *C.gchar         // in
@@ -445,7 +434,6 @@ func (self *DOMNode) NamespaceURI() string {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNode) NextSibling() *DOMNode {
 	var _arg0 *C.WebKitDOMNode // out
 	var _cret *C.WebKitDOMNode // in
@@ -467,7 +455,6 @@ func (self *DOMNode) NextSibling() *DOMNode {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMNode) NodeName() string {
 	var _arg0 *C.WebKitDOMNode // out
 	var _cret *C.gchar         // in
@@ -490,7 +477,6 @@ func (self *DOMNode) NodeName() string {
 // The function returns the following values:
 //
 //   - gushort: #gushort.
-//
 func (self *DOMNode) NodeType() uint16 {
 	var _arg0 *C.WebKitDOMNode // out
 	var _cret C.gushort        // in
@@ -512,7 +498,6 @@ func (self *DOMNode) NodeType() uint16 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMNode) NodeValue() string {
 	var _arg0 *C.WebKitDOMNode // out
 	var _cret *C.gchar         // in
@@ -535,7 +520,6 @@ func (self *DOMNode) NodeValue() string {
 // The function returns the following values:
 //
 //   - domDocument: KitDOMDocument.
-//
 func (self *DOMNode) OwnerDocument() *DOMDocument {
 	var _arg0 *C.WebKitDOMNode     // out
 	var _cret *C.WebKitDOMDocument // in
@@ -557,7 +541,6 @@ func (self *DOMNode) OwnerDocument() *DOMDocument {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMNode) ParentElement() *DOMElement {
 	var _arg0 *C.WebKitDOMNode    // out
 	var _cret *C.WebKitDOMElement // in
@@ -579,7 +562,6 @@ func (self *DOMNode) ParentElement() *DOMElement {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNode) ParentNode() *DOMNode {
 	var _arg0 *C.WebKitDOMNode // out
 	var _cret *C.WebKitDOMNode // in
@@ -602,7 +584,6 @@ func (self *DOMNode) ParentNode() *DOMNode {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMNode) Prefix() string {
 	var _arg0 *C.WebKitDOMNode // out
 	var _cret *C.gchar         // in
@@ -625,7 +606,6 @@ func (self *DOMNode) Prefix() string {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNode) PreviousSibling() *DOMNode {
 	var _arg0 *C.WebKitDOMNode // out
 	var _cret *C.WebKitDOMNode // in
@@ -647,7 +627,6 @@ func (self *DOMNode) PreviousSibling() *DOMNode {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMNode) TextContent() string {
 	var _arg0 *C.WebKitDOMNode // out
 	var _cret *C.gchar         // in
@@ -670,7 +649,6 @@ func (self *DOMNode) TextContent() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMNode) HasChildNodes() bool {
 	var _arg0 *C.WebKitDOMNode // out
 	var _cret C.gboolean       // in
@@ -699,7 +677,6 @@ func (self *DOMNode) HasChildNodes() bool {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNode) InsertBefore(newChild, refChild *DOMNode) (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMNode // out
 	var _arg1 *C.WebKitDOMNode // out
@@ -738,7 +715,6 @@ func (self *DOMNode) InsertBefore(newChild, refChild *DOMNode) (*DOMNode, error)
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMNode) IsDefaultNamespace(namespaceURI string) bool {
 	var _arg0 *C.WebKitDOMNode // out
 	var _arg1 *C.gchar         // out
@@ -770,7 +746,6 @@ func (self *DOMNode) IsDefaultNamespace(namespaceURI string) bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMNode) IsEqualNode(other *DOMNode) bool {
 	var _arg0 *C.WebKitDOMNode // out
 	var _arg1 *C.WebKitDOMNode // out
@@ -801,7 +776,6 @@ func (self *DOMNode) IsEqualNode(other *DOMNode) bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMNode) IsSameNode(other *DOMNode) bool {
 	var _arg0 *C.WebKitDOMNode // out
 	var _arg1 *C.WebKitDOMNode // out
@@ -833,7 +807,6 @@ func (self *DOMNode) IsSameNode(other *DOMNode) bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMNode) IsSupported(feature, version string) bool {
 	var _arg0 *C.WebKitDOMNode // out
 	var _arg1 *C.gchar         // out
@@ -869,7 +842,6 @@ func (self *DOMNode) IsSupported(feature, version string) bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMNode) LookupNamespaceURI(prefix string) string {
 	var _arg0 *C.WebKitDOMNode // out
 	var _arg1 *C.gchar         // out
@@ -900,7 +872,6 @@ func (self *DOMNode) LookupNamespaceURI(prefix string) string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMNode) LookupPrefix(namespaceURI string) string {
 	var _arg0 *C.WebKitDOMNode // out
 	var _arg1 *C.gchar         // out
@@ -941,7 +912,6 @@ func (self *DOMNode) Normalize() {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNode) RemoveChild(oldChild *DOMNode) (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMNode // out
 	var _arg1 *C.WebKitDOMNode // out
@@ -976,7 +946,6 @@ func (self *DOMNode) RemoveChild(oldChild *DOMNode) (*DOMNode, error) {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNode) ReplaceChild(newChild, oldChild *DOMNode) (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMNode // out
 	var _arg1 *C.WebKitDOMNode // out
@@ -1009,7 +978,6 @@ func (self *DOMNode) ReplaceChild(newChild, oldChild *DOMNode) (*DOMNode, error)
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMNode) SetNodeValue(value string) error {
 	var _arg0 *C.WebKitDOMNode // out
 	var _arg1 *C.gchar         // out
@@ -1037,7 +1005,6 @@ func (self *DOMNode) SetNodeValue(value string) error {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMNode) SetPrefix(value string) error {
 	var _arg0 *C.WebKitDOMNode // out
 	var _arg1 *C.gchar         // out
@@ -1065,7 +1032,6 @@ func (self *DOMNode) SetPrefix(value string) error {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMNode) SetTextContent(value string) error {
 	var _arg0 *C.WebKitDOMNode // out
 	var _arg1 *C.gchar         // out

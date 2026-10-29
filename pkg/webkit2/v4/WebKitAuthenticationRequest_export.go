@@ -19,7 +19,7 @@ func _gotk4_webkit24_AuthenticationRequest_ConnectAuthenticated(arg0 C.gpointer,
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -39,7 +39,7 @@ func _gotk4_webkit24_AuthenticationRequest_ConnectCancelled(arg0 C.gpointer, arg
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

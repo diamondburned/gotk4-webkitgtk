@@ -37,9 +37,9 @@ func defaultContentSnifferOverrides(v *ContentSniffer) ContentSnifferOverrides {
 
 // ContentSniffer sniffs the mime type of messages.
 //
-// A ContentSniffer tries to detect the actual content type of the files that
+// A contentsniffer tries to detect the actual content type of the files that
 // are being downloaded by looking at some of the data before the message emits
-// its message::got-headers signal. ContentSniffer implements sessionfeature,
+// its message::got-headers signal. contentsniffer implements sessionfeature,
 // so you can add content sniffing to a session with session.AddFeature or
 // session.AddFeatureByType.
 type ContentSniffer struct {
@@ -82,12 +82,11 @@ func marshalContentSniffer(p uintptr) (interface{}, error) {
 	return wrapContentSniffer(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewContentSniffer creates a new ContentSniffer.
+// NewContentSniffer creates a new contentsniffer.
 //
 // The function returns the following values:
 //
 //   - contentSniffer: new ContentSniffer.
-//
 func NewContentSniffer() *ContentSniffer {
 	var _cret *C.SoupContentSniffer // in
 
@@ -116,7 +115,6 @@ func NewContentSniffer() *ContentSniffer {
 //     "charset"), or NULL.
 //   - utf8: sniffed Content-Type of buffer; this will never be NULL, but may be
 //     application/octet-stream.
-//
 func (sniffer *ContentSniffer) Sniff(msg *Message, buffer *glib.Bytes) (map[string]string, string) {
 	var _arg0 *C.SoupContentSniffer // out
 	var _arg1 *C.SoupMessage        // out

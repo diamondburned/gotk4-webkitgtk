@@ -50,15 +50,15 @@ func defaultServerMessageOverrides(v *ServerMessage) ServerMessageOverrides {
 
 // ServerMessage: HTTP server request and response pair.
 //
-// A SoupServerMessage represents an HTTP message that is being sent or received
-// on a server.
+// A servermessage represents an HTTP message that is being sent or received on
+// a server.
 //
-// server will create SoupServerMessages automatically for incoming requests,
+// server will create servermessages automatically for incoming requests,
 // which your application will receive via handlers.
 //
 // Note that libsoup's terminology here does not quite match the HTTP
 // specification: in RFC 2616, an "HTTP-message" is *either* a Request,
-// *or* a Response. In libsoup, a ServerMessage combines both the request and
+// *or* a Response. In libsoup, a servermessage combines both the request and
 // the response.
 type ServerMessage struct {
 	_ [0]func() // equal guard
@@ -178,7 +178,6 @@ func (msg *ServerMessage) ConnectWroteInformational(f func()) coreglib.SignalHan
 // The function returns the following values:
 //
 //   - httpVersion: HTTPVersion.
-//
 func (msg *ServerMessage) HTTPVersion() HTTPVersion {
 	var _arg0 *C.SoupServerMessage // out
 	var _cret C.SoupHTTPVersion    // in
@@ -202,7 +201,6 @@ func (msg *ServerMessage) HTTPVersion() HTTPVersion {
 //
 //   - socketAddress (optional): Address associated with the local end of a
 //     connection, it may be NULL if you used server.AcceptIostream.
-//
 func (msg *ServerMessage) LocalAddress() gio.SocketAddresser {
 	var _arg0 *C.SoupServerMessage // out
 	var _cret *C.GSocketAddress    // in
@@ -239,7 +237,6 @@ func (msg *ServerMessage) LocalAddress() gio.SocketAddresser {
 // The function returns the following values:
 //
 //   - utf8: HTTP method.
-//
 func (msg *ServerMessage) Method() string {
 	var _arg0 *C.SoupServerMessage // out
 	var _cret *C.char              // in
@@ -261,7 +258,6 @@ func (msg *ServerMessage) Method() string {
 // The function returns the following values:
 //
 //   - utf8 (optional): reason phrase.
-//
 func (msg *ServerMessage) ReasonPhrase() string {
 	var _arg0 *C.SoupServerMessage // out
 	var _cret *C.char              // in
@@ -287,7 +283,6 @@ func (msg *ServerMessage) ReasonPhrase() string {
 //
 //   - socketAddress (optional): Address associated with the remote end of a
 //     connection, it may be NULL if you used server.AcceptIostream.
-//
 func (msg *ServerMessage) RemoteAddress() gio.SocketAddresser {
 	var _arg0 *C.SoupServerMessage // out
 	var _cret *C.GSocketAddress    // in
@@ -326,7 +321,6 @@ func (msg *ServerMessage) RemoteAddress() gio.SocketAddresser {
 //
 //   - utf8 (optional): IP address associated with the remote end of a
 //     connection, it may be NULL if you used server.AcceptIostream.
-//
 func (msg *ServerMessage) RemoteHost() string {
 	var _arg0 *C.SoupServerMessage // out
 	var _cret *C.char              // in
@@ -350,7 +344,6 @@ func (msg *ServerMessage) RemoteHost() string {
 // The function returns the following values:
 //
 //   - messageBody: MessageBody.
-//
 func (msg *ServerMessage) RequestBody() *MessageBody {
 	var _arg0 *C.SoupServerMessage // out
 	var _cret *C.SoupMessageBody   // in
@@ -379,7 +372,6 @@ func (msg *ServerMessage) RequestBody() *MessageBody {
 // The function returns the following values:
 //
 //   - messageHeaders with the request headers.
-//
 func (msg *ServerMessage) RequestHeaders() *MessageHeaders {
 	var _arg0 *C.SoupServerMessage  // out
 	var _cret *C.SoupMessageHeaders // in
@@ -408,7 +400,6 @@ func (msg *ServerMessage) RequestHeaders() *MessageHeaders {
 // The function returns the following values:
 //
 //   - messageBody: MessageBody.
-//
 func (msg *ServerMessage) ResponseBody() *MessageBody {
 	var _arg0 *C.SoupServerMessage // out
 	var _cret *C.SoupMessageBody   // in
@@ -437,7 +428,6 @@ func (msg *ServerMessage) ResponseBody() *MessageBody {
 // The function returns the following values:
 //
 //   - messageHeaders with the response headers.
-//
 func (msg *ServerMessage) ResponseHeaders() *MessageHeaders {
 	var _arg0 *C.SoupServerMessage  // out
 	var _cret *C.SoupMessageHeaders // in
@@ -473,7 +463,6 @@ func (msg *ServerMessage) ResponseHeaders() *MessageHeaders {
 //
 //   - socket (optional) that msg is associated with, NULL if you used
 //     server.AcceptIostream.
-//
 func (msg *ServerMessage) Socket() *gio.Socket {
 	var _arg0 *C.SoupServerMessage // out
 	var _cret *C.GSocket           // in
@@ -508,7 +497,6 @@ func (msg *ServerMessage) Socket() *gio.Socket {
 // The function returns the following values:
 //
 //   - guint: HTTP status code.
-//
 func (msg *ServerMessage) Status() uint {
 	var _arg0 *C.SoupServerMessage // out
 	var _cret C.guint              // in
@@ -533,7 +521,6 @@ func (msg *ServerMessage) Status() uint {
 //
 //   - tlsCertificate (optional) msg's TLS peer certificate, or NULL if msg's
 //     connection is not SSL.
-//
 func (msg *ServerMessage) TLSPeerCertificate() gio.TLSCertificater {
 	var _arg0 *C.SoupServerMessage // out
 	var _cret *C.GTlsCertificate   // in
@@ -572,7 +559,6 @@ func (msg *ServerMessage) TLSPeerCertificate() gio.TLSCertificater {
 // The function returns the following values:
 //
 //   - tlsCertificateFlags with msg's TLS peer certificate errors.
-//
 func (msg *ServerMessage) TLSPeerCertificateErrors() gio.TLSCertificateFlags {
 	var _arg0 *C.SoupServerMessage   // out
 	var _cret C.GTlsCertificateFlags // in
@@ -594,7 +580,6 @@ func (msg *ServerMessage) TLSPeerCertificateErrors() gio.TLSCertificateFlags {
 // The function returns the following values:
 //
 //   - uri: #GUri.
-//
 func (msg *ServerMessage) URI() *glib.URI {
 	var _arg0 *C.SoupServerMessage // out
 	var _cret *C.GUri              // in
@@ -616,7 +601,6 @@ func (msg *ServerMessage) URI() *glib.URI {
 // The function returns the following values:
 //
 //   - ok: TRUE if is an OPTIONS ping.
-//
 func (msg *ServerMessage) IsOptionsPing() bool {
 	var _arg0 *C.SoupServerMessage // out
 	var _cret C.gboolean           // in
@@ -653,7 +637,6 @@ func (msg *ServerMessage) Pause() {
 // The function takes the following parameters:
 //
 //   - version: HTTPVersion.
-//
 func (msg *ServerMessage) SetHTTPVersion(version HTTPVersion) {
 	var _arg0 *C.SoupServerMessage // out
 	var _arg1 C.SoupHTTPVersion    // out
@@ -678,7 +661,6 @@ func (msg *ServerMessage) SetHTTPVersion(version HTTPVersion) {
 //
 //   - statusCode: 3xx status code.
 //   - redirectUri: URI to redirect msg to.
-//
 func (msg *ServerMessage) SetRedirect(statusCode uint, redirectUri string) {
 	var _arg0 *C.SoupServerMessage // out
 	var _arg1 C.guint              // out
@@ -696,7 +678,7 @@ func (msg *ServerMessage) SetRedirect(statusCode uint, redirectUri string) {
 }
 
 // SetResponse: convenience function to set the response body of a
-// ServerMessage. If content_type is NULL, the response body must be empty as
+// servermessage. If content_type is NULL, the response body must be empty as
 // well.
 //
 // The function takes the following parameters:
@@ -705,7 +687,6 @@ func (msg *ServerMessage) SetRedirect(statusCode uint, redirectUri string) {
 //   - respUse describing how to handle resp_body.
 //   - respBody (optional): a data buffer containing the body of the message
 //     response.
-//
 func (msg *ServerMessage) SetResponse(contentType string, respUse MemoryUse, respBody string) {
 	var _arg0 *C.SoupServerMessage // out
 	var _arg1 *C.char              // out
@@ -740,7 +721,6 @@ func (msg *ServerMessage) SetResponse(contentType string, respUse MemoryUse, res
 //
 //   - statusCode: HTTP status code.
 //   - reasonPhrase (optional): reason phrase.
-//
 func (msg *ServerMessage) SetStatus(statusCode uint, reasonPhrase string) {
 	var _arg0 *C.SoupServerMessage // out
 	var _arg1 C.guint              // out
@@ -760,7 +740,7 @@ func (msg *ServerMessage) SetStatus(statusCode uint, reasonPhrase string) {
 }
 
 // StealConnection: "Steals" the HTTP connection associated with msg from
-// its Server. This happens immediately, regardless of the current state of
+// its server. This happens immediately, regardless of the current state of
 // the connection; if the response to msg has not yet finished being sent,
 // then it will be discarded; you can steal the connection from a
 // servermessage::wrote-informational or servermessage::wrote-body signal
@@ -774,7 +754,6 @@ func (msg *ServerMessage) SetStatus(statusCode uint, reasonPhrase string) {
 //   - ioStream formerly associated with msg (or NULL if msg was no longer
 //     associated with a connection). No guarantees are made about what kind of
 //     OStream is returned.
-//
 func (msg *ServerMessage) StealConnection() gio.IOStreamer {
 	var _arg0 *C.SoupServerMessage // out
 	var _cret *C.GIOStream         // in

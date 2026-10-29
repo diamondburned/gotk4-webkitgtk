@@ -26,7 +26,7 @@ func init() {
 	})
 }
 
-// UserContentFilter: compiled set of rules which applied to resource loads.
+// UserContentFilter: compiled set of rules which are applied to resource loads.
 //
 // An instance of this type is always passed by reference.
 type UserContentFilter struct {
@@ -52,7 +52,6 @@ func marshalUserContentFilter(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: identifier for the filter.
-//
 func (userContentFilter *UserContentFilter) Identifier() string {
 	var _arg0 *C.WebKitUserContentFilter // out
 	var _cret *C.char                    // in

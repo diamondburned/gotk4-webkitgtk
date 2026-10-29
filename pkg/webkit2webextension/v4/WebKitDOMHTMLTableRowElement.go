@@ -87,7 +87,6 @@ func marshalDOMHTMLTableRowElement(p uintptr) (interface{}, error) {
 // The function takes the following parameters:
 //
 //   - index: #glong.
-//
 func (self *DOMHTMLTableRowElement) DeleteCell(index int32) error {
 	var _arg0 *C.WebKitDOMHTMLTableRowElement // out
 	var _arg1 C.glong                         // out
@@ -114,7 +113,6 @@ func (self *DOMHTMLTableRowElement) DeleteCell(index int32) error {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableRowElement) Align() string {
 	var _arg0 *C.WebKitDOMHTMLTableRowElement // out
 	var _cret *C.gchar                        // in
@@ -137,7 +135,6 @@ func (self *DOMHTMLTableRowElement) Align() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableRowElement) BgColor() string {
 	var _arg0 *C.WebKitDOMHTMLTableRowElement // out
 	var _cret *C.gchar                        // in
@@ -160,7 +157,6 @@ func (self *DOMHTMLTableRowElement) BgColor() string {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMHTMLTableRowElement) Cells() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMHTMLTableRowElement // out
 	var _cret *C.WebKitDOMHTMLCollection      // in
@@ -182,7 +178,6 @@ func (self *DOMHTMLTableRowElement) Cells() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableRowElement) Ch() string {
 	var _arg0 *C.WebKitDOMHTMLTableRowElement // out
 	var _cret *C.gchar                        // in
@@ -205,7 +200,6 @@ func (self *DOMHTMLTableRowElement) Ch() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableRowElement) ChOff() string {
 	var _arg0 *C.WebKitDOMHTMLTableRowElement // out
 	var _cret *C.gchar                        // in
@@ -228,7 +222,6 @@ func (self *DOMHTMLTableRowElement) ChOff() string {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLTableRowElement) RowIndex() int32 {
 	var _arg0 *C.WebKitDOMHTMLTableRowElement // out
 	var _cret C.glong                         // in
@@ -250,7 +243,6 @@ func (self *DOMHTMLTableRowElement) RowIndex() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLTableRowElement) SectionRowIndex() int32 {
 	var _arg0 *C.WebKitDOMHTMLTableRowElement // out
 	var _cret C.glong                         // in
@@ -272,7 +264,6 @@ func (self *DOMHTMLTableRowElement) SectionRowIndex() int32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableRowElement) VAlign() string {
 	var _arg0 *C.WebKitDOMHTMLTableRowElement // out
 	var _cret *C.gchar                        // in
@@ -299,7 +290,6 @@ func (self *DOMHTMLTableRowElement) VAlign() string {
 // The function returns the following values:
 //
 //   - domhtmlElement: KitDOMHTMLElement.
-//
 func (self *DOMHTMLTableRowElement) InsertCell(index int32) (*DOMHTMLElement, error) {
 	var _arg0 *C.WebKitDOMHTMLTableRowElement // out
 	var _arg1 C.glong                         // out
@@ -329,7 +319,6 @@ func (self *DOMHTMLTableRowElement) InsertCell(index int32) (*DOMHTMLElement, er
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableRowElement) SetAlign(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableRowElement // out
 	var _arg1 *C.gchar                        // out
@@ -348,7 +337,6 @@ func (self *DOMHTMLTableRowElement) SetAlign(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableRowElement) SetBgColor(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableRowElement // out
 	var _arg1 *C.gchar                        // out
@@ -367,7 +355,6 @@ func (self *DOMHTMLTableRowElement) SetBgColor(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableRowElement) SetCh(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableRowElement // out
 	var _arg1 *C.gchar                        // out
@@ -386,7 +373,6 @@ func (self *DOMHTMLTableRowElement) SetCh(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableRowElement) SetChOff(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableRowElement // out
 	var _arg1 *C.gchar                        // out
@@ -405,7 +391,6 @@ func (self *DOMHTMLTableRowElement) SetChOff(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableRowElement) SetVAlign(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableRowElement // out
 	var _arg1 *C.gchar                        // out

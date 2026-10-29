@@ -16,7 +16,7 @@ func _gotk4_webkit6_CookieManager_ConnectChanged(arg0 C.gpointer, arg1 C.guintpt
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

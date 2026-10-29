@@ -86,7 +86,6 @@ func marshalDOMHTMLParamElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLParamElement) Name() string {
 	var _arg0 *C.WebKitDOMHTMLParamElement // out
 	var _cret *C.gchar                     // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLParamElement) Name() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLParamElement) TypeAttr() string {
 	var _arg0 *C.WebKitDOMHTMLParamElement // out
 	var _cret *C.gchar                     // in
@@ -132,7 +130,6 @@ func (self *DOMHTMLParamElement) TypeAttr() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLParamElement) Value() string {
 	var _arg0 *C.WebKitDOMHTMLParamElement // out
 	var _cret *C.gchar                     // in
@@ -155,7 +152,6 @@ func (self *DOMHTMLParamElement) Value() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLParamElement) ValueType() string {
 	var _arg0 *C.WebKitDOMHTMLParamElement // out
 	var _cret *C.gchar                     // in
@@ -178,7 +174,6 @@ func (self *DOMHTMLParamElement) ValueType() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLParamElement) SetName(value string) {
 	var _arg0 *C.WebKitDOMHTMLParamElement // out
 	var _arg1 *C.gchar                     // out
@@ -197,7 +192,6 @@ func (self *DOMHTMLParamElement) SetName(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLParamElement) SetTypeAttr(value string) {
 	var _arg0 *C.WebKitDOMHTMLParamElement // out
 	var _arg1 *C.gchar                     // out
@@ -216,7 +210,6 @@ func (self *DOMHTMLParamElement) SetTypeAttr(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLParamElement) SetValue(value string) {
 	var _arg0 *C.WebKitDOMHTMLParamElement // out
 	var _arg1 *C.gchar                     // out
@@ -235,7 +228,6 @@ func (self *DOMHTMLParamElement) SetValue(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLParamElement) SetValueType(value string) {
 	var _arg0 *C.WebKitDOMHTMLParamElement // out
 	var _arg1 *C.gchar                     // out

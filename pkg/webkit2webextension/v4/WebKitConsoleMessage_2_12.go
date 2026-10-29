@@ -29,8 +29,6 @@ func init() {
 
 // ConsoleMessageLevel: enum values used to denote the various levels of console
 // messages.
-//
-// Deprecated: since version 2.40.
 type ConsoleMessageLevel C.gint
 
 const (
@@ -70,8 +68,6 @@ func (c ConsoleMessageLevel) String() string {
 
 // ConsoleMessageSource: enum values used to denote the various sources of
 // console messages.
-//
-// Deprecated: since version 2.40.
 type ConsoleMessageSource C.gint
 
 const (
@@ -79,8 +75,8 @@ const (
 	ConsoleMessageSourceJavascript ConsoleMessageSource = iota
 	// ConsoleMessageSourceNetwork: network messages.
 	ConsoleMessageSourceNetwork
-	// ConsoleMessageSourceConsoleApi messages produced by console API.
-	ConsoleMessageSourceConsoleApi
+	// ConsoleMessageSourceConsoleAPI messages produced by console API.
+	ConsoleMessageSourceConsoleAPI
 	// ConsoleMessageSourceSecurity: security messages.
 	ConsoleMessageSourceSecurity
 	// ConsoleMessageSourceOther: other messages.
@@ -98,8 +94,8 @@ func (c ConsoleMessageSource) String() string {
 		return "Javascript"
 	case ConsoleMessageSourceNetwork:
 		return "Network"
-	case ConsoleMessageSourceConsoleApi:
-		return "ConsoleApi"
+	case ConsoleMessageSourceConsoleAPI:
+		return "ConsoleAPI"
 	case ConsoleMessageSourceSecurity:
 		return "Security"
 	case ConsoleMessageSourceOther:

@@ -114,7 +114,6 @@ func (notification *Notification) Close() {
 // The function returns the following values:
 //
 //   - utf8: body for the notification.
-//
 func (notification *Notification) Body() string {
 	var _arg0 *C.WebKitNotification // out
 	var _cret *C.gchar              // in
@@ -136,7 +135,6 @@ func (notification *Notification) Body() string {
 // The function returns the following values:
 //
 //   - guint64: unique id for the notification.
-//
 func (notification *Notification) ID() uint64 {
 	var _arg0 *C.WebKitNotification // out
 	var _cret C.guint64             // in
@@ -158,7 +156,6 @@ func (notification *Notification) ID() uint64 {
 // The function returns the following values:
 //
 //   - utf8 (optional): tag for the notification.
-//
 func (notification *Notification) Tag() string {
 	var _arg0 *C.WebKitNotification // out
 	var _cret *C.gchar              // in
@@ -182,7 +179,6 @@ func (notification *Notification) Tag() string {
 // The function returns the following values:
 //
 //   - utf8: title for the notification.
-//
 func (notification *Notification) Title() string {
 	var _arg0 *C.WebKitNotification // out
 	var _cret *C.gchar              // in

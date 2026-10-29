@@ -33,11 +33,11 @@ func defaultVirtualMachineOverrides(v *VirtualMachine) VirtualMachineOverrides {
 	return VirtualMachineOverrides{}
 }
 
-// VirtualMachine represents a group of JSCContext<!-- -->s. It allows
-// concurrent JavaScript execution by creating a different instance of
-// JSCVirtualMachine in each thread.
+// VirtualMachine represents a group of JSCContext objects. It allows concurrent
+// JavaScript execution by creating a different instance of JSCVirtualMachine in
+// each thread.
 //
-// To create a group of JSCContext<!-- -->s pass the same JSCVirtualMachine
+// To create a group of JSCContext objects pass the same JSCVirtualMachine
 // instance to every JSCContext constructor.
 type VirtualMachine struct {
 	_ [0]func() // equal guard
@@ -79,7 +79,6 @@ func marshalVirtualMachine(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - virtualMachine: newly created CVirtualMachine.
-//
 func NewVirtualMachine() *VirtualMachine {
 	var _cret *C.JSCVirtualMachine // in
 

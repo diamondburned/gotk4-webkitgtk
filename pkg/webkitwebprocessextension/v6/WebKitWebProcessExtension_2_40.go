@@ -3,9 +3,12 @@
 package webkitwebprocessextension
 
 import (
+	"context"
 	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
@@ -17,6 +20,8 @@ import (
 // #include <webkit/webkit-web-process-extension.h>
 // extern void _gotk4_webkitwebprocessextension6_WebProcessExtension_ConnectUserMessageReceived(gpointer, WebKitUserMessage*, guintptr);
 // extern void _gotk4_webkitwebprocessextension6_WebProcessExtension_ConnectPageCreated(gpointer, WebKitWebPage*, guintptr);
+// extern void _gotk4_webkitwebprocessextension6_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
 import "C"
 
 // GType values.
@@ -40,8 +45,8 @@ func defaultWebProcessExtensionOverrides(v *WebProcessExtension) WebProcessExten
 
 // WebProcessExtension represents an extension of the web process.
 //
-// WebKitWebProcessExtension is a loadable module for the web process. It allows
-// you to execute code in the web process and being able to use the DOM API,
+// WebKitWebProcessExtension is a loadable module for the web process.
+// It allows you to execute code in the web process and to use the DOM API,
 // to change any request or to inject custom JavaScript code, for example.
 //
 // To create a WebKitWebProcessExtension you should write
@@ -53,64 +58,67 @@ func defaultWebProcessExtensionOverrides(v *WebProcessExtension) WebProcessExten
 // public and it has to use the MODULE_EXPORT macro. It is called when the web
 // process is initialized.
 //
-//    static void
-//    web_page_created_callback (WebKitWebProcessExtension *extension,
-//                               WebKitWebPage             *web_page,
-//                               gpointer                   user_data)
-//    {
-//        g_print ("Page d created for s\n",
-//                 webkit_web_page_get_id (web_page),
-//                 webkit_web_page_get_uri (web_page));
-//    }
+//	static void
+//	web_page_created_callback (WebKitWebProcessExtension *extension,
+//	                           WebKitWebPage             *web_page,
+//	                           gpointer                   user_data)
+//	{
+//	    g_print ("Page d created for s\n",
+//	             webkit_web_page_get_id (web_page),
+//	             webkit_web_page_get_uri (web_page));
+//	}
 //
-//    G_MODULE_EXPORT void
-//    webkit_web_process_extension_initialize (WebKitWebProcessExtension *extension)
-//    {
-//        g_signal_connect (extension, "page-created",
-//                          G_CALLBACK (web_page_created_callback),
-//                          NULL);
-//    }
+//	G_MODULE_EXPORT void
+//	webkit_web_process_extension_initialize (WebKitWebProcessExtension *extension)
+//	{
+//	    g_signal_connect (extension, "page-created",
+//	                      G_CALLBACK (web_page_created_callback),
+//	                      NULL);
+//	}
 //
 // The previous piece of code shows a trivial example of an extension that
 // notifies when a KitWebPage is created.
 //
-// WebKit has to know where it can find the created WebKitWebProcessExtension.
-// To do so you should use the webkit_web_context_set_web_extensions_directory()
-// function. The signal KitWebContext::initialize-web-extensions is the
-// recommended place to call it.
+// WebKit has to know where it can find the created
+// WebKitWebProcessExtension. To do so you should use the
+// webkit_web_context_set_web_process_extensions_directory() function. The
+// signal KitWebContext::initialize-web-process-extensions is the recommended
+// place to call it.
 //
 // To provide the initialization data used by the
-// webkit_web_process_extension_initialize_with_user_data() function, you have
-// to call webkit_web_context_set_web_extensions_initialization_user_data()
+// webkit_web_process_extension_initialize_with_user_data()
+// function, you have to call
+// webkit_web_context_set_web_process_extensions_initialization_user_data()
 // with the desired data as parameter. You can see an example of this in the
 // following piece of code:
 //
-//    #define WEB_EXTENSIONS_DIRECTORY // ...
+//	#define WEB_PROCESS_EXTENSIONS_DIRECTORY // ...
 //
-//    static void
-//    initialize_web_extensions (WebKitWebContext *context,
-//                               gpointer          user_data)
-//    {
-//      // Web Extensions get a different ID for each Web Process
-//      static guint32 unique_id = 0;
+//	static void
+//	initialize_web_process_extensions (WebKitWebContext *context,
+//	                                   gpointer          user_data)
+//	{
+//	  // Web process extensions get a different ID for each web process
+//	  static guint32 unique_id = 0;
 //
-//      webkit_web_context_set_web_extensions_directory (
-//         context, WEB_EXTENSIONS_DIRECTORY);
-//      webkit_web_context_set_web_extensions_initialization_user_data (
-//         context, g_variant_new_uint32 (unique_id++));
-//    }
+//	  webkit_web_context_set_web_process_extensions_directory (
+//	     context, WEB_PROCESS_EXTENSIONS_DIRECTORY);
+//	  webkit_web_context_set_web_process_extensions_initialization_user_data (
+//	     context, g_variant_new_uint32 (unique_id++));
+//	}
 //
-//    int main (int argc, char **argv)
-//    {
-//      g_signal_connect (webkit_web_context_get_default (),
-//                       "initialize-web-extensions",
-//                        G_CALLBACK (initialize_web_extensions),
-//                        NULL);
+//	int main (int argc, char **argv)
+//	{
+//	  g_signal_connect (webkit_web_context_get_default (),
+//	                    "initialize-web-process-extensions",
+//	                    G_CALLBACK (initialize_web_process_extensions),
+//	                    NULL);
 //
-//      GtkWidget *view = webkit_web_view_new ();
+//	  // With the legacy libwpe backend, WPE also needs the "backend" property
+//	  WebKitWebView *view = g_object_new (WEBKIT_TYPE_WEB_VIEW, NULL);
 //
-//      // ...
-//    }.
+//	  // ...
+//	}.
 type WebProcessExtension struct {
 	_ [0]func() // equal guard
 	*coreglib.Object
@@ -154,7 +162,7 @@ func (extension *WebProcessExtension) ConnectPageCreated(f func(webPage *WebPage
 
 // ConnectUserMessageReceived: this signal is emitted when a KitUserMessage is
 // received from the KitWebContext corresponding to extension. Messages sent by
-// KitWebContext are always broadcasted to all web extensions and they can't be
+// KitWebContext are always broadcast to all web extensions and they can't be
 // replied to. Calling webkit_user_message_send_reply() will do nothing.
 func (extension *WebProcessExtension) ConnectUserMessageReceived(f func(message *UserMessage)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(extension, "user-message-received", false, unsafe.Pointer(C._gotk4_webkitwebprocessextension6_WebProcessExtension_ConnectUserMessageReceived), f)
@@ -170,7 +178,6 @@ func (extension *WebProcessExtension) ConnectUserMessageReceived(f func(message 
 //
 //   - webPage for the given page_id, or NULL if the identifier doesn't
 //     correspond to an existing web page.
-//
 func (extension *WebProcessExtension) Page(pageId uint64) *WebPage {
 	var _arg0 *C.WebKitWebProcessExtension // out
 	var _arg1 C.guint64                    // out
@@ -190,6 +197,46 @@ func (extension *WebProcessExtension) Page(pageId uint64) *WebPage {
 	return _webPage
 }
 
+// SendMessageToContext: send message to the KitWebContext corresponding to
+// extension. If message is floating, it's consumed.
+//
+// If you don't expect any reply, or you simply want to ignore it,
+// you can pass NULL as callback. When the operation is
+// finished, callback will be called. You can then call
+// webkit_web_process_extension_send_message_to_context_finish() to get the
+// message reply.
+//
+// The function takes the following parameters:
+//
+//   - ctx (optional) or NULL to ignore.
+//   - message: KitUserMessage.
+//   - callback (optional) to call when the request is satisfied or NULL.
+func (extension *WebProcessExtension) SendMessageToContext(ctx context.Context, message *UserMessage, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebProcessExtension // out
+	var _arg2 *C.GCancellable              // out
+	var _arg1 *C.WebKitUserMessage         // out
+	var _arg3 C.GAsyncReadyCallback        // out
+	var _arg4 C.gpointer
+
+	_arg0 = (*C.WebKitWebProcessExtension)(unsafe.Pointer(coreglib.InternObject(extension).Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = (*C.WebKitUserMessage)(unsafe.Pointer(coreglib.InternObject(message).Native()))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_web_process_extension_send_message_to_context(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(extension)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(message)
+	runtime.KeepAlive(callback)
+}
+
 // SendMessageToContextFinish: finish an asynchronous operation started with
 // webkit_web_process_extension_send_message_to_context().
 //
@@ -200,7 +247,6 @@ func (extension *WebProcessExtension) Page(pageId uint64) *WebPage {
 // The function returns the following values:
 //
 //   - userMessage with the reply or NULL in case of error.
-//
 func (extension *WebProcessExtension) SendMessageToContextFinish(result gio.AsyncResulter) (*UserMessage, error) {
 	var _arg0 *C.WebKitWebProcessExtension // out
 	var _arg1 *C.GAsyncResult              // out

@@ -86,7 +86,6 @@ func marshalDOMHTMLCanvasElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLCanvasElement) Height() int32 {
 	var _arg0 *C.WebKitDOMHTMLCanvasElement // out
 	var _cret C.glong                       // in
@@ -108,7 +107,6 @@ func (self *DOMHTMLCanvasElement) Height() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLCanvasElement) Width() int32 {
 	var _arg0 *C.WebKitDOMHTMLCanvasElement // out
 	var _cret C.glong                       // in
@@ -130,7 +128,6 @@ func (self *DOMHTMLCanvasElement) Width() int32 {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLCanvasElement) SetHeight(value int32) {
 	var _arg0 *C.WebKitDOMHTMLCanvasElement // out
 	var _arg1 C.glong                       // out
@@ -148,7 +145,6 @@ func (self *DOMHTMLCanvasElement) SetHeight(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLCanvasElement) SetWidth(value int32) {
 	var _arg0 *C.WebKitDOMHTMLCanvasElement // out
 	var _arg1 C.glong                       // out

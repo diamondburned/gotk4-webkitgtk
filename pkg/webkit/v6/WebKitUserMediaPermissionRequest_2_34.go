@@ -23,7 +23,6 @@ import "C"
 // The function returns the following values:
 //
 //   - ok: TRUE if access to a display device was requested.
-//
 func UserMediaPermissionIsForDisplayDevice(request *UserMediaPermissionRequest) bool {
 	var _arg1 *C.WebKitUserMediaPermissionRequest // out
 	var _cret C.gboolean                          // in

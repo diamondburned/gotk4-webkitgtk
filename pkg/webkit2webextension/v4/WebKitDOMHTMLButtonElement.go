@@ -86,7 +86,6 @@ func marshalDOMHTMLButtonElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLButtonElement) Autofocus() bool {
 	var _arg0 *C.WebKitDOMHTMLButtonElement // out
 	var _cret C.gboolean                    // in
@@ -110,7 +109,6 @@ func (self *DOMHTMLButtonElement) Autofocus() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLButtonElement) ButtonType() string {
 	var _arg0 *C.WebKitDOMHTMLButtonElement // out
 	var _cret *C.gchar                      // in
@@ -133,7 +131,6 @@ func (self *DOMHTMLButtonElement) ButtonType() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLButtonElement) Disabled() bool {
 	var _arg0 *C.WebKitDOMHTMLButtonElement // out
 	var _cret C.gboolean                    // in
@@ -157,7 +154,6 @@ func (self *DOMHTMLButtonElement) Disabled() bool {
 // The function returns the following values:
 //
 //   - domhtmlFormElement: KitDOMHTMLFormElement.
-//
 func (self *DOMHTMLButtonElement) Form() *DOMHTMLFormElement {
 	var _arg0 *C.WebKitDOMHTMLButtonElement // out
 	var _cret *C.WebKitDOMHTMLFormElement   // in
@@ -179,7 +175,6 @@ func (self *DOMHTMLButtonElement) Form() *DOMHTMLFormElement {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLButtonElement) Name() string {
 	var _arg0 *C.WebKitDOMHTMLButtonElement // out
 	var _cret *C.gchar                      // in
@@ -202,7 +197,6 @@ func (self *DOMHTMLButtonElement) Name() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLButtonElement) Value() string {
 	var _arg0 *C.WebKitDOMHTMLButtonElement // out
 	var _cret *C.gchar                      // in
@@ -225,7 +219,6 @@ func (self *DOMHTMLButtonElement) Value() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLButtonElement) WillValidate() bool {
 	var _arg0 *C.WebKitDOMHTMLButtonElement // out
 	var _cret C.gboolean                    // in
@@ -249,7 +242,6 @@ func (self *DOMHTMLButtonElement) WillValidate() bool {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLButtonElement) SetAutofocus(value bool) {
 	var _arg0 *C.WebKitDOMHTMLButtonElement // out
 	var _arg1 C.gboolean                    // out
@@ -269,7 +261,6 @@ func (self *DOMHTMLButtonElement) SetAutofocus(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLButtonElement) SetButtonType(value string) {
 	var _arg0 *C.WebKitDOMHTMLButtonElement // out
 	var _arg1 *C.gchar                      // out
@@ -288,7 +279,6 @@ func (self *DOMHTMLButtonElement) SetButtonType(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLButtonElement) SetDisabled(value bool) {
 	var _arg0 *C.WebKitDOMHTMLButtonElement // out
 	var _arg1 C.gboolean                    // out
@@ -308,7 +298,6 @@ func (self *DOMHTMLButtonElement) SetDisabled(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLButtonElement) SetName(value string) {
 	var _arg0 *C.WebKitDOMHTMLButtonElement // out
 	var _arg1 *C.gchar                      // out
@@ -327,7 +316,6 @@ func (self *DOMHTMLButtonElement) SetName(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLButtonElement) SetValue(value string) {
 	var _arg0 *C.WebKitDOMHTMLButtonElement // out
 	var _arg1 *C.gchar                      // out

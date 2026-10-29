@@ -25,7 +25,6 @@ import "C"
 // The function returns the following values:
 //
 //   - utf8 (optional): uri suitable for display, or NULL in case of error.
-//
 func URIForDisplay(uri string) string {
 	var _arg1 *C.gchar // out
 	var _cret *C.gchar // in

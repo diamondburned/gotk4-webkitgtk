@@ -86,7 +86,6 @@ func marshalDOMHTMLAnchorElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) Charset() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLAnchorElement) Charset() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) Coords() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -132,7 +130,6 @@ func (self *DOMHTMLAnchorElement) Coords() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) Hash() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -155,7 +152,6 @@ func (self *DOMHTMLAnchorElement) Hash() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) Host() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -178,7 +174,6 @@ func (self *DOMHTMLAnchorElement) Host() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) Hostname() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -201,7 +196,6 @@ func (self *DOMHTMLAnchorElement) Hostname() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) Href() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -224,7 +218,6 @@ func (self *DOMHTMLAnchorElement) Href() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) Hreflang() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -247,7 +240,6 @@ func (self *DOMHTMLAnchorElement) Hreflang() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) Name() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -270,7 +262,6 @@ func (self *DOMHTMLAnchorElement) Name() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) Pathname() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -293,7 +284,6 @@ func (self *DOMHTMLAnchorElement) Pathname() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) Port() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -316,7 +306,6 @@ func (self *DOMHTMLAnchorElement) Port() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) Protocol() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -339,7 +328,6 @@ func (self *DOMHTMLAnchorElement) Protocol() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) Rel() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -362,7 +350,6 @@ func (self *DOMHTMLAnchorElement) Rel() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) Rev() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -385,7 +372,6 @@ func (self *DOMHTMLAnchorElement) Rev() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) Search() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -408,7 +394,6 @@ func (self *DOMHTMLAnchorElement) Search() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) Shape() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -431,7 +416,6 @@ func (self *DOMHTMLAnchorElement) Shape() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) Target() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -454,7 +438,6 @@ func (self *DOMHTMLAnchorElement) Target() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) Text() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -477,7 +460,6 @@ func (self *DOMHTMLAnchorElement) Text() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAnchorElement) TypeAttr() string {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _cret *C.gchar                      // in
@@ -500,7 +482,6 @@ func (self *DOMHTMLAnchorElement) TypeAttr() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetCharset(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out
@@ -519,7 +500,6 @@ func (self *DOMHTMLAnchorElement) SetCharset(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetCoords(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out
@@ -538,7 +518,6 @@ func (self *DOMHTMLAnchorElement) SetCoords(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetHash(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out
@@ -557,7 +536,6 @@ func (self *DOMHTMLAnchorElement) SetHash(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetHost(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out
@@ -576,7 +554,6 @@ func (self *DOMHTMLAnchorElement) SetHost(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetHostname(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out
@@ -595,7 +572,6 @@ func (self *DOMHTMLAnchorElement) SetHostname(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetHref(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out
@@ -614,7 +590,6 @@ func (self *DOMHTMLAnchorElement) SetHref(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetHreflang(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out
@@ -633,7 +608,6 @@ func (self *DOMHTMLAnchorElement) SetHreflang(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetName(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out
@@ -652,7 +626,6 @@ func (self *DOMHTMLAnchorElement) SetName(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetPathname(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out
@@ -671,7 +644,6 @@ func (self *DOMHTMLAnchorElement) SetPathname(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetPort(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out
@@ -690,7 +662,6 @@ func (self *DOMHTMLAnchorElement) SetPort(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetProtocol(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out
@@ -709,7 +680,6 @@ func (self *DOMHTMLAnchorElement) SetProtocol(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetRel(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out
@@ -728,7 +698,6 @@ func (self *DOMHTMLAnchorElement) SetRel(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetRev(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out
@@ -747,7 +716,6 @@ func (self *DOMHTMLAnchorElement) SetRev(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetSearch(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out
@@ -766,7 +734,6 @@ func (self *DOMHTMLAnchorElement) SetSearch(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetShape(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out
@@ -785,7 +752,6 @@ func (self *DOMHTMLAnchorElement) SetShape(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetTarget(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out
@@ -804,7 +770,6 @@ func (self *DOMHTMLAnchorElement) SetTarget(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetText(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out
@@ -823,7 +788,6 @@ func (self *DOMHTMLAnchorElement) SetText(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAnchorElement) SetTypeAttr(value string) {
 	var _arg0 *C.WebKitDOMHTMLAnchorElement // out
 	var _arg1 *C.gchar                      // out

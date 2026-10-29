@@ -37,10 +37,10 @@ func defaultAuthManagerOverrides(v *AuthManager) AuthManagerOverrides {
 
 // AuthManager: HTTP client-side authentication handler.
 //
-// AuthManager is the sessionfeature that handles HTTP authentication for a
+// authmanager is the sessionfeature that handles HTTP authentication for a
 // session.
 //
-// A AuthManager is added to the session by default, and normally you
+// A authmanager is added to the session by default, and normally you
 // don't need to worry about it at all. However, if you want to disable
 // HTTP authentication, you can remove the feature from the session with
 // session.RemoveFeatureByType or disable it on individual requests with
@@ -50,7 +50,7 @@ func defaultAuthManagerOverrides(v *AuthManager) AuthManagerOverrides {
 //
 // (Although this type has only been publicly visible since libsoup 2.42,
 // it has always existed in the background, and you can use g_type_from_name
-// ("SoupAuthManager") to get its glib.Type in earlier releases.).
+// ("SoupAuthManager") to get its gobject.Type in earlier releases.).
 type AuthManager struct {
 	_ [0]func() // equal guard
 	*coreglib.Object
@@ -116,7 +116,6 @@ func (manager *AuthManager) ClearCachedCredentials() {
 //
 //   - uri under which auth is to be used.
 //   - auth to use.
-//
 func (manager *AuthManager) UseAuth(uri *glib.URI, auth Auther) {
 	var _arg0 *C.SoupAuthManager // out
 	var _arg1 *C.GUri            // out

@@ -86,7 +86,6 @@ func marshalDOMHTMLBaseElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLBaseElement) Href() string {
 	var _arg0 *C.WebKitDOMHTMLBaseElement // out
 	var _cret *C.gchar                    // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLBaseElement) Href() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLBaseElement) Target() string {
 	var _arg0 *C.WebKitDOMHTMLBaseElement // out
 	var _cret *C.gchar                    // in
@@ -132,7 +130,6 @@ func (self *DOMHTMLBaseElement) Target() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLBaseElement) SetHref(value string) {
 	var _arg0 *C.WebKitDOMHTMLBaseElement // out
 	var _arg1 *C.gchar                    // out
@@ -151,7 +148,6 @@ func (self *DOMHTMLBaseElement) SetHref(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLBaseElement) SetTarget(value string) {
 	var _arg0 *C.WebKitDOMHTMLBaseElement // out
 	var _arg1 *C.gchar                    // out

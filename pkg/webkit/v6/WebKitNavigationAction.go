@@ -97,7 +97,6 @@ func marshalNavigationAction(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - navigationAction: copy of passed in KitNavigationAction.
-//
 func (navigation *NavigationAction) Copy() *NavigationAction {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret *C.WebKitNavigationAction // in
@@ -129,7 +128,6 @@ func (navigation *NavigationAction) Copy() *NavigationAction {
 //
 //   - utf8 (optional): name of the new frame this navigation action targets or
 //     NULL.
-//
 func (navigation *NavigationAction) FrameName() string {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret *C.char                   // in
@@ -156,7 +154,6 @@ func (navigation *NavigationAction) FrameName() string {
 // The function returns the following values:
 //
 //   - guint: modifier keys.
-//
 func (navigation *NavigationAction) Modifiers() uint {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret C.guint                   // in
@@ -182,7 +179,6 @@ func (navigation *NavigationAction) Modifiers() uint {
 // The function returns the following values:
 //
 //   - guint: mouse button number or 0.
-//
 func (navigation *NavigationAction) MouseButton() uint {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret C.guint                   // in
@@ -204,7 +200,6 @@ func (navigation *NavigationAction) MouseButton() uint {
 // The function returns the following values:
 //
 //   - navigationType: KitNavigationType.
-//
 func (navigation *NavigationAction) NavigationType() NavigationType {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret C.WebKitNavigationType    // in
@@ -223,16 +218,15 @@ func (navigation *NavigationAction) NavigationType() NavigationType {
 
 // Request: return the KitURIRequest associated with the navigation action.
 //
-// Modifications to the returned object are <emphasis>not</emphasis> taken
-// into account when the request is sent over the network, and is intended
-// only to aid in evaluating whether a navigation action should be taken
-// or not. To modify requests before they are sent over the network the
-// KitPage::send-request signal can be used instead.
+// Modifications to the returned object are *not* taken into account when the
+// request is sent over the network, and the object is intended only to aid in
+// evaluating whether a navigation action should be taken or not. To modify
+// requests before they are sent over the network the KitPage::send-request
+// signal can be used instead.
 //
 // The function returns the following values:
 //
 //   - uriRequest: KitURIRequest.
-//
 func (navigation *NavigationAction) Request() *URIRequest {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret *C.WebKitURIRequest       // in
@@ -254,7 +248,6 @@ func (navigation *NavigationAction) Request() *URIRequest {
 // The function returns the following values:
 //
 //   - ok: TRUE if the original navigation was redirected, FALSE otherwise.
-//
 func (navigation *NavigationAction) IsRedirect() bool {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret C.gboolean                // in
@@ -279,7 +272,6 @@ func (navigation *NavigationAction) IsRedirect() bool {
 // The function returns the following values:
 //
 //   - ok: whether navigation action is a user gesture.
-//
 func (navigation *NavigationAction) IsUserGesture() bool {
 	var _arg0 *C.WebKitNavigationAction // out
 	var _cret C.gboolean                // in

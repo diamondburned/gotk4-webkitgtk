@@ -77,7 +77,6 @@ func marshalDOMDOMSelection(p uintptr) (interface{}, error) {
 // The function takes the following parameters:
 //
 //   - range: KitDOMRange.
-//
 func (self *DOMDOMSelection) AddRange(_range *DOMRange) {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _arg1 *C.WebKitDOMRange        // out
@@ -96,7 +95,6 @@ func (self *DOMDOMSelection) AddRange(_range *DOMRange) {
 //
 //   - node: KitDOMNode.
 //   - offset: #gulong.
-//
 func (self *DOMDOMSelection) Collapse(node *DOMNode, offset uint32) {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _arg1 *C.WebKitDOMNode         // out
@@ -160,7 +158,6 @@ func (self *DOMDOMSelection) CollapseToStart() error {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDOMSelection) ContainsNode(node *DOMNode, allowPartial bool) bool {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _arg1 *C.WebKitDOMNode         // out
@@ -213,7 +210,6 @@ func (self *DOMDOMSelection) Empty() {
 //
 //   - node: KitDOMNode.
 //   - offset: #gulong.
-//
 func (self *DOMDOMSelection) Extend(node *DOMNode, offset uint32) error {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _arg1 *C.WebKitDOMNode         // out
@@ -243,7 +239,6 @@ func (self *DOMDOMSelection) Extend(node *DOMNode, offset uint32) error {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMDOMSelection) AnchorNode() *DOMNode {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _cret *C.WebKitDOMNode         // in
@@ -265,7 +260,6 @@ func (self *DOMDOMSelection) AnchorNode() *DOMNode {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMDOMSelection) AnchorOffset() uint32 {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _cret C.gulong                 // in
@@ -287,7 +281,6 @@ func (self *DOMDOMSelection) AnchorOffset() uint32 {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMDOMSelection) BaseNode() *DOMNode {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _cret *C.WebKitDOMNode         // in
@@ -309,7 +302,6 @@ func (self *DOMDOMSelection) BaseNode() *DOMNode {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMDOMSelection) BaseOffset() uint32 {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _cret C.gulong                 // in
@@ -331,7 +323,6 @@ func (self *DOMDOMSelection) BaseOffset() uint32 {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMDOMSelection) ExtentNode() *DOMNode {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _cret *C.WebKitDOMNode         // in
@@ -353,7 +344,6 @@ func (self *DOMDOMSelection) ExtentNode() *DOMNode {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMDOMSelection) ExtentOffset() uint32 {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _cret C.gulong                 // in
@@ -375,7 +365,6 @@ func (self *DOMDOMSelection) ExtentOffset() uint32 {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMDOMSelection) FocusNode() *DOMNode {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _cret *C.WebKitDOMNode         // in
@@ -397,7 +386,6 @@ func (self *DOMDOMSelection) FocusNode() *DOMNode {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMDOMSelection) FocusOffset() uint32 {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _cret C.gulong                 // in
@@ -419,7 +407,6 @@ func (self *DOMDOMSelection) FocusOffset() uint32 {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDOMSelection) IsCollapsed() bool {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _cret C.gboolean               // in
@@ -447,7 +434,6 @@ func (self *DOMDOMSelection) IsCollapsed() bool {
 // The function returns the following values:
 //
 //   - domRange: KitDOMRange.
-//
 func (self *DOMDOMSelection) RangeAt(index uint32) (*DOMRange, error) {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _arg1 C.gulong                 // out
@@ -477,7 +463,6 @@ func (self *DOMDOMSelection) RangeAt(index uint32) (*DOMRange, error) {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMDOMSelection) RangeCount() uint32 {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _cret C.gulong                 // in
@@ -499,7 +484,6 @@ func (self *DOMDOMSelection) RangeCount() uint32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDOMSelection) SelectionType() string {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _cret *C.gchar                 // in
@@ -524,7 +508,6 @@ func (self *DOMDOMSelection) SelectionType() string {
 //   - alter: #gchar.
 //   - direction: #gchar.
 //   - granularity: #gchar.
-//
 func (self *DOMDOMSelection) Modify(alter, direction, granularity string) {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _arg1 *C.gchar                 // out
@@ -561,7 +544,6 @@ func (self *DOMDOMSelection) RemoveAllRanges() {
 // The function takes the following parameters:
 //
 //   - node: KitDOMNode.
-//
 func (self *DOMDOMSelection) SelectAllChildren(node *DOMNode) {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _arg1 *C.WebKitDOMNode         // out
@@ -582,7 +564,6 @@ func (self *DOMDOMSelection) SelectAllChildren(node *DOMNode) {
 //   - baseOffset: #gulong.
 //   - extentNode: KitDOMNode.
 //   - extentOffset: #gulong.
-//
 func (self *DOMDOMSelection) SetBaseAndExtent(baseNode *DOMNode, baseOffset uint32, extentNode *DOMNode, extentOffset uint32) {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _arg1 *C.WebKitDOMNode         // out
@@ -610,7 +591,6 @@ func (self *DOMDOMSelection) SetBaseAndExtent(baseNode *DOMNode, baseOffset uint
 //
 //   - node: KitDOMNode.
 //   - offset: #gulong.
-//
 func (self *DOMDOMSelection) SetPosition(node *DOMNode, offset uint32) {
 	var _arg0 *C.WebKitDOMDOMSelection // out
 	var _arg1 *C.WebKitDOMNode         // out

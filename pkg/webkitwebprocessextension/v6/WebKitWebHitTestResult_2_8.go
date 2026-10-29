@@ -83,7 +83,6 @@ func marshalWebHitTestResult(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - ok: TRUE if the hit test covers an editable element or FALSE otherwise.
-//
 func (webHitTestResult *WebHitTestResult) ContextIsEditable() bool {
 	var _arg0 *C.WebKitWebHitTestResult // out
 	var _cret C.gboolean                // in
@@ -111,7 +110,6 @@ func (webHitTestResult *WebHitTestResult) ContextIsEditable() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if the hit test covers an image element or FALSE otherwise.
-//
 func (webHitTestResult *WebHitTestResult) ContextIsImage() bool {
 	var _arg0 *C.WebKitWebHitTestResult // out
 	var _cret C.gboolean                // in
@@ -139,7 +137,6 @@ func (webHitTestResult *WebHitTestResult) ContextIsImage() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if the hit test covers a link element or FALSE otherwise.
-//
 func (webHitTestResult *WebHitTestResult) ContextIsLink() bool {
 	var _arg0 *C.WebKitWebHitTestResult // out
 	var _cret C.gboolean                // in
@@ -167,7 +164,6 @@ func (webHitTestResult *WebHitTestResult) ContextIsLink() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if the hit test covers a media element or FALSE otherwise.
-//
 func (webHitTestResult *WebHitTestResult) ContextIsMedia() bool {
 	var _arg0 *C.WebKitWebHitTestResult // out
 	var _cret C.gboolean                // in
@@ -195,7 +191,6 @@ func (webHitTestResult *WebHitTestResult) ContextIsMedia() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if the hit test covers a scrollbar or FALSE otherwise.
-//
 func (webHitTestResult *WebHitTestResult) ContextIsScrollbar() bool {
 	var _arg0 *C.WebKitWebHitTestResult // out
 	var _cret C.gboolean                // in
@@ -223,7 +218,6 @@ func (webHitTestResult *WebHitTestResult) ContextIsScrollbar() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if the hit test covers a selected element or FALSE otherwise.
-//
 func (webHitTestResult *WebHitTestResult) ContextIsSelection() bool {
 	var _arg0 *C.WebKitWebHitTestResult // out
 	var _cret C.gboolean                // in
@@ -242,12 +236,11 @@ func (webHitTestResult *WebHitTestResult) ContextIsSelection() bool {
 	return _ok
 }
 
-// Context gets the the context flags for the hit test result.
+// Context gets the context flags for the hit test result.
 //
 // The function returns the following values:
 //
 //   - guint: bitmask of KitHitTestResultContext flags.
-//
 func (webHitTestResult *WebHitTestResult) Context() uint {
 	var _arg0 *C.WebKitWebHitTestResult // out
 	var _cret C.guint                   // in
@@ -271,7 +264,6 @@ func (webHitTestResult *WebHitTestResult) Context() uint {
 //
 //   - utf8: URI of the image element, or NULL if the hit test does not cover an
 //     image element.
-//
 func (webHitTestResult *WebHitTestResult) ImageURI() string {
 	var _arg0 *C.WebKitWebHitTestResult // out
 	var _cret *C.gchar                  // in
@@ -298,7 +290,6 @@ func (webHitTestResult *WebHitTestResult) ImageURI() string {
 // The function returns the following values:
 //
 //   - value (optional) for the DOM node, or NULL.
-//
 func (webHitTestResult *WebHitTestResult) JsNode(world *ScriptWorld) *javascriptcore.Value {
 	var _arg0 *C.WebKitWebHitTestResult // out
 	var _arg1 *C.WebKitScriptWorld      // out
@@ -334,7 +325,6 @@ func (webHitTestResult *WebHitTestResult) JsNode(world *ScriptWorld) *javascript
 //
 //   - utf8: label of the link element, or NULL if the hit test does not cover a
 //     link element or the link element does not have a label.
-//
 func (webHitTestResult *WebHitTestResult) LinkLabel() string {
 	var _arg0 *C.WebKitWebHitTestResult // out
 	var _cret *C.gchar                  // in
@@ -358,7 +348,6 @@ func (webHitTestResult *WebHitTestResult) LinkLabel() string {
 //
 //   - utf8: title of the link element, or NULL if the hit test does not cover a
 //     link element or the link element does not have a title.
-//
 func (webHitTestResult *WebHitTestResult) LinkTitle() string {
 	var _arg0 *C.WebKitWebHitTestResult // out
 	var _cret *C.gchar                  // in
@@ -382,7 +371,6 @@ func (webHitTestResult *WebHitTestResult) LinkTitle() string {
 //
 //   - utf8: URI of the link element, or NULL if the hit test does not cover a
 //     link element.
-//
 func (webHitTestResult *WebHitTestResult) LinkURI() string {
 	var _arg0 *C.WebKitWebHitTestResult // out
 	var _cret *C.gchar                  // in
@@ -406,7 +394,6 @@ func (webHitTestResult *WebHitTestResult) LinkURI() string {
 //
 //   - utf8: URI of the media element, or NULL if the hit test does not cover a
 //     media element.
-//
 func (webHitTestResult *WebHitTestResult) MediaURI() string {
 	var _arg0 *C.WebKitWebHitTestResult // out
 	var _cret *C.gchar                  // in

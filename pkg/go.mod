@@ -1,8 +1,10 @@
 module github.com/diamondburned/gotk4-webkitgtk/pkg
 
-go 1.18
+go 1.24.0
 
-require github.com/diamondburned/gotk4/pkg v0.1.0
+toolchain go1.24.3
+
+require github.com/diamondburned/gotk4/pkg v0.4.1
 
 require (
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20231121144256-b99613f794b6 // indirect

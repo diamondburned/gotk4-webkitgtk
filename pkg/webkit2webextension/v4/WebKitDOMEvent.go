@@ -136,7 +136,6 @@ func marshalDOMEvent(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMEvent) Bubbles() bool {
 	var _arg0 *C.WebKitDOMEvent // out
 	var _cret C.gboolean        // in
@@ -160,7 +159,6 @@ func (self *DOMEvent) Bubbles() bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMEvent) CancelBubble() bool {
 	var _arg0 *C.WebKitDOMEvent // out
 	var _cret C.gboolean        // in
@@ -184,7 +182,6 @@ func (self *DOMEvent) CancelBubble() bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMEvent) Cancelable() bool {
 	var _arg0 *C.WebKitDOMEvent // out
 	var _cret C.gboolean        // in
@@ -208,7 +205,6 @@ func (self *DOMEvent) Cancelable() bool {
 // The function returns the following values:
 //
 //   - domEventTarget: KitDOMEventTarget.
-//
 func (self *DOMEvent) CurrentTarget() *DOMEventTarget {
 	var _arg0 *C.WebKitDOMEvent       // out
 	var _cret *C.WebKitDOMEventTarget // in
@@ -230,7 +226,6 @@ func (self *DOMEvent) CurrentTarget() *DOMEventTarget {
 // The function returns the following values:
 //
 //   - gushort: #gushort.
-//
 func (self *DOMEvent) EventPhase() uint16 {
 	var _arg0 *C.WebKitDOMEvent // out
 	var _cret C.gushort         // in
@@ -252,7 +247,6 @@ func (self *DOMEvent) EventPhase() uint16 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMEvent) EventType() string {
 	var _arg0 *C.WebKitDOMEvent // out
 	var _cret *C.gchar          // in
@@ -275,7 +269,6 @@ func (self *DOMEvent) EventType() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMEvent) ReturnValue() bool {
 	var _arg0 *C.WebKitDOMEvent // out
 	var _cret C.gboolean        // in
@@ -299,7 +292,6 @@ func (self *DOMEvent) ReturnValue() bool {
 // The function returns the following values:
 //
 //   - domEventTarget: KitDOMEventTarget.
-//
 func (self *DOMEvent) SrcElement() *DOMEventTarget {
 	var _arg0 *C.WebKitDOMEvent       // out
 	var _cret *C.WebKitDOMEventTarget // in
@@ -321,7 +313,6 @@ func (self *DOMEvent) SrcElement() *DOMEventTarget {
 // The function returns the following values:
 //
 //   - domEventTarget: KitDOMEventTarget.
-//
 func (self *DOMEvent) Target() *DOMEventTarget {
 	var _arg0 *C.WebKitDOMEvent       // out
 	var _cret *C.WebKitDOMEventTarget // in
@@ -343,7 +334,6 @@ func (self *DOMEvent) Target() *DOMEventTarget {
 // The function returns the following values:
 //
 //   - guint32: #guint32.
-//
 func (self *DOMEvent) TimeStamp() uint32 {
 	var _arg0 *C.WebKitDOMEvent // out
 	var _cret C.guint32         // in
@@ -367,7 +357,6 @@ func (self *DOMEvent) TimeStamp() uint32 {
 //   - eventTypeArg: #gchar.
 //   - canBubbleArg: #gboolean.
 //   - cancelableArg: #gboolean.
-//
 func (self *DOMEvent) InitEvent(eventTypeArg string, canBubbleArg, cancelableArg bool) {
 	var _arg0 *C.WebKitDOMEvent // out
 	var _arg1 *C.gchar          // out
@@ -406,7 +395,6 @@ func (self *DOMEvent) PreventDefault() {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMEvent) SetCancelBubble(value bool) {
 	var _arg0 *C.WebKitDOMEvent // out
 	var _arg1 C.gboolean        // out
@@ -426,7 +414,6 @@ func (self *DOMEvent) SetCancelBubble(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMEvent) SetReturnValue(value bool) {
 	var _arg0 *C.WebKitDOMEvent // out
 	var _arg1 C.gboolean        // out

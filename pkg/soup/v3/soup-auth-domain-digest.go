@@ -29,7 +29,7 @@ func init() {
 	})
 }
 
-// AuthDomainDigestAuthCallback: callback used by AuthDomainDigest for
+// AuthDomainDigestAuthCallback: callback used by authdomaindigest for
 // authentication purposes.
 //
 // The application should look up username in its password database, and return
@@ -46,7 +46,7 @@ func defaultAuthDomainDigestOverrides(v *AuthDomainDigest) AuthDomainDigestOverr
 
 // AuthDomainDigest: server-side "Digest" authentication.
 //
-// AuthDomainDigest handles the server side of HTTP "Digest" authentication.
+// authdomaindigest handles the server side of HTTP "Digest" authentication.
 type AuthDomainDigest struct {
 	_ [0]func() // equal guard
 	AuthDomain
@@ -98,7 +98,6 @@ func marshalAuthDomainDigest(p uintptr) (interface{}, error) {
 // The function takes the following parameters:
 //
 //   - callback: callback.
-//
 func (domain *AuthDomainDigest) SetAuthCallback(callback AuthDomainDigestAuthCallback) {
 	var _arg0 *C.SoupAuthDomain                  // out
 	var _arg1 C.SoupAuthDomainDigestAuthCallback // out
@@ -120,7 +119,7 @@ func (domain *AuthDomainDigest) SetAuthCallback(callback AuthDomainDigestAuthCal
 //
 // That is, it returns a stringified MD5 hash of username, realm, and password
 // concatenated together. This is the form that is needed as the return value of
-// AuthDomainDigest's auth handler.
+// authdomaindigest's auth handler.
 //
 // For security reasons, you should store the encoded hash, rather than storing
 // the cleartext password itself and calling this method only when you need to
@@ -138,7 +137,6 @@ func (domain *AuthDomainDigest) SetAuthCallback(callback AuthDomainDigestAuthCal
 // The function returns the following values:
 //
 //   - utf8: encoded password.
-//
 func AuthDomainDigestEncodePassword(username, realm, password string) string {
 	var _arg1 *C.char // out
 	var _arg2 *C.char // out

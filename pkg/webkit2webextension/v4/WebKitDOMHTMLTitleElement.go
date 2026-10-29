@@ -86,7 +86,6 @@ func marshalDOMHTMLTitleElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTitleElement) Text() string {
 	var _arg0 *C.WebKitDOMHTMLTitleElement // out
 	var _cret *C.gchar                     // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLTitleElement) Text() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTitleElement) SetText(value string) {
 	var _arg0 *C.WebKitDOMHTMLTitleElement // out
 	var _arg1 *C.gchar                     // out

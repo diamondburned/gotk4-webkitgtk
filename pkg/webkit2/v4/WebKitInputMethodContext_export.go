@@ -18,7 +18,7 @@ func _gotk4_webkit24_InputMethodContext_ConnectCommitted(arg0 C.gpointer, arg1 *
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -38,7 +38,7 @@ func _gotk4_webkit24_InputMethodContext_ConnectDeleteSurrounding(arg0 C.gpointer
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -60,7 +60,7 @@ func _gotk4_webkit24_InputMethodContext_ConnectPreeditChanged(arg0 C.gpointer, a
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -76,7 +76,7 @@ func _gotk4_webkit24_InputMethodContext_ConnectPreeditFinished(arg0 C.gpointer, 
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -92,7 +92,7 @@ func _gotk4_webkit24_InputMethodContext_ConnectPreeditStarted(arg0 C.gpointer, a
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

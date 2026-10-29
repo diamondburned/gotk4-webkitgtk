@@ -86,7 +86,6 @@ func marshalDOMHTMLLinkElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLLinkElement) Charset() string {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _cret *C.gchar                    // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLLinkElement) Charset() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLLinkElement) Disabled() bool {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _cret C.gboolean                  // in
@@ -133,7 +131,6 @@ func (self *DOMHTMLLinkElement) Disabled() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLLinkElement) Href() string {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _cret *C.gchar                    // in
@@ -156,7 +153,6 @@ func (self *DOMHTMLLinkElement) Href() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLLinkElement) Hreflang() string {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _cret *C.gchar                    // in
@@ -179,7 +175,6 @@ func (self *DOMHTMLLinkElement) Hreflang() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLLinkElement) Media() string {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _cret *C.gchar                    // in
@@ -202,7 +197,6 @@ func (self *DOMHTMLLinkElement) Media() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLLinkElement) Rel() string {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _cret *C.gchar                    // in
@@ -225,7 +219,6 @@ func (self *DOMHTMLLinkElement) Rel() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLLinkElement) Rev() string {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _cret *C.gchar                    // in
@@ -248,7 +241,6 @@ func (self *DOMHTMLLinkElement) Rev() string {
 // The function returns the following values:
 //
 //   - domStyleSheet: KitDOMStyleSheet.
-//
 func (self *DOMHTMLLinkElement) Sheet() *DOMStyleSheet {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _cret *C.WebKitDOMStyleSheet      // in
@@ -270,7 +262,6 @@ func (self *DOMHTMLLinkElement) Sheet() *DOMStyleSheet {
 // The function returns the following values:
 //
 //   - domdomTokenList: KitDOMDOMTokenList.
-//
 func (self *DOMHTMLLinkElement) Sizes() *DOMDOMTokenList {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _cret *C.WebKitDOMDOMTokenList    // in
@@ -292,7 +283,6 @@ func (self *DOMHTMLLinkElement) Sizes() *DOMDOMTokenList {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLLinkElement) Target() string {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _cret *C.gchar                    // in
@@ -315,7 +305,6 @@ func (self *DOMHTMLLinkElement) Target() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLLinkElement) TypeAttr() string {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _cret *C.gchar                    // in
@@ -338,7 +327,6 @@ func (self *DOMHTMLLinkElement) TypeAttr() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLLinkElement) SetCharset(value string) {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _arg1 *C.gchar                    // out
@@ -357,7 +345,6 @@ func (self *DOMHTMLLinkElement) SetCharset(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLLinkElement) SetDisabled(value bool) {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _arg1 C.gboolean                  // out
@@ -377,7 +364,6 @@ func (self *DOMHTMLLinkElement) SetDisabled(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLLinkElement) SetHref(value string) {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _arg1 *C.gchar                    // out
@@ -396,7 +382,6 @@ func (self *DOMHTMLLinkElement) SetHref(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLLinkElement) SetHreflang(value string) {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _arg1 *C.gchar                    // out
@@ -415,7 +400,6 @@ func (self *DOMHTMLLinkElement) SetHreflang(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLLinkElement) SetMedia(value string) {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _arg1 *C.gchar                    // out
@@ -434,7 +418,6 @@ func (self *DOMHTMLLinkElement) SetMedia(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLLinkElement) SetRel(value string) {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _arg1 *C.gchar                    // out
@@ -453,7 +436,6 @@ func (self *DOMHTMLLinkElement) SetRel(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLLinkElement) SetRev(value string) {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _arg1 *C.gchar                    // out
@@ -472,7 +454,6 @@ func (self *DOMHTMLLinkElement) SetRev(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLLinkElement) SetSizes(value string) {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _arg1 *C.gchar                    // out
@@ -491,7 +472,6 @@ func (self *DOMHTMLLinkElement) SetSizes(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLLinkElement) SetTarget(value string) {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _arg1 *C.gchar                    // out
@@ -510,7 +490,6 @@ func (self *DOMHTMLLinkElement) SetTarget(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLLinkElement) SetTypeAttr(value string) {
 	var _arg0 *C.WebKitDOMHTMLLinkElement // out
 	var _arg1 *C.gchar                    // out

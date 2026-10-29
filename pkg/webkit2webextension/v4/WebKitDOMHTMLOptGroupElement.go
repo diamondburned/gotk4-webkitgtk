@@ -86,7 +86,6 @@ func marshalDOMHTMLOptGroupElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLOptGroupElement) Disabled() bool {
 	var _arg0 *C.WebKitDOMHTMLOptGroupElement // out
 	var _cret C.gboolean                      // in
@@ -110,7 +109,6 @@ func (self *DOMHTMLOptGroupElement) Disabled() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLOptGroupElement) Label() string {
 	var _arg0 *C.WebKitDOMHTMLOptGroupElement // out
 	var _cret *C.gchar                        // in
@@ -133,7 +131,6 @@ func (self *DOMHTMLOptGroupElement) Label() string {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLOptGroupElement) SetDisabled(value bool) {
 	var _arg0 *C.WebKitDOMHTMLOptGroupElement // out
 	var _arg1 C.gboolean                      // out
@@ -153,7 +150,6 @@ func (self *DOMHTMLOptGroupElement) SetDisabled(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLOptGroupElement) SetLabel(value string) {
 	var _arg0 *C.WebKitDOMHTMLOptGroupElement // out
 	var _arg1 *C.gchar                        // out

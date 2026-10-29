@@ -87,7 +87,6 @@ func marshalDOMHTMLInputElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLInputElement) Accept() string {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret *C.gchar                     // in
@@ -110,7 +109,6 @@ func (self *DOMHTMLInputElement) Accept() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLInputElement) Align() string {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret *C.gchar                     // in
@@ -133,7 +131,6 @@ func (self *DOMHTMLInputElement) Align() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLInputElement) Alt() string {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret *C.gchar                     // in
@@ -157,7 +154,6 @@ func (self *DOMHTMLInputElement) Alt() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLInputElement) AutoFilled() bool {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret C.gboolean                   // in
@@ -181,7 +177,6 @@ func (self *DOMHTMLInputElement) AutoFilled() bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLInputElement) Autofocus() bool {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret C.gboolean                   // in
@@ -206,7 +201,6 @@ func (self *DOMHTMLInputElement) Autofocus() bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLInputElement) Capture() bool {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret C.gboolean                   // in
@@ -230,7 +224,6 @@ func (self *DOMHTMLInputElement) Capture() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLInputElement) CaptureType() string {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret *C.gchar                     // in
@@ -253,7 +246,6 @@ func (self *DOMHTMLInputElement) CaptureType() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLInputElement) Checked() bool {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret C.gboolean                   // in
@@ -277,7 +269,6 @@ func (self *DOMHTMLInputElement) Checked() bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLInputElement) DefaultChecked() bool {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret C.gboolean                   // in
@@ -301,7 +292,6 @@ func (self *DOMHTMLInputElement) DefaultChecked() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLInputElement) DefaultValue() string {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret *C.gchar                     // in
@@ -324,7 +314,6 @@ func (self *DOMHTMLInputElement) DefaultValue() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLInputElement) Disabled() bool {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret C.gboolean                   // in
@@ -348,7 +337,6 @@ func (self *DOMHTMLInputElement) Disabled() bool {
 // The function returns the following values:
 //
 //   - domFileList: KitDOMFileList.
-//
 func (self *DOMHTMLInputElement) Files() *DOMFileList {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret *C.WebKitDOMFileList         // in
@@ -370,7 +358,6 @@ func (self *DOMHTMLInputElement) Files() *DOMFileList {
 // The function returns the following values:
 //
 //   - domhtmlFormElement: KitDOMHTMLFormElement.
-//
 func (self *DOMHTMLInputElement) Form() *DOMHTMLFormElement {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret *C.WebKitDOMHTMLFormElement  // in
@@ -392,7 +379,6 @@ func (self *DOMHTMLInputElement) Form() *DOMHTMLFormElement {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMHTMLInputElement) Height() uint32 {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret C.gulong                     // in
@@ -414,7 +400,6 @@ func (self *DOMHTMLInputElement) Height() uint32 {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLInputElement) Indeterminate() bool {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret C.gboolean                   // in
@@ -438,7 +423,6 @@ func (self *DOMHTMLInputElement) Indeterminate() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLInputElement) InputType() string {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret *C.gchar                     // in
@@ -461,7 +445,6 @@ func (self *DOMHTMLInputElement) InputType() string {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLInputElement) MaxLength() int32 {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret C.glong                      // in
@@ -483,7 +466,6 @@ func (self *DOMHTMLInputElement) MaxLength() int32 {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLInputElement) Multiple() bool {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret C.gboolean                   // in
@@ -507,7 +489,6 @@ func (self *DOMHTMLInputElement) Multiple() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLInputElement) Name() string {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret *C.gchar                     // in
@@ -530,7 +511,6 @@ func (self *DOMHTMLInputElement) Name() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLInputElement) ReadOnly() bool {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret C.gboolean                   // in
@@ -554,7 +534,6 @@ func (self *DOMHTMLInputElement) ReadOnly() bool {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMHTMLInputElement) Size() uint32 {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret C.gulong                     // in
@@ -576,7 +555,6 @@ func (self *DOMHTMLInputElement) Size() uint32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLInputElement) Src() string {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret *C.gchar                     // in
@@ -599,7 +577,6 @@ func (self *DOMHTMLInputElement) Src() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLInputElement) UseMap() string {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret *C.gchar                     // in
@@ -622,7 +599,6 @@ func (self *DOMHTMLInputElement) UseMap() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLInputElement) Value() string {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret *C.gchar                     // in
@@ -645,7 +621,6 @@ func (self *DOMHTMLInputElement) Value() string {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMHTMLInputElement) Width() uint32 {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret C.gulong                     // in
@@ -667,7 +642,6 @@ func (self *DOMHTMLInputElement) Width() uint32 {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLInputElement) WillValidate() bool {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret C.gboolean                   // in
@@ -692,7 +666,6 @@ func (self *DOMHTMLInputElement) WillValidate() bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (input *DOMHTMLInputElement) IsEdited() bool {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _cret C.gboolean                   // in
@@ -726,7 +699,6 @@ func (self *DOMHTMLInputElement) Select() {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLInputElement) SetAccept(value string) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 *C.gchar                     // out
@@ -745,7 +717,6 @@ func (self *DOMHTMLInputElement) SetAccept(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLInputElement) SetAlign(value string) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 *C.gchar                     // out
@@ -764,7 +735,6 @@ func (self *DOMHTMLInputElement) SetAlign(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLInputElement) SetAlt(value string) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 *C.gchar                     // out
@@ -784,7 +754,6 @@ func (self *DOMHTMLInputElement) SetAlt(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLInputElement) SetAutoFilled(value bool) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 C.gboolean                   // out
@@ -804,7 +773,6 @@ func (self *DOMHTMLInputElement) SetAutoFilled(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLInputElement) SetAutofocus(value bool) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 C.gboolean                   // out
@@ -824,7 +792,6 @@ func (self *DOMHTMLInputElement) SetAutofocus(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLInputElement) SetCaptureType(value string) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 *C.gchar                     // out
@@ -843,7 +810,6 @@ func (self *DOMHTMLInputElement) SetCaptureType(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLInputElement) SetChecked(value bool) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 C.gboolean                   // out
@@ -863,7 +829,6 @@ func (self *DOMHTMLInputElement) SetChecked(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLInputElement) SetDefaultChecked(value bool) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 C.gboolean                   // out
@@ -883,7 +848,6 @@ func (self *DOMHTMLInputElement) SetDefaultChecked(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLInputElement) SetDefaultValue(value string) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 *C.gchar                     // out
@@ -902,7 +866,6 @@ func (self *DOMHTMLInputElement) SetDefaultValue(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLInputElement) SetDisabled(value bool) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 C.gboolean                   // out
@@ -923,7 +886,6 @@ func (self *DOMHTMLInputElement) SetDisabled(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLInputElement) SetEditingValue(value string) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 *C.gchar                     // out
@@ -942,7 +904,6 @@ func (self *DOMHTMLInputElement) SetEditingValue(value string) {
 // The function takes the following parameters:
 //
 //   - value: KitDOMFileList.
-//
 func (self *DOMHTMLInputElement) SetFiles(value *DOMFileList) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 *C.WebKitDOMFileList         // out
@@ -960,7 +921,6 @@ func (self *DOMHTMLInputElement) SetFiles(value *DOMFileList) {
 // The function takes the following parameters:
 //
 //   - value: #gulong.
-//
 func (self *DOMHTMLInputElement) SetHeight(value uint32) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 C.gulong                     // out
@@ -978,7 +938,6 @@ func (self *DOMHTMLInputElement) SetHeight(value uint32) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLInputElement) SetIndeterminate(value bool) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 C.gboolean                   // out
@@ -998,7 +957,6 @@ func (self *DOMHTMLInputElement) SetIndeterminate(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLInputElement) SetInputType(value string) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 *C.gchar                     // out
@@ -1017,7 +975,6 @@ func (self *DOMHTMLInputElement) SetInputType(value string) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLInputElement) SetMaxLength(value int32) error {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 C.glong                      // out
@@ -1044,7 +1001,6 @@ func (self *DOMHTMLInputElement) SetMaxLength(value int32) error {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLInputElement) SetMultiple(value bool) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 C.gboolean                   // out
@@ -1064,7 +1020,6 @@ func (self *DOMHTMLInputElement) SetMultiple(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLInputElement) SetName(value string) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 *C.gchar                     // out
@@ -1083,7 +1038,6 @@ func (self *DOMHTMLInputElement) SetName(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLInputElement) SetReadOnly(value bool) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 C.gboolean                   // out
@@ -1103,7 +1057,6 @@ func (self *DOMHTMLInputElement) SetReadOnly(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gulong.
-//
 func (self *DOMHTMLInputElement) SetSize(value uint32) error {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 C.gulong                     // out
@@ -1130,7 +1083,6 @@ func (self *DOMHTMLInputElement) SetSize(value uint32) error {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLInputElement) SetSrc(value string) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 *C.gchar                     // out
@@ -1149,7 +1101,6 @@ func (self *DOMHTMLInputElement) SetSrc(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLInputElement) SetUseMap(value string) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 *C.gchar                     // out
@@ -1168,7 +1119,6 @@ func (self *DOMHTMLInputElement) SetUseMap(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLInputElement) SetValue(value string) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 *C.gchar                     // out
@@ -1187,7 +1137,6 @@ func (self *DOMHTMLInputElement) SetValue(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gulong.
-//
 func (self *DOMHTMLInputElement) SetWidth(value uint32) {
 	var _arg0 *C.WebKitDOMHTMLInputElement // out
 	var _arg1 C.gulong                     // out

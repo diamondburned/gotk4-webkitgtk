@@ -35,7 +35,6 @@ const FORM_MIME_TYPE_URLENCODED = "application/x-www-form-urlencoded"
 //
 //   - hashTable: hash table containing the name/value pairs from encoded_form,
 //     which you can free with glib.HashTable().Destroy.
-//
 func FormDecode(encodedForm string) map[string]string {
 	var _arg1 *C.char       // out
 	var _cret *C.GHashTable // in
@@ -95,7 +94,6 @@ func FormDecode(encodedForm string) map[string]string {
 //   - hashTable (optional): a hash table containing the name/value pairs
 //     (other than file_control_name) from msg, which you can free with
 //     glib.HashTable().Destroy. On error, it will return NULL.
-//
 func FormDecodeMultipart(multipart *Multipart, fileControlName string) (filename, contentType string, file *glib.Bytes, hashTable map[string]string) {
 	var _arg1 *C.SoupMultipart // out
 	var _arg2 *C.char          // out
@@ -105,6 +103,7 @@ func FormDecodeMultipart(multipart *Multipart, fileControlName string) (filename
 	var _cret *C.GHashTable    // in
 
 	_arg1 = (*C.SoupMultipart)(gextras.StructNative(unsafe.Pointer(multipart)))
+	runtime.SetFinalizer(gextras.StructIntern(unsafe.Pointer(multipart)), nil)
 	if fileControlName != "" {
 		_arg2 = (*C.char)(unsafe.Pointer(C.CString(fileControlName)))
 		defer C.free(unsafe.Pointer(_arg2))
@@ -171,7 +170,6 @@ func FormDecodeMultipart(multipart *Multipart, fileControlName string) (filename
 // The function returns the following values:
 //
 //   - utf8: encoded form.
-//
 func FormEncodeHash(formDataSet map[string]string) string {
 	var _arg1 *C.GHashTable // out
 	var _cret *C.char       // in
@@ -181,9 +179,7 @@ func FormEncodeHash(formDataSet map[string]string) string {
 		var kdst *C.gchar // out
 		var vdst *C.gchar // out
 		kdst = (*C.gchar)(unsafe.Pointer(C.CString(ksrc)))
-		defer C.free(unsafe.Pointer(kdst))
 		vdst = (*C.gchar)(unsafe.Pointer(C.CString(vsrc)))
-		defer C.free(unsafe.Pointer(vdst))
 		C.g_hash_table_insert(_arg1, C.gpointer(unsafe.Pointer(kdst)), C.gpointer(unsafe.Pointer(vdst)))
 	}
 	defer C.g_hash_table_unref(_arg1)

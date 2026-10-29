@@ -6,15 +6,15 @@ package webkit2webextension
 // #include <webkit2/webkit-web-extension.h>
 import "C"
 
-// DOM_NODE_FILTER_ACCEPT: accept the node. Use this macro as return value
-// of webkit_dom_node_filter_accept_node() implementation to accept the given
+// DOM_NODE_FILTER_ACCEPT: accept the node. Use this macro as the return value
+// of a webkit_dom_node_filter_accept_node() implementation to accept the given
 // KitDOMNode
 //
 // Deprecated: Use JavaScriptCore API instead.
 const DOM_NODE_FILTER_ACCEPT = 1
 
-// DOM_NODE_FILTER_REJECT: reject the node. Use this macro as return value
-// of webkit_dom_node_filter_accept_node() implementation to reject the given
+// DOM_NODE_FILTER_REJECT: reject the node. Use this macro as the return value
+// of a webkit_dom_node_filter_accept_node() implementation to reject the given
 // KitDOMNode. The children of the given node will be rejected too.
 //
 // Deprecated: Use JavaScriptCore API instead.
@@ -86,8 +86,8 @@ const DOM_NODE_FILTER_SHOW_PROCESSING_INSTRUCTION = 64
 // Deprecated: Use JavaScriptCore API instead.
 const DOM_NODE_FILTER_SHOW_TEXT = 4
 
-// DOM_NODE_FILTER_SKIP: skip the node. Use this macro as return value of
-// webkit_dom_node_filter_accept_node() implementation to skip the given
+// DOM_NODE_FILTER_SKIP: skip the node. Use this macro as the return value
+// of a webkit_dom_node_filter_accept_node() implementation to skip the given
 // KitDOMNode. The children of the given node will not be skipped.
 //
 // Deprecated: Use JavaScriptCore API instead.

@@ -86,7 +86,6 @@ func marshalDOMHTMLBodyElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLBodyElement) ALink() string {
 	var _arg0 *C.WebKitDOMHTMLBodyElement // out
 	var _cret *C.gchar                    // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLBodyElement) ALink() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLBodyElement) Background() string {
 	var _arg0 *C.WebKitDOMHTMLBodyElement // out
 	var _cret *C.gchar                    // in
@@ -132,7 +130,6 @@ func (self *DOMHTMLBodyElement) Background() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLBodyElement) BgColor() string {
 	var _arg0 *C.WebKitDOMHTMLBodyElement // out
 	var _cret *C.gchar                    // in
@@ -155,7 +152,6 @@ func (self *DOMHTMLBodyElement) BgColor() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLBodyElement) Link() string {
 	var _arg0 *C.WebKitDOMHTMLBodyElement // out
 	var _cret *C.gchar                    // in
@@ -178,7 +174,6 @@ func (self *DOMHTMLBodyElement) Link() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLBodyElement) Text() string {
 	var _arg0 *C.WebKitDOMHTMLBodyElement // out
 	var _cret *C.gchar                    // in
@@ -201,7 +196,6 @@ func (self *DOMHTMLBodyElement) Text() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLBodyElement) VLink() string {
 	var _arg0 *C.WebKitDOMHTMLBodyElement // out
 	var _cret *C.gchar                    // in
@@ -224,7 +218,6 @@ func (self *DOMHTMLBodyElement) VLink() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLBodyElement) SetALink(value string) {
 	var _arg0 *C.WebKitDOMHTMLBodyElement // out
 	var _arg1 *C.gchar                    // out
@@ -243,7 +236,6 @@ func (self *DOMHTMLBodyElement) SetALink(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLBodyElement) SetBackground(value string) {
 	var _arg0 *C.WebKitDOMHTMLBodyElement // out
 	var _arg1 *C.gchar                    // out
@@ -262,7 +254,6 @@ func (self *DOMHTMLBodyElement) SetBackground(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLBodyElement) SetBgColor(value string) {
 	var _arg0 *C.WebKitDOMHTMLBodyElement // out
 	var _arg1 *C.gchar                    // out
@@ -281,7 +272,6 @@ func (self *DOMHTMLBodyElement) SetBgColor(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLBodyElement) SetLink(value string) {
 	var _arg0 *C.WebKitDOMHTMLBodyElement // out
 	var _arg1 *C.gchar                    // out
@@ -300,7 +290,6 @@ func (self *DOMHTMLBodyElement) SetLink(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLBodyElement) SetText(value string) {
 	var _arg0 *C.WebKitDOMHTMLBodyElement // out
 	var _arg1 *C.gchar                    // out
@@ -319,7 +308,6 @@ func (self *DOMHTMLBodyElement) SetText(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLBodyElement) SetVLink(value string) {
 	var _arg0 *C.WebKitDOMHTMLBodyElement // out
 	var _arg1 *C.gchar                    // out

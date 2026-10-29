@@ -86,7 +86,6 @@ func marshalDOMHTMLTextAreaElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTextAreaElement) AreaType() string {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _cret *C.gchar                        // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLTextAreaElement) AreaType() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLTextAreaElement) Autofocus() bool {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _cret C.gboolean                      // in
@@ -133,7 +131,6 @@ func (self *DOMHTMLTextAreaElement) Autofocus() bool {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLTextAreaElement) Cols() int32 {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _cret C.glong                         // in
@@ -155,7 +152,6 @@ func (self *DOMHTMLTextAreaElement) Cols() int32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTextAreaElement) DefaultValue() string {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _cret *C.gchar                        // in
@@ -178,7 +174,6 @@ func (self *DOMHTMLTextAreaElement) DefaultValue() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLTextAreaElement) Disabled() bool {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _cret C.gboolean                      // in
@@ -202,7 +197,6 @@ func (self *DOMHTMLTextAreaElement) Disabled() bool {
 // The function returns the following values:
 //
 //   - domhtmlFormElement: KitDOMHTMLFormElement.
-//
 func (self *DOMHTMLTextAreaElement) Form() *DOMHTMLFormElement {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _cret *C.WebKitDOMHTMLFormElement     // in
@@ -224,7 +218,6 @@ func (self *DOMHTMLTextAreaElement) Form() *DOMHTMLFormElement {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTextAreaElement) Name() string {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _cret *C.gchar                        // in
@@ -247,7 +240,6 @@ func (self *DOMHTMLTextAreaElement) Name() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLTextAreaElement) ReadOnly() bool {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _cret C.gboolean                      // in
@@ -271,7 +263,6 @@ func (self *DOMHTMLTextAreaElement) ReadOnly() bool {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLTextAreaElement) Rows() int32 {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _cret C.glong                         // in
@@ -293,7 +284,6 @@ func (self *DOMHTMLTextAreaElement) Rows() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLTextAreaElement) SelectionEnd() int32 {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _cret C.glong                         // in
@@ -315,7 +305,6 @@ func (self *DOMHTMLTextAreaElement) SelectionEnd() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLTextAreaElement) SelectionStart() int32 {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _cret C.glong                         // in
@@ -337,7 +326,6 @@ func (self *DOMHTMLTextAreaElement) SelectionStart() int32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTextAreaElement) Value() string {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _cret *C.gchar                        // in
@@ -360,7 +348,6 @@ func (self *DOMHTMLTextAreaElement) Value() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLTextAreaElement) WillValidate() bool {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _cret C.gboolean                      // in
@@ -384,7 +371,6 @@ func (self *DOMHTMLTextAreaElement) WillValidate() bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (input *DOMHTMLTextAreaElement) IsEdited() bool {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _cret C.gboolean                      // in
@@ -418,7 +404,6 @@ func (self *DOMHTMLTextAreaElement) Select() {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLTextAreaElement) SetAutofocus(value bool) {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _arg1 C.gboolean                      // out
@@ -438,7 +423,6 @@ func (self *DOMHTMLTextAreaElement) SetAutofocus(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLTextAreaElement) SetCols(value int32) {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _arg1 C.glong                         // out
@@ -456,7 +440,6 @@ func (self *DOMHTMLTextAreaElement) SetCols(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTextAreaElement) SetDefaultValue(value string) {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _arg1 *C.gchar                        // out
@@ -475,7 +458,6 @@ func (self *DOMHTMLTextAreaElement) SetDefaultValue(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLTextAreaElement) SetDisabled(value bool) {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _arg1 C.gboolean                      // out
@@ -495,7 +477,6 @@ func (self *DOMHTMLTextAreaElement) SetDisabled(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTextAreaElement) SetName(value string) {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _arg1 *C.gchar                        // out
@@ -514,7 +495,6 @@ func (self *DOMHTMLTextAreaElement) SetName(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLTextAreaElement) SetReadOnly(value bool) {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _arg1 C.gboolean                      // out
@@ -534,7 +514,6 @@ func (self *DOMHTMLTextAreaElement) SetReadOnly(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLTextAreaElement) SetRows(value int32) {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _arg1 C.glong                         // out
@@ -552,7 +531,6 @@ func (self *DOMHTMLTextAreaElement) SetRows(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLTextAreaElement) SetSelectionEnd(value int32) {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _arg1 C.glong                         // out
@@ -572,7 +550,6 @@ func (self *DOMHTMLTextAreaElement) SetSelectionEnd(value int32) {
 //   - start: #glong.
 //   - end: #glong.
 //   - direction: #gchar.
-//
 func (self *DOMHTMLTextAreaElement) SetSelectionRange(start, end int32, direction string) {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _arg1 C.glong                         // out
@@ -597,7 +574,6 @@ func (self *DOMHTMLTextAreaElement) SetSelectionRange(start, end int32, directio
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLTextAreaElement) SetSelectionStart(value int32) {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _arg1 C.glong                         // out
@@ -615,7 +591,6 @@ func (self *DOMHTMLTextAreaElement) SetSelectionStart(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTextAreaElement) SetValue(value string) {
 	var _arg0 *C.WebKitDOMHTMLTextAreaElement // out
 	var _arg1 *C.gchar                        // out

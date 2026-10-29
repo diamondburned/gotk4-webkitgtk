@@ -18,7 +18,7 @@ func _gotk4_webkit2webextension4_ScriptWorld_ConnectWindowObjectCleared(arg0 C.g
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

@@ -50,7 +50,6 @@ func marshalMIMEInfo(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8 (optional): description, as a string.
-//
 func (info *MIMEInfo) Description() string {
 	var _arg0 *C.WebKitMimeInfo // out
 	var _cret *C.gchar          // in
@@ -69,14 +68,13 @@ func (info *MIMEInfo) Description() string {
 	return _utf8
 }
 
-// Extensions: get the list of file extensions associated to the MIME type.
+// Extensions: get the list of file extensions associated with the MIME type.
 //
 // Deprecated: since version 2.32.
 //
 // The function returns the following values:
 //
 //   - utf8s: a NULL-terminated array of strings.
-//
 func (info *MIMEInfo) Extensions() []string {
 	var _arg0 *C.WebKitMimeInfo // out
 	var _cret **C.gchar         // in
@@ -112,7 +110,6 @@ func (info *MIMEInfo) Extensions() []string {
 // The function returns the following values:
 //
 //   - utf8: MIME type, as a string.
-//
 func (info *MIMEInfo) MIMEType() string {
 	var _arg0 *C.WebKitMimeInfo // out
 	var _cret *C.gchar          // in

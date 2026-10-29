@@ -19,7 +19,7 @@ func _gotk4_soup3_HSTSEnforcer_ConnectChanged(arg0 C.gpointer, arg1 *C.SoupHSTSP
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

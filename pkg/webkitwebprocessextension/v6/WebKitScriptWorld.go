@@ -80,17 +80,16 @@ func (world *ScriptWorld) ConnectWindowObjectCleared(f func(page *WebPage, frame
 }
 
 // NewScriptWorld creates a new isolated KitScriptWorld. Scripts executed
-// in isolated worlds have access to the DOM but not to other variable
+// in isolated worlds have access to the DOM but not to other variables
 // or functions created by the page. The KitScriptWorld is created with
 // a generated unique name. Use webkit_script_world_new_with_name() if
 // you want to create it with a custom name. You can get the JavaScript
 // execution context of a KitScriptWorld for a given KitFrame with
-// webkit_frame_get_javascript_context_for_script_world().
+// webkit_frame_get_js_context_for_script_world().
 //
 // The function returns the following values:
 //
 //   - scriptWorld: new isolated KitScriptWorld.
-//
 func NewScriptWorld() *ScriptWorld {
 	var _cret *C.WebKitScriptWorld // in
 
@@ -105,9 +104,9 @@ func NewScriptWorld() *ScriptWorld {
 
 // NewScriptWorldWithName creates a new isolated KitScriptWorld with a name.
 // Scripts executed in isolated worlds have access to the DOM but not
-// to other variable or functions created by the page. You can get the
+// to other variables or functions created by the page. You can get the
 // JavaScript execution context of a KitScriptWorld for a given KitFrame with
-// webkit_frame_get_javascript_context_for_script_world().
+// webkit_frame_get_js_context_for_script_world().
 //
 // The function takes the following parameters:
 //
@@ -116,7 +115,6 @@ func NewScriptWorld() *ScriptWorld {
 // The function returns the following values:
 //
 //   - scriptWorld: new isolated KitScriptWorld.
-//
 func NewScriptWorldWithName(name string) *ScriptWorld {
 	var _arg1 *C.char              // out
 	var _cret *C.WebKitScriptWorld // in
@@ -139,7 +137,6 @@ func NewScriptWorldWithName(name string) *ScriptWorld {
 // The function returns the following values:
 //
 //   - utf8: name of world.
-//
 func (world *ScriptWorld) Name() string {
 	var _arg0 *C.WebKitScriptWorld // out
 	var _cret *C.char              // in

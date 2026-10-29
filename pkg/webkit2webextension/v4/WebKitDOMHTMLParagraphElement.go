@@ -86,7 +86,6 @@ func marshalDOMHTMLParagraphElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLParagraphElement) Align() string {
 	var _arg0 *C.WebKitDOMHTMLParagraphElement // out
 	var _cret *C.gchar                         // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLParagraphElement) Align() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLParagraphElement) SetAlign(value string) {
 	var _arg0 *C.WebKitDOMHTMLParagraphElement // out
 	var _arg1 *C.gchar                         // out

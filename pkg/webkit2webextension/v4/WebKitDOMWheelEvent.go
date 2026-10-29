@@ -82,7 +82,6 @@ func marshalDOMWheelEvent(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMWheelEvent) WheelDelta() int32 {
 	var _arg0 *C.WebKitDOMWheelEvent // out
 	var _cret C.glong                // in
@@ -104,7 +103,6 @@ func (self *DOMWheelEvent) WheelDelta() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMWheelEvent) WheelDeltaX() int32 {
 	var _arg0 *C.WebKitDOMWheelEvent // out
 	var _cret C.glong                // in
@@ -126,7 +124,6 @@ func (self *DOMWheelEvent) WheelDeltaX() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMWheelEvent) WheelDeltaY() int32 {
 	var _arg0 *C.WebKitDOMWheelEvent // out
 	var _cret C.glong                // in
@@ -158,7 +155,6 @@ func (self *DOMWheelEvent) WheelDeltaY() int32 {
 //   - altKey: #gboolean.
 //   - shiftKey: #gboolean.
 //   - metaKey: #gboolean.
-//
 func (self *DOMWheelEvent) InitWheelEvent(wheelDeltaX, wheelDeltaY int32, view *DOMDOMWindow, screenX, screenY, clientX, clientY int32, ctrlKey, altKey, shiftKey, metaKey bool) {
 	var _arg0 *C.WebKitDOMWheelEvent // out
 	var _arg1 C.glong                // out

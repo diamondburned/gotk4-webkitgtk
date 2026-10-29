@@ -36,7 +36,7 @@ func defaultHSTSEnforcerDBOverrides(v *HSTSEnforcerDB) HSTSEnforcerDBOverrides {
 
 // HSTSEnforcerDB: persistent HTTP Strict Transport Security enforcer.
 //
-// HSTSEnforcerDB is a hstsenforcer that uses a SQLite database as a backend for
+// hstsenforcerdb is a hstsenforcer that uses a SQLite database as a backend for
 // persistency.
 type HSTSEnforcerDB struct {
 	_ [0]func() // equal guard
@@ -78,12 +78,12 @@ func marshalHSTSEnforcerDB(p uintptr) (interface{}, error) {
 	return wrapHSTSEnforcerDB(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewHSTSEnforcerDB creates a HSTSEnforcerDB.
+// NewHSTSEnforcerDB creates a hstsenforcerdb.
 //
-// filename will be read in during the initialization of a HSTSEnforcerDB, in
+// filename will be read in during the initialization of a hstsenforcerdb, in
 // order to create an initial set of HSTS policies. If the file doesn't exist,
 // a new database will be created and initialized. Changes to the policies
-// during the lifetime of a HSTSEnforcerDB will be written to filename when
+// during the lifetime of a hstsenforcerdb will be written to filename when
 // hstsenforcer::changed is emitted.
 //
 // The function takes the following parameters:
@@ -93,7 +93,6 @@ func marshalHSTSEnforcerDB(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - hstsEnforcerDB: new HSTSEnforcer.
-//
 func NewHSTSEnforcerDB(filename string) *HSTSEnforcerDB {
 	var _arg1 *C.char             // out
 	var _cret *C.SoupHSTSEnforcer // in

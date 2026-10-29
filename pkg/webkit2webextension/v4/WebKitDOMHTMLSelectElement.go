@@ -88,7 +88,6 @@ func marshalDOMHTMLSelectElement(p uintptr) (interface{}, error) {
 //
 //   - element: KitDOMHTMLElement.
 //   - before: KitDOMHTMLElement.
-//
 func (self *DOMHTMLSelectElement) Add(element, before *DOMHTMLElement) error {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _arg1 *C.WebKitDOMHTMLElement       // out
@@ -118,7 +117,6 @@ func (self *DOMHTMLSelectElement) Add(element, before *DOMHTMLElement) error {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLSelectElement) Autofocus() bool {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _cret C.gboolean                    // in
@@ -142,7 +140,6 @@ func (self *DOMHTMLSelectElement) Autofocus() bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLSelectElement) Disabled() bool {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _cret C.gboolean                    // in
@@ -166,7 +163,6 @@ func (self *DOMHTMLSelectElement) Disabled() bool {
 // The function returns the following values:
 //
 //   - domhtmlFormElement: KitDOMHTMLFormElement.
-//
 func (self *DOMHTMLSelectElement) Form() *DOMHTMLFormElement {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _cret *C.WebKitDOMHTMLFormElement   // in
@@ -188,7 +184,6 @@ func (self *DOMHTMLSelectElement) Form() *DOMHTMLFormElement {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMHTMLSelectElement) Length() uint32 {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _cret C.gulong                      // in
@@ -210,7 +205,6 @@ func (self *DOMHTMLSelectElement) Length() uint32 {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLSelectElement) Multiple() bool {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _cret C.gboolean                    // in
@@ -234,7 +228,6 @@ func (self *DOMHTMLSelectElement) Multiple() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLSelectElement) Name() string {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _cret *C.gchar                      // in
@@ -257,7 +250,6 @@ func (self *DOMHTMLSelectElement) Name() string {
 // The function returns the following values:
 //
 //   - domhtmlOptionsCollection: KitDOMHTMLOptionsCollection.
-//
 func (self *DOMHTMLSelectElement) Options() *DOMHTMLOptionsCollection {
 	var _arg0 *C.WebKitDOMHTMLSelectElement     // out
 	var _cret *C.WebKitDOMHTMLOptionsCollection // in
@@ -279,7 +271,6 @@ func (self *DOMHTMLSelectElement) Options() *DOMHTMLOptionsCollection {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLSelectElement) SelectType() string {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _cret *C.gchar                      // in
@@ -302,7 +293,6 @@ func (self *DOMHTMLSelectElement) SelectType() string {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLSelectElement) SelectedIndex() int32 {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _cret C.glong                       // in
@@ -324,7 +314,6 @@ func (self *DOMHTMLSelectElement) SelectedIndex() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLSelectElement) Size() int32 {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _cret C.glong                       // in
@@ -346,7 +335,6 @@ func (self *DOMHTMLSelectElement) Size() int32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLSelectElement) Value() string {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _cret *C.gchar                      // in
@@ -369,7 +357,6 @@ func (self *DOMHTMLSelectElement) Value() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLSelectElement) WillValidate() bool {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _cret C.gboolean                    // in
@@ -397,7 +384,6 @@ func (self *DOMHTMLSelectElement) WillValidate() bool {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMHTMLSelectElement) Item(index uint32) *DOMNode {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _arg1 C.gulong                      // out
@@ -426,7 +412,6 @@ func (self *DOMHTMLSelectElement) Item(index uint32) *DOMNode {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMHTMLSelectElement) NamedItem(name string) *DOMNode {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _arg1 *C.gchar                      // out
@@ -452,7 +437,6 @@ func (self *DOMHTMLSelectElement) NamedItem(name string) *DOMNode {
 // The function takes the following parameters:
 //
 //   - index: #glong.
-//
 func (self *DOMHTMLSelectElement) Remove(index int32) {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _arg1 C.glong                       // out
@@ -470,7 +454,6 @@ func (self *DOMHTMLSelectElement) Remove(index int32) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLSelectElement) SetAutofocus(value bool) {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _arg1 C.gboolean                    // out
@@ -490,7 +473,6 @@ func (self *DOMHTMLSelectElement) SetAutofocus(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLSelectElement) SetDisabled(value bool) {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _arg1 C.gboolean                    // out
@@ -510,7 +492,6 @@ func (self *DOMHTMLSelectElement) SetDisabled(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gulong.
-//
 func (self *DOMHTMLSelectElement) SetLength(value uint32) error {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _arg1 C.gulong                      // out
@@ -537,7 +518,6 @@ func (self *DOMHTMLSelectElement) SetLength(value uint32) error {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLSelectElement) SetMultiple(value bool) {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _arg1 C.gboolean                    // out
@@ -557,7 +537,6 @@ func (self *DOMHTMLSelectElement) SetMultiple(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLSelectElement) SetName(value string) {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _arg1 *C.gchar                      // out
@@ -576,7 +555,6 @@ func (self *DOMHTMLSelectElement) SetName(value string) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLSelectElement) SetSelectedIndex(value int32) {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _arg1 C.glong                       // out
@@ -594,7 +572,6 @@ func (self *DOMHTMLSelectElement) SetSelectedIndex(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLSelectElement) SetSize(value int32) {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _arg1 C.glong                       // out
@@ -612,7 +589,6 @@ func (self *DOMHTMLSelectElement) SetSize(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLSelectElement) SetValue(value string) {
 	var _arg0 *C.WebKitDOMHTMLSelectElement // out
 	var _arg1 *C.gchar                      // out

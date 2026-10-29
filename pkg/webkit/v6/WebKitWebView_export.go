@@ -23,7 +23,7 @@ func _gotk4_webkit6_WebView_ConnectAuthenticate(arg0 C.gpointer, arg1 *C.WebKitA
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -51,7 +51,7 @@ func _gotk4_webkit6_WebView_ConnectClose(arg0 C.gpointer, arg1 C.guintptr) {
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -67,7 +67,7 @@ func _gotk4_webkit6_WebView_ConnectContextMenuDismissed(arg0 C.gpointer, arg1 C.
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -83,7 +83,7 @@ func _gotk4_webkit6_WebView_ConnectCreate(arg0 C.gpointer, arg1 *C.WebKitNavigat
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -110,7 +110,7 @@ func _gotk4_webkit6_WebView_ConnectDecidePolicy(arg0 C.gpointer, arg1 *C.WebKitP
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -156,7 +156,7 @@ func _gotk4_webkit6_WebView_ConnectEnterFullscreen(arg0 C.gpointer, arg1 C.guint
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -180,7 +180,7 @@ func _gotk4_webkit6_WebView_ConnectInsecureContentDetected(arg0 C.gpointer, arg1
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -200,7 +200,7 @@ func _gotk4_webkit6_WebView_ConnectLeaveFullscreen(arg0 C.gpointer, arg1 C.guint
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -224,7 +224,7 @@ func _gotk4_webkit6_WebView_ConnectLoadChanged(arg0 C.gpointer, arg1 C.WebKitLoa
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -244,7 +244,7 @@ func _gotk4_webkit6_WebView_ConnectLoadFailed(arg0 C.gpointer, arg1 C.WebKitLoad
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -276,7 +276,7 @@ func _gotk4_webkit6_WebView_ConnectLoadFailedWithTLSErrors(arg0 C.gpointer, arg1
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -324,7 +324,7 @@ func _gotk4_webkit6_WebView_ConnectMouseTargetChanged(arg0 C.gpointer, arg1 *C.W
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -346,7 +346,7 @@ func _gotk4_webkit6_WebView_ConnectPermissionRequest(arg0 C.gpointer, arg1 *C.We
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -390,7 +390,7 @@ func _gotk4_webkit6_WebView_ConnectPrint(arg0 C.gpointer, arg1 *C.WebKitPrintOpe
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -418,7 +418,7 @@ func _gotk4_webkit6_WebView_ConnectQueryPermissionState(arg0 C.gpointer, arg1 *C
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -453,7 +453,7 @@ func _gotk4_webkit6_WebView_ConnectReadyToShow(arg0 C.gpointer, arg1 C.guintptr)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -469,7 +469,7 @@ func _gotk4_webkit6_WebView_ConnectResourceLoadStarted(arg0 C.gpointer, arg1 *C.
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -491,7 +491,7 @@ func _gotk4_webkit6_WebView_ConnectRunAsModal(arg0 C.gpointer, arg1 C.guintptr) 
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -507,7 +507,7 @@ func _gotk4_webkit6_WebView_ConnectRunColorChooser(arg0 C.gpointer, arg1 *C.WebK
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -535,7 +535,7 @@ func _gotk4_webkit6_WebView_ConnectRunFileChooser(arg0 C.gpointer, arg1 *C.WebKi
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -563,7 +563,7 @@ func _gotk4_webkit6_WebView_ConnectScriptDialog(arg0 C.gpointer, arg1 *C.WebKitS
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -598,7 +598,7 @@ func _gotk4_webkit6_WebView_ConnectShowNotification(arg0 C.gpointer, arg1 *C.Web
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -626,7 +626,7 @@ func _gotk4_webkit6_WebView_ConnectSubmitForm(arg0 C.gpointer, arg1 *C.WebKitFor
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -646,7 +646,7 @@ func _gotk4_webkit6_WebView_ConnectUserMessageReceived(arg0 C.gpointer, arg1 *C.
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -674,7 +674,7 @@ func _gotk4_webkit6_WebView_ConnectWebProcessTerminated(arg0 C.gpointer, arg1 C.
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

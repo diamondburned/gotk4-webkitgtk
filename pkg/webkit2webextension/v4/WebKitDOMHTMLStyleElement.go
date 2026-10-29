@@ -86,7 +86,6 @@ func marshalDOMHTMLStyleElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLStyleElement) Disabled() bool {
 	var _arg0 *C.WebKitDOMHTMLStyleElement // out
 	var _cret C.gboolean                   // in
@@ -110,7 +109,6 @@ func (self *DOMHTMLStyleElement) Disabled() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLStyleElement) Media() string {
 	var _arg0 *C.WebKitDOMHTMLStyleElement // out
 	var _cret *C.gchar                     // in
@@ -133,7 +131,6 @@ func (self *DOMHTMLStyleElement) Media() string {
 // The function returns the following values:
 //
 //   - domStyleSheet: KitDOMStyleSheet.
-//
 func (self *DOMHTMLStyleElement) Sheet() *DOMStyleSheet {
 	var _arg0 *C.WebKitDOMHTMLStyleElement // out
 	var _cret *C.WebKitDOMStyleSheet       // in
@@ -155,7 +152,6 @@ func (self *DOMHTMLStyleElement) Sheet() *DOMStyleSheet {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLStyleElement) TypeAttr() string {
 	var _arg0 *C.WebKitDOMHTMLStyleElement // out
 	var _cret *C.gchar                     // in
@@ -178,7 +174,6 @@ func (self *DOMHTMLStyleElement) TypeAttr() string {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLStyleElement) SetDisabled(value bool) {
 	var _arg0 *C.WebKitDOMHTMLStyleElement // out
 	var _arg1 C.gboolean                   // out
@@ -198,7 +193,6 @@ func (self *DOMHTMLStyleElement) SetDisabled(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLStyleElement) SetMedia(value string) {
 	var _arg0 *C.WebKitDOMHTMLStyleElement // out
 	var _arg1 *C.gchar                     // out
@@ -217,7 +211,6 @@ func (self *DOMHTMLStyleElement) SetMedia(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLStyleElement) SetTypeAttr(value string) {
 	var _arg0 *C.WebKitDOMHTMLStyleElement // out
 	var _arg1 *C.gchar                     // out

@@ -86,7 +86,6 @@ func marshalDOMHTMLScriptElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLScriptElement) Charset() string {
 	var _arg0 *C.WebKitDOMHTMLScriptElement // out
 	var _cret *C.gchar                      // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLScriptElement) Charset() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLScriptElement) Defer() bool {
 	var _arg0 *C.WebKitDOMHTMLScriptElement // out
 	var _cret C.gboolean                    // in
@@ -133,7 +131,6 @@ func (self *DOMHTMLScriptElement) Defer() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLScriptElement) Event() string {
 	var _arg0 *C.WebKitDOMHTMLScriptElement // out
 	var _cret *C.gchar                      // in
@@ -156,7 +153,6 @@ func (self *DOMHTMLScriptElement) Event() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLScriptElement) HtmlFor() string {
 	var _arg0 *C.WebKitDOMHTMLScriptElement // out
 	var _cret *C.gchar                      // in
@@ -179,7 +175,6 @@ func (self *DOMHTMLScriptElement) HtmlFor() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLScriptElement) Src() string {
 	var _arg0 *C.WebKitDOMHTMLScriptElement // out
 	var _cret *C.gchar                      // in
@@ -202,7 +197,6 @@ func (self *DOMHTMLScriptElement) Src() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLScriptElement) Text() string {
 	var _arg0 *C.WebKitDOMHTMLScriptElement // out
 	var _cret *C.gchar                      // in
@@ -225,7 +219,6 @@ func (self *DOMHTMLScriptElement) Text() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLScriptElement) TypeAttr() string {
 	var _arg0 *C.WebKitDOMHTMLScriptElement // out
 	var _cret *C.gchar                      // in
@@ -248,7 +241,6 @@ func (self *DOMHTMLScriptElement) TypeAttr() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLScriptElement) SetCharset(value string) {
 	var _arg0 *C.WebKitDOMHTMLScriptElement // out
 	var _arg1 *C.gchar                      // out
@@ -267,7 +259,6 @@ func (self *DOMHTMLScriptElement) SetCharset(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLScriptElement) SetDefer(value bool) {
 	var _arg0 *C.WebKitDOMHTMLScriptElement // out
 	var _arg1 C.gboolean                    // out
@@ -287,7 +278,6 @@ func (self *DOMHTMLScriptElement) SetDefer(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLScriptElement) SetEvent(value string) {
 	var _arg0 *C.WebKitDOMHTMLScriptElement // out
 	var _arg1 *C.gchar                      // out
@@ -306,7 +296,6 @@ func (self *DOMHTMLScriptElement) SetEvent(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLScriptElement) SetHtmlFor(value string) {
 	var _arg0 *C.WebKitDOMHTMLScriptElement // out
 	var _arg1 *C.gchar                      // out
@@ -325,7 +314,6 @@ func (self *DOMHTMLScriptElement) SetHtmlFor(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLScriptElement) SetSrc(value string) {
 	var _arg0 *C.WebKitDOMHTMLScriptElement // out
 	var _arg1 *C.gchar                      // out
@@ -344,7 +332,6 @@ func (self *DOMHTMLScriptElement) SetSrc(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLScriptElement) SetText(value string) {
 	var _arg0 *C.WebKitDOMHTMLScriptElement // out
 	var _arg1 *C.gchar                      // out
@@ -363,7 +350,6 @@ func (self *DOMHTMLScriptElement) SetText(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLScriptElement) SetTypeAttr(value string) {
 	var _arg0 *C.WebKitDOMHTMLScriptElement // out
 	var _arg1 *C.gchar                      // out

@@ -169,7 +169,6 @@ func NewCredentialForCertificatePIN(pin string, persistence CredentialPersistenc
 // The function returns the following values:
 //
 //   - ret: copy of passed in KitCredential.
-//
 func (credential *Credential) Copy() *Credential {
 	var _arg0 *C.WebKitCredential // out
 	var _cret *C.WebKitCredential // in
@@ -197,7 +196,6 @@ func (credential *Credential) Copy() *Credential {
 // The function returns the following values:
 //
 //   - tlsCertificate or NULL.
-//
 func (credential *Credential) Certificate() gio.TLSCertificater {
 	var _arg0 *C.WebKitCredential // out
 	var _cret *C.GTlsCertificate  // in
@@ -235,7 +233,6 @@ func (credential *Credential) Certificate() gio.TLSCertificater {
 // The function returns the following values:
 //
 //   - utf8: password stored in the KitCredential.
-//
 func (credential *Credential) Password() string {
 	var _arg0 *C.WebKitCredential // out
 	var _cret *C.gchar            // in
@@ -257,7 +254,6 @@ func (credential *Credential) Password() string {
 // The function returns the following values:
 //
 //   - credentialPersistence stored in the KitCredential.
-//
 func (credential *Credential) Persistence() CredentialPersistence {
 	var _arg0 *C.WebKitCredential           // out
 	var _cret C.WebKitCredentialPersistence // in
@@ -279,7 +275,6 @@ func (credential *Credential) Persistence() CredentialPersistence {
 // The function returns the following values:
 //
 //   - utf8: username stored in the KitCredential.
-//
 func (credential *Credential) Username() string {
 	var _arg0 *C.WebKitCredential // out
 	var _cret *C.gchar            // in
@@ -301,7 +296,6 @@ func (credential *Credential) Username() string {
 // The function returns the following values:
 //
 //   - ok: TRUE if the credential has a password or FALSE otherwise.
-//
 func (credential *Credential) HasPassword() bool {
 	var _arg0 *C.WebKitCredential // out
 	var _cret C.gboolean          // in

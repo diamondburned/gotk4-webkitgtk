@@ -70,7 +70,6 @@ func NewApplicationInfo() *ApplicationInfo {
 // The function returns the following values:
 //
 //   - utf8: application name.
-//
 func (info *ApplicationInfo) Name() string {
 	var _arg0 *C.WebKitApplicationInfo // out
 	var _cret *C.gchar                 // in
@@ -95,7 +94,6 @@ func (info *ApplicationInfo) Name() string {
 //   - major: return location for the major version number.
 //   - minor (optional): return location for the minor version number.
 //   - micro (optional): return location for the micro version number.
-//
 func (info *ApplicationInfo) Version() (major uint64, minor uint64, micro uint64) {
 	var _arg0 *C.WebKitApplicationInfo // out
 	var _arg1 C.guint64                // in
@@ -125,7 +123,6 @@ func (info *ApplicationInfo) Version() (major uint64, minor uint64, micro uint64
 // The function takes the following parameters:
 //
 //   - name: application name.
-//
 func (info *ApplicationInfo) SetName(name string) {
 	var _arg0 *C.WebKitApplicationInfo // out
 	var _arg1 *C.gchar                 // out
@@ -151,7 +148,6 @@ func (info *ApplicationInfo) SetName(name string) {
 //   - major version number.
 //   - minor version number.
 //   - micro version number.
-//
 func (info *ApplicationInfo) SetVersion(major uint64, minor uint64, micro uint64) {
 	var _arg0 *C.WebKitApplicationInfo // out
 	var _arg1 C.guint64                // out

@@ -86,7 +86,6 @@ func marshalDOMHTMLAppletElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAppletElement) Align() string {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _cret *C.gchar                      // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLAppletElement) Align() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAppletElement) Alt() string {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _cret *C.gchar                      // in
@@ -132,7 +130,6 @@ func (self *DOMHTMLAppletElement) Alt() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAppletElement) Archive() string {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _cret *C.gchar                      // in
@@ -155,7 +152,6 @@ func (self *DOMHTMLAppletElement) Archive() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAppletElement) Code() string {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _cret *C.gchar                      // in
@@ -178,7 +174,6 @@ func (self *DOMHTMLAppletElement) Code() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAppletElement) CodeBase() string {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _cret *C.gchar                      // in
@@ -201,7 +196,6 @@ func (self *DOMHTMLAppletElement) CodeBase() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAppletElement) Height() string {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _cret *C.gchar                      // in
@@ -224,7 +218,6 @@ func (self *DOMHTMLAppletElement) Height() string {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLAppletElement) Hspace() int32 {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _cret C.glong                       // in
@@ -246,7 +239,6 @@ func (self *DOMHTMLAppletElement) Hspace() int32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAppletElement) Name() string {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _cret *C.gchar                      // in
@@ -269,7 +261,6 @@ func (self *DOMHTMLAppletElement) Name() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAppletElement) Object() string {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _cret *C.gchar                      // in
@@ -292,7 +283,6 @@ func (self *DOMHTMLAppletElement) Object() string {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLAppletElement) Vspace() int32 {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _cret C.glong                       // in
@@ -314,7 +304,6 @@ func (self *DOMHTMLAppletElement) Vspace() int32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAppletElement) Width() string {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _cret *C.gchar                      // in
@@ -337,7 +326,6 @@ func (self *DOMHTMLAppletElement) Width() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAppletElement) SetAlign(value string) {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _arg1 *C.gchar                      // out
@@ -356,7 +344,6 @@ func (self *DOMHTMLAppletElement) SetAlign(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAppletElement) SetAlt(value string) {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _arg1 *C.gchar                      // out
@@ -375,7 +362,6 @@ func (self *DOMHTMLAppletElement) SetAlt(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAppletElement) SetArchive(value string) {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _arg1 *C.gchar                      // out
@@ -394,7 +380,6 @@ func (self *DOMHTMLAppletElement) SetArchive(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAppletElement) SetCode(value string) {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _arg1 *C.gchar                      // out
@@ -413,7 +398,6 @@ func (self *DOMHTMLAppletElement) SetCode(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAppletElement) SetCodeBase(value string) {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _arg1 *C.gchar                      // out
@@ -432,7 +416,6 @@ func (self *DOMHTMLAppletElement) SetCodeBase(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAppletElement) SetHeight(value string) {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _arg1 *C.gchar                      // out
@@ -451,7 +434,6 @@ func (self *DOMHTMLAppletElement) SetHeight(value string) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLAppletElement) SetHspace(value int32) {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _arg1 C.glong                       // out
@@ -469,7 +451,6 @@ func (self *DOMHTMLAppletElement) SetHspace(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAppletElement) SetName(value string) {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _arg1 *C.gchar                      // out
@@ -488,7 +469,6 @@ func (self *DOMHTMLAppletElement) SetName(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAppletElement) SetObject(value string) {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _arg1 *C.gchar                      // out
@@ -507,7 +487,6 @@ func (self *DOMHTMLAppletElement) SetObject(value string) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLAppletElement) SetVspace(value int32) {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _arg1 C.glong                       // out
@@ -525,7 +504,6 @@ func (self *DOMHTMLAppletElement) SetVspace(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAppletElement) SetWidth(value string) {
 	var _arg0 *C.WebKitDOMHTMLAppletElement // out
 	var _arg1 *C.gchar                      // out

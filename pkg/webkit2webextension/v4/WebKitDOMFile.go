@@ -78,7 +78,6 @@ func marshalDOMFile(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMFile) Name() string {
 	var _arg0 *C.WebKitDOMFile // out
 	var _cret *C.gchar         // in

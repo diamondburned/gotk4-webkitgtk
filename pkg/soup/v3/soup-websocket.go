@@ -211,7 +211,6 @@ func (w WebsocketError) String() string {
 // The function returns the following values:
 //
 //   - quark: error quark for SoupWebsocket.
-//
 func WebsocketErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -219,9 +218,7 @@ func WebsocketErrorQuark() glib.Quark {
 
 	var _quark glib.Quark // out
 
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
+	_quark = glib.Quark(_cret)
 
 	return _quark
 }

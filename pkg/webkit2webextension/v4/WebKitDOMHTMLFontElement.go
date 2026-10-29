@@ -86,7 +86,6 @@ func marshalDOMHTMLFontElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFontElement) Color() string {
 	var _arg0 *C.WebKitDOMHTMLFontElement // out
 	var _cret *C.gchar                    // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLFontElement) Color() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFontElement) Face() string {
 	var _arg0 *C.WebKitDOMHTMLFontElement // out
 	var _cret *C.gchar                    // in
@@ -132,7 +130,6 @@ func (self *DOMHTMLFontElement) Face() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFontElement) Size() string {
 	var _arg0 *C.WebKitDOMHTMLFontElement // out
 	var _cret *C.gchar                    // in
@@ -155,7 +152,6 @@ func (self *DOMHTMLFontElement) Size() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFontElement) SetColor(value string) {
 	var _arg0 *C.WebKitDOMHTMLFontElement // out
 	var _arg1 *C.gchar                    // out
@@ -174,7 +170,6 @@ func (self *DOMHTMLFontElement) SetColor(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFontElement) SetFace(value string) {
 	var _arg0 *C.WebKitDOMHTMLFontElement // out
 	var _arg1 *C.gchar                    // out
@@ -193,7 +188,6 @@ func (self *DOMHTMLFontElement) SetFace(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFontElement) SetSize(value string) {
 	var _arg0 *C.WebKitDOMHTMLFontElement // out
 	var _arg1 *C.gchar                    // out

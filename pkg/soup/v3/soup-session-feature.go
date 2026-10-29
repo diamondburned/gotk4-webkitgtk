@@ -26,10 +26,10 @@ func init() {
 
 // SessionFeature: interface for miscellaneous session features.
 //
-// SessionFeature is the interface used by classes that extend the functionality
+// sessionfeature is the interface used by classes that extend the functionality
 // of a session. Some features like HTTP authentication handling are implemented
-// internally via SoupSessionFeatures. Other features can be added to the
-// session by the application. (Eg, logger, cookiejar.)
+// internally via sessionfeatures. Other features can be added to the session by
+// the application. (Eg, logger, cookiejar.)
 //
 // See session.AddFeature, etc, to add a feature to a session.
 //

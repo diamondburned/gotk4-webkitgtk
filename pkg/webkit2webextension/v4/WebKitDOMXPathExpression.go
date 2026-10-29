@@ -83,7 +83,6 @@ func marshalDOMXPathExpression(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - domxPathResult: KitDOMXPathResult.
-//
 func (self *DOMXPathExpression) Evaluate(contextNode *DOMNode, typ uint16, inResult *DOMXPathResult) (*DOMXPathResult, error) {
 	var _arg0 *C.WebKitDOMXPathExpression // out
 	var _arg1 *C.WebKitDOMNode            // out

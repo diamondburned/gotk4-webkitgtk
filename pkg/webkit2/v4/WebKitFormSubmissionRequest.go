@@ -78,12 +78,12 @@ func marshalFormSubmissionRequest(p uintptr) (interface{}, error) {
 }
 
 // TextFields: get the values of the text fields contained in the form
-// associated to request.
+// associated with request.
 //
 // Get a Table with the values of the text fields contained in the form
-// associated to request. Note that fields will be missing if the form contains
-// multiple text input elements with the same name, so this function does not
-// reliably return all text fields.
+// associated with request. Note that fields will be missing if the form
+// contains multiple text input elements with the same name, so this function
+// does not reliably return all text fields.
 //
 // Deprecated: Use webkit_form_submission_request_list_text_fields() instead.
 //
@@ -91,7 +91,6 @@ func marshalFormSubmissionRequest(p uintptr) (interface{}, error) {
 //
 //   - hashTable (optional) with the form text fields, or NULL if the form
 //     doesn't contain text fields.
-//
 func (request *FormSubmissionRequest) TextFields() map[unsafe.Pointer]unsafe.Pointer {
 	var _arg0 *C.WebKitFormSubmissionRequest // out
 	var _cret *C.GHashTable                  // in
@@ -106,8 +105,8 @@ func (request *FormSubmissionRequest) TextFields() map[unsafe.Pointer]unsafe.Poi
 	if _cret != nil {
 		_hashTable = make(map[unsafe.Pointer]unsafe.Pointer, gextras.HashTableSize(unsafe.Pointer(_cret)))
 		gextras.MoveHashTable(unsafe.Pointer(_cret), false, func(k, v unsafe.Pointer) {
-			ksrc := *(**C.gpointer)(k)
-			vsrc := *(**C.gpointer)(v)
+			ksrc := *(*C.gpointer)(k)
+			vsrc := *(*C.gpointer)(v)
 			var kdst unsafe.Pointer // out
 			var vdst unsafe.Pointer // out
 			kdst = (unsafe.Pointer)(unsafe.Pointer(ksrc))

@@ -86,7 +86,6 @@ func marshalDOMHTMLHRElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLHRElement) Align() string {
 	var _arg0 *C.WebKitDOMHTMLHRElement // out
 	var _cret *C.gchar                  // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLHRElement) Align() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLHRElement) NoShade() bool {
 	var _arg0 *C.WebKitDOMHTMLHRElement // out
 	var _cret C.gboolean                // in
@@ -133,7 +131,6 @@ func (self *DOMHTMLHRElement) NoShade() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLHRElement) Size() string {
 	var _arg0 *C.WebKitDOMHTMLHRElement // out
 	var _cret *C.gchar                  // in
@@ -156,7 +153,6 @@ func (self *DOMHTMLHRElement) Size() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLHRElement) Width() string {
 	var _arg0 *C.WebKitDOMHTMLHRElement // out
 	var _cret *C.gchar                  // in
@@ -179,7 +175,6 @@ func (self *DOMHTMLHRElement) Width() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLHRElement) SetAlign(value string) {
 	var _arg0 *C.WebKitDOMHTMLHRElement // out
 	var _arg1 *C.gchar                  // out
@@ -198,7 +193,6 @@ func (self *DOMHTMLHRElement) SetAlign(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLHRElement) SetNoShade(value bool) {
 	var _arg0 *C.WebKitDOMHTMLHRElement // out
 	var _arg1 C.gboolean                // out
@@ -218,7 +212,6 @@ func (self *DOMHTMLHRElement) SetNoShade(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLHRElement) SetSize(value string) {
 	var _arg0 *C.WebKitDOMHTMLHRElement // out
 	var _arg1 *C.gchar                  // out
@@ -237,7 +230,6 @@ func (self *DOMHTMLHRElement) SetSize(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLHRElement) SetWidth(value string) {
 	var _arg0 *C.WebKitDOMHTMLHRElement // out
 	var _arg1 *C.gchar                  // out

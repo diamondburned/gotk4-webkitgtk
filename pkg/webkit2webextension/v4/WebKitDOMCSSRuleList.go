@@ -76,7 +76,6 @@ func marshalDOMCSSRuleList(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMCSSRuleList) Length() uint32 {
 	var _arg0 *C.WebKitDOMCSSRuleList // out
 	var _cret C.gulong                // in
@@ -102,7 +101,6 @@ func (self *DOMCSSRuleList) Length() uint32 {
 // The function returns the following values:
 //
 //   - domcssRule: KitDOMCSSRule.
-//
 func (self *DOMCSSRuleList) Item(index uint32) *DOMCSSRule {
 	var _arg0 *C.WebKitDOMCSSRuleList // out
 	var _arg1 C.gulong                // out

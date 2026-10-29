@@ -86,7 +86,6 @@ func marshalDOMHTMLObjectElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLObjectElement) Align() string {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret *C.gchar                      // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLObjectElement) Align() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLObjectElement) Archive() string {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret *C.gchar                      // in
@@ -132,7 +130,6 @@ func (self *DOMHTMLObjectElement) Archive() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLObjectElement) Border() string {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret *C.gchar                      // in
@@ -155,7 +152,6 @@ func (self *DOMHTMLObjectElement) Border() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLObjectElement) Code() string {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret *C.gchar                      // in
@@ -178,7 +174,6 @@ func (self *DOMHTMLObjectElement) Code() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLObjectElement) CodeBase() string {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret *C.gchar                      // in
@@ -201,7 +196,6 @@ func (self *DOMHTMLObjectElement) CodeBase() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLObjectElement) CodeType() string {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret *C.gchar                      // in
@@ -224,7 +218,6 @@ func (self *DOMHTMLObjectElement) CodeType() string {
 // The function returns the following values:
 //
 //   - domDocument: KitDOMDocument.
-//
 func (self *DOMHTMLObjectElement) ContentDocument() *DOMDocument {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret *C.WebKitDOMDocument          // in
@@ -246,7 +239,6 @@ func (self *DOMHTMLObjectElement) ContentDocument() *DOMDocument {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLObjectElement) Data() string {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret *C.gchar                      // in
@@ -269,7 +261,6 @@ func (self *DOMHTMLObjectElement) Data() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLObjectElement) Declare() bool {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret C.gboolean                    // in
@@ -293,7 +284,6 @@ func (self *DOMHTMLObjectElement) Declare() bool {
 // The function returns the following values:
 //
 //   - domhtmlFormElement: KitDOMHTMLFormElement.
-//
 func (self *DOMHTMLObjectElement) Form() *DOMHTMLFormElement {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret *C.WebKitDOMHTMLFormElement   // in
@@ -315,7 +305,6 @@ func (self *DOMHTMLObjectElement) Form() *DOMHTMLFormElement {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLObjectElement) Height() string {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret *C.gchar                      // in
@@ -338,7 +327,6 @@ func (self *DOMHTMLObjectElement) Height() string {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLObjectElement) Hspace() int32 {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret C.glong                       // in
@@ -360,7 +348,6 @@ func (self *DOMHTMLObjectElement) Hspace() int32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLObjectElement) Name() string {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret *C.gchar                      // in
@@ -383,7 +370,6 @@ func (self *DOMHTMLObjectElement) Name() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLObjectElement) Standby() string {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret *C.gchar                      // in
@@ -406,7 +392,6 @@ func (self *DOMHTMLObjectElement) Standby() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLObjectElement) TypeAttr() string {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret *C.gchar                      // in
@@ -429,7 +414,6 @@ func (self *DOMHTMLObjectElement) TypeAttr() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLObjectElement) UseMap() string {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret *C.gchar                      // in
@@ -452,7 +436,6 @@ func (self *DOMHTMLObjectElement) UseMap() string {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLObjectElement) Vspace() int32 {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret C.glong                       // in
@@ -474,7 +457,6 @@ func (self *DOMHTMLObjectElement) Vspace() int32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLObjectElement) Width() string {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _cret *C.gchar                      // in
@@ -497,7 +479,6 @@ func (self *DOMHTMLObjectElement) Width() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLObjectElement) SetAlign(value string) {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _arg1 *C.gchar                      // out
@@ -516,7 +497,6 @@ func (self *DOMHTMLObjectElement) SetAlign(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLObjectElement) SetArchive(value string) {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _arg1 *C.gchar                      // out
@@ -535,7 +515,6 @@ func (self *DOMHTMLObjectElement) SetArchive(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLObjectElement) SetBorder(value string) {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _arg1 *C.gchar                      // out
@@ -554,7 +533,6 @@ func (self *DOMHTMLObjectElement) SetBorder(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLObjectElement) SetCode(value string) {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _arg1 *C.gchar                      // out
@@ -573,7 +551,6 @@ func (self *DOMHTMLObjectElement) SetCode(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLObjectElement) SetCodeBase(value string) {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _arg1 *C.gchar                      // out
@@ -592,7 +569,6 @@ func (self *DOMHTMLObjectElement) SetCodeBase(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLObjectElement) SetCodeType(value string) {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _arg1 *C.gchar                      // out
@@ -611,7 +587,6 @@ func (self *DOMHTMLObjectElement) SetCodeType(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLObjectElement) SetData(value string) {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _arg1 *C.gchar                      // out
@@ -630,7 +605,6 @@ func (self *DOMHTMLObjectElement) SetData(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLObjectElement) SetDeclare(value bool) {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _arg1 C.gboolean                    // out
@@ -650,7 +624,6 @@ func (self *DOMHTMLObjectElement) SetDeclare(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLObjectElement) SetHeight(value string) {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _arg1 *C.gchar                      // out
@@ -669,7 +642,6 @@ func (self *DOMHTMLObjectElement) SetHeight(value string) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLObjectElement) SetHspace(value int32) {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _arg1 C.glong                       // out
@@ -687,7 +659,6 @@ func (self *DOMHTMLObjectElement) SetHspace(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLObjectElement) SetName(value string) {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _arg1 *C.gchar                      // out
@@ -706,7 +677,6 @@ func (self *DOMHTMLObjectElement) SetName(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLObjectElement) SetStandby(value string) {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _arg1 *C.gchar                      // out
@@ -725,7 +695,6 @@ func (self *DOMHTMLObjectElement) SetStandby(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLObjectElement) SetTypeAttr(value string) {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _arg1 *C.gchar                      // out
@@ -744,7 +713,6 @@ func (self *DOMHTMLObjectElement) SetTypeAttr(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLObjectElement) SetUseMap(value string) {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _arg1 *C.gchar                      // out
@@ -763,7 +731,6 @@ func (self *DOMHTMLObjectElement) SetUseMap(value string) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLObjectElement) SetVspace(value int32) {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _arg1 C.glong                       // out
@@ -781,7 +748,6 @@ func (self *DOMHTMLObjectElement) SetVspace(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLObjectElement) SetWidth(value string) {
 	var _arg0 *C.WebKitDOMHTMLObjectElement // out
 	var _arg1 *C.gchar                      // out

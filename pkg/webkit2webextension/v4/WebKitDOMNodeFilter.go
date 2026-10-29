@@ -69,7 +69,6 @@ func marshalDOMNodeFilter(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - gshort: #gshort.
-//
 func (filter *DOMNodeFilter) AcceptNode(node *DOMNode) int16 {
 	var _arg0 *C.WebKitDOMNodeFilter // out
 	var _arg1 *C.WebKitDOMNode       // out
@@ -98,7 +97,6 @@ func (filter *DOMNodeFilter) AcceptNode(node *DOMNode) int16 {
 // The function returns the following values:
 //
 //   - gshort: #gshort.
-//
 func (filter *DOMNodeFilter) acceptNode(node *DOMNode) int16 {
 	gclass := (*C.WebKitDOMNodeFilterIface)(coreglib.PeekParentClass(filter))
 	fnarg := gclass.accept_node

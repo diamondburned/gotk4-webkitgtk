@@ -60,7 +60,6 @@ func marshalPermissionStateQuery(p uintptr) (interface{}, error) {
 // The function takes the following parameters:
 //
 //   - state: KitPermissionState.
-//
 func (query *PermissionStateQuery) Finish(state PermissionState) {
 	var _arg0 *C.WebKitPermissionStateQuery // out
 	var _arg1 C.WebKitPermissionState       // out
@@ -78,7 +77,6 @@ func (query *PermissionStateQuery) Finish(state PermissionState) {
 // The function returns the following values:
 //
 //   - utf8: permission name for query.
-//
 func (query *PermissionStateQuery) Name() string {
 	var _arg0 *C.WebKitPermissionStateQuery // out
 	var _cret *C.gchar                      // in
@@ -100,7 +98,6 @@ func (query *PermissionStateQuery) Name() string {
 // The function returns the following values:
 //
 //   - securityOrigin representing the origin from which the query was emitted.
-//
 func (query *PermissionStateQuery) SecurityOrigin() *SecurityOrigin {
 	var _arg0 *C.WebKitPermissionStateQuery // out
 	var _cret *C.WebKitSecurityOrigin       // in

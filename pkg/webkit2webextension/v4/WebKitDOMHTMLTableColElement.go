@@ -86,7 +86,6 @@ func marshalDOMHTMLTableColElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableColElement) Align() string {
 	var _arg0 *C.WebKitDOMHTMLTableColElement // out
 	var _cret *C.gchar                        // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLTableColElement) Align() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableColElement) Ch() string {
 	var _arg0 *C.WebKitDOMHTMLTableColElement // out
 	var _cret *C.gchar                        // in
@@ -132,7 +130,6 @@ func (self *DOMHTMLTableColElement) Ch() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableColElement) ChOff() string {
 	var _arg0 *C.WebKitDOMHTMLTableColElement // out
 	var _cret *C.gchar                        // in
@@ -155,7 +152,6 @@ func (self *DOMHTMLTableColElement) ChOff() string {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLTableColElement) Span() int32 {
 	var _arg0 *C.WebKitDOMHTMLTableColElement // out
 	var _cret C.glong                         // in
@@ -177,7 +173,6 @@ func (self *DOMHTMLTableColElement) Span() int32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableColElement) VAlign() string {
 	var _arg0 *C.WebKitDOMHTMLTableColElement // out
 	var _cret *C.gchar                        // in
@@ -200,7 +195,6 @@ func (self *DOMHTMLTableColElement) VAlign() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableColElement) Width() string {
 	var _arg0 *C.WebKitDOMHTMLTableColElement // out
 	var _cret *C.gchar                        // in
@@ -223,7 +217,6 @@ func (self *DOMHTMLTableColElement) Width() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableColElement) SetAlign(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableColElement // out
 	var _arg1 *C.gchar                        // out
@@ -242,7 +235,6 @@ func (self *DOMHTMLTableColElement) SetAlign(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableColElement) SetCh(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableColElement // out
 	var _arg1 *C.gchar                        // out
@@ -261,7 +253,6 @@ func (self *DOMHTMLTableColElement) SetCh(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableColElement) SetChOff(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableColElement // out
 	var _arg1 *C.gchar                        // out
@@ -280,7 +271,6 @@ func (self *DOMHTMLTableColElement) SetChOff(value string) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLTableColElement) SetSpan(value int32) {
 	var _arg0 *C.WebKitDOMHTMLTableColElement // out
 	var _arg1 C.glong                         // out
@@ -298,7 +288,6 @@ func (self *DOMHTMLTableColElement) SetSpan(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableColElement) SetVAlign(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableColElement // out
 	var _arg1 *C.gchar                        // out
@@ -317,7 +306,6 @@ func (self *DOMHTMLTableColElement) SetVAlign(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableColElement) SetWidth(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableColElement // out
 	var _arg1 *C.gchar                        // out

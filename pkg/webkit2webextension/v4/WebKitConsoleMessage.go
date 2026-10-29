@@ -43,12 +43,9 @@ func marshalConsoleMessage(p uintptr) (interface{}, error) {
 
 // Copy: make a copy of console_message.
 //
-// Deprecated: since version 2.40.
-//
 // The function returns the following values:
 //
 //   - consoleMessage: copy of passed in KitConsoleMessage.
-//
 func (consoleMessage *ConsoleMessage) Copy() *ConsoleMessage {
 	var _arg0 *C.WebKitConsoleMessage // out
 	var _cret *C.WebKitConsoleMessage // in
@@ -71,14 +68,11 @@ func (consoleMessage *ConsoleMessage) Copy() *ConsoleMessage {
 	return _consoleMessage
 }
 
-// Level gets the log level of a KitConsoleMessage
-//
-// Deprecated: since version 2.40.
+// Level gets the log level of a KitConsoleMessage.
 //
 // The function returns the following values:
 //
 //   - consoleMessageLevel indicating the log level of console_message.
-//
 func (consoleMessage *ConsoleMessage) Level() ConsoleMessageLevel {
 	var _arg0 *C.WebKitConsoleMessage     // out
 	var _cret C.WebKitConsoleMessageLevel // in
@@ -95,14 +89,11 @@ func (consoleMessage *ConsoleMessage) Level() ConsoleMessageLevel {
 	return _consoleMessageLevel
 }
 
-// Line gets the line number of a KitConsoleMessage
-//
-// Deprecated: since version 2.40.
+// Line gets the line number of a KitConsoleMessage.
 //
 // The function returns the following values:
 //
 //   - guint: line number of console_message.
-//
 func (consoleMessage *ConsoleMessage) Line() uint {
 	var _arg0 *C.WebKitConsoleMessage // out
 	var _cret C.guint                 // in
@@ -119,14 +110,11 @@ func (consoleMessage *ConsoleMessage) Line() uint {
 	return _guint
 }
 
-// Source gets the source of a KitConsoleMessage
-//
-// Deprecated: since version 2.40.
+// Source gets the source of a KitConsoleMessage.
 //
 // The function returns the following values:
 //
 //   - consoleMessageSource indicating the source of console_message.
-//
 func (consoleMessage *ConsoleMessage) Source() ConsoleMessageSource {
 	var _arg0 *C.WebKitConsoleMessage      // out
 	var _cret C.WebKitConsoleMessageSource // in
@@ -143,14 +131,11 @@ func (consoleMessage *ConsoleMessage) Source() ConsoleMessageSource {
 	return _consoleMessageSource
 }
 
-// SourceID gets the source identifier of a KitConsoleMessage
-//
-// Deprecated: since version 2.40.
+// SourceID gets the source identifier of a KitConsoleMessage.
 //
 // The function returns the following values:
 //
 //   - utf8: source identifier of console_message.
-//
 func (consoleMessage *ConsoleMessage) SourceID() string {
 	var _arg0 *C.WebKitConsoleMessage // out
 	var _cret *C.gchar                // in
@@ -167,14 +152,11 @@ func (consoleMessage *ConsoleMessage) SourceID() string {
 	return _utf8
 }
 
-// Text gets the text message of a KitConsoleMessage
-//
-// Deprecated: since version 2.40.
+// Text gets the text message of a KitConsoleMessage.
 //
 // The function returns the following values:
 //
 //   - utf8: text message of console_message.
-//
 func (consoleMessage *ConsoleMessage) Text() string {
 	var _arg0 *C.WebKitConsoleMessage // out
 	var _cret *C.gchar                // in

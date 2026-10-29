@@ -20,7 +20,7 @@ func _gotk4_webkit6_WebView_ConnectContextMenu(arg0 C.gpointer, arg1 *C.WebKitCo
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -50,7 +50,7 @@ func _gotk4_webkit6_WebView_ConnectShowOptionMenu(arg0 C.gpointer, arg1 *C.WebKi
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

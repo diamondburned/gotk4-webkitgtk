@@ -86,7 +86,6 @@ func marshalDOMHTMLLegendElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLLegendElement) Align() string {
 	var _arg0 *C.WebKitDOMHTMLLegendElement // out
 	var _cret *C.gchar                      // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLLegendElement) Align() string {
 // The function returns the following values:
 //
 //   - domhtmlFormElement: KitDOMHTMLFormElement.
-//
 func (self *DOMHTMLLegendElement) Form() *DOMHTMLFormElement {
 	var _arg0 *C.WebKitDOMHTMLLegendElement // out
 	var _cret *C.WebKitDOMHTMLFormElement   // in
@@ -131,7 +129,6 @@ func (self *DOMHTMLLegendElement) Form() *DOMHTMLFormElement {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLLegendElement) SetAlign(value string) {
 	var _arg0 *C.WebKitDOMHTMLLegendElement // out
 	var _arg1 *C.gchar                      // out

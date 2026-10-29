@@ -85,7 +85,6 @@ func marshalPlugin(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8 (optional): description, as a string.
-//
 func (plugin *Plugin) Description() string {
 	var _arg0 *C.WebKitPlugin // out
 	var _cret *C.gchar        // in
@@ -114,7 +113,6 @@ func (plugin *Plugin) Description() string {
 // The function returns the following values:
 //
 //   - list of KitMimeInfo.
-//
 func (plugin *Plugin) MIMEInfoList() []*MIMEInfo {
 	var _arg0 *C.WebKitPlugin // out
 	var _cret *C.GList        // in
@@ -151,7 +149,6 @@ func (plugin *Plugin) MIMEInfoList() []*MIMEInfo {
 // The function returns the following values:
 //
 //   - utf8 (optional): name, as a string.
-//
 func (plugin *Plugin) Name() string {
 	var _arg0 *C.WebKitPlugin // out
 	var _cret *C.gchar        // in
@@ -177,7 +174,6 @@ func (plugin *Plugin) Name() string {
 // The function returns the following values:
 //
 //   - utf8 (optional): path, as a string.
-//
 func (plugin *Plugin) Path() string {
 	var _arg0 *C.WebKitPlugin // out
 	var _cret *C.gchar        // in

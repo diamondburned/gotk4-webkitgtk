@@ -87,7 +87,6 @@ func marshalDOMDocument(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMDocument) AdoptNode(source *DOMNode) (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.WebKitDOMNode     // out
@@ -122,7 +121,6 @@ func (self *DOMDocument) AdoptNode(source *DOMNode) (*DOMNode, error) {
 // The function returns the following values:
 //
 //   - domRange: KitDOMRange.
-//
 func (self *DOMDocument) CaretRangeFromPoint(x, y int32) *DOMRange {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 C.glong              // out
@@ -154,7 +152,6 @@ func (self *DOMDocument) CaretRangeFromPoint(x, y int32) *DOMRange {
 // The function returns the following values:
 //
 //   - domAttr: KitDOMAttr.
-//
 func (self *DOMDocument) CreateAttribute(name string) (*DOMAttr, error) {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -190,7 +187,6 @@ func (self *DOMDocument) CreateAttribute(name string) (*DOMAttr, error) {
 // The function returns the following values:
 //
 //   - domAttr: KitDOMAttr.
-//
 func (self *DOMDocument) CreateAttributeNs(namespaceURI, qualifiedName string) (*DOMAttr, error) {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -231,7 +227,6 @@ func (self *DOMDocument) CreateAttributeNs(namespaceURI, qualifiedName string) (
 // The function returns the following values:
 //
 //   - domcdataSection: KitDOMCDATASection.
-//
 func (self *DOMDocument) CreateCdataSection(data string) (*DOMCDATASection, error) {
 	var _arg0 *C.WebKitDOMDocument     // out
 	var _arg1 *C.gchar                 // out
@@ -266,7 +261,6 @@ func (self *DOMDocument) CreateCdataSection(data string) (*DOMCDATASection, erro
 // The function returns the following values:
 //
 //   - domComment: KitDOMComment.
-//
 func (self *DOMDocument) CreateComment(data string) *DOMComment {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -292,7 +286,6 @@ func (self *DOMDocument) CreateComment(data string) *DOMComment {
 // The function returns the following values:
 //
 //   - domcssStyleDeclaration: KitDOMCSSStyleDeclaration.
-//
 func (self *DOMDocument) CreateCSSStyleDeclaration() *DOMCSSStyleDeclaration {
 	var _arg0 *C.WebKitDOMDocument            // out
 	var _cret *C.WebKitDOMCSSStyleDeclaration // in
@@ -314,7 +307,6 @@ func (self *DOMDocument) CreateCSSStyleDeclaration() *DOMCSSStyleDeclaration {
 // The function returns the following values:
 //
 //   - domDocumentFragment: KitDOMDocumentFragment.
-//
 func (self *DOMDocument) CreateDocumentFragment() *DOMDocumentFragment {
 	var _arg0 *C.WebKitDOMDocument         // out
 	var _cret *C.WebKitDOMDocumentFragment // in
@@ -340,7 +332,6 @@ func (self *DOMDocument) CreateDocumentFragment() *DOMDocumentFragment {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDocument) CreateElement(tagName string) (*DOMElement, error) {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -376,7 +367,6 @@ func (self *DOMDocument) CreateElement(tagName string) (*DOMElement, error) {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDocument) CreateElementNs(namespaceURI, qualifiedName string) (*DOMElement, error) {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -420,7 +410,6 @@ func (self *DOMDocument) CreateElementNs(namespaceURI, qualifiedName string) (*D
 // The function returns the following values:
 //
 //   - domEntityReference: KitDOMEntityReference.
-//
 func (self *DOMDocument) CreateEntityReference(name string) (*DOMEntityReference, error) {
 	var _arg0 *C.WebKitDOMDocument        // out
 	var _arg1 *C.gchar                    // out
@@ -457,7 +446,6 @@ func (self *DOMDocument) CreateEntityReference(name string) (*DOMEntityReference
 // The function returns the following values:
 //
 //   - domEvent: KitDOMEvent.
-//
 func (self *DOMDocument) CreateEvent(eventType string) (*DOMEvent, error) {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -493,7 +481,6 @@ func (self *DOMDocument) CreateEvent(eventType string) (*DOMEvent, error) {
 // The function returns the following values:
 //
 //   - domxPathExpression: KitDOMXPathExpression.
-//
 func (self *DOMDocument) CreateExpression(expression string, resolver DOMXPathNSResolverer) (*DOMXPathExpression, error) {
 	var _arg0 *C.WebKitDOMDocument        // out
 	var _arg1 *C.gchar                    // out
@@ -534,7 +521,6 @@ func (self *DOMDocument) CreateExpression(expression string, resolver DOMXPathNS
 // The function returns the following values:
 //
 //   - domNodeIterator: KitDOMNodeIterator.
-//
 func (self *DOMDocument) CreateNodeIterator(root *DOMNode, whatToShow uint32, filter DOMNodeFilterer, expandEntityReferences bool) (*DOMNodeIterator, error) {
 	var _arg0 *C.WebKitDOMDocument     // out
 	var _arg1 *C.WebKitDOMNode         // out
@@ -581,7 +567,6 @@ func (self *DOMDocument) CreateNodeIterator(root *DOMNode, whatToShow uint32, fi
 // The function returns the following values:
 //
 //   - domxPathNSResolver: KitDOMXPathNSResolver.
-//
 func (self *DOMDocument) CreateNsResolver(nodeResolver *DOMNode) *DOMXPathNSResolver {
 	var _arg0 *C.WebKitDOMDocument        // out
 	var _arg1 *C.WebKitDOMNode            // out
@@ -611,7 +596,6 @@ func (self *DOMDocument) CreateNsResolver(nodeResolver *DOMNode) *DOMXPathNSReso
 // The function returns the following values:
 //
 //   - domProcessingInstruction: KitDOMProcessingInstruction.
-//
 func (self *DOMDocument) CreateProcessingInstruction(target, data string) (*DOMProcessingInstruction, error) {
 	var _arg0 *C.WebKitDOMDocument              // out
 	var _arg1 *C.gchar                          // out
@@ -646,7 +630,6 @@ func (self *DOMDocument) CreateProcessingInstruction(target, data string) (*DOMP
 // The function returns the following values:
 //
 //   - domRange: KitDOMRange.
-//
 func (self *DOMDocument) CreateRange() *DOMRange {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.WebKitDOMRange    // in
@@ -672,7 +655,6 @@ func (self *DOMDocument) CreateRange() *DOMRange {
 // The function returns the following values:
 //
 //   - domText: KitDOMText.
-//
 func (self *DOMDocument) CreateTextNode(data string) *DOMText {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -705,7 +687,6 @@ func (self *DOMDocument) CreateTextNode(data string) *DOMText {
 // The function returns the following values:
 //
 //   - domTreeWalker: KitDOMTreeWalker.
-//
 func (self *DOMDocument) CreateTreeWalker(root *DOMNode, whatToShow uint32, filter DOMNodeFilterer, expandEntityReferences bool) (*DOMTreeWalker, error) {
 	var _arg0 *C.WebKitDOMDocument   // out
 	var _arg1 *C.WebKitDOMNode       // out
@@ -753,7 +734,6 @@ func (self *DOMDocument) CreateTreeWalker(root *DOMNode, whatToShow uint32, filt
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDocument) ElementFromPoint(x, y int32) *DOMElement {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 C.glong              // out
@@ -789,7 +769,6 @@ func (self *DOMDocument) ElementFromPoint(x, y int32) *DOMElement {
 // The function returns the following values:
 //
 //   - domxPathResult: KitDOMXPathResult.
-//
 func (self *DOMDocument) Evaluate(expression string, contextNode *DOMNode, resolver DOMXPathNSResolverer, typ uint16, inResult *DOMXPathResult) (*DOMXPathResult, error) {
 	var _arg0 *C.WebKitDOMDocument        // out
 	var _arg1 *C.gchar                    // out
@@ -842,7 +821,6 @@ func (self *DOMDocument) Evaluate(expression string, contextNode *DOMNode, resol
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDocument) ExecCommand(command string, userInterface bool, value string) bool {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -889,7 +867,6 @@ func (self *DOMDocument) ExitPointerLock() {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDocument) ActiveElement() *DOMElement {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.WebKitDOMElement  // in
@@ -911,7 +888,6 @@ func (self *DOMDocument) ActiveElement() *DOMElement {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMDocument) Anchors() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMDocument       // out
 	var _cret *C.WebKitDOMHTMLCollection // in
@@ -933,7 +909,6 @@ func (self *DOMDocument) Anchors() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMDocument) Applets() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMDocument       // out
 	var _cret *C.WebKitDOMHTMLCollection // in
@@ -955,7 +930,6 @@ func (self *DOMDocument) Applets() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - domhtmlElement: KitDOMHTMLElement.
-//
 func (self *DOMDocument) Body() *DOMHTMLElement {
 	var _arg0 *C.WebKitDOMDocument    // out
 	var _cret *C.WebKitDOMHTMLElement // in
@@ -977,7 +951,6 @@ func (self *DOMDocument) Body() *DOMHTMLElement {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) CharacterSet() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -1000,7 +973,6 @@ func (self *DOMDocument) CharacterSet() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) Charset() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -1023,7 +995,6 @@ func (self *DOMDocument) Charset() string {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMDocument) ChildElementCount() uint32 {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret C.gulong             // in
@@ -1045,7 +1016,6 @@ func (self *DOMDocument) ChildElementCount() uint32 {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMDocument) Children() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMDocument       // out
 	var _cret *C.WebKitDOMHTMLCollection // in
@@ -1067,7 +1037,6 @@ func (self *DOMDocument) Children() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) CompatMode() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -1090,7 +1059,6 @@ func (self *DOMDocument) CompatMode() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) ContentType() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -1113,7 +1081,6 @@ func (self *DOMDocument) ContentType() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) Cookie() (string, error) {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -1141,7 +1108,6 @@ func (self *DOMDocument) Cookie() (string, error) {
 // The function returns the following values:
 //
 //   - domhtmlScriptElement: KitDOMHTMLScriptElement.
-//
 func (self *DOMDocument) CurrentScript() *DOMHTMLScriptElement {
 	var _arg0 *C.WebKitDOMDocument          // out
 	var _cret *C.WebKitDOMHTMLScriptElement // in
@@ -1163,7 +1129,6 @@ func (self *DOMDocument) CurrentScript() *DOMHTMLScriptElement {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) DefaultCharset() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -1186,7 +1151,6 @@ func (self *DOMDocument) DefaultCharset() string {
 // The function returns the following values:
 //
 //   - domdomWindow: KitDOMDOMWindow.
-//
 func (self *DOMDocument) DefaultView() *DOMDOMWindow {
 	var _arg0 *C.WebKitDOMDocument  // out
 	var _cret *C.WebKitDOMDOMWindow // in
@@ -1208,7 +1172,6 @@ func (self *DOMDocument) DefaultView() *DOMDOMWindow {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) DesignMode() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -1231,7 +1194,6 @@ func (self *DOMDocument) DesignMode() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) Dir() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -1254,7 +1216,6 @@ func (self *DOMDocument) Dir() string {
 // The function returns the following values:
 //
 //   - domDocumentType: KitDOMDocumentType.
-//
 func (self *DOMDocument) Doctype() *DOMDocumentType {
 	var _arg0 *C.WebKitDOMDocument     // out
 	var _cret *C.WebKitDOMDocumentType // in
@@ -1276,7 +1237,6 @@ func (self *DOMDocument) Doctype() *DOMDocumentType {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDocument) DocumentElement() *DOMElement {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.WebKitDOMElement  // in
@@ -1298,7 +1258,6 @@ func (self *DOMDocument) DocumentElement() *DOMElement {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) DocumentURI() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -1321,7 +1280,6 @@ func (self *DOMDocument) DocumentURI() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) Domain() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -1348,7 +1306,6 @@ func (self *DOMDocument) Domain() string {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDocument) ElementByID(elementId string) *DOMElement {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -1379,7 +1336,6 @@ func (self *DOMDocument) ElementByID(elementId string) *DOMElement {
 // The function returns the following values:
 //
 //   - domNodeList: KitDOMNodeList.
-//
 func (self *DOMDocument) ElementsByClassName(className string) *DOMNodeList {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -1410,7 +1366,6 @@ func (self *DOMDocument) ElementsByClassName(className string) *DOMNodeList {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMDocument) ElementsByClassNameAsHtmlCollection(classNames string) *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMDocument       // out
 	var _arg1 *C.gchar                   // out
@@ -1440,7 +1395,6 @@ func (self *DOMDocument) ElementsByClassNameAsHtmlCollection(classNames string) 
 // The function returns the following values:
 //
 //   - domNodeList: KitDOMNodeList.
-//
 func (self *DOMDocument) ElementsByName(elementName string) *DOMNodeList {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -1471,7 +1425,6 @@ func (self *DOMDocument) ElementsByName(elementName string) *DOMNodeList {
 // The function returns the following values:
 //
 //   - domNodeList: KitDOMNodeList.
-//
 func (self *DOMDocument) ElementsByTagName(tagName string) *DOMNodeList {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -1502,7 +1455,6 @@ func (self *DOMDocument) ElementsByTagName(tagName string) *DOMNodeList {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMDocument) ElementsByTagNameAsHtmlCollection(tagname string) *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMDocument       // out
 	var _arg1 *C.gchar                   // out
@@ -1534,7 +1486,6 @@ func (self *DOMDocument) ElementsByTagNameAsHtmlCollection(tagname string) *DOMH
 // The function returns the following values:
 //
 //   - domNodeList: KitDOMNodeList.
-//
 func (self *DOMDocument) ElementsByTagNameNs(namespaceUri, tagName string) *DOMNodeList {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -1570,7 +1521,6 @@ func (self *DOMDocument) ElementsByTagNameNs(namespaceUri, tagName string) *DOMN
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMDocument) ElementsByTagNameNsAsHtmlCollection(namespaceURI, localName string) *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMDocument       // out
 	var _arg1 *C.gchar                   // out
@@ -1600,7 +1550,6 @@ func (self *DOMDocument) ElementsByTagNameNsAsHtmlCollection(namespaceURI, local
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMDocument) Embeds() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMDocument       // out
 	var _cret *C.WebKitDOMHTMLCollection // in
@@ -1622,7 +1571,6 @@ func (self *DOMDocument) Embeds() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDocument) FirstElementChild() *DOMElement {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.WebKitDOMElement  // in
@@ -1644,7 +1592,6 @@ func (self *DOMDocument) FirstElementChild() *DOMElement {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMDocument) Forms() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMDocument       // out
 	var _cret *C.WebKitDOMHTMLCollection // in
@@ -1666,7 +1613,6 @@ func (self *DOMDocument) Forms() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - domhtmlHeadElement: KitDOMHTMLHeadElement.
-//
 func (self *DOMDocument) Head() *DOMHTMLHeadElement {
 	var _arg0 *C.WebKitDOMDocument        // out
 	var _cret *C.WebKitDOMHTMLHeadElement // in
@@ -1688,7 +1634,6 @@ func (self *DOMDocument) Head() *DOMHTMLHeadElement {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDocument) Hidden() bool {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret C.gboolean           // in
@@ -1712,7 +1657,6 @@ func (self *DOMDocument) Hidden() bool {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMDocument) Images() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMDocument       // out
 	var _cret *C.WebKitDOMHTMLCollection // in
@@ -1734,7 +1678,6 @@ func (self *DOMDocument) Images() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - domdomImplementation: KitDOMDOMImplementation.
-//
 func (self *DOMDocument) Implementation() *DOMDOMImplementation {
 	var _arg0 *C.WebKitDOMDocument          // out
 	var _cret *C.WebKitDOMDOMImplementation // in
@@ -1756,7 +1699,6 @@ func (self *DOMDocument) Implementation() *DOMDOMImplementation {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) InputEncoding() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -1779,7 +1721,6 @@ func (self *DOMDocument) InputEncoding() string {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDocument) LastElementChild() *DOMElement {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.WebKitDOMElement  // in
@@ -1801,7 +1742,6 @@ func (self *DOMDocument) LastElementChild() *DOMElement {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) LastModified() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -1824,7 +1764,6 @@ func (self *DOMDocument) LastModified() string {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMDocument) Links() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMDocument       // out
 	var _cret *C.WebKitDOMHTMLCollection // in
@@ -1846,7 +1785,6 @@ func (self *DOMDocument) Links() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) Origin() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -1874,7 +1812,6 @@ func (self *DOMDocument) Origin() string {
 // The function returns the following values:
 //
 //   - domcssStyleDeclaration: KitDOMCSSStyleDeclaration.
-//
 func (self *DOMDocument) OverrideStyle(element *DOMElement, pseudoElement string) *DOMCSSStyleDeclaration {
 	var _arg0 *C.WebKitDOMDocument            // out
 	var _arg1 *C.WebKitDOMElement             // out
@@ -1905,7 +1842,6 @@ func (self *DOMDocument) OverrideStyle(element *DOMElement, pseudoElement string
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMDocument) Plugins() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMDocument       // out
 	var _cret *C.WebKitDOMHTMLCollection // in
@@ -1927,7 +1863,6 @@ func (self *DOMDocument) Plugins() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDocument) PointerLockElement() *DOMElement {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.WebKitDOMElement  // in
@@ -1951,7 +1886,6 @@ func (self *DOMDocument) PointerLockElement() *DOMElement {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) PreferredStylesheetSet() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -1974,7 +1908,6 @@ func (self *DOMDocument) PreferredStylesheetSet() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) ReadyState() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -1997,7 +1930,6 @@ func (self *DOMDocument) ReadyState() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) Referrer() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -2020,7 +1952,6 @@ func (self *DOMDocument) Referrer() string {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMDocument) Scripts() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMDocument       // out
 	var _cret *C.WebKitDOMHTMLCollection // in
@@ -2042,7 +1973,6 @@ func (self *DOMDocument) Scripts() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDocument) ScrollingElement() *DOMElement {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.WebKitDOMElement  // in
@@ -2066,7 +1996,6 @@ func (self *DOMDocument) ScrollingElement() *DOMElement {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) SelectedStylesheetSet() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -2089,7 +2018,6 @@ func (self *DOMDocument) SelectedStylesheetSet() string {
 // The function returns the following values:
 //
 //   - domStyleSheetList: KitDOMStyleSheetList.
-//
 func (self *DOMDocument) StyleSheets() *DOMStyleSheetList {
 	var _arg0 *C.WebKitDOMDocument       // out
 	var _cret *C.WebKitDOMStyleSheetList // in
@@ -2111,7 +2039,6 @@ func (self *DOMDocument) StyleSheets() *DOMStyleSheetList {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) Title() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -2134,7 +2061,6 @@ func (self *DOMDocument) Title() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) URL() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -2157,7 +2083,6 @@ func (self *DOMDocument) URL() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) VisibilityState() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -2180,7 +2105,6 @@ func (self *DOMDocument) VisibilityState() string {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDocument) WebkitCurrentFullscreenElement() *DOMElement {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.WebKitDOMElement  // in
@@ -2202,7 +2126,6 @@ func (self *DOMDocument) WebkitCurrentFullscreenElement() *DOMElement {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDocument) WebkitFullscreenElement() *DOMElement {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.WebKitDOMElement  // in
@@ -2224,7 +2147,6 @@ func (self *DOMDocument) WebkitFullscreenElement() *DOMElement {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDocument) WebkitFullscreenEnabled() bool {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret C.gboolean           // in
@@ -2249,7 +2171,6 @@ func (self *DOMDocument) WebkitFullscreenEnabled() bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDocument) WebkitFullscreenKeyboardInputAllowed() bool {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret C.gboolean           // in
@@ -2273,7 +2194,6 @@ func (self *DOMDocument) WebkitFullscreenKeyboardInputAllowed() bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDocument) WebkitIsFullscreen() bool {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret C.gboolean           // in
@@ -2297,7 +2217,6 @@ func (self *DOMDocument) WebkitIsFullscreen() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) XMLEncoding() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -2320,7 +2239,6 @@ func (self *DOMDocument) XMLEncoding() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDocument) XMLStandalone() bool {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret C.gboolean           // in
@@ -2344,7 +2262,6 @@ func (self *DOMDocument) XMLStandalone() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) XMLVersion() string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret *C.gchar             // in
@@ -2367,7 +2284,6 @@ func (self *DOMDocument) XMLVersion() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDocument) HasFocus() bool {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _cret C.gboolean           // in
@@ -2396,7 +2312,6 @@ func (self *DOMDocument) HasFocus() bool {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMDocument) ImportNode(importedNode *DOMNode, deep bool) (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.WebKitDOMNode     // out
@@ -2435,7 +2350,6 @@ func (self *DOMDocument) ImportNode(importedNode *DOMNode, deep bool) (*DOMNode,
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDocument) QueryCommandEnabled(command string) bool {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -2467,7 +2381,6 @@ func (self *DOMDocument) QueryCommandEnabled(command string) bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDocument) QueryCommandIndeterm(command string) bool {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -2499,7 +2412,6 @@ func (self *DOMDocument) QueryCommandIndeterm(command string) bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDocument) QueryCommandState(command string) bool {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -2531,7 +2443,6 @@ func (self *DOMDocument) QueryCommandState(command string) bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDocument) QueryCommandSupported(command string) bool {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -2563,7 +2474,6 @@ func (self *DOMDocument) QueryCommandSupported(command string) bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocument) QueryCommandValue(command string) string {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -2594,7 +2504,6 @@ func (self *DOMDocument) QueryCommandValue(command string) string {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDocument) QuerySelector(selectors string) (*DOMElement, error) {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -2629,7 +2538,6 @@ func (self *DOMDocument) QuerySelector(selectors string) (*DOMElement, error) {
 // The function returns the following values:
 //
 //   - domNodeList: KitDOMNodeList.
-//
 func (self *DOMDocument) QuerySelectorAll(selectors string) (*DOMNodeList, error) {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -2660,7 +2568,6 @@ func (self *DOMDocument) QuerySelectorAll(selectors string) (*DOMNodeList, error
 // The function takes the following parameters:
 //
 //   - value: KitDOMHTMLElement.
-//
 func (self *DOMDocument) SetBody(value *DOMHTMLElement) error {
 	var _arg0 *C.WebKitDOMDocument    // out
 	var _arg1 *C.WebKitDOMHTMLElement // out
@@ -2687,7 +2594,6 @@ func (self *DOMDocument) SetBody(value *DOMHTMLElement) error {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMDocument) SetCharset(value string) {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -2706,7 +2612,6 @@ func (self *DOMDocument) SetCharset(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMDocument) SetCookie(value string) error {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -2734,7 +2639,6 @@ func (self *DOMDocument) SetCookie(value string) error {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMDocument) SetDesignMode(value string) {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -2753,7 +2657,6 @@ func (self *DOMDocument) SetDesignMode(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMDocument) SetDir(value string) {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -2772,7 +2675,6 @@ func (self *DOMDocument) SetDir(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMDocument) SetDocumentURI(value string) {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -2793,7 +2695,6 @@ func (self *DOMDocument) SetDocumentURI(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMDocument) SetSelectedStylesheetSet(value string) {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -2812,7 +2713,6 @@ func (self *DOMDocument) SetSelectedStylesheetSet(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMDocument) SetTitle(value string) {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out
@@ -2831,7 +2731,6 @@ func (self *DOMDocument) SetTitle(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMDocument) SetXMLStandalone(value bool) error {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 C.gboolean           // out
@@ -2860,7 +2759,6 @@ func (self *DOMDocument) SetXMLStandalone(value bool) error {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMDocument) SetXMLVersion(value string) error {
 	var _arg0 *C.WebKitDOMDocument // out
 	var _arg1 *C.gchar             // out

@@ -23,7 +23,6 @@ import "C"
 // The function returns the following values:
 //
 //   - utf8: key system name for request.
-//
 func MediaKeySystemPermissionGetName(request *MediaKeySystemPermissionRequest) string {
 	var _arg1 *C.WebKitMediaKeySystemPermissionRequest // out
 	var _cret *C.gchar                                 // in

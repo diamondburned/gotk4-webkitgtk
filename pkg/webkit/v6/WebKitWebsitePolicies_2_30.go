@@ -71,7 +71,7 @@ func defaultWebsitePoliciesOverrides(v *WebsitePolicies) WebsitePoliciesOverride
 // WebsitePolicies: view specific website policies.
 //
 // WebKitWebsitePolicies allows you to configure per-page policies, currently
-// only autoplay policies are supported.
+// only autoplay and custom user agent policies are supported.
 type WebsitePolicies struct {
 	_ [0]func() // equal guard
 	*coreglib.Object
@@ -112,7 +112,6 @@ func marshalWebsitePolicies(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - websitePolicies: newly created KitWebsitePolicies.
-//
 func NewWebsitePolicies() *WebsitePolicies {
 	var _cret *C.WebKitWebsitePolicies // in
 
@@ -130,7 +129,6 @@ func NewWebsitePolicies() *WebsitePolicies {
 // The function returns the following values:
 //
 //   - autoplayPolicy: KitAutoplayPolicy.
-//
 func (policies *WebsitePolicies) AutoplayPolicy() AutoplayPolicy {
 	var _arg0 *C.WebKitWebsitePolicies // out
 	var _cret C.WebKitAutoplayPolicy   // in
@@ -145,4 +143,28 @@ func (policies *WebsitePolicies) AutoplayPolicy() AutoplayPolicy {
 	_autoplayPolicy = AutoplayPolicy(_cret)
 
 	return _autoplayPolicy
+}
+
+// CustomUserAgent: get the KitWebsitePolicies:custom-user-agent property.
+//
+// The function returns the following values:
+//
+//   - utf8 (optional): custom user agent string, or NULL if the default user
+//     agent is used.
+func (policies *WebsitePolicies) CustomUserAgent() string {
+	var _arg0 *C.WebKitWebsitePolicies // out
+	var _cret *C.gchar                 // in
+
+	_arg0 = (*C.WebKitWebsitePolicies)(unsafe.Pointer(coreglib.InternObject(policies).Native()))
+
+	_cret = C.webkit_website_policies_get_custom_user_agent(_arg0)
+	runtime.KeepAlive(policies)
+
+	var _utf8 string // out
+
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
+
+	return _utf8
 }

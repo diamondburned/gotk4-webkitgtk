@@ -86,7 +86,6 @@ func marshalDOMHTMLFieldSetElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - domhtmlFormElement: KitDOMHTMLFormElement.
-//
 func (self *DOMHTMLFieldSetElement) Form() *DOMHTMLFormElement {
 	var _arg0 *C.WebKitDOMHTMLFieldSetElement // out
 	var _cret *C.WebKitDOMHTMLFormElement     // in

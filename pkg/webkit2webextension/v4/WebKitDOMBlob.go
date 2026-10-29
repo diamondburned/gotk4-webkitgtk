@@ -76,7 +76,6 @@ func marshalDOMBlob(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - guint64: #guint64.
-//
 func (self *DOMBlob) Size() uint64 {
 	var _arg0 *C.WebKitDOMBlob // out
 	var _cret C.guint64        // in

@@ -20,7 +20,7 @@ func _gotk4_soup3_Message_ConnectAcceptCertificate(arg0 C.gpointer, arg1 *C.GTls
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -66,7 +66,7 @@ func _gotk4_soup3_Message_ConnectAuthenticate(arg0 C.gpointer, arg1 *C.SoupAuth,
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -114,7 +114,7 @@ func _gotk4_soup3_Message_ConnectContentSniffed(arg0 C.gpointer, arg1 *C.gchar, 
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -145,7 +145,7 @@ func _gotk4_soup3_Message_ConnectFinished(arg0 C.gpointer, arg1 C.guintptr) {
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -161,7 +161,7 @@ func _gotk4_soup3_Message_ConnectGotBody(arg0 C.gpointer, arg1 C.guintptr) {
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -177,7 +177,7 @@ func _gotk4_soup3_Message_ConnectGotBodyData(arg0 C.gpointer, arg1 C.guint, arg2
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -197,7 +197,7 @@ func _gotk4_soup3_Message_ConnectGotHeaders(arg0 C.gpointer, arg1 C.guintptr) {
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -213,7 +213,7 @@ func _gotk4_soup3_Message_ConnectGotInformational(arg0 C.gpointer, arg1 C.guintp
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -229,7 +229,7 @@ func _gotk4_soup3_Message_ConnectHstsEnforced(arg0 C.gpointer, arg1 C.guintptr) 
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -245,7 +245,7 @@ func _gotk4_soup3_Message_ConnectNetworkEvent(arg0 C.gpointer, arg1 C.GSocketCli
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -283,7 +283,7 @@ func _gotk4_soup3_Message_ConnectRequestCertificate(arg0 C.gpointer, arg1 *C.GTl
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -327,7 +327,7 @@ func _gotk4_soup3_Message_ConnectRequestCertificatePassword(arg0 C.gpointer, arg
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -354,13 +354,41 @@ func _gotk4_soup3_Message_ConnectRequestCertificatePassword(arg0 C.gpointer, arg
 	return cret
 }
 
+//export _gotk4_soup3_Message_ConnectRequestCompressionDictionary
+func _gotk4_soup3_Message_ConnectRequestCompressionDictionary(arg0 C.gpointer, arg1 *C.SoupCompressionDictionaryRequest, arg2 C.guintptr) (cret C.gboolean) {
+	var f func(request *CompressionDictionaryRequest) (ok bool)
+	{
+		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
+		if closure == nil {
+			return
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(request *CompressionDictionaryRequest) (ok bool))
+	}
+
+	var _request *CompressionDictionaryRequest // out
+
+	_request = wrapCompressionDictionaryRequest(coreglib.Take(unsafe.Pointer(arg1)))
+
+	ok := f(_request)
+
+	var _ bool
+
+	if ok {
+		cret = C.TRUE
+	}
+
+	return cret
+}
+
 //export _gotk4_soup3_Message_ConnectRestarted
 func _gotk4_soup3_Message_ConnectRestarted(arg0 C.gpointer, arg1 C.guintptr) {
 	var f func()
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -376,7 +404,7 @@ func _gotk4_soup3_Message_ConnectStarting(arg0 C.gpointer, arg1 C.guintptr) {
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -392,7 +420,7 @@ func _gotk4_soup3_Message_ConnectWroteBody(arg0 C.gpointer, arg1 C.guintptr) {
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -408,7 +436,7 @@ func _gotk4_soup3_Message_ConnectWroteBodyData(arg0 C.gpointer, arg1 C.guint, ar
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -428,7 +456,7 @@ func _gotk4_soup3_Message_ConnectWroteHeaders(arg0 C.gpointer, arg1 C.guintptr) 
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

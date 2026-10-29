@@ -49,7 +49,6 @@ func marshalJavascriptResult(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - value of the KitJavascriptResult.
-//
 func (jsResult *JavascriptResult) JsValue() *javascriptcore.Value {
 	var _arg0 *C.WebKitJavascriptResult // out
 	var _cret *C.JSCValue               // in

@@ -76,7 +76,6 @@ func marshalDOMFileList(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMFileList) Length() uint32 {
 	var _arg0 *C.WebKitDOMFileList // out
 	var _cret C.gulong             // in
@@ -102,7 +101,6 @@ func (self *DOMFileList) Length() uint32 {
 // The function returns the following values:
 //
 //   - domFile: KitDOMFile.
-//
 func (self *DOMFileList) Item(index uint32) *DOMFile {
 	var _arg0 *C.WebKitDOMFileList // out
 	var _arg1 C.gulong             // out

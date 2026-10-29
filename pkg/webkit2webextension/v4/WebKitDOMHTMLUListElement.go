@@ -86,7 +86,6 @@ func marshalDOMHTMLUListElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLUListElement) Compact() bool {
 	var _arg0 *C.WebKitDOMHTMLUListElement // out
 	var _cret C.gboolean                   // in
@@ -110,7 +109,6 @@ func (self *DOMHTMLUListElement) Compact() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLUListElement) TypeAttr() string {
 	var _arg0 *C.WebKitDOMHTMLUListElement // out
 	var _cret *C.gchar                     // in
@@ -133,7 +131,6 @@ func (self *DOMHTMLUListElement) TypeAttr() string {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLUListElement) SetCompact(value bool) {
 	var _arg0 *C.WebKitDOMHTMLUListElement // out
 	var _arg1 C.gboolean                   // out
@@ -153,7 +150,6 @@ func (self *DOMHTMLUListElement) SetCompact(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLUListElement) SetTypeAttr(value string) {
 	var _arg0 *C.WebKitDOMHTMLUListElement // out
 	var _arg1 *C.gchar                     // out

@@ -24,7 +24,6 @@ import "C"
 // The function returns the following values:
 //
 //   - featureList: list of all features.
-//
 func SettingsGetAllFeatures() *FeatureList {
 	var _cret *C.WebKitFeatureList // in
 
@@ -47,14 +46,13 @@ func SettingsGetAllFeatures() *FeatureList {
 // features.
 //
 // The returned features are a subset of those returned by
-// settings.GetAllFeatures(), and includes those which web and WebKit developers
+// settings.GetAllFeatures(), and include those which web and WebKit developers
 // might find useful, but in general should *not* be exposed to end users;
 // see featurestatus for more details.
 //
 // The function returns the following values:
 //
 //   - featureList: list of development features.
-//
 func SettingsGetDevelopmentFeatures() *FeatureList {
 	var _cret *C.WebKitFeatureList // in
 
@@ -77,13 +75,12 @@ func SettingsGetDevelopmentFeatures() *FeatureList {
 // WebKit features.
 //
 // The returned features are a subset of those returned by
-// settings.GetAllFeatures(), and includes those which certain applications may
+// settings.GetAllFeatures(), and include those which certain applications may
 // want to expose to end users; see featurestatus for more details.
 //
 // The function returns the following values:
 //
 //   - featureList: list of experimental features.
-//
 func SettingsGetExperimentalFeatures() *FeatureList {
 	var _cret *C.WebKitFeatureList // in
 

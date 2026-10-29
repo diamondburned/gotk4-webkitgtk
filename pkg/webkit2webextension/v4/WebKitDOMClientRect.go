@@ -78,7 +78,6 @@ func marshalDOMClientRect(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - gfloat: #gfloat.
-//
 func (self *DOMClientRect) Bottom() float32 {
 	var _arg0 *C.WebKitDOMClientRect // out
 	var _cret C.gfloat               // in
@@ -102,7 +101,6 @@ func (self *DOMClientRect) Bottom() float32 {
 // The function returns the following values:
 //
 //   - gfloat: #gfloat.
-//
 func (self *DOMClientRect) Height() float32 {
 	var _arg0 *C.WebKitDOMClientRect // out
 	var _cret C.gfloat               // in
@@ -126,7 +124,6 @@ func (self *DOMClientRect) Height() float32 {
 // The function returns the following values:
 //
 //   - gfloat: #gfloat.
-//
 func (self *DOMClientRect) Left() float32 {
 	var _arg0 *C.WebKitDOMClientRect // out
 	var _cret C.gfloat               // in
@@ -150,7 +147,6 @@ func (self *DOMClientRect) Left() float32 {
 // The function returns the following values:
 //
 //   - gfloat: #gfloat.
-//
 func (self *DOMClientRect) Right() float32 {
 	var _arg0 *C.WebKitDOMClientRect // out
 	var _cret C.gfloat               // in
@@ -174,7 +170,6 @@ func (self *DOMClientRect) Right() float32 {
 // The function returns the following values:
 //
 //   - gfloat: #gfloat.
-//
 func (self *DOMClientRect) Top() float32 {
 	var _arg0 *C.WebKitDOMClientRect // out
 	var _cret C.gfloat               // in
@@ -198,7 +193,6 @@ func (self *DOMClientRect) Top() float32 {
 // The function returns the following values:
 //
 //   - gfloat: #gfloat.
-//
 func (self *DOMClientRect) Width() float32 {
 	var _arg0 *C.WebKitDOMClientRect // out
 	var _cret C.gfloat               // in

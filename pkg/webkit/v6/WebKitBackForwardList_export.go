@@ -18,7 +18,7 @@ func _gotk4_webkit6_BackForwardList_ConnectChanged(arg0 C.gpointer, arg1 *C.WebK
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

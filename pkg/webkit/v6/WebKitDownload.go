@@ -150,7 +150,6 @@ func (download *Download) Cancel() {
 // The function returns the following values:
 //
 //   - ok: current value of the KitDownload:allow-overwrite property.
-//
 func (download *Download) AllowOverwrite() bool {
 	var _arg0 *C.WebKitDownload // out
 	var _cret C.gboolean        // in
@@ -178,7 +177,6 @@ func (download *Download) AllowOverwrite() bool {
 // The function returns the following values:
 //
 //   - utf8 (optional): destination or NULL.
-//
 func (download *Download) Destination() string {
 	var _arg0 *C.WebKitDownload // out
 	var _cret *C.gchar          // in
@@ -205,7 +203,6 @@ func (download *Download) Destination() string {
 // The function returns the following values:
 //
 //   - gdouble seconds since the download was started.
-//
 func (download *Download) ElapsedTime() float64 {
 	var _arg0 *C.WebKitDownload // out
 	var _cret C.gdouble         // in
@@ -223,15 +220,13 @@ func (download *Download) ElapsedTime() float64 {
 }
 
 // EstimatedProgress gets the value of the KitDownload:estimated-progress
-// property. Gets the value of the KitDownload:estimated-progress property. You
-// can monitor the estimated progress of the download operation by connecting to
-// the notify::estimated-progress signal of download.
+// property. You can monitor the estimated progress of the download operation by
+// connecting to the notify::estimated-progress signal of download.
 //
 // The function returns the following values:
 //
-//   - gdouble: estimate of the of the percent complete for a download as a
-//     range from 0.0 to 1.0.
-//
+//   - gdouble: estimate of the percent complete for a download as a range from
+//     0.0 to 1.0.
 func (download *Download) EstimatedProgress() float64 {
 	var _arg0 *C.WebKitDownload // out
 	var _cret C.gdouble         // in
@@ -256,7 +251,6 @@ func (download *Download) EstimatedProgress() float64 {
 // The function returns the following values:
 //
 //   - guint64: amount of bytes already downloaded.
-//
 func (download *Download) ReceivedDataLength() uint64 {
 	var _arg0 *C.WebKitDownload // out
 	var _cret C.guint64         // in
@@ -278,7 +272,6 @@ func (download *Download) ReceivedDataLength() uint64 {
 // The function returns the following values:
 //
 //   - uriRequest of download.
-//
 func (download *Download) Request() *URIRequest {
 	var _arg0 *C.WebKitDownload   // out
 	var _cret *C.WebKitURIRequest // in
@@ -305,7 +298,6 @@ func (download *Download) Request() *URIRequest {
 // The function returns the following values:
 //
 //   - uriResponse or NULL if the response hasn't been received yet.
-//
 func (download *Download) Response() *URIResponse {
 	var _arg0 *C.WebKitDownload    // out
 	var _cret *C.WebKitURIResponse // in
@@ -328,7 +320,6 @@ func (download *Download) Response() *URIResponse {
 //
 //   - webView that initiated download, or NULL if download was not initiated by
 //     a KitWebView.
-//
 func (download *Download) WebView() *WebView {
 	var _arg0 *C.WebKitDownload // out
 	var _cret *C.WebKitWebView  // in
@@ -354,7 +345,6 @@ func (download *Download) WebView() *WebView {
 // The function takes the following parameters:
 //
 //   - allowed: new value for the KitDownload:allow-overwrite property.
-//
 func (download *Download) SetAllowOverwrite(allowed bool) {
 	var _arg0 *C.WebKitDownload // out
 	var _arg1 C.gboolean        // out
@@ -387,7 +377,6 @@ func (download *Download) SetAllowOverwrite(allowed bool) {
 // The function takes the following parameters:
 //
 //   - destination: destination.
-//
 func (download *Download) SetDestination(destination string) {
 	var _arg0 *C.WebKitDownload // out
 	var _arg1 *C.gchar          // out

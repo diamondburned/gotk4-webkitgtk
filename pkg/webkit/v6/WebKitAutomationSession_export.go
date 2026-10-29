@@ -18,7 +18,7 @@ func _gotk4_webkit6_AutomationSession_ConnectCreateWebView(arg0 C.gpointer, arg1
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -32,4 +32,20 @@ func _gotk4_webkit6_AutomationSession_ConnectCreateWebView(arg0 C.gpointer, arg1
 	cret = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
 
 	return cret
+}
+
+//export _gotk4_webkit6_AutomationSession_ConnectWillClose
+func _gotk4_webkit6_AutomationSession_ConnectWillClose(arg0 C.gpointer, arg1 C.guintptr) {
+	var f func()
+	{
+		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
+		if closure == nil {
+			return
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func())
+	}
+
+	f()
 }

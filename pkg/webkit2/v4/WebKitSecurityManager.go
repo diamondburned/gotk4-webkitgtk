@@ -84,7 +84,6 @@ func marshalSecurityManager(p uintptr) (interface{}, error) {
 // The function takes the following parameters:
 //
 //   - scheme: URI scheme.
-//
 func (securityManager *SecurityManager) RegisterURISchemeAsCorsEnabled(scheme string) {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
@@ -107,7 +106,6 @@ func (securityManager *SecurityManager) RegisterURISchemeAsCorsEnabled(scheme st
 // The function takes the following parameters:
 //
 //   - scheme: URI scheme.
-//
 func (securityManager *SecurityManager) RegisterURISchemeAsDisplayIsolated(scheme string) {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
@@ -129,7 +127,6 @@ func (securityManager *SecurityManager) RegisterURISchemeAsDisplayIsolated(schem
 // The function takes the following parameters:
 //
 //   - scheme: URI scheme.
-//
 func (securityManager *SecurityManager) RegisterURISchemeAsEmptyDocument(scheme string) {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
@@ -151,7 +148,6 @@ func (securityManager *SecurityManager) RegisterURISchemeAsEmptyDocument(scheme 
 // The function takes the following parameters:
 //
 //   - scheme: URI scheme.
-//
 func (securityManager *SecurityManager) RegisterURISchemeAsLocal(scheme string) {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
@@ -173,7 +169,6 @@ func (securityManager *SecurityManager) RegisterURISchemeAsLocal(scheme string) 
 // The function takes the following parameters:
 //
 //   - scheme: URI scheme.
-//
 func (securityManager *SecurityManager) RegisterURISchemeAsNoAccess(scheme string) {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
@@ -195,7 +190,6 @@ func (securityManager *SecurityManager) RegisterURISchemeAsNoAccess(scheme strin
 // The function takes the following parameters:
 //
 //   - scheme: URI scheme.
-//
 func (securityManager *SecurityManager) RegisterURISchemeAsSecure(scheme string) {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
@@ -221,7 +215,6 @@ func (securityManager *SecurityManager) RegisterURISchemeAsSecure(scheme string)
 // The function returns the following values:
 //
 //   - ok: TRUE if scheme is a CORS enabled scheme or FALSE otherwise.
-//
 func (securityManager *SecurityManager) URISchemeIsCorsEnabled(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
@@ -256,7 +249,6 @@ func (securityManager *SecurityManager) URISchemeIsCorsEnabled(scheme string) bo
 // The function returns the following values:
 //
 //   - ok: TRUE if scheme is a display isolated scheme or FALSE otherwise.
-//
 func (securityManager *SecurityManager) URISchemeIsDisplayIsolated(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
@@ -291,7 +283,6 @@ func (securityManager *SecurityManager) URISchemeIsDisplayIsolated(scheme string
 // The function returns the following values:
 //
 //   - ok: TRUE if scheme is an empty document scheme or FALSE otherwise.
-//
 func (securityManager *SecurityManager) URISchemeIsEmptyDocument(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
@@ -325,7 +316,6 @@ func (securityManager *SecurityManager) URISchemeIsEmptyDocument(scheme string) 
 // The function returns the following values:
 //
 //   - ok: TRUE if scheme is a local scheme or FALSE otherwise.
-//
 func (securityManager *SecurityManager) URISchemeIsLocal(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
@@ -359,7 +349,6 @@ func (securityManager *SecurityManager) URISchemeIsLocal(scheme string) bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if scheme is a no-access scheme or FALSE otherwise.
-//
 func (securityManager *SecurityManager) URISchemeIsNoAccess(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out
@@ -393,7 +382,6 @@ func (securityManager *SecurityManager) URISchemeIsNoAccess(scheme string) bool 
 // The function returns the following values:
 //
 //   - ok: TRUE if scheme is a secure scheme or FALSE otherwise.
-//
 func (securityManager *SecurityManager) URISchemeIsSecure(scheme string) bool {
 	var _arg0 *C.WebKitSecurityManager // out
 	var _arg1 *C.gchar                 // out

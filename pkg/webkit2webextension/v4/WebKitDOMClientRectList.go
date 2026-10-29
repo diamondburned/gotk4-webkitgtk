@@ -78,7 +78,6 @@ func marshalDOMClientRectList(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMClientRectList) Length() uint32 {
 	var _arg0 *C.WebKitDOMClientRectList // out
 	var _cret C.gulong                   // in
@@ -106,7 +105,6 @@ func (self *DOMClientRectList) Length() uint32 {
 // The function returns the following values:
 //
 //   - domClientRect: KitDOMClientRect.
-//
 func (self *DOMClientRectList) Item(index uint32) *DOMClientRect {
 	var _arg0 *C.WebKitDOMClientRectList // out
 	var _arg1 C.gulong                   // out

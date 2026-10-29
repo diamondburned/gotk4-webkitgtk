@@ -6,8 +6,10 @@ import (
 	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
 // #include <stdlib.h>
@@ -36,14 +38,20 @@ func defaultCookieJarDBOverrides(v *CookieJarDB) CookieJarDBOverrides {
 
 // CookieJarDB: database-based Cookie Jar.
 //
-// CookieJarDB is a cookiejar that reads cookies from and writes them to a
+// cookiejardb is a cookiejar that reads cookies from and writes them to a
 // sqlite database in the new Mozilla format.
 //
 // (This is identical to SoupCookieJarSqlite in libsoup-gnome; it has just been
-// moved into libsoup proper, and renamed to avoid conflicting.).
+// moved into libsoup proper, and renamed to avoid conflicting.)
+//
+// Since 3.8 this class implements gio.Initable to track failures opening the
+// database. See soupcookiejardb.NewWithError.
 type CookieJarDB struct {
 	_ [0]func() // equal guard
 	CookieJar
+
+	*coreglib.Object
+	gio.Initable
 }
 
 var (
@@ -74,6 +82,10 @@ func wrapCookieJarDB(obj *coreglib.Object) *CookieJarDB {
 				Object: obj,
 			},
 		},
+		Object: obj,
+		Initable: gio.Initable{
+			Object: obj,
+		},
 	}
 }
 
@@ -81,7 +93,7 @@ func marshalCookieJarDB(p uintptr) (interface{}, error) {
 	return wrapCookieJarDB(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewCookieJarDB creates a CookieJarDB.
+// NewCookieJarDB creates a cookiejardb.
 //
 // filename will be read in at startup to create an initial set of cookies.
 // If read_only is FALSE, then the non-session cookies will be written to
@@ -97,7 +109,6 @@ func marshalCookieJarDB(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - cookieJarDB: new CookieJar.
-//
 func NewCookieJarDB(filename string, readOnly bool) *CookieJarDB {
 	var _arg1 *C.char          // out
 	var _arg2 C.gboolean       // out
@@ -118,6 +129,113 @@ func NewCookieJarDB(filename string, readOnly bool) *CookieJarDB {
 	_cookieJarDB = wrapCookieJarDB(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
 
 	return _cookieJarDB
+}
+
+// NewCookieJarDBWithError creates a cookiejardb, returning NULL and setting
+// error if the database file cannot be opened.
+//
+// The function takes the following parameters:
+//
+//   - filename to read to/write from.
+//   - readOnly: TRUE if filename is read-only.
+//
+// The function returns the following values:
+//
+//   - cookieJarDB: new CookieJar, or NULL on error.
+func NewCookieJarDBWithError(filename string, readOnly bool) (*CookieJarDB, error) {
+	var _arg1 *C.char          // out
+	var _arg2 C.gboolean       // out
+	var _cret *C.SoupCookieJar // in
+	var _cerr *C.GError        // in
+
+	_arg1 = (*C.char)(unsafe.Pointer(C.CString(filename)))
+	defer C.free(unsafe.Pointer(_arg1))
+	if readOnly {
+		_arg2 = C.TRUE
+	}
+
+	_cret = C.soup_cookie_jar_db_new_with_error(_arg1, _arg2, &_cerr)
+	runtime.KeepAlive(filename)
+	runtime.KeepAlive(readOnly)
+
+	var _cookieJarDB *CookieJarDB // out
+	var _goerr error              // out
+
+	_cookieJarDB = wrapCookieJarDB(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
+
+	return _cookieJarDB, _goerr
+}
+
+// MaxSize: get the maximum size for the database file storage
+//
+// This method returns the currently configured max database file size. A return
+// value of zero indicates that no limit is configured.
+//
+// The function returns the following values:
+//
+//   - guint64: database max file size.
+func (jar *CookieJarDB) MaxSize() uint64 {
+	var _arg0 *C.SoupCookieJarDB // out
+	var _cret C.guint64          // in
+
+	_arg0 = (*C.SoupCookieJarDB)(unsafe.Pointer(coreglib.InternObject(jar).Native()))
+
+	_cret = C.soup_cookie_jar_db_get_max_size(_arg0)
+	runtime.KeepAlive(jar)
+
+	var _guint64 uint64 // out
+
+	_guint64 = uint64(_cret)
+
+	return _guint64
+}
+
+// SetMaxSize: set the maximum size for the database file storage
+//
+// If max_size is 0, it means "no limit", in which case the database file size
+// will be limited only by the database capabilities / intrinsic limits.
+//
+// If max_size has a higher limit than supported by the database, the max_size
+// will be internally set to the limit supported by the database.
+//
+// The max_size will be internally truncated to a multiple of the database page
+// size. If the page size is, for example, 4K, setting a max size of 10K will
+// effectively limit the database size to 8K to ensure it does not grow beyond
+// the specified limit.
+//
+// Attempting to set a limit that is less than the already used database file
+// storage will NOT truncate the database, but won't allow the database to grow
+// further in size (although writes might be still accepted within the already
+// allocated space).
+//
+// This value does not persist in the database. Each construction of this class
+// must set the property again or it will use the default value.
+//
+// The function takes the following parameters:
+//
+//   - maxSize: max database file size, in bytes error A #GError.
+func (jar *CookieJarDB) SetMaxSize(maxSize uint64) error {
+	var _arg0 *C.SoupCookieJarDB // out
+	var _arg1 C.guint64          // out
+	var _cerr *C.GError          // in
+
+	_arg0 = (*C.SoupCookieJarDB)(unsafe.Pointer(coreglib.InternObject(jar).Native()))
+	_arg1 = C.guint64(maxSize)
+
+	C.soup_cookie_jar_db_set_max_size(_arg0, _arg1, &_cerr)
+	runtime.KeepAlive(jar)
+	runtime.KeepAlive(maxSize)
+
+	var _goerr error // out
+
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
+
+	return _goerr
 }
 
 // CookieJarDBClass: instance of this type is always passed by reference.

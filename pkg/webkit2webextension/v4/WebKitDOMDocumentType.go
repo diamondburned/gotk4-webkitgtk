@@ -82,7 +82,6 @@ func marshalDOMDocumentType(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - domNamedNodeMap: KitDOMNamedNodeMap.
-//
 func (self *DOMDocumentType) Entities() *DOMNamedNodeMap {
 	var _arg0 *C.WebKitDOMDocumentType // out
 	var _cret *C.WebKitDOMNamedNodeMap // in
@@ -104,7 +103,6 @@ func (self *DOMDocumentType) Entities() *DOMNamedNodeMap {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocumentType) InternalSubset() string {
 	var _arg0 *C.WebKitDOMDocumentType // out
 	var _cret *C.gchar                 // in
@@ -127,7 +125,6 @@ func (self *DOMDocumentType) InternalSubset() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocumentType) Name() string {
 	var _arg0 *C.WebKitDOMDocumentType // out
 	var _cret *C.gchar                 // in
@@ -150,7 +147,6 @@ func (self *DOMDocumentType) Name() string {
 // The function returns the following values:
 //
 //   - domNamedNodeMap: KitDOMNamedNodeMap.
-//
 func (self *DOMDocumentType) Notations() *DOMNamedNodeMap {
 	var _arg0 *C.WebKitDOMDocumentType // out
 	var _cret *C.WebKitDOMNamedNodeMap // in
@@ -172,7 +168,6 @@ func (self *DOMDocumentType) Notations() *DOMNamedNodeMap {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocumentType) PublicID() string {
 	var _arg0 *C.WebKitDOMDocumentType // out
 	var _cret *C.gchar                 // in
@@ -195,7 +190,6 @@ func (self *DOMDocumentType) PublicID() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDocumentType) SystemID() string {
 	var _arg0 *C.WebKitDOMDocumentType // out
 	var _cret *C.gchar                 // in

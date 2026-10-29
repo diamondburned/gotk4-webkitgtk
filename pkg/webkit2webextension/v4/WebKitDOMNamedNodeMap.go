@@ -77,7 +77,6 @@ func marshalDOMNamedNodeMap(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMNamedNodeMap) Length() uint32 {
 	var _arg0 *C.WebKitDOMNamedNodeMap // out
 	var _cret C.gulong                 // in
@@ -103,7 +102,6 @@ func (self *DOMNamedNodeMap) Length() uint32 {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNamedNodeMap) NamedItem(name string) *DOMNode {
 	var _arg0 *C.WebKitDOMNamedNodeMap // out
 	var _arg1 *C.gchar                 // out
@@ -134,7 +132,6 @@ func (self *DOMNamedNodeMap) NamedItem(name string) *DOMNode {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNamedNodeMap) NamedItemNs(namespaceURI, localName string) *DOMNode {
 	var _arg0 *C.WebKitDOMNamedNodeMap // out
 	var _arg1 *C.gchar                 // out
@@ -168,7 +165,6 @@ func (self *DOMNamedNodeMap) NamedItemNs(namespaceURI, localName string) *DOMNod
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNamedNodeMap) Item(index uint32) *DOMNode {
 	var _arg0 *C.WebKitDOMNamedNodeMap // out
 	var _arg1 C.gulong                 // out
@@ -197,7 +193,6 @@ func (self *DOMNamedNodeMap) Item(index uint32) *DOMNode {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNamedNodeMap) RemoveNamedItem(name string) (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMNamedNodeMap // out
 	var _arg1 *C.gchar                 // out
@@ -233,7 +228,6 @@ func (self *DOMNamedNodeMap) RemoveNamedItem(name string) (*DOMNode, error) {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNamedNodeMap) RemoveNamedItemNs(namespaceURI, localName string) (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMNamedNodeMap // out
 	var _arg1 *C.gchar                 // out
@@ -272,7 +266,6 @@ func (self *DOMNamedNodeMap) RemoveNamedItemNs(namespaceURI, localName string) (
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNamedNodeMap) SetNamedItem(node *DOMNode) (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMNamedNodeMap // out
 	var _arg1 *C.WebKitDOMNode         // out
@@ -306,7 +299,6 @@ func (self *DOMNamedNodeMap) SetNamedItem(node *DOMNode) (*DOMNode, error) {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNamedNodeMap) SetNamedItemNs(node *DOMNode) (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMNamedNodeMap // out
 	var _arg1 *C.WebKitDOMNode         // out

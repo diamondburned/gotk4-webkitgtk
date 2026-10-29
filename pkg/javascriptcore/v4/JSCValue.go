@@ -8,6 +8,7 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
@@ -16,6 +17,7 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <jsc/jsc.h>
+// extern void _gotk4_javascriptcore4_Executor(JSCValue*, JSCValue*, gpointer);
 import "C"
 
 // GType values.
@@ -128,7 +130,7 @@ func marshalValue(p uintptr) (interface{}, error) {
 }
 
 // NewValueArrayFromStrv: create a new CValue referencing an array of strings
-// with the items from strv. If array is NULL or empty a new empty array will be
+// with the items from strv. If strv is NULL or empty a new empty array will be
 // created.
 //
 // The function takes the following parameters:
@@ -139,7 +141,6 @@ func marshalValue(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - value: CValue.
-//
 func NewValueArrayFromStrv(context *Context, strv []string) *Value {
 	var _arg1 *C.JSCContext // out
 	var _arg2 **C.char      // out
@@ -181,7 +182,6 @@ func NewValueArrayFromStrv(context *Context, strv []string) *Value {
 // The function returns the following values:
 //
 //   - ret: CValue.
-//
 func NewValueBoolean(context *Context, value bool) *Value {
 	var _arg1 *C.JSCContext // out
 	var _arg2 C.gboolean    // out
@@ -214,7 +214,6 @@ func NewValueBoolean(context *Context, value bool) *Value {
 // The function returns the following values:
 //
 //   - value: CValue.
-//
 func NewValueFromJson(context *Context, json string) *Value {
 	var _arg1 *C.JSCContext // out
 	var _arg2 *C.char       // out
@@ -235,8 +234,7 @@ func NewValueFromJson(context *Context, json string) *Value {
 	return _value
 }
 
-// NewValueNull: create a new CValue referencing <function>null</function> in
-// context.
+// NewValueNull: create a new CValue referencing null in context.
 //
 // The function takes the following parameters:
 //
@@ -245,7 +243,6 @@ func NewValueFromJson(context *Context, json string) *Value {
 // The function returns the following values:
 //
 //   - value: CValue.
-//
 func NewValueNull(context *Context) *Value {
 	var _arg1 *C.JSCContext // out
 	var _cret *C.JSCValue   // in
@@ -272,7 +269,6 @@ func NewValueNull(context *Context) *Value {
 // The function returns the following values:
 //
 //   - value: CValue.
-//
 func NewValueNumber(context *Context, number float64) *Value {
 	var _arg1 *C.JSCContext // out
 	var _arg2 C.double      // out
@@ -306,7 +302,6 @@ func NewValueNumber(context *Context, number float64) *Value {
 // The function returns the following values:
 //
 //   - value: CValue.
-//
 func NewValueObject(context *Context, instance unsafe.Pointer, jscClass *Class) *Value {
 	var _arg1 *C.JSCContext // out
 	var _arg2 C.gpointer    // out
@@ -331,6 +326,43 @@ func NewValueObject(context *Context, instance unsafe.Pointer, jscClass *Class) 
 	return _value
 }
 
+// NewValuePromise creates a new Promise. executor will be invoked during
+// promise initialization and it receives the resolve and reject objects
+// that can be called to resolve or reject the promise. It is called like a
+// JavaScript function, so exceptions raised during the executor invocation
+// will not be propagated to the context, but handled by the promise causing a
+// rejection.
+//
+// The function takes the following parameters:
+//
+//   - context: CContext.
+//   - executor: initialization callback.
+//
+// The function returns the following values:
+//
+//   - value: deferred promise object.
+func NewValuePromise(context *Context, executor Executor) *Value {
+	var _arg1 *C.JSCContext // out
+	var _arg2 C.JSCExecutor // out
+	var _arg3 C.gpointer
+	var _cret *C.JSCValue // in
+
+	_arg1 = (*C.JSCContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
+	_arg2 = (*[0]byte)(C._gotk4_javascriptcore4_Executor)
+	_arg3 = C.gpointer(gbox.Assign(executor))
+	defer gbox.Delete(uintptr(_arg3))
+
+	_cret = C.jsc_value_new_promise(_arg1, _arg2, _arg3)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(executor)
+
+	var _value *Value // out
+
+	_value = wrapValue(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
+
+	return _value
+}
+
 // NewValueString: create a new CValue from string. If you need to
 // create a CValue from a string containing null characters, use
 // jsc_value_new_string_from_bytes() instead.
@@ -343,7 +375,6 @@ func NewValueObject(context *Context, instance unsafe.Pointer, jscClass *Class) 
 // The function returns the following values:
 //
 //   - value: CValue.
-//
 func NewValueString(context *Context, str string) *Value {
 	var _arg1 *C.JSCContext // out
 	var _arg2 *C.char       // out
@@ -376,7 +407,6 @@ func NewValueString(context *Context, str string) *Value {
 // The function returns the following values:
 //
 //   - value: CValue.
-//
 func NewValueStringFromBytes(context *Context, bytes *glib.Bytes) *Value {
 	var _arg1 *C.JSCContext // out
 	var _arg2 *C.GBytes     // out
@@ -417,7 +447,6 @@ func NewValueStringFromBytes(context *Context, bytes *glib.Bytes) *Value {
 // The function returns the following values:
 //
 //   - value: CValue.
-//
 func NewValueTypedArray(context *Context, typ TypedArrayType, length uint) *Value {
 	var _arg1 *C.JSCContext       // out
 	var _arg2 C.JSCTypedArrayType // out
@@ -440,8 +469,7 @@ func NewValueTypedArray(context *Context, typ TypedArrayType, length uint) *Valu
 	return _value
 }
 
-// NewValueUndefined: create a new CValue referencing
-// <function>undefined</function> in context.
+// NewValueUndefined: create a new CValue referencing undefined in context.
 //
 // The function takes the following parameters:
 //
@@ -450,7 +478,6 @@ func NewValueTypedArray(context *Context, typ TypedArrayType, length uint) *Valu
 // The function returns the following values:
 //
 //   - value: CValue.
-//
 func NewValueUndefined(context *Context) *Value {
 	var _arg1 *C.JSCContext // out
 	var _cret *C.JSCValue   // in
@@ -484,33 +511,25 @@ func NewValueUndefined(context *Context) *Value {
 // meantime. Consider taking a copy of the data and using the copy instead in
 // asynchronous code.
 //
-// The function takes the following parameters:
-//
-//   - size (optional): location where to store the size of the memory region.
-//
 // The function returns the following values:
 //
-//   - gpointer (optional): pointer to memory.
-//
-func (value *Value) ArrayBufferGetData(size *uint) unsafe.Pointer {
+//   - guint8s: pointer to memory.
+func (value *Value) ArrayBufferGetData() []byte {
 	var _arg0 *C.JSCValue // out
-	var _arg1 *C.gsize    // out
 	var _cret C.gpointer  // in
+	var _arg1 C.gsize     // in
 
 	_arg0 = (*C.JSCValue)(unsafe.Pointer(coreglib.InternObject(value).Native()))
-	if size != nil {
-		_arg1 = (*C.gsize)(unsafe.Pointer(size))
-	}
 
-	_cret = C.jsc_value_array_buffer_get_data(_arg0, _arg1)
+	_cret = C.jsc_value_array_buffer_get_data(_arg0, &_arg1)
 	runtime.KeepAlive(value)
-	runtime.KeepAlive(size)
 
-	var _gpointer unsafe.Pointer // out
+	var _guint8s []byte // out
 
-	_gpointer = (unsafe.Pointer)(unsafe.Pointer(_cret))
+	_guint8s = make([]byte, _arg1)
+	copy(_guint8s, unsafe.Slice((*byte)(unsafe.Pointer(_cret)), _arg1))
 
-	return _gpointer
+	return _guint8s
 }
 
 // ArrayBufferGetSize gets the size in bytes of the array buffer.
@@ -521,7 +540,6 @@ func (value *Value) ArrayBufferGetData(size *uint) unsafe.Pointer {
 // The function returns the following values:
 //
 //   - gsize: size, in bytes.
-//
 func (value *Value) ArrayBufferGetSize() uint {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gsize     // in
@@ -538,19 +556,17 @@ func (value *Value) ArrayBufferGetSize() uint {
 	return _gsize
 }
 
-// ConstructorCall: invoke <function>new</function> with constructor referenced
-// by value. If n_parameters is 0 no parameters will be passed to the
-// constructor.
+// ConstructorCall: invoke new with constructor referenced by value.
+// If n_parameters is 0 no parameters will be passed to the constructor.
 //
 // The function takes the following parameters:
 //
-//   - parameters (optional) -->s to pass as parameters to the constructor,
+//   - parameters (optional) objects to pass as parameters to the constructor,
 //     or NULL.
 //
 // The function returns the following values:
 //
 //   - ret referencing the newly created object instance.
-//
 func (value *Value) ConstructorCall(parameters []*Value) *Value {
 	var _arg0 *C.JSCValue  // out
 	var _arg2 **C.JSCValue // out
@@ -586,17 +602,16 @@ func (value *Value) ConstructorCall(parameters []*Value) *Value {
 // function.
 //
 // This function always returns a CValue, in case of void functions a CValue
-// referencing <function>undefined</function> is returned.
+// referencing undefined is returned.
 //
 // The function takes the following parameters:
 //
-//   - parameters (optional) -->s to pass as parameters to the function,
+//   - parameters (optional) objects to pass as parameters to the function,
 //     or NULL.
 //
 // The function returns the following values:
 //
 //   - ret with the return value of the function.
-//
 func (value *Value) FunctionCall(parameters []*Value) *Value {
 	var _arg0 *C.JSCValue  // out
 	var _arg2 **C.JSCValue // out
@@ -632,7 +647,6 @@ func (value *Value) FunctionCall(parameters []*Value) *Value {
 // The function returns the following values:
 //
 //   - context: CValue context.
-//
 func (value *Value) Context() *Context {
 	var _arg0 *C.JSCValue   // out
 	var _cret *C.JSCContext // in
@@ -654,7 +668,6 @@ func (value *Value) Context() *Context {
 // The function returns the following values:
 //
 //   - ok: whether the value is an array.
-//
 func (value *Value) IsArray() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -678,7 +691,6 @@ func (value *Value) IsArray() bool {
 // The function returns the following values:
 //
 //   - ok: whether the value is an ArrayBuffer.
-//
 func (value *Value) IsArrayBuffer() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -702,7 +714,6 @@ func (value *Value) IsArrayBuffer() bool {
 // The function returns the following values:
 //
 //   - ok: whether the value is a boolean.
-//
 func (value *Value) IsBoolean() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -726,7 +737,6 @@ func (value *Value) IsBoolean() bool {
 // The function returns the following values:
 //
 //   - ok: whether the value is a constructor.
-//
 func (value *Value) IsConstructor() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -750,7 +760,6 @@ func (value *Value) IsConstructor() bool {
 // The function returns the following values:
 //
 //   - ok: whether the value is a function.
-//
 func (value *Value) IsFunction() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -769,13 +778,11 @@ func (value *Value) IsFunction() bool {
 	return _ok
 }
 
-// IsNull: get whether the value referenced by value is
-// <function>null</function>.
+// IsNull: get whether the value referenced by value is null.
 //
 // The function returns the following values:
 //
 //   - ok: whether the value is null.
-//
 func (value *Value) IsNull() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -799,7 +806,6 @@ func (value *Value) IsNull() bool {
 // The function returns the following values:
 //
 //   - ok: whether the value is a number.
-//
 func (value *Value) IsNumber() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -823,7 +829,6 @@ func (value *Value) IsNumber() bool {
 // The function returns the following values:
 //
 //   - ok: whether the value is an object.
-//
 func (value *Value) IsObject() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -847,7 +852,6 @@ func (value *Value) IsObject() bool {
 // The function returns the following values:
 //
 //   - ok: whether the value is a string.
-//
 func (value *Value) IsString() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -871,7 +875,6 @@ func (value *Value) IsString() bool {
 // The function returns the following values:
 //
 //   - ok: whether value is a typed array.
-//
 func (value *Value) IsTypedArray() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -890,13 +893,11 @@ func (value *Value) IsTypedArray() bool {
 	return _ok
 }
 
-// IsUndefined: get whether the value referenced by value is
-// <function>undefined</function>.
+// IsUndefined: get whether the value referenced by value is undefined.
 //
 // The function returns the following values:
 //
 //   - ok: whether the value is undefined.
-//
 func (value *Value) IsUndefined() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -939,7 +940,6 @@ func (value *Value) IsUndefined() bool {
 // The function returns the following values:
 //
 //   - value: CValue.
-//
 func (arrayBuffer *Value) NewTypedArrayWithBuffer(typ TypedArrayType, offset uint, length int) *Value {
 	var _arg0 *C.JSCValue         // out
 	var _arg1 C.JSCTypedArrayType // out
@@ -967,15 +967,13 @@ func (arrayBuffer *Value) NewTypedArrayWithBuffer(typ TypedArrayType, offset uin
 
 // ObjectDefinePropertyData: define or modify a property with property_name
 // in object referenced by value. This is equivalent to JavaScript
-// <function>Object.defineProperty()</function> when used with a data
-// descriptor.
+// Object.defineProperty() when used with a data descriptor.
 //
 // The function takes the following parameters:
 //
 //   - propertyName: name of the property to define.
 //   - flags: CValuePropertyFlags.
 //   - propertyValue (optional): default property value.
-//
 func (value *Value) ObjectDefinePropertyData(propertyName string, flags ValuePropertyFlags, propertyValue *Value) {
 	var _arg0 *C.JSCValue             // out
 	var _arg1 *C.char                 // out
@@ -1008,7 +1006,6 @@ func (value *Value) ObjectDefinePropertyData(propertyName string, flags ValuePro
 // The function returns the following values:
 //
 //   - ok: TRUE if the property was deleted, or FALSE otherwise.
-//
 func (value *Value) ObjectDeleteProperty(name string) bool {
 	var _arg0 *C.JSCValue // out
 	var _arg1 *C.char     // out
@@ -1039,7 +1036,6 @@ func (value *Value) ObjectDeleteProperty(name string) bool {
 //   - utf8s (optional): NULL-terminated array of strings containing the
 //     property names, or NULL if value doesn't have enumerable properties.
 //     Use g_strfreev() to free.
-//
 func (value *Value) ObjectEnumerateProperties() []string {
 	var _arg0 *C.JSCValue // out
 	var _cret **C.gchar   // in
@@ -1081,7 +1077,6 @@ func (value *Value) ObjectEnumerateProperties() []string {
 // The function returns the following values:
 //
 //   - ret: property CValue.
-//
 func (value *Value) ObjectGetProperty(name string) *Value {
 	var _arg0 *C.JSCValue // out
 	var _arg1 *C.char     // out
@@ -1111,7 +1106,6 @@ func (value *Value) ObjectGetProperty(name string) *Value {
 // The function returns the following values:
 //
 //   - ret: property CValue.
-//
 func (value *Value) ObjectGetPropertyAtIndex(index uint) *Value {
 	var _arg0 *C.JSCValue // out
 	var _arg1 C.guint     // out
@@ -1140,7 +1134,6 @@ func (value *Value) ObjectGetPropertyAtIndex(index uint) *Value {
 // The function returns the following values:
 //
 //   - ok: TRUE if value has a property with name, or FALSE otherwise.
-//
 func (value *Value) ObjectHasProperty(name string) bool {
 	var _arg0 *C.JSCValue // out
 	var _arg1 *C.char     // out
@@ -1170,17 +1163,17 @@ func (value *Value) ObjectHasProperty(name string) bool {
 // so it should never be passed explicitly as parameter of this function.
 //
 // This function always returns a CValue, in case of void methods a CValue
-// referencing <function>undefined</function> is returned.
+// referencing undefined is returned.
 //
 // The function takes the following parameters:
 //
 //   - name: method name.
-//   - parameters (optional) -->s to pass as parameters to the method, or NULL.
+//   - parameters (optional) objects to pass as parameters to the method,
+//     or NULL.
 //
 // The function returns the following values:
 //
 //   - ret with the return value of the method.
-//
 func (value *Value) ObjectInvokeMethod(name string, parameters []*Value) *Value {
 	var _arg0 *C.JSCValue  // out
 	var _arg1 *C.char      // out
@@ -1225,7 +1218,6 @@ func (value *Value) ObjectInvokeMethod(name string, parameters []*Value) *Value 
 // The function returns the following values:
 //
 //   - ok: whether the value is an object instance of class name.
-//
 func (value *Value) ObjectIsInstanceOf(name string) bool {
 	var _arg0 *C.JSCValue // out
 	var _arg1 *C.char     // out
@@ -1254,7 +1246,6 @@ func (value *Value) ObjectIsInstanceOf(name string) bool {
 //
 //   - name: property name.
 //   - property to set.
-//
 func (value *Value) ObjectSetProperty(name string, property *Value) {
 	var _arg0 *C.JSCValue // out
 	var _arg1 *C.char     // out
@@ -1277,7 +1268,6 @@ func (value *Value) ObjectSetProperty(name string, property *Value) {
 //
 //   - index: property index.
 //   - property to set.
-//
 func (value *Value) ObjectSetPropertyAtIndex(index uint, property *Value) {
 	var _arg0 *C.JSCValue // out
 	var _arg1 C.guint     // out
@@ -1298,7 +1288,6 @@ func (value *Value) ObjectSetPropertyAtIndex(index uint, property *Value) {
 // The function returns the following values:
 //
 //   - ok result of the conversion.
-//
 func (value *Value) ToBoolean() bool {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -1322,7 +1311,6 @@ func (value *Value) ToBoolean() bool {
 // The function returns the following values:
 //
 //   - gdouble result of the conversion.
-//
 func (value *Value) ToDouble() float64 {
 	var _arg0 *C.JSCValue // out
 	var _cret C.double    // in
@@ -1344,7 +1332,6 @@ func (value *Value) ToDouble() float64 {
 // The function returns the following values:
 //
 //   - gint32 result of the conversion.
-//
 func (value *Value) ToInt32() int32 {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gint32    // in
@@ -1372,7 +1359,6 @@ func (value *Value) ToInt32() int32 {
 // The function returns the following values:
 //
 //   - utf8: null-terminated JSON string with serialization of value.
-//
 func (value *Value) ToJson(indent uint) string {
 	var _arg0 *C.JSCValue // out
 	var _arg1 C.guint     // out
@@ -1399,7 +1385,6 @@ func (value *Value) ToJson(indent uint) string {
 // The function returns the following values:
 //
 //   - utf8: null-terminated string result of the conversion.
-//
 func (value *Value) String() string {
 	var _arg0 *C.JSCValue // out
 	var _cret *C.char     // in
@@ -1423,7 +1408,6 @@ func (value *Value) String() string {
 // The function returns the following values:
 //
 //   - bytes with the result of the conversion.
-//
 func (value *Value) ToStringAsBytes() *glib.Bytes {
 	var _arg0 *C.JSCValue // out
 	var _cret *C.GBytes   // in
@@ -1452,7 +1436,6 @@ func (value *Value) ToStringAsBytes() *glib.Bytes {
 // The function returns the following values:
 //
 //   - ret: CValue.
-//
 func (value *Value) TypedArrayGetBuffer() *Value {
 	var _arg0 *C.JSCValue // out
 	var _cret *C.JSCValue // in
@@ -1472,19 +1455,19 @@ func (value *Value) TypedArrayGetBuffer() *Value {
 // TypedArrayGetData obtains a pointer to the memory region that holds the
 // elements of the typed array; modifications done to them will be visible to
 // JavaScript code. If length is not NULL, the number of elements contained in
-// the typed array are also stored in the pointed location.
+// the typed array is also stored in the pointed location.
 //
-// The returned pointer needs to be casted to the appropriate type (see
+// The returned pointer needs to be cast to the appropriate type (see
 // CTypedArrayType), and has the offset over the underlying array buffer data
 // applied—that is, points to the first element of the typed array:
 //
-//    if (jsc_value_typed_array_get_type(value) != JSC_TYPED_ARRAY_UINT32)
-//        g_error ("Only arrays of uint32_t are supported");
+//	if (jsc_value_typed_array_get_type(value) != JSC_TYPED_ARRAY_UINT32)
+//	    g_error ("Only arrays of uint32_t are supported");
 //
-//    gsize count = 0;
-//    uint32_t *elements = jsc_value_typed_array_get_contents (value, &count);
-//    for (gsize i = 0; i < count; i++)
-//         g_print ("index zu, value %" PRIu32 "\n", i, elements[i]);
+//	gsize count = 0;
+//	uint32_t *elements = jsc_value_typed_array_get_data (value, &count);
+//	for (gsize i = 0; i < count; i++)
+//	     g_print ("index zu, value %" PRIu32 "\n", i, elements[i]);
 //
 // Note that the pointer returned by this function is not guaranteed
 // to remain the same after calls to other JSC API functions. See
@@ -1494,7 +1477,6 @@ func (value *Value) TypedArrayGetBuffer() *Value {
 //
 //   - length (optional): location to return the number of elements contained.
 //   - gpointer (optional): pointer to memory.
-//
 func (value *Value) TypedArrayGetData() (uint, unsafe.Pointer) {
 	var _arg0 *C.JSCValue // out
 	var _arg1 C.gsize     // in
@@ -1519,7 +1501,6 @@ func (value *Value) TypedArrayGetData() (uint, unsafe.Pointer) {
 // The function returns the following values:
 //
 //   - gsize: number of elements.
-//
 func (value *Value) TypedArrayGetLength() uint {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gsize     // in
@@ -1541,7 +1522,6 @@ func (value *Value) TypedArrayGetLength() uint {
 // The function returns the following values:
 //
 //   - gsize: offset, in bytes.
-//
 func (value *Value) TypedArrayGetOffset() uint {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gsize     // in
@@ -1563,7 +1543,6 @@ func (value *Value) TypedArrayGetOffset() uint {
 // The function returns the following values:
 //
 //   - gsize: size, in bytes.
-//
 func (value *Value) TypedArrayGetSize() uint {
 	var _arg0 *C.JSCValue // out
 	var _cret C.gsize     // in
@@ -1586,7 +1565,6 @@ func (value *Value) TypedArrayGetSize() uint {
 //
 //   - typedArrayType: type of the elements, or JSC_TYPED_ARRAY_NONE if value is
 //     not a typed array.
-//
 func (value *Value) TypedArrayGetType() TypedArrayType {
 	var _arg0 *C.JSCValue         // out
 	var _cret C.JSCTypedArrayType // in

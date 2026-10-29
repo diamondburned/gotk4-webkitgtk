@@ -37,7 +37,7 @@ func _gotk4_webkit24_WebContext_ConnectAutomationStarted(arg0 C.gpointer, arg1 *
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -57,7 +57,7 @@ func _gotk4_webkit24_WebContext_ConnectDownloadStarted(arg0 C.gpointer, arg1 *C.
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -77,7 +77,7 @@ func _gotk4_webkit24_WebContext_ConnectInitializeNotificationPermissions(arg0 C.
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -93,7 +93,7 @@ func _gotk4_webkit24_WebContext_ConnectInitializeWebExtensions(arg0 C.gpointer, 
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -109,7 +109,7 @@ func _gotk4_webkit24_WebContext_ConnectUserMessageReceived(arg0 C.gpointer, arg1
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

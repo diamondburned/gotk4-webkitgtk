@@ -35,19 +35,20 @@ func defaultContentDecoderOverrides(v *ContentDecoder) ContentDecoderOverrides {
 
 // ContentDecoder handles decoding of HTTP messages.
 //
-// ContentDecoder handles adding the "Accept-Encoding" header on outgoing
+// contentdecoder handles adding the "Accept-Encoding" header on outgoing
 // messages, and processing the "Content-Encoding" header on incoming ones.
-// Currently it supports the "gzip", "deflate", and "br" content codings.
+// Currently it supports the "gzip", "deflate", "br", and "zstd" content
+// codings.
 //
-// A ContentDecoder will automatically be added to the session by default.
+// A contentdecoder will automatically be added to the session by default.
 // (You can use session.RemoveFeatureByType if you don't want this.)
 //
-// If ContentDecoder successfully decodes the Content-Encoding, the message body
+// If contentdecoder successfully decodes the Content-Encoding, the message body
 // will contain the decoded data; however, the message headers will be unchanged
 // (and so "Content-Encoding" will still be present, "Content-Length" will
 // describe the original encoded length, etc).
 //
-// If "Content-Encoding" contains any encoding types that ContentDecoder doesn't
+// If "Content-Encoding" contains any encoding types that contentdecoder doesn't
 // recognize, then none of the encodings will be decoded.
 //
 // (Note that currently there is no way to (automatically) use Content-Encoding

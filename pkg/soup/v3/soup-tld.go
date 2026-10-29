@@ -74,7 +74,6 @@ func (t TLDError) String() string {
 // The function returns the following values:
 //
 //   - quark: error quark for Soup TLD functions.
-//
 func TLDErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -82,9 +81,7 @@ func TLDErrorQuark() glib.Quark {
 
 	var _quark glib.Quark // out
 
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
+	_quark = glib.Quark(_cret)
 
 	return _quark
 }
@@ -102,7 +99,6 @@ func TLDErrorQuark() glib.Quark {
 // The function returns the following values:
 //
 //   - ok: TRUE if it is a public domain, FALSE otherwise.
-//
 func TldDomainIsPublicSuffix(domain string) bool {
 	var _arg1 *C.char    // out
 	var _cret C.gboolean // in
@@ -144,7 +140,6 @@ func TldDomainIsPublicSuffix(domain string) bool {
 //
 //   - utf8: pointer to the start of the base domain in hostname. If an error
 //     occurs, NULL will be returned and error set.
-//
 func TldGetBaseDomain(hostname string) (string, error) {
 	var _arg1 *C.char   // out
 	var _cret *C.char   // in

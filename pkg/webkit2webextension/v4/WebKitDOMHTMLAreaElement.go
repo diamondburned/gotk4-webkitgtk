@@ -86,7 +86,6 @@ func marshalDOMHTMLAreaElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAreaElement) Alt() string {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _cret *C.gchar                    // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLAreaElement) Alt() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAreaElement) Coords() string {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _cret *C.gchar                    // in
@@ -132,7 +130,6 @@ func (self *DOMHTMLAreaElement) Coords() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAreaElement) Hash() string {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _cret *C.gchar                    // in
@@ -155,7 +152,6 @@ func (self *DOMHTMLAreaElement) Hash() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAreaElement) Host() string {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _cret *C.gchar                    // in
@@ -178,7 +174,6 @@ func (self *DOMHTMLAreaElement) Host() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAreaElement) Hostname() string {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _cret *C.gchar                    // in
@@ -201,7 +196,6 @@ func (self *DOMHTMLAreaElement) Hostname() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAreaElement) Href() string {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _cret *C.gchar                    // in
@@ -224,7 +218,6 @@ func (self *DOMHTMLAreaElement) Href() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLAreaElement) NoHref() bool {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _cret C.gboolean                  // in
@@ -248,7 +241,6 @@ func (self *DOMHTMLAreaElement) NoHref() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAreaElement) Pathname() string {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _cret *C.gchar                    // in
@@ -271,7 +263,6 @@ func (self *DOMHTMLAreaElement) Pathname() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAreaElement) Port() string {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _cret *C.gchar                    // in
@@ -294,7 +285,6 @@ func (self *DOMHTMLAreaElement) Port() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAreaElement) Protocol() string {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _cret *C.gchar                    // in
@@ -317,7 +307,6 @@ func (self *DOMHTMLAreaElement) Protocol() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAreaElement) Search() string {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _cret *C.gchar                    // in
@@ -340,7 +329,6 @@ func (self *DOMHTMLAreaElement) Search() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAreaElement) Shape() string {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _cret *C.gchar                    // in
@@ -363,7 +351,6 @@ func (self *DOMHTMLAreaElement) Shape() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLAreaElement) Target() string {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _cret *C.gchar                    // in
@@ -386,7 +373,6 @@ func (self *DOMHTMLAreaElement) Target() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAreaElement) SetAlt(value string) {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _arg1 *C.gchar                    // out
@@ -405,7 +391,6 @@ func (self *DOMHTMLAreaElement) SetAlt(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAreaElement) SetCoords(value string) {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _arg1 *C.gchar                    // out
@@ -424,7 +409,6 @@ func (self *DOMHTMLAreaElement) SetCoords(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAreaElement) SetHash(value string) {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _arg1 *C.gchar                    // out
@@ -443,7 +427,6 @@ func (self *DOMHTMLAreaElement) SetHash(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAreaElement) SetHost(value string) {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _arg1 *C.gchar                    // out
@@ -462,7 +445,6 @@ func (self *DOMHTMLAreaElement) SetHost(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAreaElement) SetHostname(value string) {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _arg1 *C.gchar                    // out
@@ -481,7 +463,6 @@ func (self *DOMHTMLAreaElement) SetHostname(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAreaElement) SetHref(value string) {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _arg1 *C.gchar                    // out
@@ -500,7 +481,6 @@ func (self *DOMHTMLAreaElement) SetHref(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLAreaElement) SetNoHref(value bool) {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _arg1 C.gboolean                  // out
@@ -520,7 +500,6 @@ func (self *DOMHTMLAreaElement) SetNoHref(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAreaElement) SetPathname(value string) {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _arg1 *C.gchar                    // out
@@ -539,7 +518,6 @@ func (self *DOMHTMLAreaElement) SetPathname(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAreaElement) SetPort(value string) {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _arg1 *C.gchar                    // out
@@ -558,7 +536,6 @@ func (self *DOMHTMLAreaElement) SetPort(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAreaElement) SetProtocol(value string) {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _arg1 *C.gchar                    // out
@@ -577,7 +554,6 @@ func (self *DOMHTMLAreaElement) SetProtocol(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAreaElement) SetSearch(value string) {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _arg1 *C.gchar                    // out
@@ -596,7 +572,6 @@ func (self *DOMHTMLAreaElement) SetSearch(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAreaElement) SetShape(value string) {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _arg1 *C.gchar                    // out
@@ -615,7 +590,6 @@ func (self *DOMHTMLAreaElement) SetShape(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLAreaElement) SetTarget(value string) {
 	var _arg0 *C.WebKitDOMHTMLAreaElement // out
 	var _arg1 *C.gchar                    // out

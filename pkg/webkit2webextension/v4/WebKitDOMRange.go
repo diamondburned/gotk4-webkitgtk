@@ -101,7 +101,6 @@ func marshalDOMRange(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - domDocumentFragment: KitDOMDocumentFragment.
-//
 func (self *DOMRange) CloneContents() (*DOMDocumentFragment, error) {
 	var _arg0 *C.WebKitDOMRange            // out
 	var _cret *C.WebKitDOMDocumentFragment // in
@@ -128,7 +127,6 @@ func (self *DOMRange) CloneContents() (*DOMDocumentFragment, error) {
 // The function returns the following values:
 //
 //   - domRange: KitDOMRange.
-//
 func (self *DOMRange) CloneRange() (*DOMRange, error) {
 	var _arg0 *C.WebKitDOMRange // out
 	var _cret *C.WebKitDOMRange // in
@@ -155,7 +153,6 @@ func (self *DOMRange) CloneRange() (*DOMRange, error) {
 // The function takes the following parameters:
 //
 //   - toStart: #gboolean.
-//
 func (self *DOMRange) Collapse(toStart bool) error {
 	var _arg0 *C.WebKitDOMRange // out
 	var _arg1 C.gboolean        // out
@@ -189,7 +186,6 @@ func (self *DOMRange) Collapse(toStart bool) error {
 // The function returns the following values:
 //
 //   - gshort: #gshort.
-//
 func (self *DOMRange) CompareBoundaryPoints(how uint16, sourceRange *DOMRange) (int16, error) {
 	var _arg0 *C.WebKitDOMRange // out
 	var _arg1 C.gushort         // out
@@ -226,7 +222,6 @@ func (self *DOMRange) CompareBoundaryPoints(how uint16, sourceRange *DOMRange) (
 // The function returns the following values:
 //
 //   - gshort: #gshort.
-//
 func (self *DOMRange) CompareNode(refNode *DOMNode) (int16, error) {
 	var _arg0 *C.WebKitDOMRange // out
 	var _arg1 *C.WebKitDOMNode  // out
@@ -261,7 +256,6 @@ func (self *DOMRange) CompareNode(refNode *DOMNode) (int16, error) {
 // The function returns the following values:
 //
 //   - gshort: #gshort.
-//
 func (self *DOMRange) ComparePoint(refNode *DOMNode, offset int32) (int16, error) {
 	var _arg0 *C.WebKitDOMRange // out
 	var _arg1 *C.WebKitDOMNode  // out
@@ -298,7 +292,6 @@ func (self *DOMRange) ComparePoint(refNode *DOMNode, offset int32) (int16, error
 // The function returns the following values:
 //
 //   - domDocumentFragment: KitDOMDocumentFragment.
-//
 func (self *DOMRange) CreateContextualFragment(html string) (*DOMDocumentFragment, error) {
 	var _arg0 *C.WebKitDOMRange            // out
 	var _arg1 *C.gchar                     // out
@@ -367,7 +360,6 @@ func (self *DOMRange) Detach() error {
 // The function takes the following parameters:
 //
 //   - unit: #gchar.
-//
 func (self *DOMRange) Expand(unit string) error {
 	var _arg0 *C.WebKitDOMRange // out
 	var _arg1 *C.gchar          // out
@@ -395,7 +387,6 @@ func (self *DOMRange) Expand(unit string) error {
 // The function returns the following values:
 //
 //   - domDocumentFragment: KitDOMDocumentFragment.
-//
 func (self *DOMRange) ExtractContents() (*DOMDocumentFragment, error) {
 	var _arg0 *C.WebKitDOMRange            // out
 	var _cret *C.WebKitDOMDocumentFragment // in
@@ -441,7 +432,6 @@ func (self *DOMRange) Collapsed() error {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMRange) CommonAncestorContainer() (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMRange // out
 	var _cret *C.WebKitDOMNode  // in
@@ -468,7 +458,6 @@ func (self *DOMRange) CommonAncestorContainer() (*DOMNode, error) {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMRange) EndContainer() (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMRange // out
 	var _cret *C.WebKitDOMNode  // in
@@ -495,7 +484,6 @@ func (self *DOMRange) EndContainer() (*DOMNode, error) {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMRange) EndOffset() (int32, error) {
 	var _arg0 *C.WebKitDOMRange // out
 	var _cret C.glong           // in
@@ -522,7 +510,6 @@ func (self *DOMRange) EndOffset() (int32, error) {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMRange) StartContainer() (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMRange // out
 	var _cret *C.WebKitDOMNode  // in
@@ -549,7 +536,6 @@ func (self *DOMRange) StartContainer() (*DOMNode, error) {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMRange) StartOffset() (int32, error) {
 	var _arg0 *C.WebKitDOMRange // out
 	var _cret C.glong           // in
@@ -576,7 +562,6 @@ func (self *DOMRange) StartOffset() (int32, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMRange) Text() string {
 	var _arg0 *C.WebKitDOMRange // out
 	var _cret *C.gchar          // in
@@ -599,7 +584,6 @@ func (self *DOMRange) Text() string {
 // The function takes the following parameters:
 //
 //   - newNode: KitDOMNode.
-//
 func (self *DOMRange) InsertNode(newNode *DOMNode) error {
 	var _arg0 *C.WebKitDOMRange // out
 	var _arg1 *C.WebKitDOMNode  // out
@@ -626,7 +610,6 @@ func (self *DOMRange) InsertNode(newNode *DOMNode) error {
 // The function takes the following parameters:
 //
 //   - refNode: KitDOMNode.
-//
 func (self *DOMRange) IntersectsNode(refNode *DOMNode) error {
 	var _arg0 *C.WebKitDOMRange // out
 	var _arg1 *C.WebKitDOMNode  // out
@@ -654,7 +637,6 @@ func (self *DOMRange) IntersectsNode(refNode *DOMNode) error {
 //
 //   - refNode: KitDOMNode.
 //   - offset: #glong.
-//
 func (self *DOMRange) IsPointInRange(refNode *DOMNode, offset int32) error {
 	var _arg0 *C.WebKitDOMRange // out
 	var _arg1 *C.WebKitDOMNode  // out
@@ -684,7 +666,6 @@ func (self *DOMRange) IsPointInRange(refNode *DOMNode, offset int32) error {
 // The function takes the following parameters:
 //
 //   - refNode: KitDOMNode.
-//
 func (self *DOMRange) SelectNode(refNode *DOMNode) error {
 	var _arg0 *C.WebKitDOMRange // out
 	var _arg1 *C.WebKitDOMNode  // out
@@ -711,7 +692,6 @@ func (self *DOMRange) SelectNode(refNode *DOMNode) error {
 // The function takes the following parameters:
 //
 //   - refNode: KitDOMNode.
-//
 func (self *DOMRange) SelectNodeContents(refNode *DOMNode) error {
 	var _arg0 *C.WebKitDOMRange // out
 	var _arg1 *C.WebKitDOMNode  // out
@@ -739,7 +719,6 @@ func (self *DOMRange) SelectNodeContents(refNode *DOMNode) error {
 //
 //   - refNode: KitDOMNode.
 //   - offset: #glong.
-//
 func (self *DOMRange) SetEnd(refNode *DOMNode, offset int32) error {
 	var _arg0 *C.WebKitDOMRange // out
 	var _arg1 *C.WebKitDOMNode  // out
@@ -769,7 +748,6 @@ func (self *DOMRange) SetEnd(refNode *DOMNode, offset int32) error {
 // The function takes the following parameters:
 //
 //   - refNode: KitDOMNode.
-//
 func (self *DOMRange) SetEndAfter(refNode *DOMNode) error {
 	var _arg0 *C.WebKitDOMRange // out
 	var _arg1 *C.WebKitDOMNode  // out
@@ -796,7 +774,6 @@ func (self *DOMRange) SetEndAfter(refNode *DOMNode) error {
 // The function takes the following parameters:
 //
 //   - refNode: KitDOMNode.
-//
 func (self *DOMRange) SetEndBefore(refNode *DOMNode) error {
 	var _arg0 *C.WebKitDOMRange // out
 	var _arg1 *C.WebKitDOMNode  // out
@@ -824,7 +801,6 @@ func (self *DOMRange) SetEndBefore(refNode *DOMNode) error {
 //
 //   - refNode: KitDOMNode.
 //   - offset: #glong.
-//
 func (self *DOMRange) SetStart(refNode *DOMNode, offset int32) error {
 	var _arg0 *C.WebKitDOMRange // out
 	var _arg1 *C.WebKitDOMNode  // out
@@ -854,7 +830,6 @@ func (self *DOMRange) SetStart(refNode *DOMNode, offset int32) error {
 // The function takes the following parameters:
 //
 //   - refNode: KitDOMNode.
-//
 func (self *DOMRange) SetStartAfter(refNode *DOMNode) error {
 	var _arg0 *C.WebKitDOMRange // out
 	var _arg1 *C.WebKitDOMNode  // out
@@ -881,7 +856,6 @@ func (self *DOMRange) SetStartAfter(refNode *DOMNode) error {
 // The function takes the following parameters:
 //
 //   - refNode: KitDOMNode.
-//
 func (self *DOMRange) SetStartBefore(refNode *DOMNode) error {
 	var _arg0 *C.WebKitDOMRange // out
 	var _arg1 *C.WebKitDOMNode  // out
@@ -908,7 +882,6 @@ func (self *DOMRange) SetStartBefore(refNode *DOMNode) error {
 // The function takes the following parameters:
 //
 //   - newParent: KitDOMNode.
-//
 func (self *DOMRange) SurroundContents(newParent *DOMNode) error {
 	var _arg0 *C.WebKitDOMRange // out
 	var _arg1 *C.WebKitDOMNode  // out
@@ -935,7 +908,6 @@ func (self *DOMRange) SurroundContents(newParent *DOMNode) error {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMRange) String() (string, error) {
 	var _arg0 *C.WebKitDOMRange // out
 	var _cret *C.gchar          // in

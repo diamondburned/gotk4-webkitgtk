@@ -86,7 +86,6 @@ func marshalDOMHTMLOListElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLOListElement) Compact() bool {
 	var _arg0 *C.WebKitDOMHTMLOListElement // out
 	var _cret C.gboolean                   // in
@@ -110,7 +109,6 @@ func (self *DOMHTMLOListElement) Compact() bool {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLOListElement) Start() int32 {
 	var _arg0 *C.WebKitDOMHTMLOListElement // out
 	var _cret C.glong                      // in
@@ -132,7 +130,6 @@ func (self *DOMHTMLOListElement) Start() int32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLOListElement) TypeAttr() string {
 	var _arg0 *C.WebKitDOMHTMLOListElement // out
 	var _cret *C.gchar                     // in
@@ -155,7 +152,6 @@ func (self *DOMHTMLOListElement) TypeAttr() string {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLOListElement) SetCompact(value bool) {
 	var _arg0 *C.WebKitDOMHTMLOListElement // out
 	var _arg1 C.gboolean                   // out
@@ -175,7 +171,6 @@ func (self *DOMHTMLOListElement) SetCompact(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLOListElement) SetStart(value int32) {
 	var _arg0 *C.WebKitDOMHTMLOListElement // out
 	var _arg1 C.glong                      // out
@@ -193,7 +188,6 @@ func (self *DOMHTMLOListElement) SetStart(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLOListElement) SetTypeAttr(value string) {
 	var _arg0 *C.WebKitDOMHTMLOListElement // out
 	var _arg1 *C.gchar                     // out

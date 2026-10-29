@@ -86,7 +86,6 @@ func marshalDOMHTMLLIElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLLIElement) TypeAttr() string {
 	var _arg0 *C.WebKitDOMHTMLLIElement // out
 	var _cret *C.gchar                  // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLLIElement) TypeAttr() string {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLLIElement) Value() int32 {
 	var _arg0 *C.WebKitDOMHTMLLIElement // out
 	var _cret C.glong                   // in
@@ -131,7 +129,6 @@ func (self *DOMHTMLLIElement) Value() int32 {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLLIElement) SetTypeAttr(value string) {
 	var _arg0 *C.WebKitDOMHTMLLIElement // out
 	var _arg1 *C.gchar                  // out
@@ -150,7 +147,6 @@ func (self *DOMHTMLLIElement) SetTypeAttr(value string) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLLIElement) SetValue(value int32) {
 	var _arg0 *C.WebKitDOMHTMLLIElement // out
 	var _arg1 C.glong                   // out

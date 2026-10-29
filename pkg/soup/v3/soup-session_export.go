@@ -18,7 +18,7 @@ func _gotk4_soup3_Session_ConnectRequestQueued(arg0 C.gpointer, arg1 *C.SoupMess
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -38,7 +38,7 @@ func _gotk4_soup3_Session_ConnectRequestUnqueued(arg0 C.gpointer, arg1 *C.SoupMe
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

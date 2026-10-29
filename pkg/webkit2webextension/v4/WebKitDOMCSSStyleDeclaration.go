@@ -77,7 +77,6 @@ func marshalDOMCSSStyleDeclaration(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMCSSStyleDeclaration) CSSText() string {
 	var _arg0 *C.WebKitDOMCSSStyleDeclaration // out
 	var _cret *C.gchar                        // in
@@ -100,7 +99,6 @@ func (self *DOMCSSStyleDeclaration) CSSText() string {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMCSSStyleDeclaration) Length() uint32 {
 	var _arg0 *C.WebKitDOMCSSStyleDeclaration // out
 	var _cret C.gulong                        // in
@@ -122,7 +120,6 @@ func (self *DOMCSSStyleDeclaration) Length() uint32 {
 // The function returns the following values:
 //
 //   - domcssRule: KitDOMCSSRule.
-//
 func (self *DOMCSSStyleDeclaration) ParentRule() *DOMCSSRule {
 	var _arg0 *C.WebKitDOMCSSStyleDeclaration // out
 	var _cret *C.WebKitDOMCSSRule             // in
@@ -148,7 +145,6 @@ func (self *DOMCSSStyleDeclaration) ParentRule() *DOMCSSRule {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMCSSStyleDeclaration) PropertyPriority(propertyName string) string {
 	var _arg0 *C.WebKitDOMCSSStyleDeclaration // out
 	var _arg1 *C.gchar                        // out
@@ -179,7 +175,6 @@ func (self *DOMCSSStyleDeclaration) PropertyPriority(propertyName string) string
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMCSSStyleDeclaration) PropertyShorthand(propertyName string) string {
 	var _arg0 *C.WebKitDOMCSSStyleDeclaration // out
 	var _arg1 *C.gchar                        // out
@@ -210,7 +205,6 @@ func (self *DOMCSSStyleDeclaration) PropertyShorthand(propertyName string) strin
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMCSSStyleDeclaration) PropertyValue(propertyName string) string {
 	var _arg0 *C.WebKitDOMCSSStyleDeclaration // out
 	var _arg1 *C.gchar                        // out
@@ -241,7 +235,6 @@ func (self *DOMCSSStyleDeclaration) PropertyValue(propertyName string) string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMCSSStyleDeclaration) IsPropertyImplicit(propertyName string) bool {
 	var _arg0 *C.WebKitDOMCSSStyleDeclaration // out
 	var _arg1 *C.gchar                        // out
@@ -273,7 +266,6 @@ func (self *DOMCSSStyleDeclaration) IsPropertyImplicit(propertyName string) bool
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMCSSStyleDeclaration) Item(index uint32) string {
 	var _arg0 *C.WebKitDOMCSSStyleDeclaration // out
 	var _arg1 C.gulong                        // out
@@ -303,7 +295,6 @@ func (self *DOMCSSStyleDeclaration) Item(index uint32) string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMCSSStyleDeclaration) RemoveProperty(propertyName string) (string, error) {
 	var _arg0 *C.WebKitDOMCSSStyleDeclaration // out
 	var _arg1 *C.gchar                        // out
@@ -335,7 +326,6 @@ func (self *DOMCSSStyleDeclaration) RemoveProperty(propertyName string) (string,
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMCSSStyleDeclaration) SetCSSText(value string) error {
 	var _arg0 *C.WebKitDOMCSSStyleDeclaration // out
 	var _arg1 *C.gchar                        // out
@@ -365,7 +355,6 @@ func (self *DOMCSSStyleDeclaration) SetCSSText(value string) error {
 //   - propertyName: #gchar.
 //   - value: #gchar.
 //   - priority: #gchar.
-//
 func (self *DOMCSSStyleDeclaration) SetProperty(propertyName, value, priority string) error {
 	var _arg0 *C.WebKitDOMCSSStyleDeclaration // out
 	var _arg1 *C.gchar                        // out

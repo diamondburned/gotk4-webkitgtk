@@ -18,12 +18,12 @@ const MAJOR_VERSION = 3
 // MICRO_VERSION: like get_micro_version, but from the headers used at
 // application compile time, rather than from the library linked against at
 // application run time.
-const MICRO_VERSION = 4
+const MICRO_VERSION = 0
 
 // MINOR_VERSION: like get_minor_version, but from the headers used at
 // application compile time, rather than from the library linked against at
 // application run time.
-const MINOR_VERSION = 4
+const MINOR_VERSION = 8
 
 // VERSION_MIN_REQUIRED: macro that should be defined by the user prior to
 // including libsoup.h.
@@ -56,7 +56,6 @@ const VERSION_MIN_REQUIRED = 2
 //
 //   - ok: TRUE if the version of the libsoup currently loaded is the same as or
 //     newer than the passed-in version.
-//
 func CheckVersion(major, minor, micro uint) bool {
 	var _arg1 C.guint    // out
 	var _arg2 C.guint    // out
@@ -93,7 +92,6 @@ func CheckVersion(major, minor, micro uint) bool {
 // The function returns the following values:
 //
 //   - guint: major version number of the libsoup library.
-//
 func GetMajorVersion() uint {
 	var _cret C.guint // in
 
@@ -118,7 +116,6 @@ func GetMajorVersion() uint {
 // The function returns the following values:
 //
 //   - guint: micro version number of the libsoup library.
-//
 func GetMicroVersion() uint {
 	var _cret C.guint // in
 
@@ -143,7 +140,6 @@ func GetMicroVersion() uint {
 // The function returns the following values:
 //
 //   - guint: minor version number of the libsoup library.
-//
 func GetMinorVersion() uint {
 	var _cret C.guint // in
 

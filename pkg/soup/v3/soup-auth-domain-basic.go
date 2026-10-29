@@ -29,7 +29,7 @@ func init() {
 	})
 }
 
-// AuthDomainBasicAuthCallback: callback used by AuthDomainBasic for
+// AuthDomainBasicAuthCallback: callback used by authdomainbasic for
 // authentication purposes.
 //
 // The application should verify that username and password and valid and return
@@ -56,7 +56,7 @@ func defaultAuthDomainBasicOverrides(v *AuthDomainBasic) AuthDomainBasicOverride
 
 // AuthDomainBasic: server-side "Basic" authentication.
 //
-// AuthDomainBasic handles the server side of HTTP "Basic" (ie, cleartext
+// authdomainbasic handles the server side of HTTP "Basic" (ie, cleartext
 // password) authentication.
 type AuthDomainBasic struct {
 	_ [0]func() // equal guard
@@ -109,7 +109,6 @@ func marshalAuthDomainBasic(p uintptr) (interface{}, error) {
 // The function takes the following parameters:
 //
 //   - callback: callback.
-//
 func (domain *AuthDomainBasic) SetAuthCallback(callback AuthDomainBasicAuthCallback) {
 	var _arg0 *C.SoupAuthDomain                 // out
 	var _arg1 C.SoupAuthDomainBasicAuthCallback // out

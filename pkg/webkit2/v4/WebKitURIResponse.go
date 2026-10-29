@@ -81,7 +81,6 @@ func marshalURIResponse(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - guint64: expected content length of response.
-//
 func (response *URIResponse) ContentLength() uint64 {
 	var _arg0 *C.WebKitURIResponse // out
 	var _cret C.guint64            // in
@@ -104,7 +103,6 @@ func (response *URIResponse) ContentLength() uint64 {
 //
 //   - messageHeaders with the HTTP headers of response or NULL if response is
 //     not an HTTP response.
-//
 func (response *URIResponse) HTTPHeaders() *soup.MessageHeaders {
 	var _arg0 *C.WebKitURIResponse  // out
 	var _cret *C.SoupMessageHeaders // in
@@ -133,7 +131,6 @@ func (response *URIResponse) HTTPHeaders() *soup.MessageHeaders {
 // The function returns the following values:
 //
 //   - utf8: MIME type, as a string.
-//
 func (response *URIResponse) MIMEType() string {
 	var _arg0 *C.WebKitURIResponse // out
 	var _cret *C.gchar             // in
@@ -159,7 +156,6 @@ func (response *URIResponse) MIMEType() string {
 // The function returns the following values:
 //
 //   - guint status code of response.
-//
 func (response *URIResponse) StatusCode() uint {
 	var _arg0 *C.WebKitURIResponse // out
 	var _cret C.guint              // in
@@ -185,7 +181,6 @@ func (response *URIResponse) StatusCode() uint {
 //
 //   - utf8: suggested filename or NULL if the 'Content-Disposition' HTTP header
 //     is not present.
-//
 func (response *URIResponse) SuggestedFilename() string {
 	var _arg0 *C.WebKitURIResponse // out
 	var _cret *C.gchar             // in
@@ -207,7 +202,6 @@ func (response *URIResponse) SuggestedFilename() string {
 // The function returns the following values:
 //
 //   - utf8: response URI, as a string.
-//
 func (response *URIResponse) URI() string {
 	var _arg0 *C.WebKitURIResponse // out
 	var _cret *C.gchar             // in

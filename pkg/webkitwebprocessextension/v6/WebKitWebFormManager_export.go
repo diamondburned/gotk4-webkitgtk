@@ -19,7 +19,7 @@ func _gotk4_webkitwebprocessextension6_WebFormManager_ConnectWillSendSubmitEvent
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -48,7 +48,7 @@ func _gotk4_webkitwebprocessextension6_WebFormManager_ConnectWillSubmitForm(arg0
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

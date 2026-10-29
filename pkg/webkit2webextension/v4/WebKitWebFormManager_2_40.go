@@ -108,7 +108,6 @@ func (v *WebFormManager) ConnectWillSubmitForm(f func(form *javascriptcore.Value
 //
 //   - element: CValue.
 //   - value: text to set.
-//
 func WebFormManagerInputElementAutoFill(element *javascriptcore.Value, value string) {
 	var _arg1 *C.JSCValue // out
 	var _arg2 *C.char     // out
@@ -133,7 +132,6 @@ func WebFormManagerInputElementAutoFill(element *javascriptcore.Value, value str
 //
 //   - ok: TRUE if element is an HTML input element that has been filled
 //     automatically, or FALSE otherwise.
-//
 func WebFormManagerInputElementIsAutoFilled(element *javascriptcore.Value) bool {
 	var _arg1 *C.JSCValue // out
 	var _cret C.gboolean  // in
@@ -163,7 +161,6 @@ func WebFormManagerInputElementIsAutoFilled(element *javascriptcore.Value) bool 
 //
 //   - ok: TRUE if element is an HTML text input element that has been edited by
 //     a user action, or FALSE otherwise.
-//
 func WebFormManagerInputElementIsUserEdited(element *javascriptcore.Value) bool {
 	var _arg1 *C.JSCValue // out
 	var _cret C.gboolean  // in

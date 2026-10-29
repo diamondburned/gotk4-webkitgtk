@@ -31,7 +31,7 @@ type HardwareAccelerationPolicy C.gint
 
 const (
 	// HardwareAccelerationPolicyOnDemand: hardware acceleration is
-	// enabled/disabled as request by web contents.
+	// enabled/disabled as requested by web contents. Deprecated 2.54.
 	HardwareAccelerationPolicyOnDemand HardwareAccelerationPolicy = iota
 	// HardwareAccelerationPolicyAlways: hardware acceleration is always
 	// enabled, even for websites not requesting it.

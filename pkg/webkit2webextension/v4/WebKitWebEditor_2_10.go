@@ -37,8 +37,8 @@ func defaultWebEditorOverrides(v *WebEditor) WebEditorOverrides {
 
 // WebEditor access to editing capabilities of a KitWebPage.
 //
-// The WebKitWebEditor provides access to various editing capabilities of
-// a KitWebPage such as a possibility to react to the current selection in
+// The WebKitWebEditor provides access to various editing capabilities of a
+// KitWebPage such as the possibility to react to the current selection in
 // KitWebPage.
 type WebEditor struct {
 	_ [0]func() // equal guard
@@ -87,7 +87,6 @@ func (editor *WebEditor) ConnectSelectionChanged(f func()) coreglib.SignalHandle
 // The function returns the following values:
 //
 //   - webPage: associated KitWebPage.
-//
 func (editor *WebEditor) Page() *WebPage {
 	var _arg0 *C.WebKitWebEditor // out
 	var _cret *C.WebKitWebPage   // in

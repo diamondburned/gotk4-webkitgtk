@@ -36,7 +36,7 @@ func defaultWebsocketExtensionManagerOverrides(v *WebsocketExtensionManager) Web
 // WebsocketExtensionManager is the sessionfeature that handles WebSockets
 // extensions for a session.
 //
-// A WebsocketExtensionManager is added to the session by default, and normally
+// A websocketextensionmanager is added to the session by default, and normally
 // you don't need to worry about it at all. However, if you want to disable
 // WebSocket extensions, you can remove the feature from the session with
 // session.RemoveFeatureByType or disable it on individual requests with

@@ -79,7 +79,7 @@ func _gotk4_soup3_Server_ConnectRequestAborted(arg0 C.gpointer, arg1 *C.SoupServ
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -99,7 +99,7 @@ func _gotk4_soup3_Server_ConnectRequestFinished(arg0 C.gpointer, arg1 *C.SoupSer
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -119,7 +119,7 @@ func _gotk4_soup3_Server_ConnectRequestRead(arg0 C.gpointer, arg1 *C.SoupServerM
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -139,7 +139,7 @@ func _gotk4_soup3_Server_ConnectRequestStarted(arg0 C.gpointer, arg1 *C.SoupServ
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

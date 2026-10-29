@@ -20,7 +20,7 @@ func _gotk4_webkit24_WebResource_ConnectFailed(arg0 C.gpointer, arg1 *C.GError, 
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -40,7 +40,7 @@ func _gotk4_webkit24_WebResource_ConnectFailedWithTLSErrors(arg0 C.gpointer, arg
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -78,7 +78,7 @@ func _gotk4_webkit24_WebResource_ConnectFinished(arg0 C.gpointer, arg1 C.guintpt
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -94,7 +94,7 @@ func _gotk4_webkit24_WebResource_ConnectReceivedData(arg0 C.gpointer, arg1 C.gui
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -114,7 +114,7 @@ func _gotk4_webkit24_WebResource_ConnectSentRequest(arg0 C.gpointer, arg1 *C.Web
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

@@ -87,7 +87,6 @@ func marshalDOMHTMLTableElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - domhtmlElement: KitDOMHTMLElement.
-//
 func (self *DOMHTMLTableElement) CreateCaption() *DOMHTMLElement {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _cret *C.WebKitDOMHTMLElement      // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLTableElement) CreateCaption() *DOMHTMLElement {
 // The function returns the following values:
 //
 //   - domhtmlElement: KitDOMHTMLElement.
-//
 func (self *DOMHTMLTableElement) CreateTFoot() *DOMHTMLElement {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _cret *C.WebKitDOMHTMLElement      // in
@@ -131,7 +129,6 @@ func (self *DOMHTMLTableElement) CreateTFoot() *DOMHTMLElement {
 // The function returns the following values:
 //
 //   - domhtmlElement: KitDOMHTMLElement.
-//
 func (self *DOMHTMLTableElement) CreateTHead() *DOMHTMLElement {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _cret *C.WebKitDOMHTMLElement      // in
@@ -163,7 +160,6 @@ func (self *DOMHTMLTableElement) DeleteCaption() {
 // The function takes the following parameters:
 //
 //   - index: #glong.
-//
 func (self *DOMHTMLTableElement) DeleteRow(index int32) error {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _arg1 C.glong                      // out
@@ -210,7 +206,6 @@ func (self *DOMHTMLTableElement) DeleteTHead() {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableElement) Align() string {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _cret *C.gchar                     // in
@@ -233,7 +228,6 @@ func (self *DOMHTMLTableElement) Align() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableElement) BgColor() string {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _cret *C.gchar                     // in
@@ -256,7 +250,6 @@ func (self *DOMHTMLTableElement) BgColor() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableElement) Border() string {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _cret *C.gchar                     // in
@@ -279,7 +272,6 @@ func (self *DOMHTMLTableElement) Border() string {
 // The function returns the following values:
 //
 //   - domhtmlTableCaptionElement: KitDOMHTMLTableCaptionElement.
-//
 func (self *DOMHTMLTableElement) Caption() *DOMHTMLTableCaptionElement {
 	var _arg0 *C.WebKitDOMHTMLTableElement        // out
 	var _cret *C.WebKitDOMHTMLTableCaptionElement // in
@@ -301,7 +293,6 @@ func (self *DOMHTMLTableElement) Caption() *DOMHTMLTableCaptionElement {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableElement) CellPadding() string {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _cret *C.gchar                     // in
@@ -324,7 +315,6 @@ func (self *DOMHTMLTableElement) CellPadding() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableElement) CellSpacing() string {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _cret *C.gchar                     // in
@@ -347,7 +337,6 @@ func (self *DOMHTMLTableElement) CellSpacing() string {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMHTMLTableElement) Rows() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _cret *C.WebKitDOMHTMLCollection   // in
@@ -369,7 +358,6 @@ func (self *DOMHTMLTableElement) Rows() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableElement) Rules() string {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _cret *C.gchar                     // in
@@ -392,7 +380,6 @@ func (self *DOMHTMLTableElement) Rules() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableElement) Summary() string {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _cret *C.gchar                     // in
@@ -415,7 +402,6 @@ func (self *DOMHTMLTableElement) Summary() string {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMHTMLTableElement) TBodies() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _cret *C.WebKitDOMHTMLCollection   // in
@@ -437,7 +423,6 @@ func (self *DOMHTMLTableElement) TBodies() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - domhtmlTableSectionElement: KitDOMHTMLTableSectionElement.
-//
 func (self *DOMHTMLTableElement) TFoot() *DOMHTMLTableSectionElement {
 	var _arg0 *C.WebKitDOMHTMLTableElement        // out
 	var _cret *C.WebKitDOMHTMLTableSectionElement // in
@@ -459,7 +444,6 @@ func (self *DOMHTMLTableElement) TFoot() *DOMHTMLTableSectionElement {
 // The function returns the following values:
 //
 //   - domhtmlTableSectionElement: KitDOMHTMLTableSectionElement.
-//
 func (self *DOMHTMLTableElement) THead() *DOMHTMLTableSectionElement {
 	var _arg0 *C.WebKitDOMHTMLTableElement        // out
 	var _cret *C.WebKitDOMHTMLTableSectionElement // in
@@ -481,7 +465,6 @@ func (self *DOMHTMLTableElement) THead() *DOMHTMLTableSectionElement {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLTableElement) Width() string {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _cret *C.gchar                     // in
@@ -508,7 +491,6 @@ func (self *DOMHTMLTableElement) Width() string {
 // The function returns the following values:
 //
 //   - domhtmlElement: KitDOMHTMLElement.
-//
 func (self *DOMHTMLTableElement) InsertRow(index int32) (*DOMHTMLElement, error) {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _arg1 C.glong                      // out
@@ -538,7 +520,6 @@ func (self *DOMHTMLTableElement) InsertRow(index int32) (*DOMHTMLElement, error)
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableElement) SetAlign(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _arg1 *C.gchar                     // out
@@ -557,7 +538,6 @@ func (self *DOMHTMLTableElement) SetAlign(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableElement) SetBgColor(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _arg1 *C.gchar                     // out
@@ -576,7 +556,6 @@ func (self *DOMHTMLTableElement) SetBgColor(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableElement) SetBorder(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _arg1 *C.gchar                     // out
@@ -595,7 +574,6 @@ func (self *DOMHTMLTableElement) SetBorder(value string) {
 // The function takes the following parameters:
 //
 //   - value: KitDOMHTMLTableCaptionElement.
-//
 func (self *DOMHTMLTableElement) SetCaption(value *DOMHTMLTableCaptionElement) error {
 	var _arg0 *C.WebKitDOMHTMLTableElement        // out
 	var _arg1 *C.WebKitDOMHTMLTableCaptionElement // out
@@ -622,7 +600,6 @@ func (self *DOMHTMLTableElement) SetCaption(value *DOMHTMLTableCaptionElement) e
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableElement) SetCellPadding(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _arg1 *C.gchar                     // out
@@ -641,7 +618,6 @@ func (self *DOMHTMLTableElement) SetCellPadding(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableElement) SetCellSpacing(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _arg1 *C.gchar                     // out
@@ -660,7 +636,6 @@ func (self *DOMHTMLTableElement) SetCellSpacing(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableElement) SetRules(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _arg1 *C.gchar                     // out
@@ -679,7 +654,6 @@ func (self *DOMHTMLTableElement) SetRules(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableElement) SetSummary(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _arg1 *C.gchar                     // out
@@ -698,7 +672,6 @@ func (self *DOMHTMLTableElement) SetSummary(value string) {
 // The function takes the following parameters:
 //
 //   - value: KitDOMHTMLTableSectionElement.
-//
 func (self *DOMHTMLTableElement) SetTFoot(value *DOMHTMLTableSectionElement) error {
 	var _arg0 *C.WebKitDOMHTMLTableElement        // out
 	var _arg1 *C.WebKitDOMHTMLTableSectionElement // out
@@ -725,7 +698,6 @@ func (self *DOMHTMLTableElement) SetTFoot(value *DOMHTMLTableSectionElement) err
 // The function takes the following parameters:
 //
 //   - value: KitDOMHTMLTableSectionElement.
-//
 func (self *DOMHTMLTableElement) SetTHead(value *DOMHTMLTableSectionElement) error {
 	var _arg0 *C.WebKitDOMHTMLTableElement        // out
 	var _arg1 *C.WebKitDOMHTMLTableSectionElement // out
@@ -752,7 +724,6 @@ func (self *DOMHTMLTableElement) SetTHead(value *DOMHTMLTableSectionElement) err
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLTableElement) SetWidth(value string) {
 	var _arg0 *C.WebKitDOMHTMLTableElement // out
 	var _arg1 *C.gchar                     // out

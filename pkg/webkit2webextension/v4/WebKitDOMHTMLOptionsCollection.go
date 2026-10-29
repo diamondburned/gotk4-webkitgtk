@@ -78,7 +78,6 @@ func marshalDOMHTMLOptionsCollection(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMHTMLOptionsCollection) Length() uint32 {
 	var _arg0 *C.WebKitDOMHTMLOptionsCollection // out
 	var _cret C.gulong                          // in
@@ -100,7 +99,6 @@ func (self *DOMHTMLOptionsCollection) Length() uint32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLOptionsCollection) SelectedIndex() int32 {
 	var _arg0 *C.WebKitDOMHTMLOptionsCollection // out
 	var _cret C.glong                           // in
@@ -126,7 +124,6 @@ func (self *DOMHTMLOptionsCollection) SelectedIndex() int32 {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMHTMLOptionsCollection) NamedItem(name string) *DOMNode {
 	var _arg0 *C.WebKitDOMHTMLOptionsCollection // out
 	var _arg1 *C.gchar                          // out
@@ -152,7 +149,6 @@ func (self *DOMHTMLOptionsCollection) NamedItem(name string) *DOMNode {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLOptionsCollection) SetSelectedIndex(value int32) {
 	var _arg0 *C.WebKitDOMHTMLOptionsCollection // out
 	var _arg1 C.glong                           // out

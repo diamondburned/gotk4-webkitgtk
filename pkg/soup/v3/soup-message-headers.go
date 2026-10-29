@@ -215,7 +215,6 @@ func NewMessageHeaders(typ MessageHeadersType) *MessageHeaders {
 //
 //   - name: header name to add.
 //   - value: new value of name.
-//
 func (hdrs *MessageHeaders) Append(name string, value string) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.char               // out
@@ -269,7 +268,6 @@ func (hdrs *MessageHeaders) Clear() {
 // The function takes the following parameters:
 //
 //   - fn: callback function to run for each header.
-//
 func (hdrs *MessageHeaders) ForEach(fn MessageHeadersForEachFunc) {
 	var _arg0 *C.SoupMessageHeaders           // out
 	var _arg1 C.SoupMessageHeadersForeachFunc // out
@@ -290,7 +288,6 @@ func (hdrs *MessageHeaders) ForEach(fn MessageHeadersForEachFunc) {
 // The function takes the following parameters:
 //
 //   - ranges: array of Range.
-//
 func (hdrs *MessageHeaders) FreeRanges(ranges *Range) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.SoupRange          // out
@@ -325,7 +322,6 @@ func (hdrs *MessageHeaders) FreeRanges(ranges *Range) {
 //   - params: return location for the Content-Disposition parameters, or NULL.
 //   - ok: TRUE if hdrs contains a "Content-Disposition" header, FALSE if not
 //     (in which case *disposition and *params will be unchanged).
-//
 func (hdrs *MessageHeaders) ContentDisposition() (string, map[string]string, bool) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.char               // in
@@ -368,7 +364,6 @@ func (hdrs *MessageHeaders) ContentDisposition() (string, map[string]string, boo
 // The function returns the following values:
 //
 //   - gint64: message body length declared by hdrs.
-//
 func (hdrs *MessageHeaders) ContentLength() int64 {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _cret C.goffset             // in
@@ -389,6 +384,11 @@ func (hdrs *MessageHeaders) ContentLength() int64 {
 // and total_length. If the total length field in the header was specified as
 // "*", then total_length will be set to -1.
 //
+// On success start and end are always non-negative, end is not before start,
+// and end is within total_length if that was given, so they can be used
+// directly as offsets into the response body. The out parameters are left
+// untouched if the header cannot be parsed.
+//
 // The function returns the following values:
 //
 //   - start: return value for the start of the range.
@@ -397,7 +397,6 @@ func (hdrs *MessageHeaders) ContentLength() int64 {
 //     resource, or NULL if you don't care.
 //   - ok: TRUE if hdrs contained a "Content-Range" header containing a byte
 //     range which could be parsed, FALSE otherwise.
-//
 func (hdrs *MessageHeaders) ContentRange() (start int64, end int64, totalLength int64, ok bool) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 C.goffset             // in
@@ -437,7 +436,6 @@ func (hdrs *MessageHeaders) ContentRange() (start int64, end int64, totalLength 
 //   - utf8 (optional): string with the value of the "Content-Type" header or
 //     NULL if hdrs does not contain that header or it cannot be parsed (in
 //     which case *params will be unchanged).
-//
 func (hdrs *MessageHeaders) ContentType() (map[string]string, string) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.GHashTable         // in
@@ -479,7 +477,6 @@ func (hdrs *MessageHeaders) ContentType() (map[string]string, string) {
 // The function returns the following values:
 //
 //   - encoding declared by hdrs.
-//
 func (hdrs *MessageHeaders) Encoding() Encoding {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _cret C.SoupEncoding        // in
@@ -504,7 +501,6 @@ func (hdrs *MessageHeaders) Encoding() Encoding {
 // The function returns the following values:
 //
 //   - expectation contents of hdrs's "Expect" header.
-//
 func (hdrs *MessageHeaders) Expectations() Expectation {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _cret C.SoupExpectation     // in
@@ -526,7 +522,6 @@ func (hdrs *MessageHeaders) Expectations() Expectation {
 // The function returns the following values:
 //
 //   - messageHeadersType header's type.
-//
 func (hdrs *MessageHeaders) HeadersType() MessageHeadersType {
 	var _arg0 *C.SoupMessageHeaders    // out
 	var _cret C.SoupMessageHeadersType // in
@@ -563,7 +558,6 @@ func (hdrs *MessageHeaders) HeadersType() MessageHeadersType {
 // The function returns the following values:
 //
 //   - utf8 (optional) header's value or NULL if not found.
-//
 func (hdrs *MessageHeaders) List(name string) string {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.char               // out
@@ -603,7 +597,6 @@ func (hdrs *MessageHeaders) List(name string) string {
 // The function returns the following values:
 //
 //   - utf8 (optional) header's value or NULL if not found.
-//
 func (hdrs *MessageHeaders) One(name string) string {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.char               // out
@@ -640,7 +633,11 @@ func (hdrs *MessageHeaders) One(name string) string {
 // Beware that even if given a total_length, this function does not check that
 // the ranges are satisfiable.
 //
-// Server has built-in handling for range requests. If your server handler
+// A Range header requesting more than 200 ranges is rejected, since serving
+// that many ranges costs far more than the request asking for them. server
+// answers such a request with SOUP_STATUS_REQUESTED_RANGE_NOT_SATISFIABLE.
+//
+// server has built-in handling for range requests. If your server handler
 // returns a SOUP_STATUS_OK response containing the complete response body
 // (rather than pausing the message and returning some of the response body
 // later), and there is a Range header in the request, then libsoup will
@@ -661,7 +658,6 @@ func (hdrs *MessageHeaders) One(name string) string {
 //   - ranges: return location for an array of Range.
 //   - ok: TRUE if hdrs contained a syntactically-valid "Range" header, FALSE
 //     otherwise (in which case range and length will not be set).
-//
 func (hdrs *MessageHeaders) Ranges(totalLength int64) ([]Range, bool) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 C.goffset             // out
@@ -714,7 +710,6 @@ func (hdrs *MessageHeaders) Ranges(totalLength int64) ([]Range, bool) {
 // The function returns the following values:
 //
 //   - ok: TRUE if the header is present and contains token, FALSE otherwise.
-//
 func (hdrs *MessageHeaders) HeaderContains(name string, token string) bool {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.char               // out
@@ -753,7 +748,6 @@ func (hdrs *MessageHeaders) HeaderContains(name string, token string) bool {
 //
 //   - ok: TRUE if the header is present and its value is value, FALSE
 //     otherwise.
-//
 func (hdrs *MessageHeaders) HeaderEquals(name string, value string) bool {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.char               // out
@@ -787,7 +781,6 @@ func (hdrs *MessageHeaders) HeaderEquals(name string, value string) bool {
 // The function takes the following parameters:
 //
 //   - name: header name to remove.
-//
 func (hdrs *MessageHeaders) Remove(name string) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.char               // out
@@ -812,7 +805,6 @@ func (hdrs *MessageHeaders) Remove(name string) {
 //
 //   - name: header name to replace.
 //   - value: new value of name.
-//
 func (hdrs *MessageHeaders) Replace(name string, value string) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.char               // out
@@ -840,7 +832,6 @@ func (hdrs *MessageHeaders) Replace(name string, value string) {
 //
 //   - disposition: disposition-type.
 //   - params (optional): additional parameters.
-//
 func (hdrs *MessageHeaders) SetContentDisposition(disposition string, params map[string]string) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.char               // out
@@ -855,9 +846,7 @@ func (hdrs *MessageHeaders) SetContentDisposition(disposition string, params map
 			var kdst *C.gchar // out
 			var vdst *C.gchar // out
 			kdst = (*C.gchar)(unsafe.Pointer(C.CString(ksrc)))
-			defer C.free(unsafe.Pointer(kdst))
 			vdst = (*C.gchar)(unsafe.Pointer(C.CString(vsrc)))
-			defer C.free(unsafe.Pointer(vdst))
 			C.g_hash_table_insert(_arg2, C.gpointer(unsafe.Pointer(kdst)), C.gpointer(unsafe.Pointer(vdst)))
 		}
 		defer C.g_hash_table_unref(_arg2)
@@ -883,7 +872,6 @@ func (hdrs *MessageHeaders) SetContentDisposition(disposition string, params map
 // The function takes the following parameters:
 //
 //   - contentLength: message body length.
-//
 func (hdrs *MessageHeaders) SetContentLength(contentLength int64) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 C.goffset             // out
@@ -910,7 +898,6 @@ func (hdrs *MessageHeaders) SetContentLength(contentLength int64) {
 //   - start of the range.
 //   - end of the range.
 //   - totalLength: total length of the resource, or -1 if unknown.
-//
 func (hdrs *MessageHeaders) SetContentRange(start int64, end int64, totalLength int64) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 C.goffset             // out
@@ -937,7 +924,6 @@ func (hdrs *MessageHeaders) SetContentRange(start int64, end int64, totalLength 
 //
 //   - contentType: MIME type.
 //   - params (optional): additional parameters.
-//
 func (hdrs *MessageHeaders) SetContentType(contentType string, params map[string]string) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.char               // out
@@ -952,9 +938,7 @@ func (hdrs *MessageHeaders) SetContentType(contentType string, params map[string
 			var kdst *C.gchar // out
 			var vdst *C.gchar // out
 			kdst = (*C.gchar)(unsafe.Pointer(C.CString(ksrc)))
-			defer C.free(unsafe.Pointer(kdst))
 			vdst = (*C.gchar)(unsafe.Pointer(C.CString(vsrc)))
-			defer C.free(unsafe.Pointer(vdst))
 			C.g_hash_table_insert(_arg2, C.gpointer(unsafe.Pointer(kdst)), C.gpointer(unsafe.Pointer(vdst)))
 		}
 		defer C.g_hash_table_unref(_arg2)
@@ -974,7 +958,6 @@ func (hdrs *MessageHeaders) SetContentType(contentType string, params map[string
 // The function takes the following parameters:
 //
 //   - encoding: Encoding.
-//
 func (hdrs *MessageHeaders) SetEncoding(encoding Encoding) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 C.SoupEncoding        // out
@@ -1000,7 +983,6 @@ func (hdrs *MessageHeaders) SetEncoding(encoding Encoding) {
 // The function takes the following parameters:
 //
 //   - expectations to set.
-//
 func (hdrs *MessageHeaders) SetExpectations(expectations Expectation) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 C.SoupExpectation     // out
@@ -1023,7 +1005,6 @@ func (hdrs *MessageHeaders) SetExpectations(expectations Expectation) {
 //
 //   - start of the range to request.
 //   - end of the range to request.
-//
 func (hdrs *MessageHeaders) SetRange(start int64, end int64) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 C.goffset             // out
@@ -1048,7 +1029,6 @@ func (hdrs *MessageHeaders) SetRange(start int64, end int64) {
 //
 //   - ranges: array of Range.
 //   - length of range.
-//
 func (hdrs *MessageHeaders) SetRanges(ranges *Range, length int) {
 	var _arg0 *C.SoupMessageHeaders // out
 	var _arg1 *C.SoupRange          // out
@@ -1064,11 +1044,11 @@ func (hdrs *MessageHeaders) SetRanges(ranges *Range, length int) {
 	runtime.KeepAlive(length)
 }
 
-// MessageHeadersIter: opaque type used to iterate over a SoupMessageHeaders
-// structure.
+// MessageHeadersIter: opaque type used to iterate over a messageheaders
+// structure
 //
 // After intializing the iterator with messageheadersiter.Init(), call
-// messageheadersiter.Next to fetch data from it.
+// messageheadersiter.Next() to fetch data from it.
 //
 // You may not modify the headers while iterating over them.
 //
@@ -1082,53 +1062,15 @@ type messageHeadersIter struct {
 	native *C.SoupMessageHeadersIter
 }
 
-// Next yields the next name/value pair in the messageheaders being iterated by
-// iter.
-//
-// If iter has already yielded the last header, then messageheadersiter.Next
-// will return FALSE and name and value will be unchanged.
-//
-// The function returns the following values:
-//
-//   - name: pointer to a variable to return the header name in.
-//   - value: pointer to a variable to return the header value in.
-//   - ok: TRUE if another name and value were returned, FALSE if the end of the
-//     headers has been reached.
-//
-func (iter *MessageHeadersIter) Next() (name string, value string, ok bool) {
-	var _arg0 *C.SoupMessageHeadersIter // out
-	var _arg1 *C.char                   // in
-	var _arg2 *C.char                   // in
-	var _cret C.gboolean                // in
-
-	_arg0 = (*C.SoupMessageHeadersIter)(gextras.StructNative(unsafe.Pointer(iter)))
-
-	_cret = C.soup_message_headers_iter_next(_arg0, &_arg1, &_arg2)
-	runtime.KeepAlive(iter)
-
-	var _name string  // out
-	var _value string // out
-	var _ok bool      // out
-
-	_name = C.GoString((*C.gchar)(unsafe.Pointer(_arg1)))
-	_value = C.GoString((*C.gchar)(unsafe.Pointer(_arg2)))
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _name, _value, _ok
-}
-
 // MessageHeadersIterInit initializes iter for iterating hdrs.
 //
 // The function takes the following parameters:
 //
-//   - hdrs: SoupMessageHeaders.
+//   - hdrs: MessageHeaders.
 //
 // The function returns the following values:
 //
-//   - iter: pointer to a SoupMessageHeadersIter structure.
-//
+//   - iter: pointer to a MessageHeadersIter structure.
 func MessageHeadersIterInit(hdrs *MessageHeaders) *MessageHeadersIter {
 	var _arg1 C.SoupMessageHeadersIter // in
 	var _arg2 *C.SoupMessageHeaders    // out

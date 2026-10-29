@@ -19,7 +19,7 @@ func _gotk4_soup3_CookieJar_ConnectChanged(arg0 C.gpointer, arg1 *C.SoupCookie, 
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -29,8 +29,12 @@ func _gotk4_soup3_CookieJar_ConnectChanged(arg0 C.gpointer, arg1 *C.SoupCookie, 
 	var _oldCookie *Cookie // out
 	var _newCookie *Cookie // out
 
-	_oldCookie = (*Cookie)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-	_newCookie = (*Cookie)(gextras.NewStructNative(unsafe.Pointer(arg2)))
+	if arg1 != nil {
+		_oldCookie = (*Cookie)(gextras.NewStructNative(unsafe.Pointer(arg1)))
+	}
+	if arg2 != nil {
+		_newCookie = (*Cookie)(gextras.NewStructNative(unsafe.Pointer(arg2)))
+	}
 
 	f(_oldCookie, _newCookie)
 }

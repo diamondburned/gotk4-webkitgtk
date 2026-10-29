@@ -77,7 +77,6 @@ func marshalDOMTreeWalker(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMTreeWalker) FirstChild() *DOMNode {
 	var _arg0 *C.WebKitDOMTreeWalker // out
 	var _cret *C.WebKitDOMNode       // in
@@ -99,7 +98,6 @@ func (self *DOMTreeWalker) FirstChild() *DOMNode {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMTreeWalker) CurrentNode() *DOMNode {
 	var _arg0 *C.WebKitDOMTreeWalker // out
 	var _cret *C.WebKitDOMNode       // in
@@ -124,7 +122,6 @@ func (self *DOMTreeWalker) CurrentNode() *DOMNode {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMTreeWalker) ExpandEntityReferences() bool {
 	var _arg0 *C.WebKitDOMTreeWalker // out
 	var _cret C.gboolean             // in
@@ -148,7 +145,6 @@ func (self *DOMTreeWalker) ExpandEntityReferences() bool {
 // The function returns the following values:
 //
 //   - domNodeFilter: KitDOMNodeFilter.
-//
 func (self *DOMTreeWalker) Filter() *DOMNodeFilter {
 	var _arg0 *C.WebKitDOMTreeWalker // out
 	var _cret *C.WebKitDOMNodeFilter // in
@@ -170,7 +166,6 @@ func (self *DOMTreeWalker) Filter() *DOMNodeFilter {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMTreeWalker) Root() *DOMNode {
 	var _arg0 *C.WebKitDOMTreeWalker // out
 	var _cret *C.WebKitDOMNode       // in
@@ -192,7 +187,6 @@ func (self *DOMTreeWalker) Root() *DOMNode {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMTreeWalker) WhatToShow() uint32 {
 	var _arg0 *C.WebKitDOMTreeWalker // out
 	var _cret C.gulong               // in
@@ -214,7 +208,6 @@ func (self *DOMTreeWalker) WhatToShow() uint32 {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMTreeWalker) LastChild() *DOMNode {
 	var _arg0 *C.WebKitDOMTreeWalker // out
 	var _cret *C.WebKitDOMNode       // in
@@ -236,7 +229,6 @@ func (self *DOMTreeWalker) LastChild() *DOMNode {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMTreeWalker) NextNode() *DOMNode {
 	var _arg0 *C.WebKitDOMTreeWalker // out
 	var _cret *C.WebKitDOMNode       // in
@@ -258,7 +250,6 @@ func (self *DOMTreeWalker) NextNode() *DOMNode {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMTreeWalker) NextSibling() *DOMNode {
 	var _arg0 *C.WebKitDOMTreeWalker // out
 	var _cret *C.WebKitDOMNode       // in
@@ -280,7 +271,6 @@ func (self *DOMTreeWalker) NextSibling() *DOMNode {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMTreeWalker) ParentNode() *DOMNode {
 	var _arg0 *C.WebKitDOMTreeWalker // out
 	var _cret *C.WebKitDOMNode       // in
@@ -302,7 +292,6 @@ func (self *DOMTreeWalker) ParentNode() *DOMNode {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMTreeWalker) PreviousNode() *DOMNode {
 	var _arg0 *C.WebKitDOMTreeWalker // out
 	var _cret *C.WebKitDOMNode       // in
@@ -324,7 +313,6 @@ func (self *DOMTreeWalker) PreviousNode() *DOMNode {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMTreeWalker) PreviousSibling() *DOMNode {
 	var _arg0 *C.WebKitDOMTreeWalker // out
 	var _cret *C.WebKitDOMNode       // in
@@ -346,7 +334,6 @@ func (self *DOMTreeWalker) PreviousSibling() *DOMNode {
 // The function takes the following parameters:
 //
 //   - value: KitDOMNode.
-//
 func (self *DOMTreeWalker) SetCurrentNode(value *DOMNode) error {
 	var _arg0 *C.WebKitDOMTreeWalker // out
 	var _arg1 *C.WebKitDOMNode       // out

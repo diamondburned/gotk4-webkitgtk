@@ -12,9 +12,8 @@ import "C"
 
 // SettingsFontSizeToPixels: convert points to the equivalent value in pixels.
 //
-// Convert points to the equivalent value in pixels, based on the current screen
-// DPI. Applications can use this function to convert font size values in
-// points to font size values in pixels when setting the font size properties of
+// Applications can use this function to convert font size values in points
+// to font size values in pixels when setting the font size properties of
 // KitSettings.
 //
 // The function takes the following parameters:
@@ -24,7 +23,6 @@ import "C"
 // The function returns the following values:
 //
 //   - guint32: equivalent font size in pixels.
-//
 func SettingsFontSizeToPixels(points uint32) uint32 {
 	var _arg1 C.guint32 // out
 	var _cret C.guint32 // in
@@ -43,9 +41,8 @@ func SettingsFontSizeToPixels(points uint32) uint32 {
 
 // SettingsFontSizeToPoints: convert pixels to the equivalent value in points.
 //
-// Convert pixels to the equivalent value in points, based on the current screen
-// DPI. Applications can use this function to convert font size values in
-// pixels to font size values in points when getting the font size properties of
+// Applications can use this function to convert font size values in pixels
+// to font size values in points when getting the font size properties of
 // KitSettings.
 //
 // The function takes the following parameters:
@@ -55,7 +52,6 @@ func SettingsFontSizeToPixels(points uint32) uint32 {
 // The function returns the following values:
 //
 //   - guint32: equivalent font size in points.
-//
 func SettingsFontSizeToPoints(pixels uint32) uint32 {
 	var _arg1 C.guint32 // out
 	var _cret C.guint32 // in

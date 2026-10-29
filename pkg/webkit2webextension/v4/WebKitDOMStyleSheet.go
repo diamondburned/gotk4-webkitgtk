@@ -76,7 +76,6 @@ func marshalDOMStyleSheet(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMStyleSheet) ContentType() string {
 	var _arg0 *C.WebKitDOMStyleSheet // out
 	var _cret *C.gchar               // in
@@ -99,7 +98,6 @@ func (self *DOMStyleSheet) ContentType() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMStyleSheet) Disabled() bool {
 	var _arg0 *C.WebKitDOMStyleSheet // out
 	var _cret C.gboolean             // in
@@ -123,7 +121,6 @@ func (self *DOMStyleSheet) Disabled() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMStyleSheet) Href() string {
 	var _arg0 *C.WebKitDOMStyleSheet // out
 	var _cret *C.gchar               // in
@@ -146,7 +143,6 @@ func (self *DOMStyleSheet) Href() string {
 // The function returns the following values:
 //
 //   - domMediaList: KitDOMMediaList.
-//
 func (self *DOMStyleSheet) Media() *DOMMediaList {
 	var _arg0 *C.WebKitDOMStyleSheet // out
 	var _cret *C.WebKitDOMMediaList  // in
@@ -168,7 +164,6 @@ func (self *DOMStyleSheet) Media() *DOMMediaList {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMStyleSheet) OwnerNode() *DOMNode {
 	var _arg0 *C.WebKitDOMStyleSheet // out
 	var _cret *C.WebKitDOMNode       // in
@@ -190,7 +185,6 @@ func (self *DOMStyleSheet) OwnerNode() *DOMNode {
 // The function returns the following values:
 //
 //   - domStyleSheet: KitDOMStyleSheet.
-//
 func (self *DOMStyleSheet) ParentStyleSheet() *DOMStyleSheet {
 	var _arg0 *C.WebKitDOMStyleSheet // out
 	var _cret *C.WebKitDOMStyleSheet // in
@@ -212,7 +206,6 @@ func (self *DOMStyleSheet) ParentStyleSheet() *DOMStyleSheet {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMStyleSheet) Title() string {
 	var _arg0 *C.WebKitDOMStyleSheet // out
 	var _cret *C.gchar               // in
@@ -235,7 +228,6 @@ func (self *DOMStyleSheet) Title() string {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMStyleSheet) SetDisabled(value bool) {
 	var _arg0 *C.WebKitDOMStyleSheet // out
 	var _arg1 C.gboolean             // out

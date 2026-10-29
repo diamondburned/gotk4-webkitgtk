@@ -85,7 +85,6 @@ func marshalDOMText(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMText) WholeText() string {
 	var _arg0 *C.WebKitDOMText // out
 	var _cret *C.gchar         // in
@@ -112,7 +111,6 @@ func (self *DOMText) WholeText() string {
 // The function returns the following values:
 //
 //   - domText: KitDOMText.
-//
 func (self *DOMText) ReplaceWholeText(content string) (*DOMText, error) {
 	var _arg0 *C.WebKitDOMText // out
 	var _arg1 *C.gchar         // out
@@ -147,7 +145,6 @@ func (self *DOMText) ReplaceWholeText(content string) (*DOMText, error) {
 // The function returns the following values:
 //
 //   - domText: KitDOMText.
-//
 func (self *DOMText) SplitText(offset uint32) (*DOMText, error) {
 	var _arg0 *C.WebKitDOMText // out
 	var _arg1 C.gulong         // out

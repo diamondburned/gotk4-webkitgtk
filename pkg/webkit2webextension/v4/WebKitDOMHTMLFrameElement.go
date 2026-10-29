@@ -86,7 +86,6 @@ func marshalDOMHTMLFrameElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - domDocument: KitDOMDocument.
-//
 func (self *DOMHTMLFrameElement) ContentDocument() *DOMDocument {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _cret *C.WebKitDOMDocument         // in
@@ -108,7 +107,6 @@ func (self *DOMHTMLFrameElement) ContentDocument() *DOMDocument {
 // The function returns the following values:
 //
 //   - domdomWindow: KitDOMDOMWindow.
-//
 func (self *DOMHTMLFrameElement) ContentWindow() *DOMDOMWindow {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _cret *C.WebKitDOMDOMWindow        // in
@@ -130,7 +128,6 @@ func (self *DOMHTMLFrameElement) ContentWindow() *DOMDOMWindow {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFrameElement) FrameBorder() string {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _cret *C.gchar                     // in
@@ -153,7 +150,6 @@ func (self *DOMHTMLFrameElement) FrameBorder() string {
 // The function returns the following values:
 //
 //   - glong: 0.
-//
 func (self *DOMHTMLFrameElement) Height() int32 {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _cret C.glong                      // in
@@ -175,7 +171,6 @@ func (self *DOMHTMLFrameElement) Height() int32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFrameElement) LongDesc() string {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _cret *C.gchar                     // in
@@ -198,7 +193,6 @@ func (self *DOMHTMLFrameElement) LongDesc() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFrameElement) MarginHeight() string {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _cret *C.gchar                     // in
@@ -221,7 +215,6 @@ func (self *DOMHTMLFrameElement) MarginHeight() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFrameElement) MarginWidth() string {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _cret *C.gchar                     // in
@@ -244,7 +237,6 @@ func (self *DOMHTMLFrameElement) MarginWidth() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFrameElement) Name() string {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _cret *C.gchar                     // in
@@ -267,7 +259,6 @@ func (self *DOMHTMLFrameElement) Name() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLFrameElement) NoResize() bool {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _cret C.gboolean                   // in
@@ -291,7 +282,6 @@ func (self *DOMHTMLFrameElement) NoResize() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFrameElement) Scrolling() string {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _cret *C.gchar                     // in
@@ -314,7 +304,6 @@ func (self *DOMHTMLFrameElement) Scrolling() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFrameElement) Src() string {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _cret *C.gchar                     // in
@@ -337,7 +326,6 @@ func (self *DOMHTMLFrameElement) Src() string {
 // The function returns the following values:
 //
 //   - glong: 0.
-//
 func (self *DOMHTMLFrameElement) Width() int32 {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _cret C.glong                      // in
@@ -359,7 +347,6 @@ func (self *DOMHTMLFrameElement) Width() int32 {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFrameElement) SetFrameBorder(value string) {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _arg1 *C.gchar                     // out
@@ -378,7 +365,6 @@ func (self *DOMHTMLFrameElement) SetFrameBorder(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFrameElement) SetLongDesc(value string) {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _arg1 *C.gchar                     // out
@@ -397,7 +383,6 @@ func (self *DOMHTMLFrameElement) SetLongDesc(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFrameElement) SetMarginHeight(value string) {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _arg1 *C.gchar                     // out
@@ -416,7 +401,6 @@ func (self *DOMHTMLFrameElement) SetMarginHeight(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFrameElement) SetMarginWidth(value string) {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _arg1 *C.gchar                     // out
@@ -435,7 +419,6 @@ func (self *DOMHTMLFrameElement) SetMarginWidth(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFrameElement) SetName(value string) {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _arg1 *C.gchar                     // out
@@ -454,7 +437,6 @@ func (self *DOMHTMLFrameElement) SetName(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLFrameElement) SetNoResize(value bool) {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _arg1 C.gboolean                   // out
@@ -474,7 +456,6 @@ func (self *DOMHTMLFrameElement) SetNoResize(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFrameElement) SetScrolling(value string) {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _arg1 *C.gchar                     // out
@@ -493,7 +474,6 @@ func (self *DOMHTMLFrameElement) SetScrolling(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFrameElement) SetSrc(value string) {
 	var _arg0 *C.WebKitDOMHTMLFrameElement // out
 	var _arg1 *C.gchar                     // out

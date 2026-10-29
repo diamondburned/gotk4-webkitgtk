@@ -14,12 +14,12 @@ const MAJOR_VERSION = 2
 // MICRO_VERSION: like jsc_get_micro_version(), but from the headers used at
 // application compile time, rather than from the library linked against at
 // application run time.
-const MICRO_VERSION = 4
+const MICRO_VERSION = 1
 
 // MINOR_VERSION: like jsc_get_minor_version(), but from the headers used at
 // application compile time, rather than from the library linked against at
 // application run time.
-const MINOR_VERSION = 42
+const MINOR_VERSION = 54
 
 // GetMajorVersion returns the major version number of the JavaScriptCore
 // library. (e.g. in JavaScriptCore version 1.8.3 this is 1.)
@@ -32,7 +32,6 @@ const MINOR_VERSION = 42
 // The function returns the following values:
 //
 //   - guint: major version number of the JavaScriptCore library.
-//
 func GetMajorVersion() uint {
 	var _cret C.guint // in
 
@@ -56,7 +55,6 @@ func GetMajorVersion() uint {
 // The function returns the following values:
 //
 //   - guint: micro version number of the JavaScriptCore library.
-//
 func GetMicroVersion() uint {
 	var _cret C.guint // in
 
@@ -80,7 +78,6 @@ func GetMicroVersion() uint {
 // The function returns the following values:
 //
 //   - guint: minor version number of the JavaScriptCore library.
-//
 func GetMinorVersion() uint {
 	var _cret C.guint // in
 

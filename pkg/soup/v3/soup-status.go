@@ -313,7 +313,6 @@ func (s Status) String() string {
 // The function returns the following values:
 //
 //   - utf8: (terse, English) description of status_code.
-//
 func StatusGetPhrase(statusCode uint) string {
 	var _arg1 C.guint // out
 	var _cret *C.char // in

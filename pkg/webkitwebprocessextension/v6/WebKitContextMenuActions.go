@@ -11,7 +11,7 @@ import (
 import "C"
 
 // ContextMenuAction: enum values used to denote the stock actions for
-// KitContextMenuItem<!-- -->s.
+// KitContextMenuItem objects.
 type ContextMenuAction C.gint
 
 const (
@@ -48,7 +48,7 @@ const (
 	ContextMenuActionStop ContextMenuAction = 12
 	// ContextMenuActionReload: reload the contents of current view.
 	ContextMenuActionReload ContextMenuAction = 13
-	// ContextMenuActionCopy: copy current selection the clipboard.
+	// ContextMenuActionCopy: copy current selection to the clipboard.
 	ContextMenuActionCopy ContextMenuAction = 14
 	// ContextMenuActionCut: cut current selection to the clipboard.
 	ContextMenuActionCut ContextMenuAction = 15
@@ -94,10 +94,10 @@ const (
 	// ContextMenuActionOpenAudioInNewWindow: open current audio element in a
 	// new window.
 	ContextMenuActionOpenAudioInNewWindow ContextMenuAction = 33
-	// ContextMenuActionCopyVideoLinkToClipboard: copy video link location in to
+	// ContextMenuActionCopyVideoLinkToClipboard: copy video link location to
 	// the clipboard.
 	ContextMenuActionCopyVideoLinkToClipboard ContextMenuAction = 34
-	// ContextMenuActionCopyAudioLinkToClipboard: copy audio link location in to
+	// ContextMenuActionCopyAudioLinkToClipboard: copy audio link location to
 	// the clipboard.
 	ContextMenuActionCopyAudioLinkToClipboard ContextMenuAction = 35
 	// ContextMenuActionToggleMediaControls: enable or disable media controls.

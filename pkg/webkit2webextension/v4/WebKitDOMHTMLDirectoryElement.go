@@ -86,7 +86,6 @@ func marshalDOMHTMLDirectoryElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLDirectoryElement) Compact() bool {
 	var _arg0 *C.WebKitDOMHTMLDirectoryElement // out
 	var _cret C.gboolean                       // in
@@ -110,7 +109,6 @@ func (self *DOMHTMLDirectoryElement) Compact() bool {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLDirectoryElement) SetCompact(value bool) {
 	var _arg0 *C.WebKitDOMHTMLDirectoryElement // out
 	var _arg1 C.gboolean                       // out

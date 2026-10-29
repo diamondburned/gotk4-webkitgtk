@@ -98,7 +98,6 @@ func marshalDOMCSSRule(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMCSSRule) CSSText() string {
 	var _arg0 *C.WebKitDOMCSSRule // out
 	var _cret *C.gchar            // in
@@ -121,7 +120,6 @@ func (self *DOMCSSRule) CSSText() string {
 // The function returns the following values:
 //
 //   - domcssRule: KitDOMCSSRule.
-//
 func (self *DOMCSSRule) ParentRule() *DOMCSSRule {
 	var _arg0 *C.WebKitDOMCSSRule // out
 	var _cret *C.WebKitDOMCSSRule // in
@@ -143,7 +141,6 @@ func (self *DOMCSSRule) ParentRule() *DOMCSSRule {
 // The function returns the following values:
 //
 //   - domcssStyleSheet: KitDOMCSSStyleSheet.
-//
 func (self *DOMCSSRule) ParentStyleSheet() *DOMCSSStyleSheet {
 	var _arg0 *C.WebKitDOMCSSRule       // out
 	var _cret *C.WebKitDOMCSSStyleSheet // in
@@ -165,7 +162,6 @@ func (self *DOMCSSRule) ParentStyleSheet() *DOMCSSStyleSheet {
 // The function returns the following values:
 //
 //   - gushort: #gushort.
-//
 func (self *DOMCSSRule) RuleType() uint16 {
 	var _arg0 *C.WebKitDOMCSSRule // out
 	var _cret C.gushort           // in
@@ -187,7 +183,6 @@ func (self *DOMCSSRule) RuleType() uint16 {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMCSSRule) SetCSSText(value string) error {
 	var _arg0 *C.WebKitDOMCSSRule // out
 	var _arg1 *C.gchar            // out

@@ -39,9 +39,9 @@ func defaultColorChooserRequestOverrides(v *ColorChooserRequest) ColorChooserReq
 // ColorChooserRequest: request to open a color chooser.
 //
 // Whenever the user interacts with an <input type='color' /> HTML element,
-// WebKit will need to show a dialog to choose a color. For that to happen in
-// a general way, instead of just opening a ColorChooser (which might be not
-// desirable in some cases, which could prefer to use their own color chooser
+// WebKit will need to show a dialog to choose a color. For that to happen
+// in a general way, instead of just opening a ColorChooser (which might not
+// be desirable for applications that prefer to use their own color chooser
 // dialog), WebKit will fire the KitWebView::run-color-chooser signal with a
 // KitColorChooserRequest object, which will allow the client application to
 // specify the color to be selected, to inspect the details of the request (e.g.
@@ -130,7 +130,6 @@ func (request *ColorChooserRequest) Finish() {
 // The function returns the following values:
 //
 //   - rect to fill in with the element area.
-//
 func (request *ColorChooserRequest) ElementRectangle() *gdk.Rectangle {
 	var _arg0 *C.WebKitColorChooserRequest // out
 	var _arg1 C.GdkRectangle               // in
@@ -152,7 +151,6 @@ func (request *ColorChooserRequest) ElementRectangle() *gdk.Rectangle {
 // The function returns the following values:
 //
 //   - rgba to fill in with the current color.
-//
 func (request *ColorChooserRequest) RGBA() *gdk.RGBA {
 	var _arg0 *C.WebKitColorChooserRequest // out
 	var _arg1 C.GdkRGBA                    // in
@@ -174,7 +172,6 @@ func (request *ColorChooserRequest) RGBA() *gdk.RGBA {
 // The function takes the following parameters:
 //
 //   - rgba: pointer RGBA.
-//
 func (request *ColorChooserRequest) SetRGBA(rgba *gdk.RGBA) {
 	var _arg0 *C.WebKitColorChooserRequest // out
 	var _arg1 *C.GdkRGBA                   // out

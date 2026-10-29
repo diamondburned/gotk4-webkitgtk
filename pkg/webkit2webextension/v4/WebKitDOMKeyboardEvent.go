@@ -96,7 +96,6 @@ func marshalDOMKeyboardEvent(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMKeyboardEvent) AltGraphKey() bool {
 	var _arg0 *C.WebKitDOMKeyboardEvent // out
 	var _cret C.gboolean                // in
@@ -120,7 +119,6 @@ func (self *DOMKeyboardEvent) AltGraphKey() bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMKeyboardEvent) AltKey() bool {
 	var _arg0 *C.WebKitDOMKeyboardEvent // out
 	var _cret C.gboolean                // in
@@ -144,7 +142,6 @@ func (self *DOMKeyboardEvent) AltKey() bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMKeyboardEvent) CtrlKey() bool {
 	var _arg0 *C.WebKitDOMKeyboardEvent // out
 	var _cret C.gboolean                // in
@@ -168,7 +165,6 @@ func (self *DOMKeyboardEvent) CtrlKey() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMKeyboardEvent) KeyIdentifier() string {
 	var _arg0 *C.WebKitDOMKeyboardEvent // out
 	var _cret *C.gchar                  // in
@@ -191,7 +187,6 @@ func (self *DOMKeyboardEvent) KeyIdentifier() string {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMKeyboardEvent) KeyLocation() uint32 {
 	var _arg0 *C.WebKitDOMKeyboardEvent // out
 	var _cret C.gulong                  // in
@@ -213,7 +208,6 @@ func (self *DOMKeyboardEvent) KeyLocation() uint32 {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMKeyboardEvent) MetaKey() bool {
 	var _arg0 *C.WebKitDOMKeyboardEvent // out
 	var _cret C.gboolean                // in
@@ -241,7 +235,6 @@ func (self *DOMKeyboardEvent) MetaKey() bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMKeyboardEvent) ModifierState(keyIdentifierArg string) bool {
 	var _arg0 *C.WebKitDOMKeyboardEvent // out
 	var _arg1 *C.gchar                  // out
@@ -269,7 +262,6 @@ func (self *DOMKeyboardEvent) ModifierState(keyIdentifierArg string) bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMKeyboardEvent) ShiftKey() bool {
 	var _arg0 *C.WebKitDOMKeyboardEvent // out
 	var _cret C.gboolean                // in
@@ -303,7 +295,6 @@ func (self *DOMKeyboardEvent) ShiftKey() bool {
 //   - shiftKey: #gboolean.
 //   - metaKey: #gboolean.
 //   - altGraphKey: #gboolean.
-//
 func (self *DOMKeyboardEvent) InitKeyboardEvent(typ string, canBubble, cancelable bool, view *DOMDOMWindow, keyIdentifier string, location uint32, ctrlKey, altKey, shiftKey, metaKey, altGraphKey bool) {
 	var _arg0 *C.WebKitDOMKeyboardEvent // out
 	var _arg1 *C.gchar                  // out

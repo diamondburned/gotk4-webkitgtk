@@ -35,9 +35,9 @@ func defaultClassOverrides(v *Class) ClassOverrides {
 }
 
 // Class represents a custom JavaScript class registered by the user in a
-// CContext. It allows to create new JavaScripts objects whose instances are
+// CContext. It allows creating new JavaScript objects whose instances are
 // created by the user using this API. It's possible to add constructors,
-// properties and methods for a JSSClass by providing #GCallback<!-- -->s to
+// properties and methods for a JSCClass by providing #GCallback functions to
 // implement them.
 type Class struct {
 	_ [0]func() // equal guard
@@ -79,7 +79,6 @@ func marshalClass(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: name of jsc_class.
-//
 func (jscClass *Class) Name() string {
 	var _arg0 *C.JSCClass // out
 	var _cret *C.char     // in
@@ -101,7 +100,6 @@ func (jscClass *Class) Name() string {
 // The function returns the following values:
 //
 //   - class: parent class of jsc_class.
-//
 func (jscClass *Class) Parent() *Class {
 	var _arg0 *C.JSCClass // out
 	var _cret *C.JSCClass // in

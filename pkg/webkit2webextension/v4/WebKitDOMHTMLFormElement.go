@@ -86,7 +86,6 @@ func marshalDOMHTMLFormElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFormElement) AcceptCharset() string {
 	var _arg0 *C.WebKitDOMHTMLFormElement // out
 	var _cret *C.gchar                    // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLFormElement) AcceptCharset() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFormElement) Action() string {
 	var _arg0 *C.WebKitDOMHTMLFormElement // out
 	var _cret *C.gchar                    // in
@@ -132,7 +130,6 @@ func (self *DOMHTMLFormElement) Action() string {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMHTMLFormElement) Elements() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMHTMLFormElement // out
 	var _cret *C.WebKitDOMHTMLCollection  // in
@@ -154,7 +151,6 @@ func (self *DOMHTMLFormElement) Elements() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFormElement) Encoding() string {
 	var _arg0 *C.WebKitDOMHTMLFormElement // out
 	var _cret *C.gchar                    // in
@@ -177,7 +173,6 @@ func (self *DOMHTMLFormElement) Encoding() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFormElement) Enctype() string {
 	var _arg0 *C.WebKitDOMHTMLFormElement // out
 	var _cret *C.gchar                    // in
@@ -200,7 +195,6 @@ func (self *DOMHTMLFormElement) Enctype() string {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLFormElement) Length() int32 {
 	var _arg0 *C.WebKitDOMHTMLFormElement // out
 	var _cret C.glong                     // in
@@ -222,7 +216,6 @@ func (self *DOMHTMLFormElement) Length() int32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFormElement) Method() string {
 	var _arg0 *C.WebKitDOMHTMLFormElement // out
 	var _cret *C.gchar                    // in
@@ -245,7 +238,6 @@ func (self *DOMHTMLFormElement) Method() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFormElement) Name() string {
 	var _arg0 *C.WebKitDOMHTMLFormElement // out
 	var _cret *C.gchar                    // in
@@ -268,7 +260,6 @@ func (self *DOMHTMLFormElement) Name() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLFormElement) Target() string {
 	var _arg0 *C.WebKitDOMHTMLFormElement // out
 	var _cret *C.gchar                    // in
@@ -301,7 +292,6 @@ func (self *DOMHTMLFormElement) Reset() {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFormElement) SetAcceptCharset(value string) {
 	var _arg0 *C.WebKitDOMHTMLFormElement // out
 	var _arg1 *C.gchar                    // out
@@ -320,7 +310,6 @@ func (self *DOMHTMLFormElement) SetAcceptCharset(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFormElement) SetAction(value string) {
 	var _arg0 *C.WebKitDOMHTMLFormElement // out
 	var _arg1 *C.gchar                    // out
@@ -339,7 +328,6 @@ func (self *DOMHTMLFormElement) SetAction(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFormElement) SetEncoding(value string) {
 	var _arg0 *C.WebKitDOMHTMLFormElement // out
 	var _arg1 *C.gchar                    // out
@@ -358,7 +346,6 @@ func (self *DOMHTMLFormElement) SetEncoding(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFormElement) SetEnctype(value string) {
 	var _arg0 *C.WebKitDOMHTMLFormElement // out
 	var _arg1 *C.gchar                    // out
@@ -377,7 +364,6 @@ func (self *DOMHTMLFormElement) SetEnctype(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFormElement) SetMethod(value string) {
 	var _arg0 *C.WebKitDOMHTMLFormElement // out
 	var _arg1 *C.gchar                    // out
@@ -396,7 +382,6 @@ func (self *DOMHTMLFormElement) SetMethod(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFormElement) SetName(value string) {
 	var _arg0 *C.WebKitDOMHTMLFormElement // out
 	var _arg1 *C.gchar                    // out
@@ -415,7 +400,6 @@ func (self *DOMHTMLFormElement) SetName(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLFormElement) SetTarget(value string) {
 	var _arg0 *C.WebKitDOMHTMLFormElement // out
 	var _arg1 *C.gchar                    // out

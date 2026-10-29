@@ -72,7 +72,6 @@ func NewWebViewSessionState(data *glib.Bytes) *WebViewSessionState {
 // The function returns the following values:
 //
 //   - bytes containing the state serialized.
-//
 func (state *WebViewSessionState) Serialize() *glib.Bytes {
 	var _arg0 *C.WebKitWebViewSessionState // out
 	var _cret *C.GBytes                    // in

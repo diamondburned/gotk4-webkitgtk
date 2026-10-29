@@ -86,7 +86,6 @@ func marshalDOMHTMLOptionElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLOptionElement) DefaultSelected() bool {
 	var _arg0 *C.WebKitDOMHTMLOptionElement // out
 	var _cret C.gboolean                    // in
@@ -110,7 +109,6 @@ func (self *DOMHTMLOptionElement) DefaultSelected() bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLOptionElement) Disabled() bool {
 	var _arg0 *C.WebKitDOMHTMLOptionElement // out
 	var _cret C.gboolean                    // in
@@ -134,7 +132,6 @@ func (self *DOMHTMLOptionElement) Disabled() bool {
 // The function returns the following values:
 //
 //   - domhtmlFormElement: KitDOMHTMLFormElement.
-//
 func (self *DOMHTMLOptionElement) Form() *DOMHTMLFormElement {
 	var _arg0 *C.WebKitDOMHTMLOptionElement // out
 	var _cret *C.WebKitDOMHTMLFormElement   // in
@@ -156,7 +153,6 @@ func (self *DOMHTMLOptionElement) Form() *DOMHTMLFormElement {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLOptionElement) Index() int32 {
 	var _arg0 *C.WebKitDOMHTMLOptionElement // out
 	var _cret C.glong                       // in
@@ -178,7 +174,6 @@ func (self *DOMHTMLOptionElement) Index() int32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLOptionElement) Label() string {
 	var _arg0 *C.WebKitDOMHTMLOptionElement // out
 	var _cret *C.gchar                      // in
@@ -201,7 +196,6 @@ func (self *DOMHTMLOptionElement) Label() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLOptionElement) Selected() bool {
 	var _arg0 *C.WebKitDOMHTMLOptionElement // out
 	var _cret C.gboolean                    // in
@@ -225,7 +219,6 @@ func (self *DOMHTMLOptionElement) Selected() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLOptionElement) Text() string {
 	var _arg0 *C.WebKitDOMHTMLOptionElement // out
 	var _cret *C.gchar                      // in
@@ -248,7 +241,6 @@ func (self *DOMHTMLOptionElement) Text() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLOptionElement) Value() string {
 	var _arg0 *C.WebKitDOMHTMLOptionElement // out
 	var _cret *C.gchar                      // in
@@ -271,7 +263,6 @@ func (self *DOMHTMLOptionElement) Value() string {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLOptionElement) SetDefaultSelected(value bool) {
 	var _arg0 *C.WebKitDOMHTMLOptionElement // out
 	var _arg1 C.gboolean                    // out
@@ -291,7 +282,6 @@ func (self *DOMHTMLOptionElement) SetDefaultSelected(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLOptionElement) SetDisabled(value bool) {
 	var _arg0 *C.WebKitDOMHTMLOptionElement // out
 	var _arg1 C.gboolean                    // out
@@ -311,7 +301,6 @@ func (self *DOMHTMLOptionElement) SetDisabled(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLOptionElement) SetLabel(value string) {
 	var _arg0 *C.WebKitDOMHTMLOptionElement // out
 	var _arg1 *C.gchar                      // out
@@ -330,7 +319,6 @@ func (self *DOMHTMLOptionElement) SetLabel(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLOptionElement) SetSelected(value bool) {
 	var _arg0 *C.WebKitDOMHTMLOptionElement // out
 	var _arg1 C.gboolean                    // out
@@ -350,7 +338,6 @@ func (self *DOMHTMLOptionElement) SetSelected(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLOptionElement) SetValue(value string) {
 	var _arg0 *C.WebKitDOMHTMLOptionElement // out
 	var _arg1 *C.gchar                      // out

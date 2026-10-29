@@ -84,7 +84,6 @@ func marshalDOMProcessingInstruction(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - domStyleSheet: KitDOMStyleSheet.
-//
 func (self *DOMProcessingInstruction) Sheet() *DOMStyleSheet {
 	var _arg0 *C.WebKitDOMProcessingInstruction // out
 	var _cret *C.WebKitDOMStyleSheet            // in
@@ -106,7 +105,6 @@ func (self *DOMProcessingInstruction) Sheet() *DOMStyleSheet {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMProcessingInstruction) Target() string {
 	var _arg0 *C.WebKitDOMProcessingInstruction // out
 	var _cret *C.gchar                          // in

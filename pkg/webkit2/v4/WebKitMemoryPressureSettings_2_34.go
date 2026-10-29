@@ -33,11 +33,11 @@ func init() {
 // custom settings to control how the memory pressure situations are handled by
 // the different processes.
 //
-// The memory pressure system implemented inside the different process will try
-// to keep the memory usage under the defined memory limit. In order to do that,
-// it will check the used memory with a user defined frequency and decide
+// The memory pressure system implemented inside the different processes will
+// try to keep the memory usage under the defined memory limit. In order to do
+// that, it will check the used memory with a user defined frequency and decide
 // whether it should try to release memory. The thresholds passed will define
-// how urgent is to release that memory.
+// how urgent it is to release that memory.
 //
 // Take into account that badly defined parameters can greatly reduce the
 // performance of the engine. For example, setting memory limit too low with a
@@ -91,8 +91,7 @@ func NewMemoryPressureSettings() *MemoryPressureSettings {
 //
 // The function returns the following values:
 //
-//   - memoryPressureSettings: copy of of the passed KitMemoryPressureSettings.
-//
+//   - memoryPressureSettings: copy of the passed KitMemoryPressureSettings.
 func (settings *MemoryPressureSettings) Copy() *MemoryPressureSettings {
 	var _arg0 *C.WebKitMemoryPressureSettings // out
 	var _cret *C.WebKitMemoryPressureSettings // in
@@ -120,7 +119,6 @@ func (settings *MemoryPressureSettings) Copy() *MemoryPressureSettings {
 // The function returns the following values:
 //
 //   - gdouble: value in the (0, 1) range.
-//
 func (settings *MemoryPressureSettings) ConservativeThreshold() float64 {
 	var _arg0 *C.WebKitMemoryPressureSettings // out
 	var _cret C.gdouble                       // in
@@ -142,7 +140,6 @@ func (settings *MemoryPressureSettings) ConservativeThreshold() float64 {
 // The function returns the following values:
 //
 //   - gdouble: positive value, can be zero.
-//
 func (settings *MemoryPressureSettings) KillThreshold() float64 {
 	var _arg0 *C.WebKitMemoryPressureSettings // out
 	var _cret C.gdouble                       // in
@@ -164,7 +161,6 @@ func (settings *MemoryPressureSettings) KillThreshold() float64 {
 // The function returns the following values:
 //
 //   - guint: current value, in megabytes.
-//
 func (settings *MemoryPressureSettings) MemoryLimit() uint {
 	var _arg0 *C.WebKitMemoryPressureSettings // out
 	var _cret C.guint                         // in
@@ -186,7 +182,6 @@ func (settings *MemoryPressureSettings) MemoryLimit() uint {
 // The function returns the following values:
 //
 //   - gdouble: current interval value, in seconds.
-//
 func (settings *MemoryPressureSettings) PollInterval() float64 {
 	var _arg0 *C.WebKitMemoryPressureSettings // out
 	var _cret C.gdouble                       // in
@@ -208,7 +203,6 @@ func (settings *MemoryPressureSettings) PollInterval() float64 {
 // The function returns the following values:
 //
 //   - gdouble: value in the (0, 1) range.
-//
 func (settings *MemoryPressureSettings) StrictThreshold() float64 {
 	var _arg0 *C.WebKitMemoryPressureSettings // out
 	var _cret C.gdouble                       // in
@@ -240,7 +234,6 @@ func (settings *MemoryPressureSettings) StrictThreshold() float64 {
 //
 //   - value: fraction of the memory limit where the conservative policy starts
 //     working.
-//
 func (settings *MemoryPressureSettings) SetConservativeThreshold(value float64) {
 	var _arg0 *C.WebKitMemoryPressureSettings // out
 	var _arg1 C.gdouble                       // out
@@ -256,8 +249,8 @@ func (settings *MemoryPressureSettings) SetConservativeThreshold(value float64) 
 // SetKillThreshold sets value as the fraction of the defined memory limit where
 // the process will be killed.
 //
-// The threshold must be a value bigger or equal to 0. A value of 0 means that
-// the process is never killed. If the threshold is not 0, then it must be
+// The threshold must be a value bigger than or equal to 0. A value of 0 means
+// that the process is never killed. If the threshold is not 0, then it must be
 // bigger than the strict threshold defined in settings. The threshold can also
 // have values bigger than 1. The default value is 0.
 //
@@ -265,7 +258,6 @@ func (settings *MemoryPressureSettings) SetConservativeThreshold(value float64) 
 //
 //   - value: fraction of the memory limit where the process will be killed
 //     because of excessive memory usage.
-//
 func (settings *MemoryPressureSettings) SetKillThreshold(value float64) {
 	var _arg0 *C.WebKitMemoryPressureSettings // out
 	var _arg1 C.gdouble                       // out
@@ -278,14 +270,13 @@ func (settings *MemoryPressureSettings) SetKillThreshold(value float64) {
 	runtime.KeepAlive(value)
 }
 
-// SetMemoryLimit sets memory_limit the memory limit value to settings.
+// SetMemoryLimit sets memory_limit as the memory limit value of settings.
 //
 // The default value is the system's RAM size with a maximum of 3GB.
 //
 // The function takes the following parameters:
 //
 //   - memoryLimit: amount of memory (in MB) that the process is allowed to use.
-//
 func (settings *MemoryPressureSettings) SetMemoryLimit(memoryLimit uint) {
 	var _arg0 *C.WebKitMemoryPressureSettings // out
 	var _arg1 C.guint                         // out
@@ -306,7 +297,6 @@ func (settings *MemoryPressureSettings) SetMemoryLimit(memoryLimit uint) {
 // The function takes the following parameters:
 //
 //   - value: period (in seconds) between memory usage measurements.
-//
 func (settings *MemoryPressureSettings) SetPollInterval(value float64) {
 	var _arg0 *C.WebKitMemoryPressureSettings // out
 	var _arg1 C.gdouble                       // out
@@ -334,7 +324,6 @@ func (settings *MemoryPressureSettings) SetPollInterval(value float64) {
 //
 //   - value: fraction of the memory limit where the strict policy starts
 //     working.
-//
 func (settings *MemoryPressureSettings) SetStrictThreshold(value float64) {
 	var _arg0 *C.WebKitMemoryPressureSettings // out
 	var _arg1 C.gdouble                       // out

@@ -36,8 +36,8 @@ func defaultBackForwardListItemOverrides(v *BackForwardListItem) BackForwardList
 
 // BackForwardListItem: one item of the KitBackForwardList.
 //
-// A history item is part of the KitBackForwardList and consists out of a title
-// and a URI.
+// A history item is part of the KitBackForwardList and consists of a title and
+// a URI.
 type BackForwardListItem struct {
 	_ [0]func() // equal guard
 	coreglib.InitiallyUnowned
@@ -80,7 +80,6 @@ func marshalBackForwardListItem(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: original URI of list_item or NULL when the original URI is empty.
-//
 func (listItem *BackForwardListItem) OriginalURI() string {
 	var _arg0 *C.WebKitBackForwardListItem // out
 	var _cret *C.gchar                     // in
@@ -102,7 +101,6 @@ func (listItem *BackForwardListItem) OriginalURI() string {
 // The function returns the following values:
 //
 //   - utf8: page title of list_item or NULL when the title is empty.
-//
 func (listItem *BackForwardListItem) Title() string {
 	var _arg0 *C.WebKitBackForwardListItem // out
 	var _cret *C.gchar                     // in
@@ -128,7 +126,6 @@ func (listItem *BackForwardListItem) Title() string {
 // The function returns the following values:
 //
 //   - utf8: URI of list_item or NULL when the URI is empty.
-//
 func (listItem *BackForwardListItem) URI() string {
 	var _arg0 *C.WebKitBackForwardListItem // out
 	var _cret *C.gchar                     // in

@@ -86,7 +86,6 @@ func marshalDOMHTMLPreElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLPreElement) Width() int32 {
 	var _arg0 *C.WebKitDOMHTMLPreElement // out
 	var _cret C.glong                    // in
@@ -108,7 +107,6 @@ func (self *DOMHTMLPreElement) Width() int32 {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLPreElement) Wrap() bool {
 	var _arg0 *C.WebKitDOMHTMLPreElement // out
 	var _cret C.gboolean                 // in
@@ -132,7 +130,6 @@ func (self *DOMHTMLPreElement) Wrap() bool {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLPreElement) SetWidth(value int32) {
 	var _arg0 *C.WebKitDOMHTMLPreElement // out
 	var _arg1 C.glong                    // out
@@ -150,7 +147,6 @@ func (self *DOMHTMLPreElement) SetWidth(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLPreElement) SetWrap(value bool) {
 	var _arg0 *C.WebKitDOMHTMLPreElement // out
 	var _arg1 C.gboolean                 // out

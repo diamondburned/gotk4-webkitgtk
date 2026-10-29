@@ -86,7 +86,6 @@ func marshalWebHitTestResult(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - value (optional) for the DOM node, or NULL.
-//
 func (webHitTestResult *WebHitTestResult) JsNode(world *ScriptWorld) *javascriptcore.Value {
 	var _arg0 *C.WebKitWebHitTestResult // out
 	var _arg1 *C.WebKitScriptWorld      // out
@@ -122,7 +121,6 @@ func (webHitTestResult *WebHitTestResult) JsNode(world *ScriptWorld) *javascript
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (hitTestResult *WebHitTestResult) Node() *DOMNode {
 	var _arg0 *C.WebKitWebHitTestResult // out
 	var _cret *C.WebKitDOMNode          // in

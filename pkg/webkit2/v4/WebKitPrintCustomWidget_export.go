@@ -19,7 +19,7 @@ func _gotk4_webkit24_PrintCustomWidget_ConnectApply(arg0 C.gpointer, arg1 C.guin
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -35,7 +35,7 @@ func _gotk4_webkit24_PrintCustomWidget_ConnectUpdate(arg0 C.gpointer, arg1 *C.Gt
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

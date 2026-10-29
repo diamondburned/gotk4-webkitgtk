@@ -19,7 +19,7 @@ func _gotk4_webkit6_Download_ConnectCreatedDestination(arg0 C.gpointer, arg1 *C.
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -39,7 +39,7 @@ func _gotk4_webkit6_Download_ConnectDecideDestination(arg0 C.gpointer, arg1 *C.g
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -67,7 +67,7 @@ func _gotk4_webkit6_Download_ConnectFailed(arg0 C.gpointer, arg1 *C.GError, arg2
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -87,7 +87,7 @@ func _gotk4_webkit6_Download_ConnectFinished(arg0 C.gpointer, arg1 C.guintptr) {
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -103,7 +103,7 @@ func _gotk4_webkit6_Download_ConnectReceivedData(arg0 C.gpointer, arg1 C.guint64
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

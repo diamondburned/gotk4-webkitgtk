@@ -77,7 +77,6 @@ func marshalDOMMediaList(p uintptr) (interface{}, error) {
 // The function takes the following parameters:
 //
 //   - newMedium: #gchar.
-//
 func (self *DOMMediaList) AppendMedium(newMedium string) error {
 	var _arg0 *C.WebKitDOMMediaList // out
 	var _arg1 *C.gchar              // out
@@ -105,7 +104,6 @@ func (self *DOMMediaList) AppendMedium(newMedium string) error {
 // The function takes the following parameters:
 //
 //   - oldMedium: #gchar.
-//
 func (self *DOMMediaList) DeleteMedium(oldMedium string) error {
 	var _arg0 *C.WebKitDOMMediaList // out
 	var _arg1 *C.gchar              // out
@@ -133,7 +131,6 @@ func (self *DOMMediaList) DeleteMedium(oldMedium string) error {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMMediaList) Length() uint32 {
 	var _arg0 *C.WebKitDOMMediaList // out
 	var _cret C.gulong              // in
@@ -155,7 +152,6 @@ func (self *DOMMediaList) Length() uint32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMMediaList) MediaText() string {
 	var _arg0 *C.WebKitDOMMediaList // out
 	var _cret *C.gchar              // in
@@ -182,7 +178,6 @@ func (self *DOMMediaList) MediaText() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMMediaList) Item(index uint32) string {
 	var _arg0 *C.WebKitDOMMediaList // out
 	var _arg1 C.gulong              // out
@@ -208,7 +203,6 @@ func (self *DOMMediaList) Item(index uint32) string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMMediaList) SetMediaText(value string) error {
 	var _arg0 *C.WebKitDOMMediaList // out
 	var _arg1 *C.gchar              // out

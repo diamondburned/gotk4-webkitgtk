@@ -75,7 +75,6 @@ func (d DateFormat) String() string {
 //
 //   - dateTime (optional): new Time, or NULL if date_string could not be
 //     parsed.
-//
 func DateTimeNewFromHTTPString(dateString string) *glib.DateTime {
 	var _arg1 *C.char      // out
 	var _cret *C.GDateTime // in
@@ -111,7 +110,6 @@ func DateTimeNewFromHTTPString(dateString string) *glib.DateTime {
 // The function returns the following values:
 //
 //   - utf8: date as a string or NULL.
-//
 func DateTimeToString(date *glib.DateTime, format DateFormat) string {
 	var _arg1 *C.GDateTime     // out
 	var _arg2 C.SoupDateFormat // out

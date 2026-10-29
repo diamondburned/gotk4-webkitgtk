@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
@@ -23,6 +24,8 @@ import (
 // extern void _gotk4_soup3_Session_ConnectRequestQueued(gpointer, SoupMessage*, guintptr);
 // extern void _gotk4_soup3_SessionClass_request_unqueued(SoupSession*, SoupMessage*);
 // extern void _gotk4_soup3_SessionClass_request_queued(SoupSession*, SoupMessage*);
+// extern void _gotk4_soup3_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
 // void _gotk4_soup3_Session_virtual_request_queued(void* fnptr, SoupSession* arg0, SoupMessage* arg1) {
 //   ((void (*)(SoupSession*, SoupMessage*))(fnptr))(arg0, arg1);
 // };
@@ -44,7 +47,7 @@ func init() {
 	})
 }
 
-// SessionError: Session error.
+// SessionError: session error.
 type SessionError C.gint
 
 const (
@@ -98,7 +101,6 @@ func (s SessionError) String() string {
 // The function returns the following values:
 //
 //   - quark: error quark for SoupSession.
-//
 func SessionErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -106,20 +108,14 @@ func SessionErrorQuark() glib.Quark {
 
 	var _quark glib.Quark // out
 
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
+	_quark = glib.Quark(_cret)
 
 	return _quark
 }
 
 // SessionOverrides contains methods that are overridable.
 type SessionOverrides struct {
-	// The function takes the following parameters:
-	//
-	RequestQueued func(msg *Message)
-	// The function takes the following parameters:
-	//
+	RequestQueued   func(msg *Message)
 	RequestUnqueued func(msg *Message)
 }
 
@@ -132,12 +128,12 @@ func defaultSessionOverrides(v *Session) SessionOverrides {
 
 // Session: soup session state object.
 //
-// Session is the object that controls client-side HTTP. A Session encapsulates
+// session is the object that controls client-side HTTP. A session encapsulates
 // all of the state that libsoup is keeping on behalf of your program; cached
 // HTTP connections, authentication information, etc. It also keeps track of
 // various global options and features that you are using.
 //
-// Most applications will only need a single Session; the primary reason you
+// Most applications will only need a single session; the primary reason you
 // might need multiple sessions is if you need to have multiple independent
 // authentication contexts. (Eg, you are connecting to a server and
 // authenticating as two different users at different times; the easiest way
@@ -145,7 +141,7 @@ func defaultSessionOverrides(v *Session) SessionOverrides {
 // intended is to use one session for the first user, and a second session for
 // the other user.)
 //
-// Additional Session functionality is provided by sessionfeature objects, which
+// Additional session functionality is provided by sessionfeature objects, which
 // can be added to a session with session.AddFeature or session.AddFeatureByType
 // For example, logger provides support for logging HTTP traffic, contentdecoder
 // provides support for compressed response handling, and contentsniffer
@@ -155,7 +151,7 @@ func defaultSessionOverrides(v *Session) SessionOverrides {
 //
 // All SoupSessions are created with a authmanager, and support for
 // SOUP_TYPE_AUTH_BASIC and SOUP_TYPE_AUTH_DIGEST. Additionally, sessions using
-// the plain Session class (rather than one of its deprecated subtypes) have a
+// the plain session class (rather than one of its deprecated subtypes) have a
 // contentdecoder by default.
 //
 // Note that all async methods will invoke their callbacks on the thread-default
@@ -240,12 +236,11 @@ func (session *Session) ConnectRequestUnqueued(f func(msg *Message)) coreglib.Si
 	return coreglib.ConnectGeneratedClosure(session, "request-unqueued", false, unsafe.Pointer(C._gotk4_soup3_Session_ConnectRequestUnqueued), f)
 }
 
-// NewSession creates a Session with the default options.
+// NewSession creates a session with the default options.
 //
 // The function returns the following values:
 //
 //   - session: new session.
-//
 func NewSession() *Session {
 	var _cret *C.SoupSession // in
 
@@ -270,15 +265,14 @@ func (session *Session) Abort() {
 }
 
 // AddFeature adds feature's functionality to session. You cannot add multiple
-// features of the same glib.Type to a session.
+// features of the same gobject.Type to a session.
 //
-// See the main Session documentation for information on what features are
+// See the main session documentation for information on what features are
 // present in sessions by default.
 //
 // The function takes the following parameters:
 //
 //   - feature: object that implements SessionFeature.
-//
 func (session *Session) AddFeature(feature SessionFeaturer) {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 *C.SoupSessionFeature // out
@@ -301,13 +295,12 @@ func (session *Session) AddFeature(feature SessionFeaturer) {
 // feature on session the chance to accept feature_type as a "subfeature".
 // This can be used to add new auth types, for instance.
 //
-// See the main Session documentation for information on what features are
+// See the main session documentation for information on what features are
 // present in sessions by default.
 //
 // The function takes the following parameters:
 //
 //   - featureType: #GType.
-//
 func (session *Session) AddFeatureByType(featureType coreglib.Type) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 C.GType        // out
@@ -326,7 +319,6 @@ func (session *Session) AddFeatureByType(featureType coreglib.Type) {
 // The function returns the following values:
 //
 //   - utf8 (optional): accept language string.
-//
 func (session *Session) AcceptLanguage() string {
 	var _arg0 *C.SoupSession // out
 	var _cret *C.char        // in
@@ -352,7 +344,6 @@ func (session *Session) AcceptLanguage() string {
 //
 //   - ok: TRUE if session sets "Accept-Language" header automatically, or FALSE
 //     otherwise.
-//
 func (session *Session) AcceptLanguageAuto() bool {
 	var _arg0 *C.SoupSession // out
 	var _cret C.gboolean     // in
@@ -383,7 +374,6 @@ func (session *Session) AcceptLanguageAuto() bool {
 //
 //   - message (optional) or NULL if result is not a valid session async
 //     operation result.
-//
 func (session *Session) AsyncResultMessage(result gio.AsyncResulter) *Message {
 	var _arg0 *C.SoupSession  // out
 	var _arg1 *C.GAsyncResult // out
@@ -414,7 +404,6 @@ func (session *Session) AsyncResultMessage(result gio.AsyncResulter) *Message {
 // The function returns the following values:
 //
 //   - sessionFeature (optional) or NULL. The feature is owned by session.
-//
 func (session *Session) Feature(featureType coreglib.Type) *SessionFeature {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 C.GType               // out
@@ -447,7 +436,6 @@ func (session *Session) Feature(featureType coreglib.Type) *SessionFeature {
 // The function returns the following values:
 //
 //   - sessionFeature (optional) The feature is owned by session.
-//
 func (session *Session) FeatureForMessage(featureType coreglib.Type, msg *Message) *SessionFeature {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 C.GType               // out
@@ -478,7 +466,6 @@ func (session *Session) FeatureForMessage(featureType coreglib.Type, msg *Messag
 // The function returns the following values:
 //
 //   - guint: timeout in seconds.
-//
 func (session *Session) IdleTimeout() uint {
 	var _arg0 *C.SoupSession // out
 	var _cret C.guint        // in
@@ -501,7 +488,6 @@ func (session *Session) IdleTimeout() uint {
 // The function returns the following values:
 //
 //   - inetSocketAddress (optional): SocketAddress.
-//
 func (session *Session) LocalAddress() *gio.InetSocketAddress {
 	var _arg0 *C.SoupSession        // out
 	var _cret *C.GInetSocketAddress // in
@@ -536,7 +522,6 @@ func (session *Session) LocalAddress() *gio.InetSocketAddress {
 // The function returns the following values:
 //
 //   - guint: maximum number of connections.
-//
 func (session *Session) MaxConns() uint {
 	var _arg0 *C.SoupSession // out
 	var _cret C.guint        // in
@@ -559,7 +544,6 @@ func (session *Session) MaxConns() uint {
 // The function returns the following values:
 //
 //   - guint: maximum number of connections per host.
-//
 func (session *Session) MaxConnsPerHost() uint {
 	var _arg0 *C.SoupSession // out
 	var _cret C.guint        // in
@@ -581,7 +565,6 @@ func (session *Session) MaxConnsPerHost() uint {
 // The function returns the following values:
 //
 //   - proxyResolver (optional) or NULL if proxies are disabled in session.
-//
 func (session *Session) ProxyResolver() *gio.ProxyResolver {
 	var _arg0 *C.SoupSession    // out
 	var _cret *C.GProxyResolver // in
@@ -610,7 +593,6 @@ func (session *Session) ProxyResolver() *gio.ProxyResolver {
 // The function returns the following values:
 //
 //   - socketConnectable (optional): Connectable.
-//
 func (session *Session) RemoteConnectable() *gio.SocketConnectable {
 	var _arg0 *C.SoupSession        // out
 	var _cret *C.GSocketConnectable // in
@@ -640,7 +622,6 @@ func (session *Session) RemoteConnectable() *gio.SocketConnectable {
 // The function returns the following values:
 //
 //   - guint: timeout in seconds.
-//
 func (session *Session) Timeout() uint {
 	var _arg0 *C.SoupSession // out
 	var _cret C.guint        // in
@@ -662,7 +643,6 @@ func (session *Session) Timeout() uint {
 // The function returns the following values:
 //
 //   - tlsDatabase (optional): Database.
-//
 func (session *Session) TLSDatabase() gio.TLSDatabaser {
 	var _arg0 *C.SoupSession  // out
 	var _cret *C.GTlsDatabase // in
@@ -699,7 +679,6 @@ func (session *Session) TLSDatabase() gio.TLSDatabaser {
 // The function returns the following values:
 //
 //   - tlsInteraction (optional): Interaction.
-//
 func (session *Session) TLSInteraction() *gio.TLSInteraction {
 	var _arg0 *C.SoupSession     // out
 	var _cret *C.GTlsInteraction // in
@@ -729,7 +708,6 @@ func (session *Session) TLSInteraction() *gio.TLSInteraction {
 // The function returns the following values:
 //
 //   - utf8 (optional): user agent string.
-//
 func (session *Session) UserAgent() string {
 	var _arg0 *C.SoupSession // out
 	var _cret *C.char        // in
@@ -759,7 +737,6 @@ func (session *Session) UserAgent() string {
 // The function returns the following values:
 //
 //   - ok: TRUE or FALSE.
-//
 func (session *Session) HasFeature(featureType coreglib.Type) bool {
 	var _arg0 *C.SoupSession // out
 	var _arg1 C.GType        // out
@@ -781,13 +758,59 @@ func (session *Session) HasFeature(featureType coreglib.Type) bool {
 	return _ok
 }
 
+// PreconnectAsync: start a preconnection to msg.
+//
+// Once the connection is done, it will remain in idle state so that it can
+// be reused by future requests. If there's already an idle connection for
+// the given msg host, the operation finishes successfully without creating a
+// new connection. If a new request for the given msg host is made while the
+// preconnect is still ongoing, the request will take the ownership of the
+// connection and the preconnect operation will finish successfully (if there's
+// a connection error it will be handled by the request).
+//
+// The operation finishes when the connection is done or an error occurred.
+//
+// The function takes the following parameters:
+//
+//   - ctx (optional): #GCancellable.
+//   - msg: Message.
+//   - ioPriority: i/O priority of the request.
+//   - callback (optional) to invoke when the operation finishes.
+func (session *Session) PreconnectAsync(ctx context.Context, msg *Message, ioPriority int, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.SoupSession        // out
+	var _arg3 *C.GCancellable       // out
+	var _arg1 *C.SoupMessage        // out
+	var _arg2 C.int                 // out
+	var _arg4 C.GAsyncReadyCallback // out
+	var _arg5 C.gpointer
+
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+	_arg2 = C.int(ioPriority)
+	if callback != nil {
+		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg5 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.soup_session_preconnect_async(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(ioPriority)
+	runtime.KeepAlive(callback)
+}
+
 // PreconnectFinish: complete a preconnect async operation started with
 // session.PreconnectAsync.
 //
 // The function takes the following parameters:
 //
 //   - result passed to your callback.
-//
 func (session *Session) PreconnectFinish(result gio.AsyncResulter) error {
 	var _arg0 *C.SoupSession  // out
 	var _arg1 *C.GAsyncResult // out
@@ -814,7 +837,6 @@ func (session *Session) PreconnectFinish(result gio.AsyncResulter) error {
 // The function takes the following parameters:
 //
 //   - feature that has previously been added to session.
-//
 func (session *Session) RemoveFeature(feature SessionFeaturer) {
 	var _arg0 *C.SoupSession        // out
 	var _arg1 *C.SoupSessionFeature // out
@@ -833,7 +855,6 @@ func (session *Session) RemoveFeature(feature SessionFeaturer) {
 // The function takes the following parameters:
 //
 //   - featureType: #GType.
-//
 func (session *Session) RemoveFeatureByType(featureType coreglib.Type) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 C.GType        // out
@@ -863,6 +884,9 @@ func (session *Session) RemoveFeatureByType(featureType coreglib.Type) {
 // (3xx/401/407) response body will be suppressed, and session.Send will only
 // return once a final response has been received.
 //
+// Possible error domains include sessionerror, gio.IOErrorEnum, and
+// gio.TLSError which you may want to specifically handle.
+//
 // The function takes the following parameters:
 //
 //   - ctx (optional): #GCancellable.
@@ -871,7 +895,6 @@ func (session *Session) RemoveFeatureByType(featureType coreglib.Type) {
 // The function returns the following values:
 //
 //   - inputStream for reading the response body, or NULL on error.
-//
 func (session *Session) Send(ctx context.Context, msg *Message) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupSession  // out
 	var _arg2 *C.GCancellable // out
@@ -935,7 +958,6 @@ func (session *Session) Send(ctx context.Context, msg *Message) (gio.InputStream
 // The function returns the following values:
 //
 //   - bytes or NULL on error.
-//
 func (session *Session) SendAndRead(ctx context.Context, msg *Message) (*glib.Bytes, error) {
 	var _arg0 *C.SoupSession  // out
 	var _arg2 *C.GCancellable // out
@@ -973,6 +995,50 @@ func (session *Session) SendAndRead(ctx context.Context, msg *Message) (*glib.By
 	return _bytes, _goerr
 }
 
+// SendAndReadAsync: asynchronously sends msg and reads the response body.
+//
+// When callback is called, then either msg has been sent, and its response body
+// read, or else an error has occurred. This function should only be used when
+// the resource to be retrieved is not too long and can be stored in memory.
+// Call session.SendAndReadFinish to get a glib.Bytes with the response body.
+//
+// See session.Send for more details on the general semantics.
+//
+// The function takes the following parameters:
+//
+//   - ctx (optional): #GCancellable.
+//   - msg: Message.
+//   - ioPriority: i/O priority of the request.
+//   - callback (optional) to invoke.
+func (session *Session) SendAndReadAsync(ctx context.Context, msg *Message, ioPriority int, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.SoupSession        // out
+	var _arg3 *C.GCancellable       // out
+	var _arg1 *C.SoupMessage        // out
+	var _arg2 C.int                 // out
+	var _arg4 C.GAsyncReadyCallback // out
+	var _arg5 C.gpointer
+
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+	_arg2 = C.int(ioPriority)
+	if callback != nil {
+		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg5 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.soup_session_send_and_read_async(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(ioPriority)
+	runtime.KeepAlive(callback)
+}
+
 // SendAndReadFinish gets the response to a session.SendAndReadAsync.
 //
 // If successful, returns a glib.Bytes with the response body.
@@ -984,7 +1050,6 @@ func (session *Session) SendAndRead(ctx context.Context, msg *Message) (*glib.By
 // The function returns the following values:
 //
 //   - bytes or NULL on error.
-//
 func (session *Session) SendAndReadFinish(result gio.AsyncResulter) (*glib.Bytes, error) {
 	var _arg0 *C.SoupSession  // out
 	var _arg1 *C.GAsyncResult // out
@@ -1031,7 +1096,6 @@ func (session *Session) SendAndReadFinish(result gio.AsyncResulter) (*glib.Bytes
 //
 //   - gssize containing the size of the data spliced, or -1 if an error
 //     occurred.
-//
 func (session *Session) SendAndSplice(ctx context.Context, msg *Message, outStream gio.OutputStreamer, flags gio.OutputStreamSpliceFlags) (int, error) {
 	var _arg0 *C.SoupSession             // out
 	var _arg4 *C.GCancellable            // out
@@ -1069,6 +1133,55 @@ func (session *Session) SendAndSplice(ctx context.Context, msg *Message, outStre
 	return _gssize, _goerr
 }
 
+// SendAndSpliceAsync: asynchronously sends msg and splices the response body
+// stream into out_stream. When callback is called, then either msg has been
+// sent and its response body spliced, or else an error has occurred.
+//
+// See session.Send for more details on the general semantics.
+//
+// The function takes the following parameters:
+//
+//   - ctx (optional): #GCancellable.
+//   - msg: Message.
+//   - outStream: Stream.
+//   - flags: set of StreamSpliceFlags.
+//   - ioPriority: i/O priority of the request.
+//   - callback (optional) to invoke.
+func (session *Session) SendAndSpliceAsync(ctx context.Context, msg *Message, outStream gio.OutputStreamer, flags gio.OutputStreamSpliceFlags, ioPriority int, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.SoupSession             // out
+	var _arg5 *C.GCancellable            // out
+	var _arg1 *C.SoupMessage             // out
+	var _arg2 *C.GOutputStream           // out
+	var _arg3 C.GOutputStreamSpliceFlags // out
+	var _arg4 C.int                      // out
+	var _arg6 C.GAsyncReadyCallback      // out
+	var _arg7 C.gpointer
+
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg5 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+	_arg2 = (*C.GOutputStream)(unsafe.Pointer(coreglib.InternObject(outStream).Native()))
+	_arg3 = C.GOutputStreamSpliceFlags(flags)
+	_arg4 = C.int(ioPriority)
+	if callback != nil {
+		_arg6 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg7 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.soup_session_send_and_splice_async(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(outStream)
+	runtime.KeepAlive(flags)
+	runtime.KeepAlive(ioPriority)
+	runtime.KeepAlive(callback)
+}
+
 // SendAndSpliceFinish gets the response to a session.SendAndSpliceAsync.
 //
 // The function takes the following parameters:
@@ -1079,7 +1192,6 @@ func (session *Session) SendAndSplice(ctx context.Context, msg *Message, outStre
 //
 //   - gssize containing the size of the data spliced, or -1 if an error
 //     occurred.
-//
 func (session *Session) SendAndSpliceFinish(result gio.AsyncResulter) (int, error) {
 	var _arg0 *C.SoupSession  // out
 	var _arg1 *C.GAsyncResult // out
@@ -1104,6 +1216,50 @@ func (session *Session) SendAndSpliceFinish(result gio.AsyncResulter) (int, erro
 	return _gssize, _goerr
 }
 
+// SendAsync: asynchronously sends msg and waits for the beginning of a
+// response.
+//
+// When callback is called, then either msg has been sent, and its response
+// headers received, or else an error has occurred. Call session.SendFinish to
+// get a gio.InputStream for reading the response body.
+//
+// See session.Send for more details on the general semantics.
+//
+// The function takes the following parameters:
+//
+//   - ctx (optional): #GCancellable.
+//   - msg: Message.
+//   - ioPriority: i/O priority of the request.
+//   - callback (optional) to invoke.
+func (session *Session) SendAsync(ctx context.Context, msg *Message, ioPriority int, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.SoupSession        // out
+	var _arg3 *C.GCancellable       // out
+	var _arg1 *C.SoupMessage        // out
+	var _arg2 C.int                 // out
+	var _arg4 C.GAsyncReadyCallback // out
+	var _arg5 C.gpointer
+
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+	_arg2 = C.int(ioPriority)
+	if callback != nil {
+		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg5 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.soup_session_send_async(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(ioPriority)
+	runtime.KeepAlive(callback)
+}
+
 // SendFinish gets the response to a session.SendAsync call.
 //
 // If successful returns a gio.InputStream that can be used to read the response
@@ -1116,7 +1272,6 @@ func (session *Session) SendAndSpliceFinish(result gio.AsyncResulter) (int, erro
 // The function returns the following values:
 //
 //   - inputStream for reading the response body, or NULL on error.
-//
 func (session *Session) SendFinish(result gio.AsyncResulter) (gio.InputStreamer, error) {
 	var _arg0 *C.SoupSession  // out
 	var _arg1 *C.GAsyncResult // out
@@ -1166,7 +1321,6 @@ func (session *Session) SendFinish(result gio.AsyncResulter) (gio.InputStreamer,
 // The function takes the following parameters:
 //
 //   - acceptLanguage languages string.
-//
 func (session *Session) SetAcceptLanguage(acceptLanguage string) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.char        // out
@@ -1189,7 +1343,6 @@ func (session *Session) SetAcceptLanguage(acceptLanguage string) {
 // The function takes the following parameters:
 //
 //   - acceptLanguageAuto: value to set.
-//
 func (session *Session) SetAcceptLanguageAuto(acceptLanguageAuto bool) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 C.gboolean     // out
@@ -1212,7 +1365,6 @@ func (session *Session) SetAcceptLanguageAuto(acceptLanguageAuto bool) {
 // The function takes the following parameters:
 //
 //   - timeout in seconds.
-//
 func (session *Session) SetIdleTimeout(timeout uint) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 C.guint        // out
@@ -1234,7 +1386,6 @@ func (session *Session) SetIdleTimeout(timeout uint) {
 // The function takes the following parameters:
 //
 //   - proxyResolver (optional) or NULL.
-//
 func (session *Session) SetProxyResolver(proxyResolver gio.ProxyResolverer) {
 	var _arg0 *C.SoupSession    // out
 	var _arg1 *C.GProxyResolver // out
@@ -1257,7 +1408,6 @@ func (session *Session) SetProxyResolver(proxyResolver gio.ProxyResolverer) {
 // The function takes the following parameters:
 //
 //   - timeout in seconds.
-//
 func (session *Session) SetTimeout(timeout uint) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 C.guint        // out
@@ -1279,7 +1429,6 @@ func (session *Session) SetTimeout(timeout uint) {
 // The function takes the following parameters:
 //
 //   - tlsDatabase (optional): Database.
-//
 func (session *Session) SetTLSDatabase(tlsDatabase gio.TLSDatabaser) {
 	var _arg0 *C.SoupSession  // out
 	var _arg1 *C.GTlsDatabase // out
@@ -1305,7 +1454,6 @@ func (session *Session) SetTLSDatabase(tlsDatabase gio.TLSDatabaser) {
 // The function takes the following parameters:
 //
 //   - tlsInteraction (optional): Interaction.
-//
 func (session *Session) SetTLSInteraction(tlsInteraction *gio.TLSInteraction) {
 	var _arg0 *C.SoupSession     // out
 	var _arg1 *C.GTlsInteraction // out
@@ -1331,7 +1479,6 @@ func (session *Session) SetTLSInteraction(tlsInteraction *gio.TLSInteraction) {
 // The function takes the following parameters:
 //
 //   - userAgent: user agent string.
-//
 func (session *Session) SetUserAgent(userAgent string) {
 	var _arg0 *C.SoupSession // out
 	var _arg1 *C.char        // out
@@ -1343,6 +1490,81 @@ func (session *Session) SetUserAgent(userAgent string) {
 	C.soup_session_set_user_agent(_arg0, _arg1)
 	runtime.KeepAlive(session)
 	runtime.KeepAlive(userAgent)
+}
+
+// WebsocketConnectAsync: asynchronously creates a websocketconnection to
+// communicate with a remote server.
+//
+// All necessary WebSocket-related headers will be added to msg, and it will
+// then be sent and asynchronously processed normally (including handling of
+// redirection and HTTP authentication).
+//
+// If the server returns "101 Switching Protocols", then msg's status code and
+// response headers will be updated, and then the WebSocket handshake will be
+// completed. On success, session.WebsocketConnectFinish will return a new
+// websocketconnection. On failure it will return a #GError.
+//
+// If the server returns a status other than "101 Switching Protocols",
+// then msg will contain the complete response headers and body from
+// the server's response, and session.WebsocketConnectFinish will return
+// SOUP_WEBSOCKET_ERROR_NOT_WEBSOCKET.
+//
+// The function takes the following parameters:
+//
+//   - ctx (optional): #GCancellable.
+//   - msg indicating the WebSocket server to connect to.
+//   - origin (optional) of the connection.
+//   - protocols (optional): a NULL-terminated array of protocols supported.
+//   - ioPriority: i/O priority of the request.
+//   - callback (optional) to invoke.
+func (session *Session) WebsocketConnectAsync(ctx context.Context, msg *Message, origin string, protocols []string, ioPriority int, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.SoupSession        // out
+	var _arg5 *C.GCancellable       // out
+	var _arg1 *C.SoupMessage        // out
+	var _arg2 *C.char               // out
+	var _arg3 **C.char              // out
+	var _arg4 C.int                 // out
+	var _arg6 C.GAsyncReadyCallback // out
+	var _arg7 C.gpointer
+
+	_arg0 = (*C.SoupSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg5 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
+	if origin != "" {
+		_arg2 = (*C.char)(unsafe.Pointer(C.CString(origin)))
+		defer C.free(unsafe.Pointer(_arg2))
+	}
+	{
+		_arg3 = (**C.char)(C.calloc(C.size_t((len(protocols) + 1)), C.size_t(unsafe.Sizeof(uint(0)))))
+		defer C.free(unsafe.Pointer(_arg3))
+		{
+			out := unsafe.Slice(_arg3, len(protocols)+1)
+			var zero *C.char
+			out[len(protocols)] = zero
+			for i := range protocols {
+				out[i] = (*C.char)(unsafe.Pointer(C.CString(protocols[i])))
+				defer C.free(unsafe.Pointer(out[i]))
+			}
+		}
+	}
+	_arg4 = C.int(ioPriority)
+	if callback != nil {
+		_arg6 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg7 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.soup_session_websocket_connect_async(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(msg)
+	runtime.KeepAlive(origin)
+	runtime.KeepAlive(protocols)
+	runtime.KeepAlive(ioPriority)
+	runtime.KeepAlive(callback)
 }
 
 // WebsocketConnectFinish gets the websocketconnection response to a
@@ -1358,7 +1580,6 @@ func (session *Session) SetUserAgent(userAgent string) {
 // The function returns the following values:
 //
 //   - websocketConnection: new WebsocketConnection, or NULL on error.
-//
 func (session *Session) WebsocketConnectFinish(result gio.AsyncResulter) (*WebsocketConnection, error) {
 	var _arg0 *C.SoupSession             // out
 	var _arg1 *C.GAsyncResult            // out
@@ -1383,8 +1604,6 @@ func (session *Session) WebsocketConnectFinish(result gio.AsyncResulter) (*Webso
 	return _websocketConnection, _goerr
 }
 
-// The function takes the following parameters:
-//
 func (session *Session) requestQueued(msg *Message) {
 	gclass := (*C.SoupSessionClass)(coreglib.PeekParentClass(session))
 	fnarg := gclass.request_queued
@@ -1400,8 +1619,6 @@ func (session *Session) requestQueued(msg *Message) {
 	runtime.KeepAlive(msg)
 }
 
-// The function takes the following parameters:
-//
 func (session *Session) requestUnqueued(msg *Message) {
 	gclass := (*C.SoupSessionClass)(coreglib.PeekParentClass(session))
 	fnarg := gclass.request_unqueued

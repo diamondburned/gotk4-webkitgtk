@@ -76,7 +76,6 @@ func marshalDOMStyleSheetList(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMStyleSheetList) Length() uint32 {
 	var _arg0 *C.WebKitDOMStyleSheetList // out
 	var _cret C.gulong                   // in
@@ -102,7 +101,6 @@ func (self *DOMStyleSheetList) Length() uint32 {
 // The function returns the following values:
 //
 //   - domStyleSheet: KitDOMStyleSheet.
-//
 func (self *DOMStyleSheetList) Item(index uint32) *DOMStyleSheet {
 	var _arg0 *C.WebKitDOMStyleSheetList // out
 	var _arg1 C.gulong                   // out

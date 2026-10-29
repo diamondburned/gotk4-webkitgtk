@@ -119,10 +119,6 @@ func (c Cacheability) Has(other Cacheability) bool {
 
 // CacheOverrides contains methods that are overridable.
 type CacheOverrides struct {
-	// The function takes the following parameters:
-	//
-	// The function returns the following values:
-	//
 	Cacheability func(msg *Message) Cacheability
 }
 
@@ -192,7 +188,6 @@ func marshalCache(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - cache: new Cache.
-//
 func NewCache(cacheDir string, cacheType CacheType) *Cache {
 	var _arg1 *C.char         // out
 	var _arg2 C.SoupCacheType // out
@@ -218,7 +213,7 @@ func NewCache(cacheDir string, cacheType CacheType) *Cache {
 // Clear will remove all entries in the cache plus all the cache files.
 //
 // This is not thread safe and must be called only from the thread that created
-// the Cache.
+// the cache.
 func (cache *Cache) Clear() {
 	var _arg0 *C.SoupCache // out
 
@@ -236,7 +231,7 @@ func (cache *Cache) Clear() {
 // between sessions.
 //
 // This is not thread safe and must be called only from the thread that created
-// the Cache.
+// the cache.
 func (cache *Cache) Dump() {
 	var _arg0 *C.SoupCache // out
 
@@ -266,7 +261,6 @@ func (cache *Cache) Flush() {
 // The function returns the following values:
 //
 //   - guint: maximum size of the cache, in bytes.
-//
 func (cache *Cache) MaxSize() uint {
 	var _arg0 *C.SoupCache // out
 	var _cret C.guint      // in
@@ -286,7 +280,7 @@ func (cache *Cache) MaxSize() uint {
 // Load loads the contents of cache's index into memory.
 //
 // This is not thread safe and must be called only from the thread that created
-// the Cache.
+// the cache.
 func (cache *Cache) Load() {
 	var _arg0 *C.SoupCache // out
 
@@ -301,7 +295,6 @@ func (cache *Cache) Load() {
 // The function takes the following parameters:
 //
 //   - maxSize: maximum size of the cache, in bytes.
-//
 func (cache *Cache) SetMaxSize(maxSize uint) {
 	var _arg0 *C.SoupCache // out
 	var _arg1 C.guint      // out
@@ -314,10 +307,6 @@ func (cache *Cache) SetMaxSize(maxSize uint) {
 	runtime.KeepAlive(maxSize)
 }
 
-// The function takes the following parameters:
-//
-// The function returns the following values:
-//
 func (cache *Cache) cacheability(msg *Message) Cacheability {
 	gclass := (*C.SoupCacheClass)(coreglib.PeekParentClass(cache))
 	fnarg := gclass.get_cacheability
@@ -354,7 +343,7 @@ func (c *CacheClass) Padding() [4]unsafe.Pointer {
 	valptr := &c.native.padding
 	var _v [4]unsafe.Pointer // out
 	{
-		src := &*valptr
+		src := unsafe.Slice(&(*valptr)[0], 4)
 		for i := 0; i < 4; i++ {
 			_v[i] = (unsafe.Pointer)(unsafe.Pointer(src[i]))
 		}

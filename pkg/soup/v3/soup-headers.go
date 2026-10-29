@@ -26,7 +26,6 @@ import "C"
 // The function returns the following values:
 //
 //   - ok: whether or not header contains token.
-//
 func HeaderContains(header, token string) bool {
 	var _arg1 *C.char    // out
 	var _arg2 *C.char    // out
@@ -56,7 +55,6 @@ func HeaderContains(header, token string) bool {
 //
 //   - paramList returned from header_parse_param_list or
 //     header_parse_semi_param_list.
-//
 func HeaderFreeParamList(paramList map[string]string) {
 	var _arg1 *C.GHashTable // out
 
@@ -65,9 +63,7 @@ func HeaderFreeParamList(paramList map[string]string) {
 		var kdst *C.gchar // out
 		var vdst *C.gchar // out
 		kdst = (*C.gchar)(unsafe.Pointer(C.CString(ksrc)))
-		defer C.free(unsafe.Pointer(kdst))
 		vdst = (*C.gchar)(unsafe.Pointer(C.CString(vsrc)))
-		defer C.free(unsafe.Pointer(vdst))
 		C.g_hash_table_insert(_arg1, C.gpointer(unsafe.Pointer(kdst)), C.gpointer(unsafe.Pointer(vdst)))
 	}
 	defer C.g_hash_table_unref(_arg1)
@@ -88,7 +84,6 @@ func HeaderFreeParamList(paramList map[string]string) {
 // The function returns the following values:
 //
 //   - sList of list elements, as allocated strings.
-//
 func HeaderParseList(header string) []string {
 	var _arg1 *C.char   // out
 	var _cret *C.GSList // in
@@ -130,7 +125,6 @@ func HeaderParseList(header string) []string {
 //
 //   - hashTable: a Table of list elements, which can be freed with
 //     header_free_param_list.
-//
 func HeaderParseParamList(header string) map[string]string {
 	var _arg1 *C.char       // out
 	var _cret *C.GHashTable // in
@@ -174,7 +168,6 @@ func HeaderParseParamList(header string) map[string]string {
 //
 //   - hashTable (optional): a Table of list elements, which can be freed with
 //     header_free_param_list or NULL if there are duplicate elements.
-//
 func HeaderParseParamListStrict(header string) map[string]string {
 	var _arg1 *C.char       // out
 	var _cret *C.GHashTable // in
@@ -221,7 +214,6 @@ func HeaderParseParamListStrict(header string) map[string]string {
 //   - unacceptable (optional): on return, will contain a list of unacceptable
 //     values.
 //   - sList of acceptable values (as allocated strings), highest-qvalue first.
-//
 func HeaderParseQualityList(header string) (unacceptable, sList []string) {
 	var _arg1 *C.char   // out
 	var _arg2 *C.GSList // in
@@ -274,7 +266,6 @@ func HeaderParseQualityList(header string) (unacceptable, sList []string) {
 //
 //   - hashTable: a Table of list elements, which can be freed with
 //     header_free_param_list.
-//
 func HeaderParseSemiParamList(header string) map[string]string {
 	var _arg1 *C.char       // out
 	var _cret *C.GHashTable // in
@@ -319,7 +310,6 @@ func HeaderParseSemiParamList(header string) map[string]string {
 //
 //   - hashTable (optional): a Table of list elements, which can be freed with
 //     header_free_param_list or NULL if there are duplicate elements.
-//
 func HeaderParseSemiParamListStrict(header string) map[string]string {
 	var _arg1 *C.char       // out
 	var _cret *C.GHashTable // in
@@ -362,27 +352,25 @@ func HeaderParseSemiParamListStrict(header string) map[string]string {
 //
 //   - str: header string (including the Request-Line or Status-Line, but not
 //     the trailing blank line).
-//   - len: length of str.
 //   - dest to store the header values in.
 //
 // The function returns the following values:
 //
 //   - ok success or failure.
-//
-func HeadersParse(str string, len int, dest *MessageHeaders) bool {
-	var _arg1 *C.char               // out
-	var _arg2 C.int                 // out
+func HeadersParse(str string, dest *MessageHeaders) bool {
+	var _arg1 *C.char // out
+	var _arg2 C.int
 	var _arg3 *C.SoupMessageHeaders // out
 	var _cret C.gboolean            // in
 
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(str)))
+	_arg2 = (C.int)(len(str))
+	_arg1 = (*C.char)(C.calloc(C.size_t((len(str) + 1)), C.size_t(C.sizeof_char)))
+	copy(unsafe.Slice((*byte)(unsafe.Pointer(_arg1)), len(str)), str)
 	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = C.int(len)
 	_arg3 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(dest)))
 
 	_cret = C.soup_headers_parse(_arg1, _arg2, _arg3)
 	runtime.KeepAlive(str)
-	runtime.KeepAlive(len)
 	runtime.KeepAlive(dest)
 
 	var _ok bool // out
@@ -402,7 +390,6 @@ func HeadersParse(str string, len int, dest *MessageHeaders) bool {
 // The function takes the following parameters:
 //
 //   - str headers (up to, but not including, the trailing blank line).
-//   - len: length of str.
 //   - reqHeaders to store the header values in.
 //
 // The function returns the following values:
@@ -413,24 +400,23 @@ func HeadersParse(str string, len int, dest *MessageHeaders) bool {
 //   - ver (optional): if non-NULL, will be filled in with the HTTP version.
 //   - guint: SOUP_STATUS_OK if the headers could be parsed, or an HTTP error to
 //     be returned to the client if they could not be.
-//
-func HeadersParseRequest(str string, len int, reqHeaders *MessageHeaders) (reqMethod, reqPath string, ver HTTPVersion, guint uint) {
-	var _arg1 *C.char               // out
-	var _arg2 C.int                 // out
+func HeadersParseRequest(str string, reqHeaders *MessageHeaders) (reqMethod, reqPath string, ver HTTPVersion, guint uint) {
+	var _arg1 *C.char // out
+	var _arg2 C.int
 	var _arg3 *C.SoupMessageHeaders // out
 	var _arg4 *C.char               // in
 	var _arg5 *C.char               // in
 	var _arg6 C.SoupHTTPVersion     // in
 	var _cret C.guint               // in
 
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(str)))
+	_arg2 = (C.int)(len(str))
+	_arg1 = (*C.char)(C.calloc(C.size_t((len(str) + 1)), C.size_t(C.sizeof_char)))
+	copy(unsafe.Slice((*byte)(unsafe.Pointer(_arg1)), len(str)), str)
 	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = C.int(len)
 	_arg3 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(reqHeaders)))
 
 	_cret = C.soup_headers_parse_request(_arg1, _arg2, _arg3, &_arg4, &_arg5, &_arg6)
 	runtime.KeepAlive(str)
-	runtime.KeepAlive(len)
 	runtime.KeepAlive(reqHeaders)
 
 	var _reqMethod string // out
@@ -460,7 +446,6 @@ func HeadersParseRequest(str string, len int, reqHeaders *MessageHeaders) (reqMe
 // The function takes the following parameters:
 //
 //   - str headers (up to, but not including, the trailing blank line).
-//   - len: length of str.
 //   - headers to store the header values in.
 //
 // The function returns the following values:
@@ -471,24 +456,23 @@ func HeadersParseRequest(str string, len int, reqHeaders *MessageHeaders) (reqMe
 //   - reasonPhrase (optional): if non-NULL, will be filled in with the reason
 //     phrase.
 //   - ok success or failure.
-//
-func HeadersParseResponse(str string, len int, headers *MessageHeaders) (HTTPVersion, uint, string, bool) {
-	var _arg1 *C.char               // out
-	var _arg2 C.int                 // out
+func HeadersParseResponse(str string, headers *MessageHeaders) (HTTPVersion, uint, string, bool) {
+	var _arg1 *C.char // out
+	var _arg2 C.int
 	var _arg3 *C.SoupMessageHeaders // out
 	var _arg4 C.SoupHTTPVersion     // in
 	var _arg5 C.guint               // in
 	var _arg6 *C.char               // in
 	var _cret C.gboolean            // in
 
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(str)))
+	_arg2 = (C.int)(len(str))
+	_arg1 = (*C.char)(C.calloc(C.size_t((len(str) + 1)), C.size_t(C.sizeof_char)))
+	copy(unsafe.Slice((*byte)(unsafe.Pointer(_arg1)), len(str)), str)
 	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = C.int(len)
 	_arg3 = (*C.SoupMessageHeaders)(gextras.StructNative(unsafe.Pointer(headers)))
 
 	_cret = C.soup_headers_parse_response(_arg1, _arg2, _arg3, &_arg4, &_arg5, &_arg6)
 	runtime.KeepAlive(str)
-	runtime.KeepAlive(len)
 	runtime.KeepAlive(headers)
 
 	var _ver HTTPVersion     // out
@@ -526,7 +510,6 @@ func HeadersParseResponse(str string, len int, headers *MessageHeaders) (HTTPVer
 //   - reasonPhrase (optional): if non-NULL, will be filled in with the reason
 //     phrase.
 //   - ok: TRUE if status_line was parsed successfully.
-//
 func HeadersParseStatusLine(statusLine string) (HTTPVersion, uint, string, bool) {
 	var _arg1 *C.char           // out
 	var _arg2 C.SoupHTTPVersion // in

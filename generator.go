@@ -16,7 +16,6 @@ var data = genmain.Overlay(
 	genmain.Data{
 		Module: webkitModule,
 		Packages: []genmain.Package{
-			{Name: "libsoup-2.4"},
 			{Name: "libsoup-3.0"},
 			{Name: "webkit2gtk-4.1"},
 			{Name: "webkitgtk-6.0"},
@@ -24,7 +23,6 @@ var data = genmain.Overlay(
 		PkgGenerated: []string{
 			"javascriptcore",
 			"soup",
-			"soupgnome",
 			"webkit",
 			"webkit2",
 			"webkit2webextension",
@@ -45,24 +43,25 @@ var data = genmain.Overlay(
 			types.AbsoluteFilter("C.soup_requester_error_quark"),
 			// gio.TLSProtocolVersion is too new.
 			types.AbsoluteFilter("Soup-3.Message.get_tls_protocol_version"),
-			// Not sure what this type is, but it's not used.
-			types.AbsoluteFilter("Soup-2.PasswordManagerInterface"),
-			types.AbsoluteFilter("Soup-2.RequesterClass"),
+			// webkit.h only includes this header when ENABLE_POINTER_LOCK is
+			// defined, which it never is for consumers of the library.
+			types.AbsoluteFilter("WebKit-6.PointerLockPermissionRequest"),
+			types.AbsoluteFilter("WebKit-6.PointerLockPermissionRequestClass"),
+			types.AbsoluteFilter("WebKit2-4.PointerLockPermissionRequest"),
+			types.AbsoluteFilter("WebKit2-4.PointerLockPermissionRequestClass"),
+			// Deprecated in favor of the lowercase variant, which has the same
+			// Go name.
+			types.AbsoluteFilter("C.webkit_web_extension_match_pattern_register_custom_URL_scheme"),
+			// The generated callback passes text as []byte while the override
+			// takes a string, since the docs never call text UTF-8.
+			types.AbsoluteFilter("WebKit-6.InputMethodContext.notify_surrounding"),
+			types.AbsoluteFilter("WebKit2-4.InputMethodContext.notify_surrounding"),
 		},
 		Postprocessors: map[string][]girgen.Postprocessor{
 			"WebKitWebProcessExtension-6": {
 				func(n *girgen.NamespaceGenerator) error {
 					// Fix the name colliding with an all-lowercase one.
 					n.Rename("WebKitWebProcessExtension.go", "WebKitWebProcessExtension2.go")
-					return nil
-				},
-			},
-			"Soup-2": {
-				func(n *girgen.NamespaceGenerator) error {
-					f := n.Files["soup-message.go"]
-					h := f.Header()
-					// This import is not needed. Must be a gotk4 bug.
-					delete(h.Imports, "github.com/diamondburned/gotk4/pkg/glib/v2")
 					return nil
 				},
 			},

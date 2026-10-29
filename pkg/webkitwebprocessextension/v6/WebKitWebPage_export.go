@@ -5,6 +5,7 @@ package webkitwebprocessextension
 import (
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
@@ -12,13 +13,33 @@ import (
 // #include <webkit/webkit-web-process-extension.h>
 import "C"
 
+//export _gotk4_webkitwebprocessextension6_WebPage_ConnectConsoleMessageSent
+func _gotk4_webkitwebprocessextension6_WebPage_ConnectConsoleMessageSent(arg0 C.gpointer, arg1 *C.WebKitConsoleMessage, arg2 C.guintptr) {
+	var f func(consoleMessage *ConsoleMessage)
+	{
+		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
+		if closure == nil {
+			return
+		}
+		defer closure.TryRepanic()
+
+		f = closure.Func.(func(consoleMessage *ConsoleMessage))
+	}
+
+	var _consoleMessage *ConsoleMessage // out
+
+	_consoleMessage = (*ConsoleMessage)(gextras.NewStructNative(unsafe.Pointer(arg1)))
+
+	f(_consoleMessage)
+}
+
 //export _gotk4_webkitwebprocessextension6_WebPage_ConnectContextMenu
 func _gotk4_webkitwebprocessextension6_WebPage_ConnectContextMenu(arg0 C.gpointer, arg1 *C.WebKitContextMenu, arg2 *C.WebKitWebHitTestResult, arg3 C.guintptr) (cret C.gboolean) {
 	var f func(contextMenu *ContextMenu, hitTestResult *WebHitTestResult) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -48,7 +69,7 @@ func _gotk4_webkitwebprocessextension6_WebPage_ConnectDocumentLoaded(arg0 C.gpoi
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -64,7 +85,7 @@ func _gotk4_webkitwebprocessextension6_WebPage_ConnectSendRequest(arg0 C.gpointe
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -94,7 +115,7 @@ func _gotk4_webkitwebprocessextension6_WebPage_ConnectUserMessageReceived(arg0 C
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

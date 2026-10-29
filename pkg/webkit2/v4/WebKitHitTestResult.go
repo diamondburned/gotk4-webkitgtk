@@ -168,7 +168,6 @@ func marshalHitTestResult(p uintptr) (interface{}, error) {
 //
 //   - ok: TRUE if there's an editable element at the coordinates of the
 //     hit_test_result, or FALSE otherwise.
-//
 func (hitTestResult *HitTestResult) ContextIsEditable() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
@@ -194,7 +193,6 @@ func (hitTestResult *HitTestResult) ContextIsEditable() bool {
 //
 //   - ok: TRUE if there's an image element in the coordinates of the Hit Test,
 //     or FALSE otherwise.
-//
 func (hitTestResult *HitTestResult) ContextIsImage() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
@@ -220,7 +218,6 @@ func (hitTestResult *HitTestResult) ContextIsImage() bool {
 //
 //   - ok: TRUE if there's a link element in the coordinates of the Hit Test,
 //     or FALSE otherwise.
-//
 func (hitTestResult *HitTestResult) ContextIsLink() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
@@ -246,7 +243,6 @@ func (hitTestResult *HitTestResult) ContextIsLink() bool {
 //
 //   - ok: TRUE if there's a media element in the coordinates of the Hit Test,
 //     or FALSE otherwise.
-//
 func (hitTestResult *HitTestResult) ContextIsMedia() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
@@ -272,7 +268,6 @@ func (hitTestResult *HitTestResult) ContextIsMedia() bool {
 //
 //   - ok: TRUE if there's a scrollbar element at the coordinates of the
 //     hit_test_result, or FALSE otherwise.
-//
 func (hitTestResult *HitTestResult) ContextIsScrollbar() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
@@ -298,7 +293,6 @@ func (hitTestResult *HitTestResult) ContextIsScrollbar() bool {
 //
 //   - ok: TRUE if there's a selected element at the coordinates of the
 //     hit_test_result, or FALSE otherwise.
-//
 func (hitTestResult *HitTestResult) ContextIsSelection() bool {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.gboolean             // in
@@ -322,7 +316,6 @@ func (hitTestResult *HitTestResult) ContextIsSelection() bool {
 // The function returns the following values:
 //
 //   - guint: bitmask of KitHitTestResultContext flags.
-//
 func (hitTestResult *HitTestResult) Context() uint {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret C.guint                // in
@@ -345,7 +338,6 @@ func (hitTestResult *HitTestResult) Context() uint {
 //
 //   - utf8: URI of the image element in the coordinates of the Hit Test,
 //     or NULL if there isn't an image element in hit_test_result context.
-//
 func (hitTestResult *HitTestResult) ImageURI() string {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret *C.gchar               // in
@@ -369,7 +361,6 @@ func (hitTestResult *HitTestResult) ImageURI() string {
 //   - utf8: label of the link element in the coordinates of the Hit Test,
 //     or NULL if there isn't a link element in hit_test_result context or the
 //     link element doesn't have a label.
-//
 func (hitTestResult *HitTestResult) LinkLabel() string {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret *C.gchar               // in
@@ -393,7 +384,6 @@ func (hitTestResult *HitTestResult) LinkLabel() string {
 //   - utf8: title of the link element in the coordinates of the Hit Test,
 //     or NULL if there isn't a link element in hit_test_result context or the
 //     link element doesn't have a title.
-//
 func (hitTestResult *HitTestResult) LinkTitle() string {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret *C.gchar               // in
@@ -416,7 +406,6 @@ func (hitTestResult *HitTestResult) LinkTitle() string {
 //
 //   - utf8: URI of the link element in the coordinates of the Hit Test,
 //     or NULL if there isn't a link element in hit_test_result context.
-//
 func (hitTestResult *HitTestResult) LinkURI() string {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret *C.gchar               // in
@@ -439,7 +428,6 @@ func (hitTestResult *HitTestResult) LinkURI() string {
 //
 //   - utf8: URI of the media element in the coordinates of the Hit Test,
 //     or NULL if there isn't a media element in hit_test_result context.
-//
 func (hitTestResult *HitTestResult) MediaURI() string {
 	var _arg0 *C.WebKitHitTestResult // out
 	var _cret *C.gchar               // in

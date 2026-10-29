@@ -76,7 +76,6 @@ func marshalDOMHTMLCollection(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMHTMLCollection) Length() uint32 {
 	var _arg0 *C.WebKitDOMHTMLCollection // out
 	var _cret C.gulong                   // in
@@ -102,7 +101,6 @@ func (self *DOMHTMLCollection) Length() uint32 {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMHTMLCollection) Item(index uint32) *DOMNode {
 	var _arg0 *C.WebKitDOMHTMLCollection // out
 	var _arg1 C.gulong                   // out
@@ -131,7 +129,6 @@ func (self *DOMHTMLCollection) Item(index uint32) *DOMNode {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMHTMLCollection) NamedItem(name string) *DOMNode {
 	var _arg0 *C.WebKitDOMHTMLCollection // out
 	var _arg1 *C.gchar                   // out

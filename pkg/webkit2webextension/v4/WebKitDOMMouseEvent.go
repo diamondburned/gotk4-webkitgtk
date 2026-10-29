@@ -80,7 +80,6 @@ func marshalDOMMouseEvent(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMMouseEvent) AltKey() bool {
 	var _arg0 *C.WebKitDOMMouseEvent // out
 	var _cret C.gboolean             // in
@@ -104,7 +103,6 @@ func (self *DOMMouseEvent) AltKey() bool {
 // The function returns the following values:
 //
 //   - gushort: #gushort.
-//
 func (self *DOMMouseEvent) Button() uint16 {
 	var _arg0 *C.WebKitDOMMouseEvent // out
 	var _cret C.gushort              // in
@@ -126,7 +124,6 @@ func (self *DOMMouseEvent) Button() uint16 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMMouseEvent) ClientX() int32 {
 	var _arg0 *C.WebKitDOMMouseEvent // out
 	var _cret C.glong                // in
@@ -148,7 +145,6 @@ func (self *DOMMouseEvent) ClientX() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMMouseEvent) ClientY() int32 {
 	var _arg0 *C.WebKitDOMMouseEvent // out
 	var _cret C.glong                // in
@@ -170,7 +166,6 @@ func (self *DOMMouseEvent) ClientY() int32 {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMMouseEvent) CtrlKey() bool {
 	var _arg0 *C.WebKitDOMMouseEvent // out
 	var _cret C.gboolean             // in
@@ -194,7 +189,6 @@ func (self *DOMMouseEvent) CtrlKey() bool {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMMouseEvent) FromElement() *DOMNode {
 	var _arg0 *C.WebKitDOMMouseEvent // out
 	var _cret *C.WebKitDOMNode       // in
@@ -216,7 +210,6 @@ func (self *DOMMouseEvent) FromElement() *DOMNode {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMMouseEvent) MetaKey() bool {
 	var _arg0 *C.WebKitDOMMouseEvent // out
 	var _cret C.gboolean             // in
@@ -240,7 +233,6 @@ func (self *DOMMouseEvent) MetaKey() bool {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMMouseEvent) OffsetX() int32 {
 	var _arg0 *C.WebKitDOMMouseEvent // out
 	var _cret C.glong                // in
@@ -262,7 +254,6 @@ func (self *DOMMouseEvent) OffsetX() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMMouseEvent) OffsetY() int32 {
 	var _arg0 *C.WebKitDOMMouseEvent // out
 	var _cret C.glong                // in
@@ -284,7 +275,6 @@ func (self *DOMMouseEvent) OffsetY() int32 {
 // The function returns the following values:
 //
 //   - domEventTarget: KitDOMEventTarget.
-//
 func (self *DOMMouseEvent) RelatedTarget() *DOMEventTarget {
 	var _arg0 *C.WebKitDOMMouseEvent  // out
 	var _cret *C.WebKitDOMEventTarget // in
@@ -306,7 +296,6 @@ func (self *DOMMouseEvent) RelatedTarget() *DOMEventTarget {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMMouseEvent) ScreenX() int32 {
 	var _arg0 *C.WebKitDOMMouseEvent // out
 	var _cret C.glong                // in
@@ -328,7 +317,6 @@ func (self *DOMMouseEvent) ScreenX() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMMouseEvent) ScreenY() int32 {
 	var _arg0 *C.WebKitDOMMouseEvent // out
 	var _cret C.glong                // in
@@ -350,7 +338,6 @@ func (self *DOMMouseEvent) ScreenY() int32 {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMMouseEvent) ShiftKey() bool {
 	var _arg0 *C.WebKitDOMMouseEvent // out
 	var _cret C.gboolean             // in
@@ -374,7 +361,6 @@ func (self *DOMMouseEvent) ShiftKey() bool {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMMouseEvent) ToElement() *DOMNode {
 	var _arg0 *C.WebKitDOMMouseEvent // out
 	var _cret *C.WebKitDOMNode       // in
@@ -396,7 +382,6 @@ func (self *DOMMouseEvent) ToElement() *DOMNode {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMMouseEvent) X() int32 {
 	var _arg0 *C.WebKitDOMMouseEvent // out
 	var _cret C.glong                // in
@@ -418,7 +403,6 @@ func (self *DOMMouseEvent) X() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMMouseEvent) Y() int32 {
 	var _arg0 *C.WebKitDOMMouseEvent // out
 	var _cret C.glong                // in
@@ -454,7 +438,6 @@ func (self *DOMMouseEvent) Y() int32 {
 //   - metaKey: #gboolean.
 //   - button: #gushort.
 //   - relatedTarget: KitDOMEventTarget.
-//
 func (self *DOMMouseEvent) InitMouseEvent(typ string, canBubble, cancelable bool, view *DOMDOMWindow, detail, screenX, screenY, clientX, clientY int32, ctrlKey, altKey, shiftKey, metaKey bool, button uint16, relatedTarget DOMEventTargetter) {
 	var _arg0 *C.WebKitDOMMouseEvent   // out
 	var _arg1 *C.gchar                 // out

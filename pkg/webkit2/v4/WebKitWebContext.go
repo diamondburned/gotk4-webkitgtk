@@ -3,11 +3,13 @@
 package webkit2
 
 import (
+	"context"
 	"fmt"
 	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
@@ -28,6 +30,8 @@ import (
 // extern void _gotk4_webkit24_WebContextClass_download_started(WebKitWebContext*, WebKitDownload*);
 // extern void _gotk4_webkit24_WebContextClass_automation_started(WebKitWebContext*, WebKitAutomationSession*);
 // extern void _gotk4_webkit24_URISchemeRequestCallback(WebKitURISchemeRequest*, gpointer);
+// extern void _gotk4_webkit24_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
 // extern gboolean _gotk4_webkit24_WebContext_ConnectUserMessageReceived(gpointer, WebKitUserMessage*, guintptr);
 // extern gboolean _gotk4_webkit24_WebContextClass_user_message_received(WebKitWebContext*, WebKitUserMessage*);
 // gboolean _gotk4_webkit24_WebContext_virtual_user_message_received(void* fnptr, WebKitWebContext* arg0, WebKitUserMessage* arg1) {
@@ -97,24 +101,16 @@ func (c CacheModel) String() string {
 }
 
 // URISchemeRequestCallback: type definition for a function that will be called
-// back when an URI request is made for a user registered URI scheme.
+// back when a URI request is made for a user registered URI scheme.
 type URISchemeRequestCallback func(request *URISchemeRequest)
 
 // WebContextOverrides contains methods that are overridable.
 type WebContextOverrides struct {
-	// The function takes the following parameters:
-	//
-	AutomationStarted func(session *AutomationSession)
-	// The function takes the following parameters:
-	//
+	AutomationStarted                 func(session *AutomationSession)
 	DownloadStarted                   func(download *Download)
 	InitializeNotificationPermissions func()
 	InitializeWebExtensions           func()
-	// The function takes the following parameters:
-	//
-	// The function returns the following values:
-	//
-	UserMessageReceived func(message *UserMessage) bool
+	UserMessageReceived               func(message *UserMessage) bool
 }
 
 func defaultWebContextOverrides(v *WebContext) WebContextOverrides {
@@ -127,13 +123,13 @@ func defaultWebContextOverrides(v *WebContext) WebContextOverrides {
 	}
 }
 
-// WebContext manages aspects common to all KitWebView<!-- -->s
+// WebContext manages aspects common to all KitWebView objects
 //
-// The KitWebContext manages all aspects common to all KitWebView<!-- -->s.
+// The KitWebContext manages all aspects common to all KitWebView objects.
 //
 // You can define the KitCacheModel with webkit_web_context_set_cache_model(),
 // depending on the needs of your application. You can access the
-// KitSecurityManager to specify the behaviour of your application regarding
+// KitSecurityManager to specify the behavior of your application regarding
 // security using webkit_web_context_get_security_manager().
 //
 // It is also possible to change your preferred language or enable
@@ -256,7 +252,6 @@ func (context *WebContext) ConnectUserMessageReceived(f func(message *UserMessag
 // The function returns the following values:
 //
 //   - webContext: newly created KitWebContext.
-//
 func NewWebContext() *WebContext {
 	var _cret *C.WebKitWebContext // in
 
@@ -274,14 +269,13 @@ func NewWebContext() *WebContext {
 // An ephemeral KitWebContext is a context created with an ephemeral
 // KitWebsiteDataManager. This is just a convenient method to create ephemeral
 // contexts without having to create your own KitWebsiteDataManager.
-// All KitWebView<!-- -->s associated with this context will also be ephemeral.
+// All KitWebView objects associated with this context will also be ephemeral.
 // Websites will not store any data in the client storage. This is normally used
 // to implement private instances.
 //
 // The function returns the following values:
 //
 //   - webContext: new ephemeral KitWebContext.
-//
 func NewWebContextEphemeral() *WebContext {
 	var _cret *C.WebKitWebContext // in
 
@@ -304,7 +298,6 @@ func NewWebContextEphemeral() *WebContext {
 // The function returns the following values:
 //
 //   - webContext: newly created KitWebContext.
-//
 func NewWebContextWithWebsiteDataManager(manager *WebsiteDataManager) *WebContext {
 	var _arg1 *C.WebKitWebsiteDataManager // out
 	var _cret *C.WebKitWebContext         // in
@@ -323,9 +316,8 @@ func NewWebContextWithWebsiteDataManager(manager *WebsiteDataManager) *WebContex
 
 // AddPathToSandbox adds a path to be mounted in the sandbox.
 //
-// path must exist before any web process has been created; otherwise, it will
-// be silently ignored. It is a fatal error to add paths after a web process has
-// been spawned.
+// path must exist before any web process has been created. It is a fatal error
+// to add paths after a web process has been spawned.
 //
 // Paths under /sys, /proc, and /dev are invalid. Attempting to add all of / is
 // not valid. Since 2.40, adding the user's entire home directory or /home is
@@ -337,7 +329,6 @@ func NewWebContextWithWebsiteDataManager(manager *WebsiteDataManager) *WebContex
 //
 //   - path: absolute path to mount in the sandbox.
 //   - readOnly: if TRUE the path will be read-only.
-//
 func (context *WebContext) AddPathToSandbox(path string, readOnly bool) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 *C.char             // out
@@ -356,14 +347,16 @@ func (context *WebContext) AddPathToSandbox(path string, readOnly bool) {
 	runtime.KeepAlive(readOnly)
 }
 
-// AllowTLSCertificateForHost: ignore further TLS errors on the host for the
-// certificate present in info.
+// AllowTLSCertificateForHost: ignore further TLS errors on the host for
+// certificate.
+//
+// If host is an IPv6 address, it should not be surrounded by brackets. This
+// expectation matches g_uri_get_host().
 //
 // The function takes the following parameters:
 //
 //   - certificate: Certificate.
 //   - host for which a certificate is to be allowed.
-//
 func (context *WebContext) AllowTLSCertificateForHost(certificate gio.TLSCertificater, host string) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 *C.GTlsCertificate  // out
@@ -394,8 +387,8 @@ func (context *WebContext) ClearCache() {
 
 // DownloadURI requests downloading of the specified URI string.
 //
-// The download operation will not be associated to any KitWebView, if you
-// are interested in starting a download from a particular KitWebView use
+// The download operation will not be associated with any KitWebView,
+// if you are interested in starting a download from a particular KitWebView use
 // webkit_web_view_download_uri() instead.
 //
 // The function takes the following parameters:
@@ -405,7 +398,6 @@ func (context *WebContext) ClearCache() {
 // The function returns the following values:
 //
 //   - download: new KitDownload representing the download operation.
-//
 func (context *WebContext) DownloadURI(uri string) *Download {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 *C.gchar            // out
@@ -434,7 +426,6 @@ func (context *WebContext) DownloadURI(uri string) *Download {
 // The function returns the following values:
 //
 //   - cacheModel: current KitCacheModel.
-//
 func (context *WebContext) CacheModel() CacheModel {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret C.WebKitCacheModel  // in
@@ -457,7 +448,6 @@ func (context *WebContext) CacheModel() CacheModel {
 // The function returns the following values:
 //
 //   - cookieManager of context.
-//
 func (context *WebContext) CookieManager() *CookieManager {
 	var _arg0 *C.WebKitWebContext    // out
 	var _cret *C.WebKitCookieManager // in
@@ -482,7 +472,6 @@ func (context *WebContext) CookieManager() *CookieManager {
 // The function returns the following values:
 //
 //   - faviconDatabase of context.
-//
 func (context *WebContext) FaviconDatabase() *FaviconDatabase {
 	var _arg0 *C.WebKitWebContext      // out
 	var _cret *C.WebKitFaviconDatabase // in
@@ -513,7 +502,6 @@ func (context *WebContext) FaviconDatabase() *FaviconDatabase {
 //
 //   - utf8: path of the directory of the favicons database associated with
 //     context, or NULL.
-//
 func (context *WebContext) FaviconDatabaseDirectory() string {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret *C.gchar            // in
@@ -535,7 +523,6 @@ func (context *WebContext) FaviconDatabaseDirectory() string {
 // The function returns the following values:
 //
 //   - geolocationManager of context.
-//
 func (context *WebContext) GeolocationManager() *GeolocationManager {
 	var _arg0 *C.WebKitWebContext         // out
 	var _cret *C.WebKitGeolocationManager // in
@@ -552,6 +539,40 @@ func (context *WebContext) GeolocationManager() *GeolocationManager {
 	return _geolocationManager
 }
 
+// Plugins: asynchronously get the list of installed plugins.
+//
+// When the operation is finished, callback will be called. You can then call
+// webkit_web_context_get_plugins_finish() to get the result of the operation.
+//
+// Deprecated: since version 2.32.
+//
+// The function takes the following parameters:
+//
+//   - ctx (optional) or NULL to ignore.
+//   - callback (optional) to call when the request is satisfied.
+func (context *WebContext) Plugins(ctx context.Context, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebContext   // out
+	var _arg1 *C.GCancellable       // out
+	var _arg2 C.GAsyncReadyCallback // out
+	var _arg3 C.gpointer
+
+	_arg0 = (*C.WebKitWebContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	if callback != nil {
+		_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_web_context_get_plugins(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(callback)
+}
+
 // PluginsFinish: finish an asynchronous operation started with
 // webkit_web_context_get_plugins.
 //
@@ -564,8 +585,7 @@ func (context *WebContext) GeolocationManager() *GeolocationManager {
 // The function returns the following values:
 //
 //   - list of KitPlugin. You must free the #GList with g_list_free() and unref
-//     the KitPlugin<!-- -->s with g_object_unref() when you're done with them.
-//
+//     the KitPlugin objects with g_object_unref() when you're done with them.
 func (context *WebContext) PluginsFinish(result gio.AsyncResulter) ([]*Plugin, error) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 *C.GAsyncResult     // out
@@ -606,7 +626,6 @@ func (context *WebContext) PluginsFinish(result gio.AsyncResulter) ([]*Plugin, e
 // The function returns the following values:
 //
 //   - processModel: WEBKIT_PROCESS_MODEL_MULTIPLE_SECONDARY_PROCESSES.
-//
 func (context *WebContext) ProcessModel() ProcessModel {
 	var _arg0 *C.WebKitWebContext  // out
 	var _cret C.WebKitProcessModel // in
@@ -628,7 +647,6 @@ func (context *WebContext) ProcessModel() ProcessModel {
 // The function returns the following values:
 //
 //   - ok: TRUE if sandboxing is enabled, or FALSE otherwise.
-//
 func (context *WebContext) SandboxEnabled() bool {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret C.gboolean          // in
@@ -652,7 +670,6 @@ func (context *WebContext) SandboxEnabled() bool {
 // The function returns the following values:
 //
 //   - securityManager of context.
-//
 func (context *WebContext) SecurityManager() *SecurityManager {
 	var _arg0 *C.WebKitWebContext      // out
 	var _cret *C.WebKitSecurityManager // in
@@ -675,7 +692,6 @@ func (context *WebContext) SecurityManager() *SecurityManager {
 // The function returns the following values:
 //
 //   - ok: TRUE If spell checking is enabled, or FALSE otherwise.
-//
 func (context *WebContext) SpellCheckingEnabled() bool {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret C.gboolean          // in
@@ -694,10 +710,10 @@ func (context *WebContext) SpellCheckingEnabled() bool {
 	return _ok
 }
 
-// SpellCheckingLanguages: get the the list of spell checking languages.
+// SpellCheckingLanguages: get the list of spell checking languages.
 //
-// Get the the list of spell checking languages associated with context, or NULL
-// if no languages have been previously set.
+// Get the list of spell checking languages associated with context, or NULL if
+// no languages have been previously set.
 //
 // See webkit_web_context_set_spell_checking_languages() for more details on the
 // format of the languages in the list.
@@ -706,7 +722,6 @@ func (context *WebContext) SpellCheckingEnabled() bool {
 //
 //   - utf8s: NULL-terminated array of languages if available, or NULL
 //     otherwise.
-//
 func (context *WebContext) SpellCheckingLanguages() []string {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret **C.gchar           // in
@@ -739,6 +754,7 @@ func (context *WebContext) SpellCheckingLanguages() []string {
 //
 // The function returns the following values:
 //
+//   - utf8 (optional): time zone override, or NULL if none was set.
 func (context *WebContext) TimeZoneOverride() string {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret *C.gchar            // in
@@ -750,7 +766,9 @@ func (context *WebContext) TimeZoneOverride() string {
 
 	var _utf8 string // out
 
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
 
 	return _utf8
 }
@@ -762,7 +780,6 @@ func (context *WebContext) TimeZoneOverride() string {
 // The function returns the following values:
 //
 //   - tlsErrorsPolicy: KitTLSErrorsPolicy.
-//
 func (context *WebContext) TLSErrorsPolicy() TLSErrorsPolicy {
 	var _arg0 *C.WebKitWebContext     // out
 	var _cret C.WebKitTLSErrorsPolicy // in
@@ -782,11 +799,12 @@ func (context *WebContext) TLSErrorsPolicy() TLSErrorsPolicy {
 // UseSystemAppearanceForScrollbars: get the
 // KitWebContext:use-system-appearance-for-scrollbars property.
 //
+// Deprecated: since version 2.46.
+//
 // The function returns the following values:
 //
-//   - ok: TRUE if scrollbars are rendering using the system appearance,
-//     or FALSE otherwise.
-//
+//   - ok: TRUE if scrollbars are rendered using the system appearance, or FALSE
+//     otherwise.
 func (context *WebContext) UseSystemAppearanceForScrollbars() bool {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret C.gboolean          // in
@@ -816,7 +834,6 @@ func (context *WebContext) UseSystemAppearanceForScrollbars() bool {
 // The function returns the following values:
 //
 //   - guint: maximum limit of web processes, or 0 if there isn't a limit.
-//
 func (context *WebContext) WebProcessCountLimit() uint {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret C.guint             // in
@@ -838,7 +855,6 @@ func (context *WebContext) WebProcessCountLimit() uint {
 // The function returns the following values:
 //
 //   - websiteDataManager: KitWebsiteDataManager.
-//
 func (context *WebContext) WebsiteDataManager() *WebsiteDataManager {
 	var _arg0 *C.WebKitWebContext         // out
 	var _cret *C.WebKitWebsiteDataManager // in
@@ -876,7 +892,6 @@ func (context *WebContext) WebsiteDataManager() *WebsiteDataManager {
 //
 //   - allowedOrigins of security origins.
 //   - disallowedOrigins of security origins.
-//
 func (context *WebContext) InitializeNotificationPermissions(allowedOrigins, disallowedOrigins []*SecurityOrigin) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 *C.GList            // out
@@ -911,7 +926,6 @@ func (context *WebContext) InitializeNotificationPermissions(allowedOrigins, dis
 // The function returns the following values:
 //
 //   - ok: TRUE if automation is allowed or FALSE otherwise.
-//
 func (context *WebContext) IsAutomationAllowed() bool {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret C.gboolean          // in
@@ -935,7 +949,6 @@ func (context *WebContext) IsAutomationAllowed() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if context is ephemeral or FALSE otherwise.
-//
 func (context *WebContext) IsEphemeral() bool {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret C.gboolean          // in
@@ -962,7 +975,6 @@ func (context *WebContext) IsEphemeral() bool {
 // The function takes the following parameters:
 //
 //   - hostname to be resolved.
-//
 func (context *WebContext) PrefetchDns(hostname string) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 *C.gchar            // out
@@ -978,45 +990,43 @@ func (context *WebContext) PrefetchDns(hostname string) {
 
 // RegisterURIScheme: register scheme in context.
 //
-// Register scheme in context, so that when an URI request with scheme is
-// made in the KitWebContext, the KitURISchemeRequestCallback registered will
-// be called with a KitURISchemeRequest. It is possible to handle URI scheme
-// requests asynchronously, by calling g_object_ref() on the KitURISchemeRequest
-// and calling webkit_uri_scheme_request_finish() later when the data of the
-// request is available or webkit_uri_scheme_request_finish_error() in case of
-// error.
+// Register scheme in context, so that when a URI request with scheme is made in
+// the KitWebContext, the KitURISchemeRequestCallback registered will be called
+// with a KitURISchemeRequest. It is possible to handle URI scheme requests
+// asynchronously, by calling g_object_ref() on the KitURISchemeRequest and
+// calling webkit_uri_scheme_request_finish() later when the data of the request
+// is available or webkit_uri_scheme_request_finish_error() in case of error.
 //
-//    static void
-//    about_uri_scheme_request_cb (WebKitURISchemeRequest *request,
-//                                 gpointer                user_data)
-//    {
-//        GInputStream *stream;
-//        gsize         stream_length;
-//        const gchar  *path = webkit_uri_scheme_request_get_path (request);
+//	static void
+//	about_uri_scheme_request_cb (WebKitURISchemeRequest *request,
+//	                             gpointer                user_data)
+//	{
+//	    GInputStream *stream;
+//	    gsize         stream_length;
+//	    const gchar  *path = webkit_uri_scheme_request_get_path (request);
 //
-//        if (!g_strcmp0 (path, "memory")) {
-//            // Create a GInputStream with the contents of memory about page, and set its length to stream_length
-//        } else if (!g_strcmp0 (path, "applications")) {
-//            // Create a GInputStream with the contents of applications about page, and set its length to stream_length
-//        } else if (!g_strcmp0 (path, "example")) {
-//            gchar *contents = g_strdup_printf ("<html><body><p>Example about page</p></body></html>");
-//            stream_length = strlen (contents);
-//            stream = g_memory_input_stream_new_from_data (contents, stream_length, g_free);
-//        } else {
-//            GError *error = g_error_new (ABOUT_HANDLER_ERROR, ABOUT_HANDLER_ERROR_INVALID, "Invalid about:s page.", path);
-//            webkit_uri_scheme_request_finish_error (request, error);
-//            g_error_free (error);
-//            return;
-//        }
-//        webkit_uri_scheme_request_finish (request, stream, stream_length, "text/html");
-//        g_object_unref (stream);
-//    }.
+//	    if (!g_strcmp0 (path, "memory")) {
+//	        // Create a GInputStream with the contents of memory about page, and set its length to stream_length
+//	    } else if (!g_strcmp0 (path, "applications")) {
+//	        // Create a GInputStream with the contents of applications about page, and set its length to stream_length
+//	    } else if (!g_strcmp0 (path, "example")) {
+//	        gchar *contents = g_strdup_printf ("<html><body><p>Example about page</p></body></html>");
+//	        stream_length = strlen (contents);
+//	        stream = g_memory_input_stream_new_from_data (contents, stream_length, g_free);
+//	    } else {
+//	        GError *error = g_error_new (ABOUT_HANDLER_ERROR, ABOUT_HANDLER_ERROR_INVALID, "Invalid about:s page.", path);
+//	        webkit_uri_scheme_request_finish_error (request, error);
+//	        g_error_free (error);
+//	        return;
+//	    }
+//	    webkit_uri_scheme_request_finish (request, stream, stream_length, "text/html");
+//	    g_object_unref (stream);
+//	}.
 //
 // The function takes the following parameters:
 //
 //   - scheme: network scheme to register.
 //   - callback: KitURISchemeRequestCallback.
-//
 func (context *WebContext) RegisterURIScheme(scheme string, callback URISchemeRequestCallback) {
 	var _arg0 *C.WebKitWebContext              // out
 	var _arg1 *C.gchar                         // out
@@ -1038,14 +1048,13 @@ func (context *WebContext) RegisterURIScheme(scheme string, callback URISchemeRe
 }
 
 // SendMessageToAllExtensions: send message to all web process extensions
-// associated to context.
+// associated with context.
 //
 // If message is floating, it's consumed.
 //
 // The function takes the following parameters:
 //
 //   - message: KitUserMessage.
-//
 func (context *WebContext) SendMessageToAllExtensions(message *UserMessage) {
 	var _arg0 *C.WebKitWebContext  // out
 	var _arg1 *C.WebKitUserMessage // out
@@ -1066,7 +1075,6 @@ func (context *WebContext) SendMessageToAllExtensions(message *UserMessage) {
 // The function takes the following parameters:
 //
 //   - directory to add.
-//
 func (context *WebContext) SetAdditionalPluginsDirectory(directory string) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 *C.gchar            // out
@@ -1094,7 +1102,6 @@ func (context *WebContext) SetAdditionalPluginsDirectory(directory string) {
 // The function takes the following parameters:
 //
 //   - allowed: value to set.
-//
 func (context *WebContext) SetAutomationAllowed(allowed bool) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 C.gboolean          // out
@@ -1114,7 +1121,7 @@ func (context *WebContext) SetAutomationAllowed(allowed bool) {
 // Specifies a usage model for WebViews, which WebKit will use to determine
 // its caching behavior. All web views follow the cache model. This cache
 // model determines the RAM and disk space to use for caching previously viewed
-// content .
+// content.
 //
 // Research indicates that users tend to browse within clusters of documents
 // that hold resources in common, and to revisit previously visited documents.
@@ -1132,7 +1139,6 @@ func (context *WebContext) SetAutomationAllowed(allowed bool) {
 // The function takes the following parameters:
 //
 //   - cacheModel: KitCacheModel.
-//
 func (context *WebContext) SetCacheModel(cacheModel CacheModel) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 C.WebKitCacheModel  // out
@@ -1161,7 +1167,6 @@ func (context *WebContext) SetCacheModel(cacheModel CacheModel) {
 // The function takes the following parameters:
 //
 //   - directory to set.
-//
 func (context *WebContext) SetDiskCacheDirectory(directory string) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 *C.gchar            // out
@@ -1190,7 +1195,6 @@ func (context *WebContext) SetDiskCacheDirectory(directory string) {
 //
 //   - path (optional): absolute path to the icon database directory or NULL to
 //     use the defaults.
-//
 func (context *WebContext) SetFaviconDatabaseDirectory(path string) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 *C.gchar            // out
@@ -1224,7 +1228,6 @@ func (context *WebContext) SetFaviconDatabaseDirectory(path string) {
 //
 //   - proxyMode: KitNetworkProxyMode.
 //   - proxySettings (optional) or NULL.
-//
 func (context *WebContext) SetNetworkProxySettings(proxyMode NetworkProxyMode, proxySettings *NetworkProxySettings) {
 	var _arg0 *C.WebKitWebContext           // out
 	var _arg1 C.WebKitNetworkProxyMode      // out
@@ -1258,7 +1261,6 @@ func (context *WebContext) SetNetworkProxySettings(proxyMode NetworkProxyMode, p
 // The function takes the following parameters:
 //
 //   - languages (optional): NULL-terminated list of language identifiers.
-//
 func (context *WebContext) SetPreferredLanguages(languages []string) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 **C.gchar           // out
@@ -1293,7 +1295,6 @@ func (context *WebContext) SetPreferredLanguages(languages []string) {
 // The function takes the following parameters:
 //
 //   - processModel: KitProcessModel.
-//
 func (context *WebContext) SetProcessModel(processModel ProcessModel) {
 	var _arg0 *C.WebKitWebContext  // out
 	var _arg1 C.WebKitProcessModel // out
@@ -1318,7 +1319,6 @@ func (context *WebContext) SetProcessModel(processModel ProcessModel) {
 // The function takes the following parameters:
 //
 //   - enabled: if TRUE enable sandboxing.
-//
 func (context *WebContext) SetSandboxEnabled(enabled bool) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 C.gboolean          // out
@@ -1338,7 +1338,6 @@ func (context *WebContext) SetSandboxEnabled(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (context *WebContext) SetSpellCheckingEnabled(enabled bool) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 C.gboolean          // out
@@ -1367,7 +1366,6 @@ func (context *WebContext) SetSpellCheckingEnabled(enabled bool) {
 // The function takes the following parameters:
 //
 //   - languages: NULL-terminated list of spell checking languages.
-//
 func (context *WebContext) SetSpellCheckingLanguages(languages []string) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 **C.gchar           // out
@@ -1399,7 +1397,6 @@ func (context *WebContext) SetSpellCheckingLanguages(languages []string) {
 // The function takes the following parameters:
 //
 //   - policy: KitTLSErrorsPolicy.
-//
 func (context *WebContext) SetTLSErrorsPolicy(policy TLSErrorsPolicy) {
 	var _arg0 *C.WebKitWebContext     // out
 	var _arg1 C.WebKitTLSErrorsPolicy // out
@@ -1415,10 +1412,14 @@ func (context *WebContext) SetTLSErrorsPolicy(policy TLSErrorsPolicy) {
 // SetUseSystemAppearanceForScrollbars: set the
 // KitWebContext:use-system-appearance-for-scrollbars property.
 //
+// This is now deprecated and when WebKit is built with Skia this method does
+// nothing.
+//
+// Deprecated: since version 2.46.
+//
 // The function takes the following parameters:
 //
 //   - enabled: value to set.
-//
 func (context *WebContext) SetUseSystemAppearanceForScrollbars(enabled bool) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 C.gboolean          // out
@@ -1444,7 +1445,6 @@ func (context *WebContext) SetUseSystemAppearanceForScrollbars(enabled bool) {
 // The function takes the following parameters:
 //
 //   - directory to add.
-//
 func (context *WebContext) SetWebExtensionsDirectory(directory string) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 *C.gchar            // out
@@ -1470,7 +1470,6 @@ func (context *WebContext) SetWebExtensionsDirectory(directory string) {
 // The function takes the following parameters:
 //
 //   - userData: #GVariant.
-//
 func (context *WebContext) SetWebExtensionsInitializationUserData(userData *glib.Variant) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 *C.GVariant         // out
@@ -1495,7 +1494,6 @@ func (context *WebContext) SetWebExtensionsInitializationUserData(userData *glib
 // The function takes the following parameters:
 //
 //   - limit: maximum number of web processes.
-//
 func (context *WebContext) SetWebProcessCountLimit(limit uint) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 C.guint             // out
@@ -1508,8 +1506,6 @@ func (context *WebContext) SetWebProcessCountLimit(limit uint) {
 	runtime.KeepAlive(limit)
 }
 
-// The function takes the following parameters:
-//
 func (context *WebContext) automationStarted(session *AutomationSession) {
 	gclass := (*C.WebKitWebContextClass)(coreglib.PeekParentClass(context))
 	fnarg := gclass.automation_started
@@ -1525,8 +1521,6 @@ func (context *WebContext) automationStarted(session *AutomationSession) {
 	runtime.KeepAlive(session)
 }
 
-// The function takes the following parameters:
-//
 func (context *WebContext) downloadStarted(download *Download) {
 	gclass := (*C.WebKitWebContextClass)(coreglib.PeekParentClass(context))
 	fnarg := gclass.download_started
@@ -1566,10 +1560,6 @@ func (context *WebContext) initializeWebExtensions() {
 	runtime.KeepAlive(context)
 }
 
-// The function takes the following parameters:
-//
-// The function returns the following values:
-//
 func (context *WebContext) userMessageReceived(message *UserMessage) bool {
 	gclass := (*C.WebKitWebContextClass)(coreglib.PeekParentClass(context))
 	fnarg := gclass.user_message_received
@@ -1599,7 +1589,6 @@ func (context *WebContext) userMessageReceived(message *UserMessage) bool {
 // The function returns the following values:
 //
 //   - webContext: KitWebContext.
-//
 func WebContextGetDefault() *WebContext {
 	var _cret *C.WebKitWebContext // in
 

@@ -39,15 +39,12 @@ func init() {
 
 // PrintCustomWidgetOverrides contains methods that are overridable.
 type PrintCustomWidgetOverrides struct {
-	// The function takes the following parameters:
-	//
 	Apply func(widget gtk.Widgetter)
 	// The function takes the following parameters:
 	//
 	//   - widget
 	//   - pageSetup
 	//   - printSettings
-	//
 	Update func(widget gtk.Widgetter, pageSetup *gtk.PageSetup, printSettings *gtk.PrintSettings)
 }
 
@@ -58,9 +55,9 @@ func defaultPrintCustomWidgetOverrides(v *PrintCustomWidget) PrintCustomWidgetOv
 	}
 }
 
-// PrintCustomWidget allows to embed a custom widget in print dialog.
+// PrintCustomWidget allows embedding a custom widget in the print dialog.
 //
-// A WebKitPrintCustomWidget allows to embed a custom widget in the print
+// A WebKitPrintCustomWidget allows embedding a custom widget in the print
 // dialog by connecting to the KitPrintOperation::create-custom-widget
 // signal, creating a new WebKitPrintCustomWidget with
 // webkit_print_custom_widget_new() and returning it from there. You can later
@@ -128,7 +125,7 @@ func (printCustomWidget *PrintCustomWidget) ConnectApply(f func()) coreglib.Sign
 
 // ConnectUpdate is emitted after change of selected printer in the dialog.
 // The actual page setup and print settings are available and the custom widget
-// can actualize itself according to their values.
+// can update itself according to their values.
 func (printCustomWidget *PrintCustomWidget) ConnectUpdate(f func(pageSetup *gtk.PageSetup, printSettings *gtk.PrintSettings)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(printCustomWidget, "update", false, unsafe.Pointer(C._gotk4_webkit24_PrintCustomWidget_ConnectUpdate), f)
 }
@@ -149,8 +146,7 @@ func (printCustomWidget *PrintCustomWidget) ConnectUpdate(f func(pageSetup *gtk.
 //
 // The function returns the following values:
 //
-//   - printCustomWidget: new KitPrintOperation.
-//
+//   - printCustomWidget: new KitPrintCustomWidget.
 func NewPrintCustomWidget(widget gtk.Widgetter, title string) *PrintCustomWidget {
 	var _arg1 *C.GtkWidget               // out
 	var _arg2 *C.char                    // out
@@ -181,7 +177,6 @@ func NewPrintCustomWidget(widget gtk.Widgetter, title string) *PrintCustomWidget
 // The function returns the following values:
 //
 //   - utf8: title of the print_custom_widget.
-//
 func (printCustomWidget *PrintCustomWidget) Title() string {
 	var _arg0 *C.WebKitPrintCustomWidget // out
 	var _cret *C.gchar                   // in
@@ -211,7 +206,6 @@ func (printCustomWidget *PrintCustomWidget) Title() string {
 // The function returns the following values:
 //
 //   - widget: Widget.
-//
 func (printCustomWidget *PrintCustomWidget) Widget() gtk.Widgetter {
 	var _arg0 *C.WebKitPrintCustomWidget // out
 	var _cret *C.GtkWidget               // in
@@ -244,8 +238,6 @@ func (printCustomWidget *PrintCustomWidget) Widget() gtk.Widgetter {
 	return _widget
 }
 
-// The function takes the following parameters:
-//
 func (printCustomWidget *PrintCustomWidget) apply(widget gtk.Widgetter) {
 	gclass := (*C.WebKitPrintCustomWidgetClass)(coreglib.PeekParentClass(printCustomWidget))
 	fnarg := gclass.apply
@@ -266,7 +258,6 @@ func (printCustomWidget *PrintCustomWidget) apply(widget gtk.Widgetter) {
 //   - widget
 //   - pageSetup
 //   - printSettings
-//
 func (printCustomWidget *PrintCustomWidget) update(widget gtk.Widgetter, pageSetup *gtk.PageSetup, printSettings *gtk.PrintSettings) {
 	gclass := (*C.WebKitPrintCustomWidgetClass)(coreglib.PeekParentClass(printCustomWidget))
 	fnarg := gclass.update

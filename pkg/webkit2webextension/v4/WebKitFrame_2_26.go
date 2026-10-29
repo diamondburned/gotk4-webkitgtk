@@ -81,7 +81,6 @@ func marshalFrame(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - guint64: identifier of frame.
-//
 func (frame *Frame) ID() uint64 {
 	var _arg0 *C.WebKitFrame // out
 	var _cret C.guint64      // in
@@ -104,7 +103,6 @@ func (frame *Frame) ID() uint64 {
 // The function returns the following values:
 //
 //   - context for the JavaScript execution context of frame.
-//
 func (frame *Frame) JsContext() *javascriptcore.Context {
 	var _arg0 *C.WebKitFrame // out
 	var _cret *C.JSCContext  // in
@@ -136,7 +134,6 @@ func (frame *Frame) JsContext() *javascriptcore.Context {
 // The function returns the following values:
 //
 //   - context for the JavaScript execution context of frame for world.
-//
 func (frame *Frame) JsContextForScriptWorld(world *ScriptWorld) *javascriptcore.Context {
 	var _arg0 *C.WebKitFrame       // out
 	var _arg1 *C.WebKitScriptWorld // out
@@ -173,7 +170,6 @@ func (frame *Frame) JsContextForScriptWorld(world *ScriptWorld) *javascriptcore.
 // The function returns the following values:
 //
 //   - value referencing dom_object.
-//
 func (frame *Frame) JsValueForDomObject(domObject *DOMObject) *javascriptcore.Value {
 	var _arg0 *C.WebKitFrame     // out
 	var _arg1 *C.WebKitDOMObject // out
@@ -212,7 +208,6 @@ func (frame *Frame) JsValueForDomObject(domObject *DOMObject) *javascriptcore.Va
 // The function returns the following values:
 //
 //   - value referencing dom_object.
-//
 func (frame *Frame) JsValueForDomObjectInScriptWorld(domObject *DOMObject, world *ScriptWorld) *javascriptcore.Value {
 	var _arg0 *C.WebKitFrame       // out
 	var _arg1 *C.WebKitDOMObject   // out
@@ -245,7 +240,6 @@ func (frame *Frame) JsValueForDomObjectInScriptWorld(domObject *DOMObject, world
 // The function returns the following values:
 //
 //   - utf8: current active URI of frame or NULL if nothing has been loaded yet.
-//
 func (frame *Frame) URI() string {
 	var _arg0 *C.WebKitFrame // out
 	var _cret *C.gchar       // in
@@ -267,7 +261,6 @@ func (frame *Frame) URI() string {
 // The function returns the following values:
 //
 //   - ok: TRUE if frame is a main frame or FALSE otherwise.
-//
 func (frame *Frame) IsMainFrame() bool {
 	var _arg0 *C.WebKitFrame // out
 	var _cret C.gboolean     // in

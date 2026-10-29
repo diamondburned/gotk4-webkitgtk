@@ -115,7 +115,6 @@ func NewSecurityOriginForURI(uri string) *SecurityOrigin {
 // The function returns the following values:
 //
 //   - utf8 (optional): host of the KitSecurityOrigin.
-//
 func (origin *SecurityOrigin) Host() string {
 	var _arg0 *C.WebKitSecurityOrigin // out
 	var _cret *C.gchar                // in
@@ -144,7 +143,6 @@ func (origin *SecurityOrigin) Host() string {
 // The function returns the following values:
 //
 //   - guint16: port of the KitSecurityOrigin.
-//
 func (origin *SecurityOrigin) Port() uint16 {
 	var _arg0 *C.WebKitSecurityOrigin // out
 	var _cret C.guint16               // in
@@ -166,7 +164,6 @@ func (origin *SecurityOrigin) Port() uint16 {
 // The function returns the following values:
 //
 //   - utf8 (optional): protocol of the KitSecurityOrigin.
-//
 func (origin *SecurityOrigin) Protocol() string {
 	var _arg0 *C.WebKitSecurityOrigin // out
 	var _cret *C.gchar                // in
@@ -196,7 +193,6 @@ func (origin *SecurityOrigin) Protocol() string {
 // The function returns the following values:
 //
 //   - ok: FALSE.
-//
 func (origin *SecurityOrigin) IsOpaque() bool {
 	var _arg0 *C.WebKitSecurityOrigin // out
 	var _cret C.gboolean              // in
@@ -223,7 +219,6 @@ func (origin *SecurityOrigin) IsOpaque() bool {
 // The function returns the following values:
 //
 //   - utf8 (optional): URI representing origin.
-//
 func (origin *SecurityOrigin) String() string {
 	var _arg0 *C.WebKitSecurityOrigin // out
 	var _cret *C.gchar                // in

@@ -84,7 +84,6 @@ func marshalURIRequest(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - uriRequest: new KitURIRequest.
-//
 func NewURIRequest(uri string) *URIRequest {
 	var _arg1 *C.gchar            // out
 	var _cret *C.WebKitURIRequest // in
@@ -108,7 +107,6 @@ func NewURIRequest(uri string) *URIRequest {
 //
 //   - messageHeaders with the HTTP headers of request or NULL if request is not
 //     an HTTP request.
-//
 func (request *URIRequest) HTTPHeaders() *soup.MessageHeaders {
 	var _arg0 *C.WebKitURIRequest   // out
 	var _cret *C.SoupMessageHeaders // in
@@ -138,7 +136,6 @@ func (request *URIRequest) HTTPHeaders() *soup.MessageHeaders {
 //
 //   - utf8: HTTP method of the KitURIRequest or NULL if request is not an HTTP
 //     request.
-//
 func (request *URIRequest) HTTPMethod() string {
 	var _arg0 *C.WebKitURIRequest // out
 	var _cret *C.gchar            // in
@@ -160,7 +157,6 @@ func (request *URIRequest) HTTPMethod() string {
 // The function returns the following values:
 //
 //   - utf8: request URI, as a string.
-//
 func (request *URIRequest) URI() string {
 	var _arg0 *C.WebKitURIRequest // out
 	var _cret *C.gchar            // in
@@ -182,7 +178,6 @@ func (request *URIRequest) URI() string {
 // The function takes the following parameters:
 //
 //   - uri: URI.
-//
 func (request *URIRequest) SetURI(uri string) {
 	var _arg0 *C.WebKitURIRequest // out
 	var _arg1 *C.gchar            // out

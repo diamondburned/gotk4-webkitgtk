@@ -113,7 +113,7 @@ func marshalPrintOperation(p uintptr) (interface{}, error) {
 // webkit_print_operation_run_dialog(). The returned KitPrintCustomWidget
 // will be added to the print dialog and it will be owned by the
 // print_operation. However, the object is guaranteed to be alive until the
-// KitPrintCustomWidget::apply is emitted.
+// KitPrintCustomWidget::apply signal is emitted.
 func (printOperation *PrintOperation) ConnectCreateCustomWidget(f func() (printCustomWidget *PrintCustomWidget)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(printOperation, "create-custom-widget", false, unsafe.Pointer(C._gotk4_webkit24_PrintOperation_ConnectCreateCustomWidget), f)
 }
@@ -140,7 +140,6 @@ func (printOperation *PrintOperation) ConnectFinished(f func()) coreglib.SignalH
 // The function returns the following values:
 //
 //   - printOperation: new KitPrintOperation.
-//
 func NewPrintOperation(webView *WebView) *PrintOperation {
 	var _arg1 *C.WebKitWebView        // out
 	var _cret *C.WebKitPrintOperation // in
@@ -165,7 +164,6 @@ func NewPrintOperation(webView *WebView) *PrintOperation {
 // The function returns the following values:
 //
 //   - pageSetup: current PageSetup of print_operation.
-//
 func (printOperation *PrintOperation) PageSetup() *gtk.PageSetup {
 	var _arg0 *C.WebKitPrintOperation // out
 	var _cret *C.GtkPageSetup         // in
@@ -195,7 +193,6 @@ func (printOperation *PrintOperation) PageSetup() *gtk.PageSetup {
 // The function returns the following values:
 //
 //   - printSettings: current PrintSettings of print_operation.
-//
 func (printOperation *PrintOperation) PrintSettings() *gtk.PrintSettings {
 	var _arg0 *C.WebKitPrintOperation // out
 	var _cret *C.GtkPrintSettings     // in
@@ -227,6 +224,11 @@ func (printOperation *PrintOperation) PrintSettings() *gtk.PrintSettings {
 // The KitPrintOperation::finished signal is emitted when the printing
 // operation finishes. If an error occurs while printing the signal
 // KitPrintOperation::failed is emitted before KitPrintOperation::finished.
+//
+// If the app is running in a sandbox, this function only works if printing
+// to a file that is in a location accessible to the sandbox, usually acquired
+// through the File Chooser portal. This function will not work for physical
+// printers when running in a sandbox.
 func (printOperation *PrintOperation) Print() {
 	var _arg0 *C.WebKitPrintOperation // out
 
@@ -245,11 +247,11 @@ func (printOperation *PrintOperation) Print() {
 // is returned and the print operation starts. In this case, the
 // KitPrintOperation::finished signal is emitted when the operation finishes.
 // If an error occurs while printing, the signal KitPrintOperation::failed
-// is emitted before KitPrintOperation::finished. If the print dialog is
-// not cancelled current print settings and page setup of print_operation
-// are updated with options selected by the user when Print button is
-// pressed in print dialog. You can get the updated print settings and
-// page setup by calling webkit_print_operation_get_print_settings() and
+// is emitted before KitPrintOperation::finished. If the print dialog is not
+// cancelled, the current print settings and page setup of print_operation
+// are updated with the options selected by the user when the Print button
+// is pressed in the print dialog. You can get the updated print settings
+// and page setup by calling webkit_print_operation_get_print_settings() and
 // webkit_print_operation_get_page_setup() after this method.
 //
 // The function takes the following parameters:
@@ -259,7 +261,6 @@ func (printOperation *PrintOperation) Print() {
 // The function returns the following values:
 //
 //   - printOperationResponse of the print dialog.
-//
 func (printOperation *PrintOperation) RunDialog(parent *gtk.Window) PrintOperationResponse {
 	var _arg0 *C.WebKitPrintOperation        // out
 	var _arg1 *C.GtkWindow                   // out
@@ -289,7 +290,6 @@ func (printOperation *PrintOperation) RunDialog(parent *gtk.Window) PrintOperati
 // The function takes the following parameters:
 //
 //   - pageSetup to set.
-//
 func (printOperation *PrintOperation) SetPageSetup(pageSetup *gtk.PageSetup) {
 	var _arg0 *C.WebKitPrintOperation // out
 	var _arg1 *C.GtkPageSetup         // out
@@ -311,7 +311,6 @@ func (printOperation *PrintOperation) SetPageSetup(pageSetup *gtk.PageSetup) {
 // The function takes the following parameters:
 //
 //   - printSettings to set.
-//
 func (printOperation *PrintOperation) SetPrintSettings(printSettings *gtk.PrintSettings) {
 	var _arg0 *C.WebKitPrintOperation // out
 	var _arg1 *C.GtkPrintSettings     // out

@@ -41,11 +41,12 @@ func init() {
 
 // HSTSEnforcerOverrides contains methods that are overridable.
 type HSTSEnforcerOverrides struct {
+	// Changed class closure for the hstsenforcer::changed signal.
+	//
 	// The function takes the following parameters:
 	//
 	//   - oldPolicy
 	//   - newPolicy
-	//
 	Changed func(oldPolicy, newPolicy *HSTSPolicy)
 	// HasValidPolicy gets whether hsts_enforcer has a currently valid policy
 	// for domain.
@@ -58,14 +59,12 @@ type HSTSEnforcerOverrides struct {
 	//
 	//   - ok: TRUE if access to domain should happen over HTTPS, false
 	//     otherwise.
-	//
 	HasValidPolicy func(domain string) bool
 	// IsPersistent gets whether hsts_enforcer stores policies persistenly.
 	//
 	// The function returns the following values:
 	//
 	//   - ok: TRUE if hsts_enforcer storage is persistent or FALSE otherwise.
-	//
 	IsPersistent func() bool
 }
 
@@ -79,22 +78,22 @@ func defaultHSTSEnforcerOverrides(v *HSTSEnforcer) HSTSEnforcerOverrides {
 
 // HSTSEnforcer: automatic HTTP Strict Transport Security enforcing for session.
 //
-// A HSTSEnforcer stores HSTS policies and enforces them when required.
-// HSTSEnforcer implements sessionfeature, so you can add an HSTS enforcer to a
+// A hstsenforcer stores HSTS policies and enforces them when required.
+// hstsenforcer implements sessionfeature, so you can add an HSTS enforcer to a
 // session with session.AddFeature or session.AddFeatureByType.
 //
-// HSTSEnforcer keeps track of all the HTTPS destinations that, when connected
+// hstsenforcer keeps track of all the HTTPS destinations that, when connected
 // to, return the Strict-Transport-Security header with valid values.
-// HSTSEnforcer will forget those destinations upon expiry or when the server
+// hstsenforcer will forget those destinations upon expiry or when the server
 // requests it.
 //
-// When the session the HSTSEnforcer is attached to queues or restarts a
-// message, the HSTSEnforcer will rewrite the URI to HTTPS if the destination
+// When the session the hstsenforcer is attached to queues or restarts a
+// message, the hstsenforcer will rewrite the URI to HTTPS if the destination
 // is a known HSTS host and is contacted over an insecure transport protocol
-// (HTTP). Users of HSTSEnforcer are advised to listen to changes in the
+// (HTTP). Users of hstsenforcer are advised to listen to changes in the
 // message:uri property in order to be aware of changes in the message URI.
 //
-// Note that HSTSEnforcer does not support any form of long-term HSTS policy
+// Note that hstsenforcer does not support any form of long-term HSTS policy
 // persistence. See hstsenforcerdb for a persistent enforcer.
 type HSTSEnforcer struct {
 	_ [0]func() // equal guard
@@ -163,15 +162,14 @@ func (hstsEnforcer *HSTSEnforcer) ConnectChanged(f func(oldPolicy, newPolicy *HS
 	return coreglib.ConnectGeneratedClosure(hstsEnforcer, "changed", false, unsafe.Pointer(C._gotk4_soup3_HSTSEnforcer_ConnectChanged), f)
 }
 
-// NewHSTSEnforcer creates a new HSTSEnforcer.
+// NewHSTSEnforcer creates a new hstsenforcer.
 //
-// The base HSTSEnforcer class does not support persistent storage of HSTS
+// The base hstsenforcer class does not support persistent storage of HSTS
 // policies, see hstsenforcerdb for that.
 //
 // The function returns the following values:
 //
 //   - hstsEnforcer: new HSTSEnforcer.
-//
 func NewHSTSEnforcer() *HSTSEnforcer {
 	var _cret *C.SoupHSTSEnforcer // in
 
@@ -194,7 +192,6 @@ func NewHSTSEnforcer() *HSTSEnforcer {
 //
 //   - list: newly allocated list of domains. Use glib.List().FreeFull and
 //     glib.Free() to free the list.
-//
 func (hstsEnforcer *HSTSEnforcer) Domains(sessionPolicies bool) []string {
 	var _arg0 *C.SoupHSTSEnforcer // out
 	var _arg1 C.gboolean          // out
@@ -233,7 +230,6 @@ func (hstsEnforcer *HSTSEnforcer) Domains(sessionPolicies bool) []string {
 //
 //   - list: newly allocated list of policies. Use glib.List().FreeFull and
 //     hstspolicy.Free to free the list.
-//
 func (hstsEnforcer *HSTSEnforcer) Policies(sessionPolicies bool) []*HSTSPolicy {
 	var _arg0 *C.SoupHSTSEnforcer // out
 	var _arg1 C.gboolean          // out
@@ -277,7 +273,6 @@ func (hstsEnforcer *HSTSEnforcer) Policies(sessionPolicies bool) []*HSTSPolicy {
 // The function returns the following values:
 //
 //   - ok: TRUE if access to domain should happen over HTTPS, false otherwise.
-//
 func (hstsEnforcer *HSTSEnforcer) HasValidPolicy(domain string) bool {
 	var _arg0 *C.SoupHSTSEnforcer // out
 	var _arg1 *C.char             // out
@@ -305,7 +300,6 @@ func (hstsEnforcer *HSTSEnforcer) HasValidPolicy(domain string) bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if hsts_enforcer storage is persistent or FALSE otherwise.
-//
 func (hstsEnforcer *HSTSEnforcer) IsPersistent() bool {
 	var _arg0 *C.SoupHSTSEnforcer // out
 	var _cret C.gboolean          // in
@@ -335,7 +329,6 @@ func (hstsEnforcer *HSTSEnforcer) IsPersistent() bool {
 // The function takes the following parameters:
 //
 //   - policy of the HSTS host.
-//
 func (hstsEnforcer *HSTSEnforcer) SetPolicy(policy *HSTSPolicy) {
 	var _arg0 *C.SoupHSTSEnforcer // out
 	var _arg1 *C.SoupHSTSPolicy   // out
@@ -357,7 +350,6 @@ func (hstsEnforcer *HSTSEnforcer) SetPolicy(policy *HSTSPolicy) {
 //
 //   - domain: policy domain or hostname.
 //   - includeSubdomains: TRUE if the policy applies on sub domains.
-//
 func (hstsEnforcer *HSTSEnforcer) SetSessionPolicy(domain string, includeSubdomains bool) {
 	var _arg0 *C.SoupHSTSEnforcer // out
 	var _arg1 *C.char             // out
@@ -376,11 +368,12 @@ func (hstsEnforcer *HSTSEnforcer) SetSessionPolicy(domain string, includeSubdoma
 	runtime.KeepAlive(includeSubdomains)
 }
 
+// Changed class closure for the hstsenforcer::changed signal.
+//
 // The function takes the following parameters:
 //
 //   - oldPolicy
 //   - newPolicy
-//
 func (enforcer *HSTSEnforcer) changed(oldPolicy, newPolicy *HSTSPolicy) {
 	gclass := (*C.SoupHSTSEnforcerClass)(coreglib.PeekParentClass(enforcer))
 	fnarg := gclass.changed
@@ -409,7 +402,6 @@ func (enforcer *HSTSEnforcer) changed(oldPolicy, newPolicy *HSTSPolicy) {
 // The function returns the following values:
 //
 //   - ok: TRUE if access to domain should happen over HTTPS, false otherwise.
-//
 func (hstsEnforcer *HSTSEnforcer) hasValidPolicy(domain string) bool {
 	gclass := (*C.SoupHSTSEnforcerClass)(coreglib.PeekParentClass(hstsEnforcer))
 	fnarg := gclass.has_valid_policy
@@ -440,7 +432,6 @@ func (hstsEnforcer *HSTSEnforcer) hasValidPolicy(domain string) bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if hsts_enforcer storage is persistent or FALSE otherwise.
-//
 func (hstsEnforcer *HSTSEnforcer) isPersistent() bool {
 	gclass := (*C.SoupHSTSEnforcerClass)(coreglib.PeekParentClass(hstsEnforcer))
 	fnarg := gclass.is_persistent
@@ -462,7 +453,7 @@ func (hstsEnforcer *HSTSEnforcer) isPersistent() bool {
 	return _ok
 }
 
-// HSTSEnforcerClass class structure for HSTSEnforcer.
+// HSTSEnforcerClass class structure for hstsenforcer.
 //
 // An instance of this type is always passed by reference.
 type HSTSEnforcerClass struct {

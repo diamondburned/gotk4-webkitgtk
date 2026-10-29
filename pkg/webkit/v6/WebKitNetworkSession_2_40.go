@@ -3,9 +3,12 @@
 package webkit
 
 import (
+	"context"
 	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
@@ -16,6 +19,8 @@ import (
 // #include <glib-object.h>
 // #include <webkit/webkit.h>
 // extern void _gotk4_webkit6_NetworkSession_ConnectDownloadStarted(gpointer, WebKitDownload*, guintptr);
+// extern void _gotk4_webkit6_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
 import "C"
 
 // GType values.
@@ -86,9 +91,12 @@ func (session *NetworkSession) ConnectDownloadStarted(f func(download *Download)
 // passed, the default directory will be passed to KitWebsiteDataManager
 // so that webkit_website_data_manager_get_base_data_directory() and
 // webkit_website_data_manager_get_base_cache_directory() always return a value
-// for non ephemeral sessions.
+// for non-ephemeral sessions.
 //
-// It must be passed as construct parameter of a KitWebView.
+// It can be passed as the KitWebView:network-session construct parameter
+// of a KitWebView. A web view created without a network session uses
+// the one of its related view, if any, or the default one returned by
+// webkit_network_session_get_default().
 //
 // The function takes the following parameters:
 //
@@ -98,7 +106,6 @@ func (session *NetworkSession) ConnectDownloadStarted(f func(download *Download)
 // The function returns the following values:
 //
 //   - networkSession: newly created KitNetworkSession.
-//
 func NewNetworkSession(dataDirectory, cacheDirectory string) *NetworkSession {
 	var _arg1 *C.char                 // out
 	var _arg2 *C.char                 // out
@@ -130,7 +137,6 @@ func NewNetworkSession(dataDirectory, cacheDirectory string) *NetworkSession {
 // The function returns the following values:
 //
 //   - networkSession: new ephemeral KitNetworkSession.
-//
 func NewNetworkSessionEphemeral() *NetworkSession {
 	var _cret *C.WebKitNetworkSession // in
 
@@ -143,14 +149,16 @@ func NewNetworkSessionEphemeral() *NetworkSession {
 	return _networkSession
 }
 
-// AllowTLSCertificateForHost: ignore further TLS errors on the host for the
-// certificate present in info.
+// AllowTLSCertificateForHost: ignore further TLS errors on the host for
+// certificate.
+//
+// If host is an IPv6 address, it should not be surrounded by brackets. This
+// expectation matches g_uri_get_host().
 //
 // The function takes the following parameters:
 //
 //   - certificate: Certificate.
 //   - host for which a certificate is to be allowed.
-//
 func (session *NetworkSession) AllowTLSCertificateForHost(certificate gio.TLSCertificater, host string) {
 	var _arg0 *C.WebKitNetworkSession // out
 	var _arg1 *C.GTlsCertificate      // out
@@ -169,8 +177,8 @@ func (session *NetworkSession) AllowTLSCertificateForHost(certificate gio.TLSCer
 
 // DownloadURI requests downloading of the specified URI string.
 //
-// The download operation will not be associated to any KitWebView, if you
-// are interested in starting a download from a particular KitWebView use
+// The download operation will not be associated with any KitWebView,
+// if you are interested in starting a download from a particular KitWebView use
 // webkit_web_view_download_uri() instead.
 //
 // The function takes the following parameters:
@@ -180,7 +188,6 @@ func (session *NetworkSession) AllowTLSCertificateForHost(certificate gio.TLSCer
 // The function returns the following values:
 //
 //   - download: new KitDownload representing the download operation.
-//
 func (session *NetworkSession) DownloadURI(uri string) *Download {
 	var _arg0 *C.WebKitNetworkSession // out
 	var _arg1 *C.char                 // out
@@ -206,7 +213,6 @@ func (session *NetworkSession) DownloadURI(uri string) *Download {
 // The function returns the following values:
 //
 //   - cookieManager: KitCookieManager.
-//
 func (session *NetworkSession) CookieManager() *CookieManager {
 	var _arg0 *C.WebKitNetworkSession // out
 	var _cret *C.WebKitCookieManager  // in
@@ -229,7 +235,6 @@ func (session *NetworkSession) CookieManager() *CookieManager {
 // The function returns the following values:
 //
 //   - ok: TRUE if ITP is enabled, or FALSE otherwise.
-//
 func (session *NetworkSession) ItpEnabled() bool {
 	var _arg0 *C.WebKitNetworkSession // out
 	var _cret C.gboolean              // in
@@ -248,6 +253,42 @@ func (session *NetworkSession) ItpEnabled() bool {
 	return _ok
 }
 
+// ItpSummary: asynchronously get the list of KitITPThirdParty seen for session.
+//
+// Every KitITPThirdParty contains the list of KitITPFirstParty under which it
+// has been seen.
+//
+// When the operation is finished, callback will be called. You can then call
+// webkit_network_session_get_itp_summary_finish() to get the result of the
+// operation.
+//
+// The function takes the following parameters:
+//
+//   - ctx (optional) or NULL to ignore.
+//   - callback (optional) to call when the request is satisfied.
+func (session *NetworkSession) ItpSummary(ctx context.Context, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitNetworkSession // out
+	var _arg1 *C.GCancellable         // out
+	var _arg2 C.GAsyncReadyCallback   // out
+	var _arg3 C.gpointer
+
+	_arg0 = (*C.WebKitNetworkSession)(unsafe.Pointer(coreglib.InternObject(session).Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	if callback != nil {
+		_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_network_session_get_itp_summary(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(session)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(callback)
+}
+
 // ItpSummaryFinish: finish an asynchronous operation started with
 // webkit_network_session_get_itp_summary().
 //
@@ -258,9 +299,8 @@ func (session *NetworkSession) ItpEnabled() bool {
 // The function returns the following values:
 //
 //   - list of KitITPThirdParty. You must free the #GList with g_list_free() and
-//     unref the KitITPThirdParty<!-- -->s with webkit_itp_third_party_unref()
+//     unref the KitITPThirdParty objects with webkit_itp_third_party_unref()
 //     when you're done with them.
-//
 func (session *NetworkSession) ItpSummaryFinish(result gio.AsyncResulter) ([]*ITPThirdParty, error) {
 	var _arg0 *C.WebKitNetworkSession // out
 	var _arg1 *C.GAsyncResult         // out
@@ -305,7 +345,6 @@ func (session *NetworkSession) ItpSummaryFinish(result gio.AsyncResulter) ([]*IT
 // The function returns the following values:
 //
 //   - ok: TRUE if persistent credential storage is enabled, or FALSE otherwise.
-//
 func (session *NetworkSession) PersistentCredentialStorageEnabled() bool {
 	var _arg0 *C.WebKitNetworkSession // out
 	var _cret C.gboolean              // in
@@ -329,7 +368,6 @@ func (session *NetworkSession) PersistentCredentialStorageEnabled() bool {
 // The function returns the following values:
 //
 //   - tlsErrorsPolicy: KitTLSErrorsPolicy.
-//
 func (session *NetworkSession) TLSErrorsPolicy() TLSErrorsPolicy {
 	var _arg0 *C.WebKitNetworkSession // out
 	var _cret C.WebKitTLSErrorsPolicy // in
@@ -351,7 +389,6 @@ func (session *NetworkSession) TLSErrorsPolicy() TLSErrorsPolicy {
 // The function returns the following values:
 //
 //   - websiteDataManager: KitWebsiteDataManager.
-//
 func (session *NetworkSession) WebsiteDataManager() *WebsiteDataManager {
 	var _arg0 *C.WebKitNetworkSession     // out
 	var _cret *C.WebKitWebsiteDataManager // in
@@ -374,8 +411,7 @@ func (session *NetworkSession) WebsiteDataManager() *WebsiteDataManager {
 //
 // The function returns the following values:
 //
-//   - ok: TRUE if session is pehmeral, or FALSE otherwise.
-//
+//   - ok: TRUE if session is ephemeral, or FALSE otherwise.
 func (session *NetworkSession) IsEphemeral() bool {
 	var _arg0 *C.WebKitNetworkSession // out
 	var _cret C.gboolean              // in
@@ -401,7 +437,6 @@ func (session *NetworkSession) IsEphemeral() bool {
 // The function takes the following parameters:
 //
 //   - hostname to be resolved.
-//
 func (session *NetworkSession) PrefetchDns(hostname string) {
 	var _arg0 *C.WebKitNetworkSession // out
 	var _arg1 *C.char                 // out
@@ -422,12 +457,11 @@ func (session *NetworkSession) PrefetchDns(hostname string) {
 // prevent user tracking. Note that while ITP is enabled the accept
 // policy WEBKIT_COOKIE_POLICY_ACCEPT_NO_THIRD_PARTY is ignored
 // and WEBKIT_COOKIE_POLICY_ACCEPT_ALWAYS is used instead. See also
-// webkit_cookie_session_set_accept_policy().
+// webkit_cookie_manager_set_accept_policy().
 //
 // The function takes the following parameters:
 //
 //   - enabled: value to set.
-//
 func (session *NetworkSession) SetItpEnabled(enabled bool) {
 	var _arg0 *C.WebKitNetworkSession // out
 	var _arg1 C.gboolean              // out
@@ -446,13 +480,12 @@ func (session *NetworkSession) SetItpEnabled(enabled bool) {
 // credential storage.
 //
 // When enabled, which is the default for non-ephemeral sessions, the network
-// process will try to read and write HTTP authentiacation credentials from
+// process will try to read and write HTTP authentication credentials from
 // persistent storage.
 //
 // The function takes the following parameters:
 //
 //   - enabled: value to set.
-//
 func (session *NetworkSession) SetPersistentCredentialStorageEnabled(enabled bool) {
 	var _arg0 *C.WebKitNetworkSession // out
 	var _arg1 C.gboolean              // out
@@ -468,7 +501,7 @@ func (session *NetworkSession) SetPersistentCredentialStorageEnabled(enabled boo
 }
 
 // SetProxySettings: set the network proxy settings to be used by connections
-// started in session session.
+// started in session.
 //
 // By default WEBKIT_NETWORK_PROXY_MODE_DEFAULT is used, which means that
 // the system settings will be used (g_proxy_resolver_get_default()).
@@ -482,7 +515,6 @@ func (session *NetworkSession) SetPersistentCredentialStorageEnabled(enabled boo
 //
 //   - proxyMode: KitNetworkProxyMode.
 //   - proxySettings (optional) or NULL.
-//
 func (session *NetworkSession) SetProxySettings(proxyMode NetworkProxyMode, proxySettings *NetworkProxySettings) {
 	var _arg0 *C.WebKitNetworkSession       // out
 	var _arg1 C.WebKitNetworkProxyMode      // out
@@ -505,7 +537,6 @@ func (session *NetworkSession) SetProxySettings(proxyMode NetworkProxyMode, prox
 // The function takes the following parameters:
 //
 //   - policy: KitTLSErrorsPolicy.
-//
 func (session *NetworkSession) SetTLSErrorsPolicy(policy TLSErrorsPolicy) {
 	var _arg0 *C.WebKitNetworkSession // out
 	var _arg1 C.WebKitTLSErrorsPolicy // out
@@ -525,7 +556,6 @@ func (session *NetworkSession) SetTLSErrorsPolicy(policy TLSErrorsPolicy) {
 // The function returns the following values:
 //
 //   - networkSession: KitNetworkSession.
-//
 func NetworkSessionGetDefault() *NetworkSession {
 	var _cret *C.WebKitNetworkSession // in
 
@@ -556,7 +586,6 @@ func NetworkSessionGetDefault() *NetworkSession {
 // The function takes the following parameters:
 //
 //   - settings: webKitMemoryPressureSettings.
-//
 func NetworkSessionSetMemoryPressureSettings(settings *MemoryPressureSettings) {
 	var _arg1 *C.WebKitMemoryPressureSettings // out
 

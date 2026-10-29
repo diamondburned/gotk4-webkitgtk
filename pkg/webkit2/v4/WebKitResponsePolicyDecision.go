@@ -79,16 +79,15 @@ func marshalResponsePolicyDecision(p uintptr) (interface{}, error) {
 
 // Request: return the KitURIRequest associated with the response decision.
 //
-// Modifications to the returned object are <emphasis>not</emphasis> taken
-// into account when the request is sent over the network, and is intended
-// only to aid in evaluating whether a response decision should be taken
-// or not. To modify requests before they are sent over the network the
-// KitPage::send-request signal can be used instead.
+// Modifications to the returned object are *not* taken into account when the
+// request is sent over the network, and is intended only to aid in evaluating
+// whether a response decision should be taken or not. To modify requests before
+// they are sent over the network the KitPage::send-request signal can be used
+// instead.
 //
 // The function returns the following values:
 //
 //   - uriRequest: URI request that is associated with this policy decision.
-//
 func (decision *ResponsePolicyDecision) Request() *URIRequest {
 	var _arg0 *C.WebKitResponsePolicyDecision // out
 	var _cret *C.WebKitURIRequest             // in
@@ -110,7 +109,6 @@ func (decision *ResponsePolicyDecision) Request() *URIRequest {
 // The function returns the following values:
 //
 //   - uriResponse: URI response that is associated with this policy decision.
-//
 func (decision *ResponsePolicyDecision) Response() *URIResponse {
 	var _arg0 *C.WebKitResponsePolicyDecision // out
 	var _cret *C.WebKitURIResponse            // in
@@ -132,9 +130,8 @@ func (decision *ResponsePolicyDecision) Response() *URIResponse {
 //
 // The function returns the following values:
 //
-//   - ok: TRUE if the request is the main frame main resouce or FALSE
+//   - ok: TRUE if the request is the main frame main resource or FALSE
 //     otherwise.
-//
 func (decision *ResponsePolicyDecision) IsMainFrameMainResource() bool {
 	var _arg0 *C.WebKitResponsePolicyDecision // out
 	var _cret C.gboolean                      // in
@@ -164,7 +161,6 @@ func (decision *ResponsePolicyDecision) IsMainFrameMainResource() bool {
 //
 //   - ok: TRUE if the MIME type of the response is supported or FALSE
 //     otherwise.
-//
 func (decision *ResponsePolicyDecision) IsMIMETypeSupported() bool {
 	var _arg0 *C.WebKitResponsePolicyDecision // out
 	var _cret C.gboolean                      // in

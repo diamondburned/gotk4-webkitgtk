@@ -107,7 +107,6 @@ func (request *AuthenticationRequest) ConnectCancelled(f func()) coreglib.Signal
 // The function takes the following parameters:
 //
 //   - credential (optional) or NULL.
-//
 func (request *AuthenticationRequest) Authenticate(credential *Credential) {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _arg1 *C.WebKitCredential            // out
@@ -135,7 +134,6 @@ func (request *AuthenticationRequest) Authenticate(credential *Credential) {
 // The function returns the following values:
 //
 //   - ok: TRUE if WebKit can store credentials or FALSE otherwise.
-//
 func (request *AuthenticationRequest) CanSaveCredentials() bool {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.gboolean                     // in
@@ -175,7 +173,6 @@ func (request *AuthenticationRequest) Cancel() {
 // The function returns the following values:
 //
 //   - tlsPasswordFlags: PasswordFlags.
-//
 func (request *AuthenticationRequest) CertificatePINFlags() gio.TLSPasswordFlags {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.GTlsPasswordFlags            // in
@@ -197,7 +194,6 @@ func (request *AuthenticationRequest) CertificatePINFlags() gio.TLSPasswordFlags
 // The function returns the following values:
 //
 //   - utf8: host of request.
-//
 func (request *AuthenticationRequest) Host() string {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret *C.gchar                       // in
@@ -219,7 +215,6 @@ func (request *AuthenticationRequest) Host() string {
 // The function returns the following values:
 //
 //   - guint: port of request.
-//
 func (request *AuthenticationRequest) Port() uint {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.guint                        // in
@@ -247,7 +242,6 @@ func (request *AuthenticationRequest) Port() uint {
 //
 //   - credential encapsulating credential details or NULL if there is no stored
 //     credential.
-//
 func (request *AuthenticationRequest) ProposedCredential() *Credential {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret *C.WebKitCredential            // in
@@ -275,7 +269,6 @@ func (request *AuthenticationRequest) ProposedCredential() *Credential {
 // The function returns the following values:
 //
 //   - utf8: realm of request.
-//
 func (request *AuthenticationRequest) Realm() string {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret *C.gchar                       // in
@@ -297,7 +290,6 @@ func (request *AuthenticationRequest) Realm() string {
 // The function returns the following values:
 //
 //   - authenticationScheme of request.
-//
 func (request *AuthenticationRequest) Scheme() AuthenticationScheme {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.WebKitAuthenticationScheme   // in
@@ -320,7 +312,6 @@ func (request *AuthenticationRequest) Scheme() AuthenticationScheme {
 // The function returns the following values:
 //
 //   - securityOrigin: newly created KitSecurityOrigin.
-//
 func (request *AuthenticationRequest) SecurityOrigin() *SecurityOrigin {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret *C.WebKitSecurityOrigin        // in
@@ -352,7 +343,6 @@ func (request *AuthenticationRequest) SecurityOrigin() *SecurityOrigin {
 // The function returns the following values:
 //
 //   - ok: TRUE if authentication is for a proxy or FALSE otherwise.
-//
 func (request *AuthenticationRequest) IsForProxy() bool {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.gboolean                     // in
@@ -371,13 +361,12 @@ func (request *AuthenticationRequest) IsForProxy() bool {
 	return _ok
 }
 
-// IsRetry: determine whether this this is a first attempt or a retry for this
+// IsRetry: determine whether this is a first attempt or a retry for this
 // authentication challenge.
 //
 // The function returns the following values:
 //
 //   - ok: TRUE if authentication attempt is a retry or FALSE otherwise.
-//
 func (request *AuthenticationRequest) IsRetry() bool {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _cret C.gboolean                     // in
@@ -408,7 +397,6 @@ func (request *AuthenticationRequest) IsRetry() bool {
 // The function takes the following parameters:
 //
 //   - enabled: value to set.
-//
 func (request *AuthenticationRequest) SetCanSaveCredentials(enabled bool) {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _arg1 C.gboolean                     // out
@@ -436,7 +424,6 @@ func (request *AuthenticationRequest) SetCanSaveCredentials(enabled bool) {
 // The function takes the following parameters:
 //
 //   - credential or NULL.
-//
 func (request *AuthenticationRequest) SetProposedCredential(credential *Credential) {
 	var _arg0 *C.WebKitAuthenticationRequest // out
 	var _arg1 *C.WebKitCredential            // out

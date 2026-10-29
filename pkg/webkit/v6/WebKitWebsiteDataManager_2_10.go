@@ -3,18 +3,24 @@
 package webkit
 
 import (
+	"context"
 	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
+	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit/webkit.h>
+// extern void _gotk4_webkit6_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
 import "C"
 
 // GType values.
@@ -40,7 +46,7 @@ func defaultWebsiteDataManagerOverrides(v *WebsiteDataManager) WebsiteDataManage
 //
 // You can use WebKitWebsiteDataManager to configure the local directories where
 // website data will be stored. Use KitWebsiteDataManager:base-data-directory
-// and KitWebsiteDataManager:base-cache-directory set a common base directory
+// and KitWebsiteDataManager:base-cache-directory to set a common base directory
 // for all website data and caches.
 //
 // A WebKitWebsiteDataManager can be ephemeral, in which case all the
@@ -86,13 +92,60 @@ func marshalWebsiteDataManager(p uintptr) (interface{}, error) {
 	return wrapWebsiteDataManager(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+// Clear: asynchronously clear the website data of the given types modified in
+// the past timespan.
+//
+// If timespan is 0, all website data will be removed.
+//
+// When the operation is finished, callback will be called. You can then
+// call webkit_website_data_manager_clear_finish() to get the result of the
+// operation.
+//
+// Due to implementation limitations, this function does not currently delete
+// any stored cookies if timespan is nonzero. This behavior may change in the
+// future.
+//
+// The function takes the following parameters:
+//
+//   - ctx (optional) or NULL to ignore.
+//   - types: KitWebsiteDataTypes.
+//   - timespan: Span.
+//   - callback (optional) to call when the request is satisfied.
+func (manager *WebsiteDataManager) Clear(ctx context.Context, types WebsiteDataTypes, timespan glib.TimeSpan, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebsiteDataManager // out
+	var _arg3 *C.GCancellable             // out
+	var _arg1 C.WebKitWebsiteDataTypes    // out
+	var _arg2 C.GTimeSpan                 // out
+	var _arg4 C.GAsyncReadyCallback       // out
+	var _arg5 C.gpointer
+
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(coreglib.InternObject(manager).Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = C.WebKitWebsiteDataTypes(types)
+	_arg2 = C.GTimeSpan(timespan)
+	if callback != nil {
+		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg5 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_website_data_manager_clear(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(types)
+	runtime.KeepAlive(timespan)
+	runtime.KeepAlive(callback)
+}
+
 // ClearFinish: finish an asynchronous operation started with
 // webkit_website_data_manager_clear().
 //
 // The function takes the following parameters:
 //
 //   - result: Result.
-//
 func (manager *WebsiteDataManager) ClearFinish(result gio.AsyncResulter) error {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 *C.GAsyncResult             // out
@@ -114,6 +167,43 @@ func (manager *WebsiteDataManager) ClearFinish(result gio.AsyncResulter) error {
 	return _goerr
 }
 
+// Fetch: asynchronously get the list of KitWebsiteData for the given types.
+//
+// When the operation is finished, callback will be called. You can then
+// call webkit_website_data_manager_fetch_finish() to get the result of the
+// operation.
+//
+// The function takes the following parameters:
+//
+//   - ctx (optional) or NULL to ignore.
+//   - types: KitWebsiteDataTypes.
+//   - callback (optional) to call when the request is satisfied.
+func (manager *WebsiteDataManager) Fetch(ctx context.Context, types WebsiteDataTypes, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebsiteDataManager // out
+	var _arg2 *C.GCancellable             // out
+	var _arg1 C.WebKitWebsiteDataTypes    // out
+	var _arg3 C.GAsyncReadyCallback       // out
+	var _arg4 C.gpointer
+
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(coreglib.InternObject(manager).Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = C.WebKitWebsiteDataTypes(types)
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_website_data_manager_fetch(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(types)
+	runtime.KeepAlive(callback)
+}
+
 // FetchFinish: finish an asynchronous operation started with
 // webkit_website_data_manager_fetch().
 //
@@ -124,9 +214,8 @@ func (manager *WebsiteDataManager) ClearFinish(result gio.AsyncResulter) error {
 // The function returns the following values:
 //
 //   - list of KitWebsiteData. You must free the #GList with g_list_free() and
-//     unref the KitWebsiteData<!-- -->s with webkit_website_data_unref() when
+//     unref the KitWebsiteData objects with webkit_website_data_unref() when
 //     you're done with them.
-//
 func (manager *WebsiteDataManager) FetchFinish(result gio.AsyncResulter) ([]*WebsiteData, error) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 *C.GAsyncResult             // out
@@ -171,7 +260,6 @@ func (manager *WebsiteDataManager) FetchFinish(result gio.AsyncResulter) ([]*Web
 //   - utf8 (optional): base directory for caches, or NULL if
 //     KitWebsiteDataManager:base-cache-directory was not provided or manager is
 //     ephemeral.
-//
 func (manager *WebsiteDataManager) BaseCacheDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
@@ -198,7 +286,6 @@ func (manager *WebsiteDataManager) BaseCacheDirectory() string {
 //   - utf8 (optional): base directory for website data, or NULL if
 //     KitWebsiteDataManager:base-data-directory was not provided or manager is
 //     ephemeral.
-//
 func (manager *WebsiteDataManager) BaseDataDirectory() string {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.gchar                    // in
@@ -222,7 +309,6 @@ func (manager *WebsiteDataManager) BaseDataDirectory() string {
 // The function returns the following values:
 //
 //   - faviconDatabase (optional) or NULL if website icons are disabled.
-//
 func (manager *WebsiteDataManager) FaviconDatabase() *FaviconDatabase {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret *C.WebKitFaviconDatabase    // in
@@ -246,7 +332,6 @@ func (manager *WebsiteDataManager) FaviconDatabase() *FaviconDatabase {
 // The function returns the following values:
 //
 //   - ok: TRUE if website icons are enabled, or FALSE otherwise.
-//
 func (manager *WebsiteDataManager) FaviconsEnabled() bool {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret C.gboolean                  // in
@@ -265,6 +350,42 @@ func (manager *WebsiteDataManager) FaviconsEnabled() bool {
 	return _ok
 }
 
+// ItpSummary: asynchronously get the list of KitITPThirdParty seen for manager.
+//
+// Every KitITPThirdParty contains the list of KitITPFirstParty under which it
+// has been seen.
+//
+// When the operation is finished, callback will be called. You can then call
+// webkit_website_data_manager_get_itp_summary_finish() to get the result of the
+// operation.
+//
+// The function takes the following parameters:
+//
+//   - ctx (optional) or NULL to ignore.
+//   - callback (optional) to call when the request is satisfied.
+func (manager *WebsiteDataManager) ItpSummary(ctx context.Context, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebsiteDataManager // out
+	var _arg1 *C.GCancellable             // out
+	var _arg2 C.GAsyncReadyCallback       // out
+	var _arg3 C.gpointer
+
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(coreglib.InternObject(manager).Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	if callback != nil {
+		_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_website_data_manager_get_itp_summary(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(callback)
+}
+
 // ItpSummaryFinish: finish an asynchronous operation started with
 // webkit_website_data_manager_get_itp_summary().
 //
@@ -275,9 +396,8 @@ func (manager *WebsiteDataManager) FaviconsEnabled() bool {
 // The function returns the following values:
 //
 //   - list of KitITPThirdParty. You must free the #GList with g_list_free() and
-//     unref the KitITPThirdParty<!-- -->s with webkit_itp_third_party_unref()
+//     unref the KitITPThirdParty objects with webkit_itp_third_party_unref()
 //     when you're done with them.
-//
 func (manager *WebsiteDataManager) ItpSummaryFinish(result gio.AsyncResulter) ([]*ITPThirdParty, error) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 *C.GAsyncResult             // out
@@ -321,7 +441,6 @@ func (manager *WebsiteDataManager) ItpSummaryFinish(result gio.AsyncResulter) ([
 // The function returns the following values:
 //
 //   - ok: TRUE if manager is ephemeral or FALSE otherwise.
-//
 func (manager *WebsiteDataManager) IsEphemeral() bool {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _cret C.gboolean                  // in
@@ -340,13 +459,64 @@ func (manager *WebsiteDataManager) IsEphemeral() bool {
 	return _ok
 }
 
+// Remove: asynchronously removes the website data in the given website_data
+// list.
+//
+// Asynchronously removes the website data of the given types for websites in
+// the given website_data list. Use webkit_website_data_manager_clear() if you
+// want to remove the website data for all sites.
+//
+// When the operation is finished, callback will be called. You can then
+// call webkit_website_data_manager_remove_finish() to get the result of the
+// operation.
+//
+// The function takes the following parameters:
+//
+//   - ctx (optional) or NULL to ignore.
+//   - types: KitWebsiteDataTypes.
+//   - websiteData of KitWebsiteData.
+//   - callback (optional) to call when the request is satisfied.
+func (manager *WebsiteDataManager) Remove(ctx context.Context, types WebsiteDataTypes, websiteData []*WebsiteData, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebsiteDataManager // out
+	var _arg3 *C.GCancellable             // out
+	var _arg1 C.WebKitWebsiteDataTypes    // out
+	var _arg2 *C.GList                    // out
+	var _arg4 C.GAsyncReadyCallback       // out
+	var _arg5 C.gpointer
+
+	_arg0 = (*C.WebKitWebsiteDataManager)(unsafe.Pointer(coreglib.InternObject(manager).Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = C.WebKitWebsiteDataTypes(types)
+	for i := len(websiteData) - 1; i >= 0; i-- {
+		src := websiteData[i]
+		var dst *C.WebKitWebsiteData // out
+		dst = (*C.WebKitWebsiteData)(gextras.StructNative(unsafe.Pointer(src)))
+		_arg2 = C.g_list_prepend(_arg2, C.gpointer(unsafe.Pointer(dst)))
+	}
+	defer C.g_list_free(_arg2)
+	if callback != nil {
+		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg5 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_website_data_manager_remove(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
+	runtime.KeepAlive(manager)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(types)
+	runtime.KeepAlive(websiteData)
+	runtime.KeepAlive(callback)
+}
+
 // RemoveFinish: finish an asynchronous operation started with
 // webkit_website_data_manager_remove().
 //
 // The function takes the following parameters:
 //
 //   - result: Result.
-//
 func (manager *WebsiteDataManager) RemoveFinish(result gio.AsyncResulter) error {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 *C.GAsyncResult             // out
@@ -377,7 +547,6 @@ func (manager *WebsiteDataManager) RemoveFinish(result gio.AsyncResulter) error 
 // The function takes the following parameters:
 //
 //   - enabled: value to set.
-//
 func (manager *WebsiteDataManager) SetFaviconsEnabled(enabled bool) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
 	var _arg1 C.gboolean                  // out

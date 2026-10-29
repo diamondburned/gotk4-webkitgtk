@@ -3,9 +3,12 @@
 package webkit2
 
 import (
+	"context"
 	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
@@ -20,6 +23,8 @@ import (
 // extern void _gotk4_webkit24_WebResource_ConnectFinished(gpointer, guintptr);
 // extern void _gotk4_webkit24_WebResource_ConnectFailedWithTLSErrors(gpointer, GTlsCertificate*, GTlsCertificateFlags, guintptr);
 // extern void _gotk4_webkit24_WebResource_ConnectFailed(gpointer, GError*, guintptr);
+// extern void _gotk4_webkit24_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
 import "C"
 
 // GType values.
@@ -108,7 +113,7 @@ func (resource *WebResource) ConnectFinished(f func()) coreglib.SignalHandle {
 // every time new data has been received. It's useful to know the progress of
 // the resource load operation.
 //
-// This is signal is deprecated since version 2.40 and it's never emitted.
+// This signal is deprecated since version 2.40 and it's never emitted.
 func (resource *WebResource) ConnectReceivedData(f func(dataLength uint64)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(resource, "received-data", false, unsafe.Pointer(C._gotk4_webkit24_WebResource_ConnectReceivedData), f)
 }
@@ -122,6 +127,38 @@ func (resource *WebResource) ConnectSentRequest(f func(request *URIRequest, redi
 	return coreglib.ConnectGeneratedClosure(resource, "sent-request", false, unsafe.Pointer(C._gotk4_webkit24_WebResource_ConnectSentRequest), f)
 }
 
+// Data: asynchronously get the raw data for resource.
+//
+// When the operation is finished, callback will be called. You can then call
+// webkit_web_resource_get_data_finish() to get the result of the operation.
+//
+// The function takes the following parameters:
+//
+//   - ctx (optional) or NULL to ignore.
+//   - callback (optional) to call when the request is satisfied.
+func (resource *WebResource) Data(ctx context.Context, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitWebResource  // out
+	var _arg1 *C.GCancellable       // out
+	var _arg2 C.GAsyncReadyCallback // out
+	var _arg3 C.gpointer
+
+	_arg0 = (*C.WebKitWebResource)(unsafe.Pointer(coreglib.InternObject(resource).Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	if callback != nil {
+		_arg2 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg3 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_web_resource_get_data(_arg0, _arg1, _arg2, _arg3)
+	runtime.KeepAlive(resource)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(callback)
+}
+
 // DataFinish: finish an asynchronous operation started with
 // webkit_web_resource_get_data().
 //
@@ -132,8 +169,7 @@ func (resource *WebResource) ConnectSentRequest(f func(request *URIRequest, redi
 // The function returns the following values:
 //
 //   - guint8s: a string with the data of resource, or NULL in case of error.
-//     if length is not NULL, the size of the data will be assigned to it.
-//
+//     If length is not NULL, the size of the data will be assigned to it.
 func (resource *WebResource) DataFinish(result gio.AsyncResulter) ([]byte, error) {
 	var _arg0 *C.WebKitWebResource // out
 	var _arg1 *C.GAsyncResult      // out
@@ -170,7 +206,6 @@ func (resource *WebResource) DataFinish(result gio.AsyncResulter) ([]byte, error
 // The function returns the following values:
 //
 //   - uriResponse or NULL if the response hasn't been received yet.
-//
 func (resource *WebResource) Response() *URIResponse {
 	var _arg0 *C.WebKitWebResource // out
 	var _cret *C.WebKitURIResponse // in
@@ -191,16 +226,14 @@ func (resource *WebResource) Response() *URIResponse {
 //
 // The active URI might change during a load operation:
 //
-// <orderedlist> <listitem><para> When the resource load starts, the active URI
-// is the requested URI </para></listitem> <listitem><para> When the initial
-// request is sent to the server, KitWebResource::sent-request signal is emitted
-// without a redirected response, the active URI is the URI of the request
-// sent to the server. </para></listitem> <listitem><para> In case of a server
-// redirection, KitWebResource::sent-request signal is emitted again with a
-// redirected response, the active URI is the URI the request was redirected to.
-// </para></listitem> <listitem><para> When the response is received from
-// the server, the active URI is the final one and it will not change again.
-// </para></listitem> </orderedlist>
+// 1. When the resource load starts, the active URI is the requested URI 2.
+// When the initial request is sent to the server, KitWebResource::sent-request
+// signal is emitted without a redirected response, the active URI is the URI
+// of the request sent to the server. 3. In case of a server redirection,
+// KitWebResource::sent-request signal is emitted again with a redirected
+// response, the active URI is the URI the request was redirected to. 4. When
+// the response is received from the server, the active URI is the final one and
+// it will not change again.
 //
 // You can monitor the active URI by connecting to the notify::uri signal of
 // resource.
@@ -208,7 +241,6 @@ func (resource *WebResource) Response() *URIResponse {
 // The function returns the following values:
 //
 //   - utf8: current active URI of resource.
-//
 func (resource *WebResource) URI() string {
 	var _arg0 *C.WebKitWebResource // out
 	var _cret *C.gchar             // in

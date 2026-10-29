@@ -109,7 +109,7 @@ func (decision *PolicyDecision) Download() {
 	runtime.KeepAlive(decision)
 }
 
-// Ignore this would cancel the request.
+// Ignore the action which triggered this decision.
 //
 // Ignore the action which triggered this decision. For instance, for a
 // KitResponsePolicyDecision, this would cancel the request.
@@ -140,13 +140,12 @@ func (decision *PolicyDecision) Use() {
 // with the accepted navigation action.
 //
 // For example, a navigation decision to a video sharing website may be accepted
-// under the priviso no movies are allowed to autoplay. The autoplay policy in
+// under the proviso no movies are allowed to autoplay. The autoplay policy in
 // this case would be set in the policies.
 //
 // The function takes the following parameters:
 //
 //   - policies: KitWebsitePolicies.
-//
 func (decision *PolicyDecision) UseWithPolicies(policies *WebsitePolicies) {
 	var _arg0 *C.WebKitPolicyDecision  // out
 	var _arg1 *C.WebKitWebsitePolicies // out

@@ -86,7 +86,6 @@ func marshalDOMHTMLLabelElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - domhtmlFormElement: KitDOMHTMLFormElement.
-//
 func (self *DOMHTMLLabelElement) Form() *DOMHTMLFormElement {
 	var _arg0 *C.WebKitDOMHTMLLabelElement // out
 	var _cret *C.WebKitDOMHTMLFormElement  // in
@@ -108,7 +107,6 @@ func (self *DOMHTMLLabelElement) Form() *DOMHTMLFormElement {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLLabelElement) HtmlFor() string {
 	var _arg0 *C.WebKitDOMHTMLLabelElement // out
 	var _cret *C.gchar                     // in
@@ -131,7 +129,6 @@ func (self *DOMHTMLLabelElement) HtmlFor() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLLabelElement) SetHtmlFor(value string) {
 	var _arg0 *C.WebKitDOMHTMLLabelElement // out
 	var _arg1 *C.gchar                     // out

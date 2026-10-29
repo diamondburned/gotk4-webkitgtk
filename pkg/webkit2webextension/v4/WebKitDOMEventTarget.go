@@ -19,9 +19,6 @@ import (
 // gboolean _gotk4_webkit2webextension4_DOMEventTarget_virtual_dispatch_event(void* fnptr, WebKitDOMEventTarget* arg0, WebKitDOMEvent* arg1, GError** arg2) {
 //   return ((gboolean (*)(WebKitDOMEventTarget*, WebKitDOMEvent*, GError**))(fnptr))(arg0, arg1, arg2);
 // };
-// gboolean _gotk4_webkit2webextension4_DOMEventTarget_virtual_remove_event_listener(void* fnptr, WebKitDOMEventTarget* arg0, char* arg1, GClosure* arg2, gboolean arg3) {
-//   return ((gboolean (*)(WebKitDOMEventTarget*, char*, GClosure*, gboolean))(fnptr))(arg0, arg1, arg2, arg3);
-// };
 import "C"
 
 // GType values.
@@ -52,14 +49,14 @@ type DOMEventTargetter interface {
 	coreglib.Objector
 
 	// AddEventListener: version of webkit_dom_event_target_add_event_listener()
-	// using a closure instead of a callbacks for easier binding in other
+	// using a closure instead of callbacks for easier binding in other
 	// languages.
 	AddEventListener(eventName string, handler coreglib.AnyClosure, useCapture bool) bool
 	// DispatchEvent: deprecated: Use JavaScriptCore API instead.
 	DispatchEvent(event *DOMEvent) error
 	// RemoveEventListener: version of
 	// webkit_dom_event_target_remove_event_listener() using a closure instead
-	// of a callbacks for easier binding in other languages.
+	// of callbacks for easier binding in other languages.
 	RemoveEventListener(eventName string, handler coreglib.AnyClosure, useCapture bool) bool
 }
 
@@ -76,7 +73,7 @@ func marshalDOMEventTarget(p uintptr) (interface{}, error) {
 }
 
 // AddEventListener: version of webkit_dom_event_target_add_event_listener()
-// using a closure instead of a callbacks for easier binding in other languages.
+// using a closure instead of callbacks for easier binding in other languages.
 //
 // Deprecated: Use JavaScriptCore API instead.
 //
@@ -89,7 +86,6 @@ func marshalDOMEventTarget(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (target *DOMEventTarget) AddEventListener(eventName string, handler coreglib.AnyClosure, useCapture bool) bool {
 	var _arg0 *C.WebKitDOMEventTarget // out
 	var _arg1 *C.char                 // out
@@ -125,7 +121,6 @@ func (target *DOMEventTarget) AddEventListener(eventName string, handler coregli
 // The function takes the following parameters:
 //
 //   - event: KitDOMEvent.
-//
 func (target *DOMEventTarget) DispatchEvent(event *DOMEvent) error {
 	var _arg0 *C.WebKitDOMEventTarget // out
 	var _arg1 *C.WebKitDOMEvent       // out
@@ -148,7 +143,7 @@ func (target *DOMEventTarget) DispatchEvent(event *DOMEvent) error {
 }
 
 // RemoveEventListener: version of
-// webkit_dom_event_target_remove_event_listener() using a closure instead of a
+// webkit_dom_event_target_remove_event_listener() using a closure instead of
 // callbacks for easier binding in other languages.
 //
 // Deprecated: Use JavaScriptCore API instead.
@@ -162,7 +157,6 @@ func (target *DOMEventTarget) DispatchEvent(event *DOMEvent) error {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (target *DOMEventTarget) RemoveEventListener(eventName string, handler coreglib.AnyClosure, useCapture bool) bool {
 	var _arg0 *C.WebKitDOMEventTarget // out
 	var _arg1 *C.char                 // out
@@ -198,9 +192,6 @@ func (target *DOMEventTarget) RemoveEventListener(eventName string, handler core
 //   - eventName
 //   - handler
 //   - useCapture
-//
-// The function returns the following values:
-//
 func (target *DOMEventTarget) addEventListener(eventName string, handler coreglib.AnyClosure, useCapture bool) bool {
 	gclass := (*C.WebKitDOMEventTargetIface)(coreglib.PeekParentClass(target))
 	fnarg := gclass.add_event_listener
@@ -239,7 +230,6 @@ func (target *DOMEventTarget) addEventListener(eventName string, handler coregli
 // The function takes the following parameters:
 //
 //   - event: KitDOMEvent.
-//
 func (target *DOMEventTarget) dispatchEvent(event *DOMEvent) error {
 	gclass := (*C.WebKitDOMEventTargetIface)(coreglib.PeekParentClass(target))
 	fnarg := gclass.dispatch_event
@@ -262,51 +252,6 @@ func (target *DOMEventTarget) dispatchEvent(event *DOMEvent) error {
 	}
 
 	return _goerr
-}
-
-// removeEventListener: deprecated: Use JavaScriptCore API instead.
-//
-// The function takes the following parameters:
-//
-//   - eventName: #gchar.
-//   - handler: #GCallback.
-//   - useCapture: #gboolean.
-//
-// The function returns the following values:
-//
-//   - ok: #gboolean.
-//
-func (target *DOMEventTarget) removeEventListener(eventName string, handler coreglib.AnyClosure, useCapture bool) bool {
-	gclass := (*C.WebKitDOMEventTargetIface)(coreglib.PeekParentClass(target))
-	fnarg := gclass.remove_event_listener
-
-	var _arg0 *C.WebKitDOMEventTarget // out
-	var _arg1 *C.char                 // out
-	var _arg2 *C.GClosure             // out
-	var _arg3 C.gboolean              // out
-	var _cret C.gboolean              // in
-
-	_arg0 = (*C.WebKitDOMEventTarget)(unsafe.Pointer(coreglib.InternObject(target).Native()))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(eventName)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.GClosure)(coreglib.NewClosure(coreglib.InternObject(target), handler))
-	if useCapture {
-		_arg3 = C.TRUE
-	}
-
-	_cret = C._gotk4_webkit2webextension4_DOMEventTarget_virtual_remove_event_listener(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2, _arg3)
-	runtime.KeepAlive(target)
-	runtime.KeepAlive(eventName)
-	runtime.KeepAlive(handler)
-	runtime.KeepAlive(useCapture)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
 }
 
 // DOMEventTargetIface: instance of this type is always passed by reference.

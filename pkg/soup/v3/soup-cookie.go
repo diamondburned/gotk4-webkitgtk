@@ -31,7 +31,7 @@ func init() {
 // COOKIE_MAX_AGE_ONE_DAY: constant corresponding to 1 day.
 //
 // For use with cookie.New and cookie.SetMaxAge.
-const COOKIE_MAX_AGE_ONE_DAY = 0
+const COOKIE_MAX_AGE_ONE_DAY = 86400
 
 // COOKIE_MAX_AGE_ONE_HOUR: constant corresponding to 1 hour.
 //
@@ -41,12 +41,12 @@ const COOKIE_MAX_AGE_ONE_HOUR = 3600
 // COOKIE_MAX_AGE_ONE_WEEK: constant corresponding to 1 week.
 //
 // For use with cookie.New and cookie.SetMaxAge.
-const COOKIE_MAX_AGE_ONE_WEEK = 0
+const COOKIE_MAX_AGE_ONE_WEEK = 604800
 
 // COOKIE_MAX_AGE_ONE_YEAR: constant corresponding to 1 year.
 //
 // For use with cookie.New and cookie.SetMaxAge.
-const COOKIE_MAX_AGE_ONE_YEAR = 0
+const COOKIE_MAX_AGE_ONE_YEAR = 31556926.08
 
 // SameSitePolicy represents the same-site policies of a cookie.
 type SameSitePolicy C.gint
@@ -84,7 +84,7 @@ func (s SameSitePolicy) String() string {
 // glib.SList of SoupCookies.
 //
 // As the "Cookie" header, unlike "Set-Cookie", only contains cookie names
-// and values, none of the other Cookie fields will be filled in. (Thus,
+// and values, none of the other cookie fields will be filled in. (Thus,
 // you can't generally pass a cookie returned from this method directly to
 // cookies_to_response.).
 //
@@ -95,7 +95,6 @@ func (s SameSitePolicy) String() string {
 // The function returns the following values:
 //
 //   - sList of SoupCookies, which can be freed with cookie.Free.
-//
 func CookiesFromRequest(msg *Message) []*Cookie {
 	var _arg1 *C.SoupMessage // out
 	var _cret *C.GSList      // in
@@ -137,7 +136,6 @@ func CookiesFromRequest(msg *Message) []*Cookie {
 // The function returns the following values:
 //
 //   - sList of SoupCookies, which can be freed with cookie.Free.
-//
 func CookiesFromResponse(msg *Message) []*Cookie {
 	var _arg1 *C.SoupMessage // out
 	var _cret *C.GSList      // in
@@ -166,17 +164,16 @@ func CookiesFromResponse(msg *Message) []*Cookie {
 	return _sList
 }
 
-// CookiesToCookieHeader serializes a glib.SList of Cookie into a string
+// CookiesToCookieHeader serializes a glib.SList of cookie into a string
 // suitable for setting as the value of the "Cookie" header.
 //
 // The function takes the following parameters:
 //
-//   - cookies of Cookie.
+//   - cookies of cookie.
 //
 // The function returns the following values:
 //
 //   - utf8: serialization of cookies.
-//
 func CookiesToCookieHeader(cookies []*Cookie) string {
 	var _arg1 *C.GSList // out
 	var _cret *C.char   // in
@@ -209,9 +206,8 @@ func CookiesToCookieHeader(cookies []*Cookie) string {
 //
 // The function takes the following parameters:
 //
-//   - cookies of Cookie.
+//   - cookies of cookie.
 //   - msg: Message.
-//
 func CookiesToRequest(cookies []*Cookie, msg *Message) {
 	var _arg1 *C.GSList      // out
 	var _arg2 *C.SoupMessage // out
@@ -237,9 +233,8 @@ func CookiesToRequest(cookies []*Cookie, msg *Message) {
 //
 // The function takes the following parameters:
 //
-//   - cookies of Cookie.
+//   - cookies of cookie.
 //   - msg: Message.
-//
 func CookiesToResponse(cookies []*Cookie, msg *Message) {
 	var _arg1 *C.GSList      // out
 	var _arg2 *C.SoupMessage // out
@@ -258,13 +253,13 @@ func CookiesToResponse(cookies []*Cookie, msg *Message) {
 	runtime.KeepAlive(msg)
 }
 
-// CookieParse parses header and returns a Cookie.
+// CookieParse parses header and returns a cookie.
 //
 // If header contains multiple cookies, only the first one will be parsed.
 //
 // If header does not have "path" or "domain" attributes, they will be defaulted
 // from origin. If origin is NULL, path will default to "/", but domain will
-// be left as NULL. Note that this is not a valid state for a Cookie, and you
+// be left as NULL. Note that this is not a valid state for a cookie, and you
 // will need to fill in some appropriate string for the domain if you want to
 // actually make use of the cookie.
 //
@@ -281,7 +276,6 @@ func CookiesToResponse(cookies []*Cookie, msg *Message) {
 //   - cookie (optional): new Cookie, or NULL if it could not be parsed,
 //     or contained an illegal "domain" attribute for a cookie originating from
 //     origin.
-//
 func CookieParse(header string, origin *glib.URI) *Cookie {
 	var _arg1 *C.char       // out
 	var _arg2 *C.GUri       // out

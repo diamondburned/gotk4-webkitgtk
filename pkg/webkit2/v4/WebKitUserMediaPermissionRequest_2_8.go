@@ -36,7 +36,6 @@ func init() {
 // The function returns the following values:
 //
 //   - ok: TRUE if access to an audio device was requested.
-//
 func UserMediaPermissionIsForAudioDevice(request *UserMediaPermissionRequest) bool {
 	var _arg1 *C.WebKitUserMediaPermissionRequest // out
 	var _cret C.gboolean                          // in
@@ -65,7 +64,6 @@ func UserMediaPermissionIsForAudioDevice(request *UserMediaPermissionRequest) bo
 // The function returns the following values:
 //
 //   - ok: TRUE if access to a video device was requested.
-//
 func UserMediaPermissionIsForVideoDevice(request *UserMediaPermissionRequest) bool {
 	var _arg1 *C.WebKitUserMediaPermissionRequest // out
 	var _cret C.gboolean                          // in

@@ -73,7 +73,6 @@ func (d DownloadError) String() string {
 // The function returns the following values:
 //
 //   - quark: download error domain.
-//
 func DownloadErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -81,9 +80,7 @@ func DownloadErrorQuark() glib.Quark {
 
 	var _quark glib.Quark // out
 
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
+	_quark = glib.Quark(_cret)
 
 	return _quark
 }
@@ -97,7 +94,7 @@ const (
 	// execution.
 	JavascriptErrorScriptFailed JavascriptError = 699
 	// JavascriptErrorInvalidParameter: unsupported parameter has been used to
-	// call and async function from API. Since 2.40.
+	// call an async function from API. Since 2.40.
 	JavascriptErrorInvalidParameter JavascriptError = 600
 	// JavascriptErrorInvalidResult: result of JavaScript execution could not be
 	// returned. Since 2.40.
@@ -127,7 +124,6 @@ func (j JavascriptError) String() string {
 // The function returns the following values:
 //
 //   - quark: javaScript error domain.
-//
 func JavascriptErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -135,9 +131,7 @@ func JavascriptErrorQuark() glib.Quark {
 
 	var _quark glib.Quark // out
 
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
+	_quark = glib.Quark(_cret)
 
 	return _quark
 }
@@ -185,7 +179,6 @@ func (n NetworkError) String() string {
 // The function returns the following values:
 //
 //   - quark: network error domain.
-//
 func NetworkErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -193,9 +186,7 @@ func NetworkErrorQuark() glib.Quark {
 
 	var _quark glib.Quark // out
 
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
+	_quark = glib.Quark(_cret)
 
 	return _quark
 }
@@ -252,7 +243,6 @@ func (p PluginError) String() string {
 // The function returns the following values:
 //
 //   - quark: plug-in error domain.
-//
 func PluginErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -260,9 +250,7 @@ func PluginErrorQuark() glib.Quark {
 
 	var _quark glib.Quark // out
 
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
+	_quark = glib.Quark(_cret)
 
 	return _quark
 }
@@ -311,7 +299,6 @@ func (p PolicyError) String() string {
 // The function returns the following values:
 //
 //   - quark: policy error domain.
-//
 func PolicyErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -319,9 +306,7 @@ func PolicyErrorQuark() glib.Quark {
 
 	var _quark glib.Quark // out
 
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
+	_quark = glib.Quark(_cret)
 
 	return _quark
 }
@@ -361,7 +346,6 @@ func (p PrintError) String() string {
 // The function returns the following values:
 //
 //   - quark: print error domain.
-//
 func PrintErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -369,9 +353,7 @@ func PrintErrorQuark() glib.Quark {
 
 	var _quark glib.Quark // out
 
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
+	_quark = glib.Quark(_cret)
 
 	return _quark
 }
@@ -405,7 +387,6 @@ func (s SnapshotError) String() string {
 // The function returns the following values:
 //
 //   - quark: snapshot error domain.
-//
 func SnapshotErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -413,9 +394,7 @@ func SnapshotErrorQuark() glib.Quark {
 
 	var _quark glib.Quark // out
 
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
+	_quark = glib.Quark(_cret)
 
 	return _quark
 }
@@ -426,7 +405,6 @@ func SnapshotErrorQuark() glib.Quark {
 // The function returns the following values:
 //
 //   - quark: user content filter error domain.
-//
 func UserContentFilterErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -434,9 +412,7 @@ func UserContentFilterErrorQuark() glib.Quark {
 
 	var _quark glib.Quark // out
 
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
+	_quark = glib.Quark(_cret)
 
 	return _quark
 }

@@ -16,7 +16,7 @@ func _gotk4_webkit2webextension4_WebEditor_ConnectSelectionChanged(arg0 C.gpoint
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

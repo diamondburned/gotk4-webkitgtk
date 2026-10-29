@@ -48,7 +48,6 @@ type WebsocketExtensionOverrides struct {
 	//   - connectionType: either SOUP_WEBSOCKET_CONNECTION_CLIENT or
 	//     SOUP_WEBSOCKET_CONNECTION_SERVER.
 	//   - params (optional): parameters.
-	//
 	Configure func(connectionType WebsocketConnectionType, params map[unsafe.Pointer]unsafe.Pointer) error
 	// RequestParams: get the parameters strings to be included in the request
 	// header.
@@ -59,7 +58,6 @@ type WebsocketExtensionOverrides struct {
 	// The function returns the following values:
 	//
 	//   - utf8 (optional): new allocated string with the parameters.
-	//
 	RequestParams func() string
 	// ResponseParams: get the parameters strings to be included in the response
 	// header.
@@ -70,7 +68,6 @@ type WebsocketExtensionOverrides struct {
 	// The function returns the following values:
 	//
 	//   - utf8 (optional): new allocated string with the parameters.
-	//
 	ResponseParams func() string
 }
 
@@ -84,7 +81,7 @@ func defaultWebsocketExtensionOverrides(v *WebsocketExtension) WebsocketExtensio
 
 // WebsocketExtension: webSocket extension
 //
-// WebsocketExtension is the base class for WebSocket extension objects.
+// websocketextension is the base class for WebSocket extension objects.
 type WebsocketExtension struct {
 	_ [0]func() // equal guard
 	*coreglib.Object
@@ -161,7 +158,6 @@ func BaseWebsocketExtension(obj WebsocketExtensioner) *WebsocketExtension {
 //   - connectionType: either SOUP_WEBSOCKET_CONNECTION_CLIENT or
 //     SOUP_WEBSOCKET_CONNECTION_SERVER.
 //   - params (optional): parameters.
-//
 func (extension *WebsocketExtension) Configure(connectionType WebsocketConnectionType, params map[unsafe.Pointer]unsafe.Pointer) error {
 	var _arg0 *C.SoupWebsocketExtension     // out
 	var _arg1 C.SoupWebsocketConnectionType // out
@@ -173,10 +169,10 @@ func (extension *WebsocketExtension) Configure(connectionType WebsocketConnectio
 	if params != nil {
 		_arg2 = C.g_hash_table_new_full(nil, nil, (*[0]byte)(C.free), (*[0]byte)(C.free))
 		for ksrc, vsrc := range params {
-			var kdst *C.gpointer // out
-			var vdst *C.gpointer // out
-			kdst = (*C.gpointer)(unsafe.Pointer(ksrc))
-			vdst = (*C.gpointer)(unsafe.Pointer(vsrc))
+			var kdst C.gpointer // out
+			var vdst C.gpointer // out
+			kdst = (C.gpointer)(unsafe.Pointer(ksrc))
+			vdst = (C.gpointer)(unsafe.Pointer(vsrc))
 			C.g_hash_table_insert(_arg2, C.gpointer(unsafe.Pointer(kdst)), C.gpointer(unsafe.Pointer(vdst)))
 		}
 		defer C.g_hash_table_unref(_arg2)
@@ -205,7 +201,6 @@ func (extension *WebsocketExtension) Configure(connectionType WebsocketConnectio
 // The function returns the following values:
 //
 //   - utf8 (optional): new allocated string with the parameters.
-//
 func (extension *WebsocketExtension) RequestParams() string {
 	var _arg0 *C.SoupWebsocketExtension // out
 	var _cret *C.char                   // in
@@ -234,7 +229,6 @@ func (extension *WebsocketExtension) RequestParams() string {
 // The function returns the following values:
 //
 //   - utf8 (optional): new allocated string with the parameters.
-//
 func (extension *WebsocketExtension) ResponseParams() string {
 	var _arg0 *C.SoupWebsocketExtension // out
 	var _cret *C.char                   // in
@@ -261,7 +255,6 @@ func (extension *WebsocketExtension) ResponseParams() string {
 //   - connectionType: either SOUP_WEBSOCKET_CONNECTION_CLIENT or
 //     SOUP_WEBSOCKET_CONNECTION_SERVER.
 //   - params (optional): parameters.
-//
 func (extension *WebsocketExtension) configure(connectionType WebsocketConnectionType, params map[unsafe.Pointer]unsafe.Pointer) error {
 	gclass := (*C.SoupWebsocketExtensionClass)(coreglib.PeekParentClass(extension))
 	fnarg := gclass.configure
@@ -276,10 +269,10 @@ func (extension *WebsocketExtension) configure(connectionType WebsocketConnectio
 	if params != nil {
 		_arg2 = C.g_hash_table_new_full(nil, nil, (*[0]byte)(C.free), (*[0]byte)(C.free))
 		for ksrc, vsrc := range params {
-			var kdst *C.gpointer // out
-			var vdst *C.gpointer // out
-			kdst = (*C.gpointer)(unsafe.Pointer(ksrc))
-			vdst = (*C.gpointer)(unsafe.Pointer(vsrc))
+			var kdst C.gpointer // out
+			var vdst C.gpointer // out
+			kdst = (C.gpointer)(unsafe.Pointer(ksrc))
+			vdst = (C.gpointer)(unsafe.Pointer(vsrc))
 			C.g_hash_table_insert(_arg2, C.gpointer(unsafe.Pointer(kdst)), C.gpointer(unsafe.Pointer(vdst)))
 		}
 		defer C.g_hash_table_unref(_arg2)
@@ -308,7 +301,6 @@ func (extension *WebsocketExtension) configure(connectionType WebsocketConnectio
 // The function returns the following values:
 //
 //   - utf8 (optional): new allocated string with the parameters.
-//
 func (extension *WebsocketExtension) requestParams() string {
 	gclass := (*C.SoupWebsocketExtensionClass)(coreglib.PeekParentClass(extension))
 	fnarg := gclass.get_request_params
@@ -340,7 +332,6 @@ func (extension *WebsocketExtension) requestParams() string {
 // The function returns the following values:
 //
 //   - utf8 (optional): new allocated string with the parameters.
-//
 func (extension *WebsocketExtension) responseParams() string {
 	gclass := (*C.SoupWebsocketExtensionClass)(coreglib.PeekParentClass(extension))
 	fnarg := gclass.get_response_params
@@ -363,7 +354,7 @@ func (extension *WebsocketExtension) responseParams() string {
 	return _utf8
 }
 
-// WebsocketExtensionClass class structure for the WebsocketExtension.
+// WebsocketExtensionClass class structure for the websocketextension.
 //
 // An instance of this type is always passed by reference.
 type WebsocketExtensionClass struct {

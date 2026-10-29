@@ -86,7 +86,6 @@ func marshalDOMHTMLEmbedElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLEmbedElement) Align() string {
 	var _arg0 *C.WebKitDOMHTMLEmbedElement // out
 	var _cret *C.gchar                     // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLEmbedElement) Align() string {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLEmbedElement) Height() int32 {
 	var _arg0 *C.WebKitDOMHTMLEmbedElement // out
 	var _cret C.glong                      // in
@@ -131,7 +129,6 @@ func (self *DOMHTMLEmbedElement) Height() int32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLEmbedElement) Name() string {
 	var _arg0 *C.WebKitDOMHTMLEmbedElement // out
 	var _cret *C.gchar                     // in
@@ -154,7 +151,6 @@ func (self *DOMHTMLEmbedElement) Name() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLEmbedElement) Src() string {
 	var _arg0 *C.WebKitDOMHTMLEmbedElement // out
 	var _cret *C.gchar                     // in
@@ -177,7 +173,6 @@ func (self *DOMHTMLEmbedElement) Src() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLEmbedElement) TypeAttr() string {
 	var _arg0 *C.WebKitDOMHTMLEmbedElement // out
 	var _cret *C.gchar                     // in
@@ -200,7 +195,6 @@ func (self *DOMHTMLEmbedElement) TypeAttr() string {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLEmbedElement) Width() int32 {
 	var _arg0 *C.WebKitDOMHTMLEmbedElement // out
 	var _cret C.glong                      // in
@@ -222,7 +216,6 @@ func (self *DOMHTMLEmbedElement) Width() int32 {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLEmbedElement) SetAlign(value string) {
 	var _arg0 *C.WebKitDOMHTMLEmbedElement // out
 	var _arg1 *C.gchar                     // out
@@ -241,7 +234,6 @@ func (self *DOMHTMLEmbedElement) SetAlign(value string) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLEmbedElement) SetHeight(value int32) {
 	var _arg0 *C.WebKitDOMHTMLEmbedElement // out
 	var _arg1 C.glong                      // out
@@ -259,7 +251,6 @@ func (self *DOMHTMLEmbedElement) SetHeight(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLEmbedElement) SetName(value string) {
 	var _arg0 *C.WebKitDOMHTMLEmbedElement // out
 	var _arg1 *C.gchar                     // out
@@ -278,7 +269,6 @@ func (self *DOMHTMLEmbedElement) SetName(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLEmbedElement) SetSrc(value string) {
 	var _arg0 *C.WebKitDOMHTMLEmbedElement // out
 	var _arg1 *C.gchar                     // out
@@ -297,7 +287,6 @@ func (self *DOMHTMLEmbedElement) SetSrc(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLEmbedElement) SetTypeAttr(value string) {
 	var _arg0 *C.WebKitDOMHTMLEmbedElement // out
 	var _arg1 *C.gchar                     // out
@@ -316,7 +305,6 @@ func (self *DOMHTMLEmbedElement) SetTypeAttr(value string) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLEmbedElement) SetWidth(value int32) {
 	var _arg0 *C.WebKitDOMHTMLEmbedElement // out
 	var _arg1 C.glong                      // out

@@ -100,7 +100,6 @@ func (self *DOMElement) Blur() {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMElement) Closest(selectors string) (*DOMElement, error) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -145,7 +144,6 @@ func (self *DOMElement) Focus() {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMElement) Attribute(name string) string {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -176,7 +174,6 @@ func (self *DOMElement) Attribute(name string) string {
 // The function returns the following values:
 //
 //   - domAttr: KitDOMAttr.
-//
 func (self *DOMElement) AttributeNode(name string) *DOMAttr {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -207,7 +204,6 @@ func (self *DOMElement) AttributeNode(name string) *DOMAttr {
 // The function returns the following values:
 //
 //   - domAttr: KitDOMAttr.
-//
 func (self *DOMElement) AttributeNodeNs(namespaceURI, localName string) *DOMAttr {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -242,7 +238,6 @@ func (self *DOMElement) AttributeNodeNs(namespaceURI, localName string) *DOMAttr
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMElement) AttributeNs(namespaceURI, localName string) string {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -273,7 +268,6 @@ func (self *DOMElement) AttributeNs(namespaceURI, localName string) string {
 // The function returns the following values:
 //
 //   - domNamedNodeMap: KitDOMNamedNodeMap.
-//
 func (self *DOMElement) Attributes() *DOMNamedNodeMap {
 	var _arg0 *C.WebKitDOMElement      // out
 	var _cret *C.WebKitDOMNamedNodeMap // in
@@ -298,7 +292,6 @@ func (self *DOMElement) Attributes() *DOMNamedNodeMap {
 // The function returns the following values:
 //
 //   - domClientRect: KitDOMClientRect.
-//
 func (self *DOMElement) BoundingClientRect() *DOMClientRect {
 	var _arg0 *C.WebKitDOMElement    // out
 	var _cret *C.WebKitDOMClientRect // in
@@ -320,7 +313,6 @@ func (self *DOMElement) BoundingClientRect() *DOMClientRect {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMElement) ChildElementCount() uint32 {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret C.gulong            // in
@@ -342,7 +334,6 @@ func (self *DOMElement) ChildElementCount() uint32 {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMElement) Children() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMElement        // out
 	var _cret *C.WebKitDOMHTMLCollection // in
@@ -364,7 +355,6 @@ func (self *DOMElement) Children() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - domdomTokenList: KitDOMDOMTokenList.
-//
 func (self *DOMElement) ClassList() *DOMDOMTokenList {
 	var _arg0 *C.WebKitDOMElement      // out
 	var _cret *C.WebKitDOMDOMTokenList // in
@@ -386,7 +376,6 @@ func (self *DOMElement) ClassList() *DOMDOMTokenList {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMElement) ClassName() string {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret *C.gchar            // in
@@ -409,7 +398,6 @@ func (self *DOMElement) ClassName() string {
 // The function returns the following values:
 //
 //   - gdouble: #gdouble.
-//
 func (self *DOMElement) ClientHeight() float64 {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret C.gdouble           // in
@@ -431,7 +419,6 @@ func (self *DOMElement) ClientHeight() float64 {
 // The function returns the following values:
 //
 //   - gdouble: #gdouble.
-//
 func (self *DOMElement) ClientLeft() float64 {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret C.gdouble           // in
@@ -449,14 +436,13 @@ func (self *DOMElement) ClientLeft() float64 {
 }
 
 // ClientRects returns a collection of KitDOMClientRect objects, each of which
-// describe the size and position of a CSS border box relative to the viewport.
+// describes the size and position of a CSS border box relative to the viewport.
 //
 // Deprecated: Use JavaScriptCore API instead.
 //
 // The function returns the following values:
 //
 //   - domClientRectList: KitDOMClientRectList.
-//
 func (self *DOMElement) ClientRects() *DOMClientRectList {
 	var _arg0 *C.WebKitDOMElement        // out
 	var _cret *C.WebKitDOMClientRectList // in
@@ -478,7 +464,6 @@ func (self *DOMElement) ClientRects() *DOMClientRectList {
 // The function returns the following values:
 //
 //   - gdouble: #gdouble.
-//
 func (self *DOMElement) ClientTop() float64 {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret C.gdouble           // in
@@ -500,7 +485,6 @@ func (self *DOMElement) ClientTop() float64 {
 // The function returns the following values:
 //
 //   - gdouble: #gdouble.
-//
 func (self *DOMElement) ClientWidth() float64 {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret C.gdouble           // in
@@ -527,7 +511,6 @@ func (self *DOMElement) ClientWidth() float64 {
 // The function returns the following values:
 //
 //   - domNodeList: KitDOMNodeList.
-//
 func (self *DOMElement) ElementsByClassName(className string) *DOMNodeList {
 	var _arg0 *C.WebKitDOMElement  // out
 	var _arg1 *C.gchar             // out
@@ -558,7 +541,6 @@ func (self *DOMElement) ElementsByClassName(className string) *DOMNodeList {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMElement) ElementsByClassNameAsHtmlCollection(name string) *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMElement        // out
 	var _arg1 *C.gchar                   // out
@@ -589,7 +571,6 @@ func (self *DOMElement) ElementsByClassNameAsHtmlCollection(name string) *DOMHTM
 // The function returns the following values:
 //
 //   - domNodeList: KitDOMNodeList.
-//
 func (self *DOMElement) ElementsByTagName(tagName string) *DOMNodeList {
 	var _arg0 *C.WebKitDOMElement  // out
 	var _arg1 *C.gchar             // out
@@ -620,7 +601,6 @@ func (self *DOMElement) ElementsByTagName(tagName string) *DOMNodeList {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMElement) ElementsByTagNameAsHtmlCollection(name string) *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMElement        // out
 	var _arg1 *C.gchar                   // out
@@ -652,7 +632,6 @@ func (self *DOMElement) ElementsByTagNameAsHtmlCollection(name string) *DOMHTMLC
 // The function returns the following values:
 //
 //   - domNodeList: KitDOMNodeList.
-//
 func (self *DOMElement) ElementsByTagNameNs(namespaceUri, tagName string) *DOMNodeList {
 	var _arg0 *C.WebKitDOMElement  // out
 	var _arg1 *C.gchar             // out
@@ -688,7 +667,6 @@ func (self *DOMElement) ElementsByTagNameNs(namespaceUri, tagName string) *DOMNo
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMElement) ElementsByTagNameNsAsHtmlCollection(namespaceURI, localName string) *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMElement        // out
 	var _arg1 *C.gchar                   // out
@@ -718,7 +696,6 @@ func (self *DOMElement) ElementsByTagNameNsAsHtmlCollection(namespaceURI, localN
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMElement) FirstElementChild() *DOMElement {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret *C.WebKitDOMElement // in
@@ -740,7 +717,6 @@ func (self *DOMElement) FirstElementChild() *DOMElement {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMElement) ID() string {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret *C.gchar            // in
@@ -763,7 +739,6 @@ func (self *DOMElement) ID() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMElement) InnerHtml() string {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret *C.gchar            // in
@@ -786,7 +761,6 @@ func (self *DOMElement) InnerHtml() string {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMElement) LastElementChild() *DOMElement {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret *C.WebKitDOMElement // in
@@ -808,7 +782,6 @@ func (self *DOMElement) LastElementChild() *DOMElement {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMElement) LocalName() string {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret *C.gchar            // in
@@ -831,7 +804,6 @@ func (self *DOMElement) LocalName() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMElement) NamespaceURI() string {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret *C.gchar            // in
@@ -854,7 +826,6 @@ func (self *DOMElement) NamespaceURI() string {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMElement) NextElementSibling() *DOMElement {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret *C.WebKitDOMElement // in
@@ -876,7 +847,6 @@ func (self *DOMElement) NextElementSibling() *DOMElement {
 // The function returns the following values:
 //
 //   - gdouble: #gdouble.
-//
 func (self *DOMElement) OffsetHeight() float64 {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret C.gdouble           // in
@@ -898,7 +868,6 @@ func (self *DOMElement) OffsetHeight() float64 {
 // The function returns the following values:
 //
 //   - gdouble: #gdouble.
-//
 func (self *DOMElement) OffsetLeft() float64 {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret C.gdouble           // in
@@ -920,7 +889,6 @@ func (self *DOMElement) OffsetLeft() float64 {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMElement) OffsetParent() *DOMElement {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret *C.WebKitDOMElement // in
@@ -942,7 +910,6 @@ func (self *DOMElement) OffsetParent() *DOMElement {
 // The function returns the following values:
 //
 //   - gdouble: #gdouble.
-//
 func (self *DOMElement) OffsetTop() float64 {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret C.gdouble           // in
@@ -964,7 +931,6 @@ func (self *DOMElement) OffsetTop() float64 {
 // The function returns the following values:
 //
 //   - gdouble: #gdouble.
-//
 func (self *DOMElement) OffsetWidth() float64 {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret C.gdouble           // in
@@ -986,7 +952,6 @@ func (self *DOMElement) OffsetWidth() float64 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMElement) OuterHtml() string {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret *C.gchar            // in
@@ -1009,7 +974,6 @@ func (self *DOMElement) OuterHtml() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMElement) Prefix() string {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret *C.gchar            // in
@@ -1032,7 +996,6 @@ func (self *DOMElement) Prefix() string {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMElement) PreviousElementSibling() *DOMElement {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret *C.WebKitDOMElement // in
@@ -1054,7 +1017,6 @@ func (self *DOMElement) PreviousElementSibling() *DOMElement {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMElement) ScrollHeight() int32 {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret C.glong             // in
@@ -1076,7 +1038,6 @@ func (self *DOMElement) ScrollHeight() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMElement) ScrollLeft() int32 {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret C.glong             // in
@@ -1098,7 +1059,6 @@ func (self *DOMElement) ScrollLeft() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMElement) ScrollTop() int32 {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret C.glong             // in
@@ -1120,7 +1080,6 @@ func (self *DOMElement) ScrollTop() int32 {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMElement) ScrollWidth() int32 {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret C.glong             // in
@@ -1142,7 +1101,6 @@ func (self *DOMElement) ScrollWidth() int32 {
 // The function returns the following values:
 //
 //   - domcssStyleDeclaration: KitDOMCSSStyleDeclaration.
-//
 func (self *DOMElement) Style() *DOMCSSStyleDeclaration {
 	var _arg0 *C.WebKitDOMElement             // out
 	var _cret *C.WebKitDOMCSSStyleDeclaration // in
@@ -1164,7 +1122,6 @@ func (self *DOMElement) Style() *DOMCSSStyleDeclaration {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMElement) TagName() string {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret *C.gchar            // in
@@ -1190,7 +1147,6 @@ func (self *DOMElement) TagName() string {
 // The function returns the following values:
 //
 //   - utf8: NULL.
-//
 func (self *DOMElement) WebkitRegionOverset() string {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret *C.gchar            // in
@@ -1217,7 +1173,6 @@ func (self *DOMElement) WebkitRegionOverset() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMElement) HasAttribute(name string) bool {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -1250,7 +1205,6 @@ func (self *DOMElement) HasAttribute(name string) bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMElement) HasAttributeNs(namespaceURI, localName string) bool {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -1282,7 +1236,6 @@ func (self *DOMElement) HasAttributeNs(namespaceURI, localName string) bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMElement) HasAttributes() bool {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret C.gboolean          // in
@@ -1310,7 +1263,6 @@ func (self *DOMElement) HasAttributes() bool {
 // The function returns the following values:
 //
 //   - ok: whether element has been filled automatically.
-//
 func (element *DOMElement) HtmlInputElementGetAutoFilled() bool {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret C.gboolean          // in
@@ -1338,7 +1290,6 @@ func (element *DOMElement) HtmlInputElementGetAutoFilled() bool {
 // The function returns the following values:
 //
 //   - ok: whether element has been edited by a user action.
-//
 func (element *DOMElement) HtmlInputElementIsUserEdited() bool {
 	var _arg0 *C.WebKitDOMElement // out
 	var _cret C.gboolean          // in
@@ -1366,7 +1317,6 @@ func (element *DOMElement) HtmlInputElementIsUserEdited() bool {
 // The function takes the following parameters:
 //
 //   - autoFilled: value to set.
-//
 func (element *DOMElement) HtmlInputElementSetAutoFilled(autoFilled bool) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 C.gboolean          // out
@@ -1390,7 +1340,6 @@ func (element *DOMElement) HtmlInputElementSetAutoFilled(autoFilled bool) {
 // The function takes the following parameters:
 //
 //   - value: text to set.
-//
 func (element *DOMElement) HtmlInputElementSetEditingValue(value string) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.char             // out
@@ -1414,7 +1363,6 @@ func (element *DOMElement) HtmlInputElementSetEditingValue(value string) {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMElement) InsertAdjacentElement(where string, element *DOMElement) (*DOMElement, error) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -1449,7 +1397,6 @@ func (self *DOMElement) InsertAdjacentElement(where string, element *DOMElement)
 //
 //   - where: #gchar.
 //   - html: #gchar.
-//
 func (self *DOMElement) InsertAdjacentHtml(where, html string) error {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -1482,7 +1429,6 @@ func (self *DOMElement) InsertAdjacentHtml(where, html string) error {
 //
 //   - where: #gchar.
 //   - text: #gchar.
-//
 func (self *DOMElement) InsertAdjacentText(where, text string) error {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -1514,7 +1460,6 @@ func (self *DOMElement) InsertAdjacentText(where, text string) error {
 // The function takes the following parameters:
 //
 //   - selectors: #gchar.
-//
 func (self *DOMElement) Matches(selectors string) error {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -1546,7 +1491,6 @@ func (self *DOMElement) Matches(selectors string) error {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMElement) QuerySelector(selectors string) (*DOMElement, error) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -1581,7 +1525,6 @@ func (self *DOMElement) QuerySelector(selectors string) (*DOMElement, error) {
 // The function returns the following values:
 //
 //   - domNodeList: KitDOMNodeList.
-//
 func (self *DOMElement) QuerySelectorAll(selectors string) (*DOMNodeList, error) {
 	var _arg0 *C.WebKitDOMElement  // out
 	var _arg1 *C.gchar             // out
@@ -1631,7 +1574,6 @@ func (self *DOMElement) Remove() error {
 // The function takes the following parameters:
 //
 //   - name: #gchar.
-//
 func (self *DOMElement) RemoveAttribute(name string) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -1654,7 +1596,6 @@ func (self *DOMElement) RemoveAttribute(name string) {
 // The function returns the following values:
 //
 //   - domAttr: KitDOMAttr.
-//
 func (self *DOMElement) RemoveAttributeNode(oldAttr *DOMAttr) (*DOMAttr, error) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.WebKitDOMAttr    // out
@@ -1685,7 +1626,6 @@ func (self *DOMElement) RemoveAttributeNode(oldAttr *DOMAttr) (*DOMAttr, error) 
 //
 //   - namespaceURI: #gchar.
 //   - localName: #gchar.
-//
 func (self *DOMElement) RemoveAttributeNs(namespaceURI, localName string) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -1718,7 +1658,6 @@ func (self *DOMElement) RequestPointerLock() {
 // The function takes the following parameters:
 //
 //   - lines: #glong.
-//
 func (self *DOMElement) ScrollByLines(lines int32) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 C.glong             // out
@@ -1736,7 +1675,6 @@ func (self *DOMElement) ScrollByLines(lines int32) {
 // The function takes the following parameters:
 //
 //   - pages: #glong.
-//
 func (self *DOMElement) ScrollByPages(pages int32) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 C.glong             // out
@@ -1754,7 +1692,6 @@ func (self *DOMElement) ScrollByPages(pages int32) {
 // The function takes the following parameters:
 //
 //   - alignWithTop: #gboolean.
-//
 func (self *DOMElement) ScrollIntoView(alignWithTop bool) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 C.gboolean          // out
@@ -1774,7 +1711,6 @@ func (self *DOMElement) ScrollIntoView(alignWithTop bool) {
 // The function takes the following parameters:
 //
 //   - centerIfNeeded: #gboolean.
-//
 func (self *DOMElement) ScrollIntoViewIfNeeded(centerIfNeeded bool) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 C.gboolean          // out
@@ -1795,7 +1731,6 @@ func (self *DOMElement) ScrollIntoViewIfNeeded(centerIfNeeded bool) {
 //
 //   - name: #gchar.
 //   - value: #gchar.
-//
 func (self *DOMElement) SetAttribute(name, value string) error {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -1831,7 +1766,6 @@ func (self *DOMElement) SetAttribute(name, value string) error {
 // The function returns the following values:
 //
 //   - domAttr: KitDOMAttr.
-//
 func (self *DOMElement) SetAttributeNode(newAttr *DOMAttr) (*DOMAttr, error) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.WebKitDOMAttr    // out
@@ -1865,7 +1799,6 @@ func (self *DOMElement) SetAttributeNode(newAttr *DOMAttr) (*DOMAttr, error) {
 // The function returns the following values:
 //
 //   - domAttr: KitDOMAttr.
-//
 func (self *DOMElement) SetAttributeNodeNs(newAttr *DOMAttr) (*DOMAttr, error) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.WebKitDOMAttr    // out
@@ -1897,7 +1830,6 @@ func (self *DOMElement) SetAttributeNodeNs(newAttr *DOMAttr) (*DOMAttr, error) {
 //   - namespaceURI (optional): #gchar.
 //   - qualifiedName: #gchar.
 //   - value: #gchar.
-//
 func (self *DOMElement) SetAttributeNs(namespaceURI, qualifiedName, value string) error {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -1935,7 +1867,6 @@ func (self *DOMElement) SetAttributeNs(namespaceURI, qualifiedName, value string
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMElement) SetClassName(value string) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -1954,7 +1885,6 @@ func (self *DOMElement) SetClassName(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMElement) SetID(value string) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -1973,7 +1903,6 @@ func (self *DOMElement) SetID(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMElement) SetInnerHtml(value string) error {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -2001,7 +1930,6 @@ func (self *DOMElement) SetInnerHtml(value string) error {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMElement) SetOuterHtml(value string) error {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out
@@ -2029,7 +1957,6 @@ func (self *DOMElement) SetOuterHtml(value string) error {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMElement) SetScrollLeft(value int32) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 C.glong             // out
@@ -2047,7 +1974,6 @@ func (self *DOMElement) SetScrollLeft(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMElement) SetScrollTop(value int32) {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 C.glong             // out
@@ -2065,7 +1991,6 @@ func (self *DOMElement) SetScrollTop(value int32) {
 // The function takes the following parameters:
 //
 //   - selectors: #gchar.
-//
 func (self *DOMElement) WebkitMatchesSelector(selectors string) error {
 	var _arg0 *C.WebKitDOMElement // out
 	var _arg1 *C.gchar            // out

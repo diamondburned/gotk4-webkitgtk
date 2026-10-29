@@ -135,7 +135,7 @@ func (s ServerListenOptions) Has(other ServerListenOptions) bool {
 type ServerCallback func(server *Server, msg *ServerMessage, path string, query map[string]string)
 
 // ServerWebsocketCallback: callback used to handle WebSocket requests to a
-// Server.
+// server.
 //
 // The callback will be invoked after sending the handshake response back to the
 // client (and is only invoked if the handshake was successful).
@@ -146,18 +146,10 @@ type ServerWebsocketCallback func(server *Server, msg *ServerMessage, path strin
 
 // ServerOverrides contains methods that are overridable.
 type ServerOverrides struct {
-	// The function takes the following parameters:
-	//
-	RequestAborted func(msg *ServerMessage)
-	// The function takes the following parameters:
-	//
+	RequestAborted  func(msg *ServerMessage)
 	RequestFinished func(msg *ServerMessage)
-	// The function takes the following parameters:
-	//
-	RequestRead func(msg *ServerMessage)
-	// The function takes the following parameters:
-	//
-	RequestStarted func(msg *ServerMessage)
+	RequestRead     func(msg *ServerMessage)
+	RequestStarted  func(msg *ServerMessage)
 }
 
 func defaultServerOverrides(v *Server) ServerOverrides {
@@ -169,9 +161,11 @@ func defaultServerOverrides(v *Server) ServerOverrides {
 	}
 }
 
-// Server: HTTP server.
-//
-// Server implements a simple HTTP server.
+// Server: server provides a basic implementation of an HTTP server.
+// The recommended usage of this server is for internal use, tasks like a mock
+// server for tests, a private service for IPC, etc. It is not recommended to
+// be exposed to untrusted clients as it may be vulnerable to denial of service
+// attacks or other exploits.
 //
 // To begin, create a server using server.New. Add at least one handler by
 // calling server.AddHandler or server.AddEarlyHandler; the handler will be
@@ -179,26 +173,26 @@ func defaultServerOverrides(v *Server) ServerOverrides {
 // requests to go to the same handler, just pass "/" (or NULL) for the path.)
 //
 // When a new connection is accepted (or a new request is started on an existing
-// persistent connection), the Server will emit server::request-started and
+// persistent connection), the server will emit server::request-started and
 // then begin processing the request as described below, but note that once the
 // message is assigned a status-code, then callbacks after that point will be
 // skipped. Note also that it is not defined when the callbacks happen relative
 // to various servermessage signals.
 //
-// Once the headers have been read, Server will check if there is a authdomain
+// Once the headers have been read, server will check if there is a authdomain
 // (qv) covering the Request-URI; if so, and if the message does not
 // contain suitable authorization, then the authdomain will set a status of
 // SOUP_STATUS_UNAUTHORIZED on the message.
 //
-// After checking for authorization, Server will look for "early" handlers
+// After checking for authorization, server will look for "early" handlers
 // (added with server.AddEarlyHandler) matching the Request-URI. If one is
 // found, it will be run; in particular, this can be used to connect to signals
 // to do a streaming read of the request body.
 //
 // (At this point, if the request headers contain Expect: 100-continue,
-// and a status code has been set, then Server will skip the remaining steps and
+// and a status code has been set, then server will skip the remaining steps and
 // return the response. If the request headers contain Expect: 100-continue and
-// no status code has been set, Server will return a SOUP_STATUS_CONTINUE status
+// no status code has been set, server will return a SOUP_STATUS_CONTINUE status
 // before continuing.)
 //
 // The server will then read in the response body (if present). At this point,
@@ -210,7 +204,7 @@ func defaultServerOverrides(v *Server) ServerOverrides {
 // Request-URI will be run.
 //
 // Then, if the path has a WebSocket handler registered (and has not
-// yet been assigned a status), Server will attempt to validate the
+// yet been assigned a status), server will attempt to validate the
 // WebSocket handshake, filling in the response and setting a status of
 // SOUP_STATUS_SWITCHING_PROTOCOLS or SOUP_STATUS_BAD_REQUEST accordingly.
 //
@@ -232,12 +226,12 @@ func defaultServerOverrides(v *Server) ServerOverrides {
 //
 // Once the server is set up, make one or more calls to server.Listen,
 // server.ListenLocal, or server.ListenAll to tell it where to listen for
-// connections. (All ports on a Server use the same handlers; if you need to
-// handle some ports differently, such as returning different data for http
-// and https, you'll need to create multiple SoupServers, or else check the
-// passed-in URI in the handler function.).
+// connections. (All ports on a server use the same handlers; if you need to
+// handle some ports differently, such as returning different data for http and
+// https, you'll need to create multiple servers, or else check the passed-in
+// URI in the handler function.).
 //
-// Server will begin processing connections as soon as you return to (or start)
+// server will begin processing connections as soon as you return to (or start)
 // the main loop for the current thread-default glib.MainContext.
 type Server struct {
 	_ [0]func() // equal guard
@@ -346,7 +340,6 @@ func (server *Server) ConnectRequestStarted(f func(message *ServerMessage)) core
 //   - stream: OStream.
 //   - localAddr (optional): local Address associated with the stream.
 //   - remoteAddr (optional): remote Address associated with the stream.
-//
 func (server *Server) AcceptIostream(stream gio.IOStreamer, localAddr, remoteAddr gio.SocketAddresser) error {
 	var _arg0 *C.SoupServer     // out
 	var _arg1 *C.GIOStream      // out
@@ -393,7 +386,6 @@ func (server *Server) AcceptIostream(stream gio.IOStreamer, localAddr, remoteAdd
 // The function takes the following parameters:
 //
 //   - authDomain: AuthDomain.
-//
 func (server *Server) AddAuthDomain(authDomain AuthDomainer) {
 	var _arg0 *C.SoupServer     // out
 	var _arg1 *C.SoupAuthDomain // out
@@ -436,7 +428,6 @@ func (server *Server) AddAuthDomain(authDomain AuthDomainer) {
 //
 //   - path (optional): toplevel path for the handler.
 //   - callback to invoke for requests under path.
-//
 func (server *Server) AddEarlyHandler(path string, callback ServerCallback) {
 	var _arg0 *C.SoupServer        // out
 	var _arg1 *C.char              // out
@@ -493,7 +484,6 @@ func (server *Server) AddEarlyHandler(path string, callback ServerCallback) {
 //
 //   - path (optional): toplevel path for the handler.
 //   - callback to invoke for requests under path.
-//
 func (server *Server) AddHandler(path string, callback ServerCallback) {
 	var _arg0 *C.SoupServer        // out
 	var _arg1 *C.char              // out
@@ -529,7 +519,6 @@ func (server *Server) AddHandler(path string, callback ServerCallback) {
 // The function takes the following parameters:
 //
 //   - extensionType: #GType.
-//
 func (server *Server) AddWebsocketExtension(extensionType coreglib.Type) {
 	var _arg0 *C.SoupServer // out
 	var _arg1 C.GType       // out
@@ -566,7 +555,6 @@ func (server *Server) AddWebsocketExtension(extensionType coreglib.Type) {
 //   - origin (optional) of the connection.
 //   - protocols (optional): protocols supported by this handler.
 //   - callback to invoke for successful WebSocket requests under path.
-//
 func (server *Server) AddWebsocketHandler(path, origin string, protocols []string, callback ServerWebsocketCallback) {
 	var _arg0 *C.SoupServer                 // out
 	var _arg1 *C.char                       // out
@@ -634,7 +622,6 @@ func (server *Server) Disconnect() {
 // The function returns the following values:
 //
 //   - sList: a list of listening sockets.
-//
 func (server *Server) Listeners() []*gio.Socket {
 	var _arg0 *C.SoupServer // out
 	var _cret *C.GSList     // in
@@ -673,7 +660,6 @@ func (server *Server) Listeners() []*gio.Socket {
 // The function returns the following values:
 //
 //   - tlsAuthenticationMode: AuthenticationMode.
-//
 func (server *Server) TLSAuthMode() gio.TLSAuthenticationMode {
 	var _arg0 *C.SoupServer            // out
 	var _cret C.GTlsAuthenticationMode // in
@@ -695,7 +681,6 @@ func (server *Server) TLSAuthMode() gio.TLSAuthenticationMode {
 // The function returns the following values:
 //
 //   - tlsCertificate (optional) or NULL.
-//
 func (server *Server) TLSCertificate() gio.TLSCertificater {
 	var _arg0 *C.SoupServer      // out
 	var _cret *C.GTlsCertificate // in
@@ -732,7 +717,6 @@ func (server *Server) TLSCertificate() gio.TLSCertificater {
 // The function returns the following values:
 //
 //   - tlsDatabase (optional): Database.
-//
 func (server *Server) TLSDatabase() gio.TLSDatabaser {
 	var _arg0 *C.SoupServer   // out
 	var _cret *C.GTlsDatabase // in
@@ -776,8 +760,8 @@ func (server *Server) TLSDatabase() gio.TLSDatabaser {
 //
 // The function returns the following values:
 //
-//   - sList: list of #GUris, which you must free when you are done with it.
-//
+//   - sList: list of glib.URI, which you must free with each element with
+//     glib.URI.Unref() when you are done with it.
 func (server *Server) URIs() []*glib.URI {
 	var _arg0 *C.SoupServer // out
 	var _cret *C.GSList     // in
@@ -813,7 +797,7 @@ func (server *Server) URIs() []*glib.URI {
 // to use.
 //
 // If you are using the deprecated single-listener APIs, then a return value
-// of TRUE indicates that the Server serves https exclusively. If you are using
+// of TRUE indicates that the server serves https exclusively. If you are using
 // server.Listen, etc, then a TRUE return value merely indicates that the server
 // is *able* to do https, regardless of whether it actually currently is or not.
 // Use server.GetURIs to see if it currently has any https listeners.
@@ -821,7 +805,6 @@ func (server *Server) URIs() []*glib.URI {
 // The function returns the following values:
 //
 //   - ok: TRUE if server is configured to serve https.
-//
 func (server *Server) IsHTTPS() bool {
 	var _arg0 *C.SoupServer // out
 	var _cret C.gboolean    // in
@@ -861,7 +844,6 @@ func (server *Server) IsHTTPS() bool {
 //
 //   - address of the interface to listen on.
 //   - options: listening options for this server.
-//
 func (server *Server) Listen(address gio.SocketAddresser, options ServerListenOptions) error {
 	var _arg0 *C.SoupServer             // out
 	var _arg1 *C.GSocketAddress         // out
@@ -901,7 +883,6 @@ func (server *Server) Listen(address gio.SocketAddresser, options ServerListenOp
 //
 //   - port to listen on, or 0.
 //   - options: listening options for this server.
-//
 func (server *Server) ListenAll(port uint, options ServerListenOptions) error {
 	var _arg0 *C.SoupServer             // out
 	var _arg1 C.guint                   // out
@@ -941,7 +922,6 @@ func (server *Server) ListenAll(port uint, options ServerListenOptions) error {
 //
 //   - port to listen on, or 0.
 //   - options: listening options for this server.
-//
 func (server *Server) ListenLocal(port uint, options ServerListenOptions) error {
 	var _arg0 *C.SoupServer             // out
 	var _arg1 C.guint                   // out
@@ -974,7 +954,6 @@ func (server *Server) ListenLocal(port uint, options ServerListenOptions) error 
 //
 //   - socket: listening #GSocket.
 //   - options: listening options for this server.
-//
 func (server *Server) ListenSocket(socket *gio.Socket, options ServerListenOptions) error {
 	var _arg0 *C.SoupServer             // out
 	var _arg1 *C.GSocket                // out
@@ -1004,7 +983,7 @@ func (server *Server) ListenSocket(socket *gio.Socket, options ServerListenOptio
 // This can be used when you need to return from the server handler without
 // having the full response ready yet. Use server.UnpauseMessage to resume I/O.
 //
-// This must only be called on a servermessage which was created by the Server
+// This must only be called on a servermessage which was created by the server
 // and are currently doing I/O, such as those passed into a servercallback or
 // emitted in a server::request-read signal.
 //
@@ -1013,7 +992,6 @@ func (server *Server) ListenSocket(socket *gio.Socket, options ServerListenOptio
 // The function takes the following parameters:
 //
 //   - msg associated with server.
-//
 func (server *Server) PauseMessage(msg *ServerMessage) {
 	var _arg0 *C.SoupServer        // out
 	var _arg1 *C.SoupServerMessage // out
@@ -1031,7 +1009,6 @@ func (server *Server) PauseMessage(msg *ServerMessage) {
 // The function takes the following parameters:
 //
 //   - authDomain: AuthDomain.
-//
 func (server *Server) RemoveAuthDomain(authDomain AuthDomainer) {
 	var _arg0 *C.SoupServer     // out
 	var _arg1 *C.SoupAuthDomain // out
@@ -1049,7 +1026,6 @@ func (server *Server) RemoveAuthDomain(authDomain AuthDomainer) {
 // The function takes the following parameters:
 //
 //   - path: toplevel path for the handler.
-//
 func (server *Server) RemoveHandler(path string) {
 	var _arg0 *C.SoupServer // out
 	var _arg1 *C.char       // out
@@ -1069,7 +1045,6 @@ func (server *Server) RemoveHandler(path string) {
 // The function takes the following parameters:
 //
 //   - extensionType: #GType.
-//
 func (server *Server) RemoveWebsocketExtension(extensionType coreglib.Type) {
 	var _arg0 *C.SoupServer // out
 	var _arg1 C.GType       // out
@@ -1088,7 +1063,6 @@ func (server *Server) RemoveWebsocketExtension(extensionType coreglib.Type) {
 // The function takes the following parameters:
 //
 //   - mode: AuthenticationMode.
-//
 func (server *Server) SetTLSAuthMode(mode gio.TLSAuthenticationMode) {
 	var _arg0 *C.SoupServer            // out
 	var _arg1 C.GTlsAuthenticationMode // out
@@ -1107,7 +1081,6 @@ func (server *Server) SetTLSAuthMode(mode gio.TLSAuthenticationMode) {
 // The function takes the following parameters:
 //
 //   - certificate: Certificate.
-//
 func (server *Server) SetTLSCertificate(certificate gio.TLSCertificater) {
 	var _arg0 *C.SoupServer      // out
 	var _arg1 *C.GTlsCertificate // out
@@ -1126,7 +1099,6 @@ func (server *Server) SetTLSCertificate(certificate gio.TLSCertificater) {
 // The function takes the following parameters:
 //
 //   - tlsDatabase: Database.
-//
 func (server *Server) SetTLSDatabase(tlsDatabase gio.TLSDatabaser) {
 	var _arg0 *C.SoupServer   // out
 	var _arg1 *C.GTlsDatabase // out
@@ -1146,7 +1118,7 @@ func (server *Server) SetTLSDatabase(tlsDatabase gio.TLSDatabaser) {
 //
 // I/O won't actually resume until you return to the main loop.
 //
-// This must only be called on a servermessage which was created by the Server
+// This must only be called on a servermessage which was created by the server
 // and are currently doing I/O, such as those passed into a servercallback or
 // emitted in a server::request-read signal.
 //
@@ -1155,7 +1127,6 @@ func (server *Server) SetTLSDatabase(tlsDatabase gio.TLSDatabaser) {
 // The function takes the following parameters:
 //
 //   - msg associated with server.
-//
 func (server *Server) UnpauseMessage(msg *ServerMessage) {
 	var _arg0 *C.SoupServer        // out
 	var _arg1 *C.SoupServerMessage // out
@@ -1168,8 +1139,6 @@ func (server *Server) UnpauseMessage(msg *ServerMessage) {
 	runtime.KeepAlive(msg)
 }
 
-// The function takes the following parameters:
-//
 func (server *Server) requestAborted(msg *ServerMessage) {
 	gclass := (*C.SoupServerClass)(coreglib.PeekParentClass(server))
 	fnarg := gclass.request_aborted
@@ -1185,8 +1154,6 @@ func (server *Server) requestAborted(msg *ServerMessage) {
 	runtime.KeepAlive(msg)
 }
 
-// The function takes the following parameters:
-//
 func (server *Server) requestFinished(msg *ServerMessage) {
 	gclass := (*C.SoupServerClass)(coreglib.PeekParentClass(server))
 	fnarg := gclass.request_finished
@@ -1202,8 +1169,6 @@ func (server *Server) requestFinished(msg *ServerMessage) {
 	runtime.KeepAlive(msg)
 }
 
-// The function takes the following parameters:
-//
 func (server *Server) requestRead(msg *ServerMessage) {
 	gclass := (*C.SoupServerClass)(coreglib.PeekParentClass(server))
 	fnarg := gclass.request_read
@@ -1219,8 +1184,6 @@ func (server *Server) requestRead(msg *ServerMessage) {
 	runtime.KeepAlive(msg)
 }
 
-// The function takes the following parameters:
-//
 func (server *Server) requestStarted(msg *ServerMessage) {
 	gclass := (*C.SoupServerClass)(coreglib.PeekParentClass(server))
 	fnarg := gclass.request_started
@@ -1250,7 +1213,7 @@ func (s *ServerClass) Padding() [6]unsafe.Pointer {
 	valptr := &s.native.padding
 	var _v [6]unsafe.Pointer // out
 	{
-		src := &*valptr
+		src := unsafe.Slice(&(*valptr)[0], 6)
 		for i := 0; i < 6; i++ {
 			_v[i] = (unsafe.Pointer)(unsafe.Pointer(src[i]))
 		}

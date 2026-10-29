@@ -36,7 +36,7 @@ func defaultCookieJarTextOverrides(v *CookieJarText) CookieJarTextOverrides {
 
 // CookieJarText: text-file-based ("cookies.txt") Cookie Jar
 //
-// CookieJarText is a cookiejar that reads cookies from and writes them to a
+// cookiejartext is a cookiejar that reads cookies from and writes them to a
 // text file in format similar to Mozilla's "cookies.txt".
 type CookieJarText struct {
 	_ [0]func() // equal guard
@@ -78,7 +78,7 @@ func marshalCookieJarText(p uintptr) (interface{}, error) {
 	return wrapCookieJarText(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewCookieJarText creates a CookieJarText.
+// NewCookieJarText creates a cookiejartext.
 //
 // filename will be read in at startup to create an initial set of cookies.
 // If read_only is FALSE, then the non-session cookies will be written to
@@ -94,7 +94,6 @@ func marshalCookieJarText(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - cookieJarText: new CookieJar.
-//
 func NewCookieJarText(filename string, readOnly bool) *CookieJarText {
 	var _arg1 *C.char          // out
 	var _arg2 C.gboolean       // out

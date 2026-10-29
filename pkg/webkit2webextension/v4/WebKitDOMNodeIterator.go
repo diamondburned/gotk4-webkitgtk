@@ -89,8 +89,7 @@ func (self *DOMNodeIterator) Detach() {
 //
 // The function returns the following values:
 //
-//   - ok: #gboolean *.
-//
+//   - ok: #gboolean.
 func (self *DOMNodeIterator) ExpandEntityReferences() bool {
 	var _arg0 *C.WebKitDOMNodeIterator // out
 	var _cret C.gboolean               // in
@@ -114,7 +113,6 @@ func (self *DOMNodeIterator) ExpandEntityReferences() bool {
 // The function returns the following values:
 //
 //   - domNodeFilter: KitDOMNodeFilter.
-//
 func (self *DOMNodeIterator) Filter() *DOMNodeFilter {
 	var _arg0 *C.WebKitDOMNodeIterator // out
 	var _cret *C.WebKitDOMNodeFilter   // in
@@ -136,7 +134,6 @@ func (self *DOMNodeIterator) Filter() *DOMNodeFilter {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMNodeIterator) PointerBeforeReferenceNode() bool {
 	var _arg0 *C.WebKitDOMNodeIterator // out
 	var _cret C.gboolean               // in
@@ -160,7 +157,6 @@ func (self *DOMNodeIterator) PointerBeforeReferenceNode() bool {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNodeIterator) ReferenceNode() *DOMNode {
 	var _arg0 *C.WebKitDOMNodeIterator // out
 	var _cret *C.WebKitDOMNode         // in
@@ -182,7 +178,6 @@ func (self *DOMNodeIterator) ReferenceNode() *DOMNode {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNodeIterator) Root() *DOMNode {
 	var _arg0 *C.WebKitDOMNodeIterator // out
 	var _cret *C.WebKitDOMNode         // in
@@ -204,7 +199,6 @@ func (self *DOMNodeIterator) Root() *DOMNode {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMNodeIterator) WhatToShow() uint32 {
 	var _arg0 *C.WebKitDOMNodeIterator // out
 	var _cret C.gulong                 // in
@@ -226,7 +220,6 @@ func (self *DOMNodeIterator) WhatToShow() uint32 {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNodeIterator) NextNode() (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMNodeIterator // out
 	var _cret *C.WebKitDOMNode         // in
@@ -253,7 +246,6 @@ func (self *DOMNodeIterator) NextNode() (*DOMNode, error) {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNodeIterator) PreviousNode() (*DOMNode, error) {
 	var _arg0 *C.WebKitDOMNodeIterator // out
 	var _cret *C.WebKitDOMNode         // in

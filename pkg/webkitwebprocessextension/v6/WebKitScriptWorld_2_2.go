@@ -15,12 +15,11 @@ import "C"
 // ScriptWorldGetDefault: get the default KitScriptWorld. This is the normal
 // script world where all scripts are executed by default. You can get the
 // JavaScript execution context of a KitScriptWorld for a given KitFrame with
-// webkit_frame_get_javascript_context_for_script_world().
+// webkit_frame_get_js_context_for_script_world().
 //
 // The function returns the following values:
 //
 //   - scriptWorld: default KitScriptWorld.
-//
 func ScriptWorldGetDefault() *ScriptWorld {
 	var _cret *C.WebKitScriptWorld // in
 

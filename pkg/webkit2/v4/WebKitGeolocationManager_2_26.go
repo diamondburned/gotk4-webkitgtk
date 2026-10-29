@@ -106,7 +106,6 @@ func (manager *GeolocationManager) ConnectStop(f func()) coreglib.SignalHandle {
 // The function takes the following parameters:
 //
 //   - errorMessage: error message.
-//
 func (manager *GeolocationManager) Failed(errorMessage string) {
 	var _arg0 *C.WebKitGeolocationManager // out
 	var _arg1 *C.char                     // out
@@ -125,7 +124,6 @@ func (manager *GeolocationManager) Failed(errorMessage string) {
 // The function returns the following values:
 //
 //   - ok: whether the setting is enabled.
-//
 func (manager *GeolocationManager) EnableHighAccuracy() bool {
 	var _arg0 *C.WebKitGeolocationManager // out
 	var _cret C.gboolean                  // in
@@ -149,7 +147,6 @@ func (manager *GeolocationManager) EnableHighAccuracy() bool {
 // The function takes the following parameters:
 //
 //   - position: KitGeolocationPosition.
-//
 func (manager *GeolocationManager) UpdatePosition(position *GeolocationPosition) {
 	var _arg0 *C.WebKitGeolocationManager  // out
 	var _arg1 *C.WebKitGeolocationPosition // out
@@ -218,7 +215,6 @@ func NewGeolocationPosition(latitude float64, longitude float64, accuracy float6
 // The function returns the following values:
 //
 //   - geolocationPosition: copy of position.
-//
 func (position *GeolocationPosition) Copy() *GeolocationPosition {
 	var _arg0 *C.WebKitGeolocationPosition // out
 	var _cret *C.WebKitGeolocationPosition // in
@@ -246,7 +242,6 @@ func (position *GeolocationPosition) Copy() *GeolocationPosition {
 // The function takes the following parameters:
 //
 //   - altitude in meters.
-//
 func (position *GeolocationPosition) SetAltitude(altitude float64) {
 	var _arg0 *C.WebKitGeolocationPosition // out
 	var _arg1 C.double                     // out
@@ -264,7 +259,6 @@ func (position *GeolocationPosition) SetAltitude(altitude float64) {
 // The function takes the following parameters:
 //
 //   - altitudeAccuracy: accuracy of position altitude in meters.
-//
 func (position *GeolocationPosition) SetAltitudeAccuracy(altitudeAccuracy float64) {
 	var _arg0 *C.WebKitGeolocationPosition // out
 	var _arg1 C.double                     // out
@@ -285,7 +279,6 @@ func (position *GeolocationPosition) SetAltitudeAccuracy(altitudeAccuracy float6
 // The function takes the following parameters:
 //
 //   - heading in degrees.
-//
 func (position *GeolocationPosition) SetHeading(heading float64) {
 	var _arg0 *C.WebKitGeolocationPosition // out
 	var _arg1 C.double                     // out
@@ -303,7 +296,6 @@ func (position *GeolocationPosition) SetHeading(heading float64) {
 // The function takes the following parameters:
 //
 //   - speed in meters per second.
-//
 func (position *GeolocationPosition) SetSpeed(speed float64) {
 	var _arg0 *C.WebKitGeolocationPosition // out
 	var _arg1 C.double                     // out
@@ -323,7 +315,6 @@ func (position *GeolocationPosition) SetSpeed(speed float64) {
 // The function takes the following parameters:
 //
 //   - timestamp in seconds since the epoch, or 0 to use current time.
-//
 func (position *GeolocationPosition) SetTimestamp(timestamp uint64) {
 	var _arg0 *C.WebKitGeolocationPosition // out
 	var _arg1 C.guint64                    // out

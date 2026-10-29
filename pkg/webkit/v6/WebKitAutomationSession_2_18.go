@@ -13,6 +13,7 @@ import (
 // #include <stdlib.h>
 // #include <glib-object.h>
 // #include <webkit/webkit.h>
+// extern void _gotk4_webkit6_AutomationSession_ConnectWillClose(gpointer, guintptr);
 // extern WebKitWebView* _gotk4_webkit6_AutomationSession_ConnectCreateWebView(gpointer, guintptr);
 import "C"
 
@@ -94,15 +95,21 @@ func (session *AutomationSession) ConnectCreateWebView(f func() (webView *WebVie
 	return coreglib.ConnectGeneratedClosure(session, "create-web-view", false, unsafe.Pointer(C._gotk4_webkit6_AutomationSession_ConnectCreateWebView), f)
 }
 
-// ApplicationInfo: get the the previously set KitAutomationSession.
+// ConnectWillClose: this signal is emitted when the given automation session
+// is about to finish. It allows clients to perform any cleanup tasks before the
+// session is destroyed.
+func (session *AutomationSession) ConnectWillClose(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(session, "will-close", false, unsafe.Pointer(C._gotk4_webkit6_AutomationSession_ConnectWillClose), f)
+}
+
+// ApplicationInfo: get the previously set KitApplicationInfo.
 //
-// Get the KitAutomationSession previously set with
+// Get the KitApplicationInfo previously set with
 // webkit_automation_session_set_application_info().
 //
 // The function returns the following values:
 //
 //   - applicationInfo of session, or NULL if no one has been set.
-//
 func (session *AutomationSession) ApplicationInfo() *ApplicationInfo {
 	var _arg0 *C.WebKitAutomationSession // out
 	var _cret *C.WebKitApplicationInfo   // in
@@ -131,7 +138,6 @@ func (session *AutomationSession) ApplicationInfo() *ApplicationInfo {
 // The function returns the following values:
 //
 //   - utf8: unique identifier of session.
-//
 func (session *AutomationSession) ID() string {
 	var _arg0 *C.WebKitAutomationSession // out
 	var _cret *C.char                    // in
@@ -161,7 +167,6 @@ func (session *AutomationSession) ID() string {
 // The function takes the following parameters:
 //
 //   - info: KitApplicationInfo.
-//
 func (session *AutomationSession) SetApplicationInfo(info *ApplicationInfo) {
 	var _arg0 *C.WebKitAutomationSession // out
 	var _arg1 *C.WebKitApplicationInfo   // out

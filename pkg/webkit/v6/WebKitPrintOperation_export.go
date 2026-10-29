@@ -19,7 +19,7 @@ func _gotk4_webkit6_PrintOperation_ConnectFailed(arg0 C.gpointer, arg1 *C.GError
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 
@@ -39,7 +39,7 @@ func _gotk4_webkit6_PrintOperation_ConnectFinished(arg0 C.gpointer, arg1 C.guint
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
 		if closure == nil {
-			panic("given unknown closure user_data")
+			return
 		}
 		defer closure.TryRepanic()
 

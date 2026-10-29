@@ -89,7 +89,6 @@ func (weakValue *WeakValue) ConnectCleared(f func()) coreglib.SignalHandle {
 // The function returns the following values:
 //
 //   - weakValue: new CWeakValue.
-//
 func NewWeakValue(value *Value) *WeakValue {
 	var _arg1 *C.JSCValue     // out
 	var _cret *C.JSCWeakValue // in
@@ -111,7 +110,6 @@ func NewWeakValue(value *Value) *WeakValue {
 // The function returns the following values:
 //
 //   - value: new CValue or NULL if weak_value was cleared.
-//
 func (weakValue *WeakValue) Value() *Value {
 	var _arg0 *C.JSCWeakValue // out
 	var _cret *C.JSCValue     // in

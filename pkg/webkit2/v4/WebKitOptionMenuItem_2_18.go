@@ -28,7 +28,7 @@ func init() {
 
 // OptionMenuItem: one item of a KitOptionMenu.
 //
-// The KitOptionMenu is composed of WebKitOptionMenuItem<!-- -->s.
+// The KitOptionMenu is composed of WebKitOptionMenuItem objects.
 // A WebKitOptionMenuItem always has a label and can contain a tooltip text. You
 // can use the WebKitOptionMenuItem of a KitOptionMenu to build your own menus.
 //
@@ -52,7 +52,6 @@ func marshalOptionMenuItem(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - optionMenuItem: copy of passed in KitOptionMenuItem.
-//
 func (item *OptionMenuItem) Copy() *OptionMenuItem {
 	var _arg0 *C.WebKitOptionMenuItem // out
 	var _cret *C.WebKitOptionMenuItem // in
@@ -80,7 +79,6 @@ func (item *OptionMenuItem) Copy() *OptionMenuItem {
 // The function returns the following values:
 //
 //   - utf8: label of item.
-//
 func (item *OptionMenuItem) Label() string {
 	var _arg0 *C.WebKitOptionMenuItem // out
 	var _cret *C.gchar                // in
@@ -102,7 +100,6 @@ func (item *OptionMenuItem) Label() string {
 // The function returns the following values:
 //
 //   - utf8: tooltip of item, or NULL.
-//
 func (item *OptionMenuItem) Tooltip() string {
 	var _arg0 *C.WebKitOptionMenuItem // out
 	var _cret *C.gchar                // in
@@ -124,7 +121,6 @@ func (item *OptionMenuItem) Tooltip() string {
 // The function returns the following values:
 //
 //   - ok: TRUE if the item is enabled or FALSE otherwise.
-//
 func (item *OptionMenuItem) IsEnabled() bool {
 	var _arg0 *C.WebKitOptionMenuItem // out
 	var _cret C.gboolean              // in
@@ -148,7 +144,6 @@ func (item *OptionMenuItem) IsEnabled() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if the item is a group child or FALSE otherwise.
-//
 func (item *OptionMenuItem) IsGroupChild() bool {
 	var _arg0 *C.WebKitOptionMenuItem // out
 	var _cret C.gboolean              // in
@@ -172,7 +167,6 @@ func (item *OptionMenuItem) IsGroupChild() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if the item is a group label or FALSE otherwise.
-//
 func (item *OptionMenuItem) IsGroupLabel() bool {
 	var _arg0 *C.WebKitOptionMenuItem // out
 	var _cret C.gboolean              // in
@@ -196,7 +190,6 @@ func (item *OptionMenuItem) IsGroupLabel() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if the item is selected or FALSE otherwise.
-//
 func (item *OptionMenuItem) IsSelected() bool {
 	var _arg0 *C.WebKitOptionMenuItem // out
 	var _cret C.gboolean              // in

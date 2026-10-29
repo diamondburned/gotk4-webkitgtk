@@ -101,7 +101,6 @@ func (u URIComponent) String() string {
 //
 //   - contentType (optional): location to store content type.
 //   - bytes with the contents of uri, or NULL if uri is not a valid data URI.
-//
 func URIDecodeDataURI(uri string) (string, *glib.Bytes) {
 	var _arg1 *C.char   // out
 	var _arg2 *C.char   // in
@@ -141,7 +140,6 @@ func URIDecodeDataURI(uri string) (string, *glib.Bytes) {
 // The function returns the following values:
 //
 //   - ok: TRUE if equal otherwise FALSE.
-//
 func URIEqual(uri1, uri2 *glib.URI) bool {
 	var _arg1 *C.GUri    // out
 	var _arg2 *C.GUri    // out

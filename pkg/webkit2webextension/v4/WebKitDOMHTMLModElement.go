@@ -86,7 +86,6 @@ func marshalDOMHTMLModElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLModElement) Cite() string {
 	var _arg0 *C.WebKitDOMHTMLModElement // out
 	var _cret *C.gchar                   // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLModElement) Cite() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLModElement) DateTime() string {
 	var _arg0 *C.WebKitDOMHTMLModElement // out
 	var _cret *C.gchar                   // in
@@ -132,7 +130,6 @@ func (self *DOMHTMLModElement) DateTime() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLModElement) SetCite(value string) {
 	var _arg0 *C.WebKitDOMHTMLModElement // out
 	var _arg1 *C.gchar                   // out
@@ -151,7 +148,6 @@ func (self *DOMHTMLModElement) SetCite(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLModElement) SetDateTime(value string) {
 	var _arg0 *C.WebKitDOMHTMLModElement // out
 	var _arg1 *C.gchar                   // out

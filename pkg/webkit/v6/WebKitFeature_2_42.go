@@ -31,22 +31,22 @@ func init() {
 	})
 }
 
-// FeatureStatus describes the status of a webkitfeature.
+// FeatureStatus describes the status of a feature.
 //
 // The status for a given feature can be obtained with
 // webkit_feature_get_status.
 type FeatureStatus C.gint
 
 const (
-	// FeatureStatusEmbedder: feature that adjust behaviour for specific
+	// FeatureStatusEmbedder: feature that adjusts behavior for specific
 	// application needs. The feature is not part of a Web platform feature,
-	// not a mature feature intended to be always on.
+	// nor a mature feature intended to be always on.
 	FeatureStatusEmbedder FeatureStatus = iota
 	// FeatureStatusUnstable: feature in development. The feature may be
 	// unfinished, and there are no guarantees about its safety and stability.
 	FeatureStatusUnstable
 	// FeatureStatusInternal: feature for debugging the WebKit engine. The
-	// feature is not generally useful for user or web developers, and always
+	// feature is not generally useful for users or web developers, and always
 	// disabled by default.
 	FeatureStatusInternal
 	// FeatureStatusDeveloper: feature for web developers. The feature is not
@@ -116,18 +116,17 @@ func (f FeatureStatus) String() string {
 // - A category, which may be used to group features together:
 // feature.GetCategory.
 //
-// - An optional short “name” which can be presented to an user:
-// feature.GetName.
+// - An optional short “name” which can be presented to a user: feature.GetName.
 //
 // - An optional longer “detailed” description: feature.GetDetails.
 //
 // The lists of available features can be obtained with
 // settings.GetAllFeatures(), settings.GetExperimentalFeatures(), and
-// settings.GetDevelopmentFeatures()). As a rule of thumb, applications which
-// may want to allow users (i.e. web developers) to test WebKit features should
-// use the list of experimental features. Additionally, applications might want
-// to expose development features *when targeting technically inclined users*
-// for early testing of in-development features (i.e. in “technology preview” or
+// settings.GetDevelopmentFeatures(). As a rule of thumb, applications which may
+// want to allow users (i.e. web developers) to test WebKit features should use
+// the list of experimental features. Additionally, applications might want to
+// expose development features *when targeting technically inclined users* for
+// early testing of in-development features (i.e. in “technology preview” or
 // “canary” builds).
 //
 // Applications **must not** expose the list of all features to end users
@@ -158,7 +157,6 @@ func marshalFeature(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: feature category.
-//
 func (feature *Feature) Category() string {
 	var _arg0 *C.WebKitFeature // out
 	var _cret *C.char          // in
@@ -185,7 +183,6 @@ func (feature *Feature) Category() string {
 // The function returns the following values:
 //
 //   - ok: whether the feature is enabled by default.
-//
 func (feature *Feature) DefaultValue() bool {
 	var _arg0 *C.WebKitFeature // out
 	var _cret C.gboolean       // in
@@ -218,7 +215,6 @@ func (feature *Feature) DefaultValue() bool {
 // The function returns the following values:
 //
 //   - utf8 (optional): feature description.
-//
 func (feature *Feature) Details() string {
 	var _arg0 *C.WebKitFeature // out
 	var _cret *C.char          // in
@@ -242,7 +238,6 @@ func (feature *Feature) Details() string {
 // The function returns the following values:
 //
 //   - utf8: identifier string for the feature.
-//
 func (feature *Feature) Identifier() string {
 	var _arg0 *C.WebKitFeature // out
 	var _cret *C.char          // in
@@ -270,7 +265,6 @@ func (feature *Feature) Identifier() string {
 // The function returns the following values:
 //
 //   - utf8 (optional): short feature name.
-//
 func (feature *Feature) Name() string {
 	var _arg0 *C.WebKitFeature // out
 	var _cret *C.char          // in
@@ -294,7 +288,6 @@ func (feature *Feature) Name() string {
 // The function returns the following values:
 //
 //   - featureStatus: feature status.
-//
 func (feature *Feature) Status() FeatureStatus {
 	var _arg0 *C.WebKitFeature      // out
 	var _cret C.WebKitFeatureStatus // in
@@ -316,11 +309,11 @@ func (feature *Feature) Status() FeatureStatus {
 // The list supports passing around a set of feature objects and iterating over
 // them:
 //
-//    g_autoptr(WebKitFeatureList) list = webkit_settings_get_experimental_features();
-//    for (gsize i = 0; i < webkit_feature_list_get_length(list): i++) {
-//        WebKitFeature *feature = webkit_feature_list_get(list, i);
-//        // Do something with "feature".
-//    }
+//	g_autoptr(WebKitFeatureList) list = webkit_settings_get_experimental_features();
+//	for (gsize i = 0; i < webkit_feature_list_get_length(list); i++) {
+//	    WebKitFeature *feature = webkit_feature_list_get(list, i);
+//	    // Do something with "feature".
+//	}
 //
 // Lists of features can be obtained with settings.GetExperimentalFeatures(),
 // settings.GetDevelopmentFeatures(), and settings.GetAllFeatures().
@@ -340,6 +333,45 @@ func marshalFeatureList(p uintptr) (interface{}, error) {
 	return &FeatureList{&featureList{(*C.WebKitFeatureList)(b)}}, nil
 }
 
+// Find finds a feature given its identifier.
+//
+// The function takes the following parameters:
+//
+//   - identifier: KitFeature identifier.
+//
+// The function returns the following values:
+//
+//   - feature (optional) with the given identifier, or NULL if it cannot be
+//     found.
+func (featureList *FeatureList) Find(identifier string) *Feature {
+	var _arg0 *C.WebKitFeatureList // out
+	var _arg1 *C.gchar             // out
+	var _cret *C.WebKitFeature     // in
+
+	_arg0 = (*C.WebKitFeatureList)(gextras.StructNative(unsafe.Pointer(featureList)))
+	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(identifier)))
+	defer C.free(unsafe.Pointer(_arg1))
+
+	_cret = C.webkit_feature_list_find(_arg0, _arg1)
+	runtime.KeepAlive(featureList)
+	runtime.KeepAlive(identifier)
+
+	var _feature *Feature // out
+
+	if _cret != nil {
+		_feature = (*Feature)(gextras.NewStructNative(unsafe.Pointer(_cret)))
+		C.webkit_feature_ref(_cret)
+		runtime.SetFinalizer(
+			gextras.StructIntern(unsafe.Pointer(_feature)),
+			func(intern *struct{ C unsafe.Pointer }) {
+				C.webkit_feature_unref((*C.WebKitFeature)(intern.C))
+			},
+		)
+	}
+
+	return _feature
+}
+
 // Get gets a feature given its index.
 //
 // The function takes the following parameters:
@@ -349,7 +381,6 @@ func marshalFeatureList(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - feature at index.
-//
 func (featureList *FeatureList) Get(index uint) *Feature {
 	var _arg0 *C.WebKitFeatureList // out
 	var _arg1 C.gsize              // out
@@ -381,9 +412,6 @@ func (featureList *FeatureList) Get(index uint) *Feature {
 // The function returns the following values:
 //
 //   - gsize: number of elements.
-//
-//     Since 2.42.
-//
 func (featureList *FeatureList) Length() uint {
 	var _arg0 *C.WebKitFeatureList // out
 	var _cret C.gsize              // in

@@ -36,7 +36,7 @@ func init() {
 }
 
 // UserContentInjectedFrames specifies in which frames user style sheets are to
-// be inserted in.
+// be inserted.
 type UserContentInjectedFrames C.gint
 
 const (
@@ -64,7 +64,7 @@ func (u UserContentInjectedFrames) String() string {
 	}
 }
 
-// UserScriptInjectionTime specifies at which place of documents an user script
+// UserScriptInjectionTime specifies at which place of documents a user script
 // will be inserted.
 type UserScriptInjectionTime C.gint
 
@@ -93,11 +93,11 @@ func (u UserScriptInjectionTime) String() string {
 	}
 }
 
-// UserStyleLevel specifies how to treat an user style sheet.
+// UserStyleLevel specifies how to treat a user style sheet.
 type UserStyleLevel C.gint
 
 const (
-	// UserStyleLevelUser: style sheet is an user style sheet, its contents
+	// UserStyleLevelUser: style sheet is a user style sheet, its contents
 	// always override other style sheets. This is the default.
 	UserStyleLevelUser UserStyleLevel = iota
 	// UserStyleLevelAuthor: style sheet will be treated as if it was provided

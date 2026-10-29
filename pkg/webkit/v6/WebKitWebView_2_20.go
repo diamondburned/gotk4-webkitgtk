@@ -34,9 +34,9 @@ const (
 	WebProcessCrashed WebProcessTerminationReason = iota
 	// WebProcessExceededMemoryLimit: web process exceeded the memory limit.
 	WebProcessExceededMemoryLimit
-	// WebProcessTerminatedByApi: web process termination was requested by an
+	// WebProcessTerminatedByAPI: web process termination was requested by an
 	// API call. Since: 2.34.
-	WebProcessTerminatedByApi
+	WebProcessTerminatedByAPI
 )
 
 func marshalWebProcessTerminationReason(p uintptr) (interface{}, error) {
@@ -50,8 +50,8 @@ func (w WebProcessTerminationReason) String() string {
 		return "Crashed"
 	case WebProcessExceededMemoryLimit:
 		return "ExceededMemoryLimit"
-	case WebProcessTerminatedByApi:
-		return "TerminatedByApi"
+	case WebProcessTerminatedByAPI:
+		return "TerminatedByAPI"
 	default:
 		return fmt.Sprintf("WebProcessTerminationReason(%d)", w)
 	}

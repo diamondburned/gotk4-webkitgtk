@@ -43,10 +43,11 @@ func defaultURISchemeResponseOverrides(v *URISchemeResponse) URISchemeResponseOv
 // KitURISchemeRequestCallback. After that, when a URI response is made with
 // that particular scheme, your callback will be called. There you will be able
 // to provide more response parameters when the methods and properties of a
-// KitURISchemeRequest is not enough.
+// KitURISchemeRequest are not enough.
 //
 // When you finished setting up your KitURISchemeResponse, call
-// webkit_uri_request_finish_with_response() with it to return the response.
+// webkit_uri_scheme_request_finish_with_response() with it to return the
+// response.
 type URISchemeResponse struct {
 	_ [0]func() // equal guard
 	*coreglib.Object
@@ -92,7 +93,6 @@ func marshalURISchemeResponse(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - uriSchemeResponse: newly created KitURISchemeResponse.
-//
 func NewURISchemeResponse(inputStream gio.InputStreamer, streamLength int64) *URISchemeResponse {
 	var _arg1 *C.GInputStream            // out
 	var _arg2 C.gint64                   // out
@@ -117,7 +117,6 @@ func NewURISchemeResponse(inputStream gio.InputStreamer, streamLength int64) *UR
 // The function takes the following parameters:
 //
 //   - contentType: content type of the stream.
-//
 func (response *URISchemeResponse) SetContentType(contentType string) {
 	var _arg0 *C.WebKitURISchemeResponse // out
 	var _arg1 *C.gchar                   // out
@@ -139,7 +138,6 @@ func (response *URISchemeResponse) SetContentType(contentType string) {
 // The function takes the following parameters:
 //
 //   - headers: HTTP headers to be set.
-//
 func (response *URISchemeResponse) SetHTTPHeaders(headers *soup.MessageHeaders) {
 	var _arg0 *C.WebKitURISchemeResponse // out
 	var _arg1 *C.SoupMessageHeaders      // out
@@ -161,7 +159,6 @@ func (response *URISchemeResponse) SetHTTPHeaders(headers *soup.MessageHeaders) 
 //
 //   - statusCode: HTTP status code to be returned.
 //   - reasonPhrase (optional): reason phrase.
-//
 func (response *URISchemeResponse) SetStatus(statusCode uint, reasonPhrase string) {
 	var _arg0 *C.WebKitURISchemeResponse // out
 	var _arg1 C.guint                    // out

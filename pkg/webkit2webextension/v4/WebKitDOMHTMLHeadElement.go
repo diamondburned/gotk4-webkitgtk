@@ -86,7 +86,6 @@ func marshalDOMHTMLHeadElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLHeadElement) Profile() string {
 	var _arg0 *C.WebKitDOMHTMLHeadElement // out
 	var _cret *C.gchar                    // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLHeadElement) Profile() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLHeadElement) SetProfile(value string) {
 	var _arg0 *C.WebKitDOMHTMLHeadElement // out
 	var _arg1 *C.gchar                    // out

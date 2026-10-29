@@ -86,7 +86,6 @@ func marshalDOMHTMLDivElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLDivElement) Align() string {
 	var _arg0 *C.WebKitDOMHTMLDivElement // out
 	var _cret *C.gchar                   // in
@@ -109,7 +108,6 @@ func (self *DOMHTMLDivElement) Align() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLDivElement) SetAlign(value string) {
 	var _arg0 *C.WebKitDOMHTMLDivElement // out
 	var _arg1 *C.gchar                   // out

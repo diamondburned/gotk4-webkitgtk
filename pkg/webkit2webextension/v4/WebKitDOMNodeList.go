@@ -76,7 +76,6 @@ func marshalDOMNodeList(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMNodeList) Length() uint32 {
 	var _arg0 *C.WebKitDOMNodeList // out
 	var _cret C.gulong             // in
@@ -102,7 +101,6 @@ func (self *DOMNodeList) Length() uint32 {
 // The function returns the following values:
 //
 //   - domNode: KitDOMNode.
-//
 func (self *DOMNodeList) Item(index uint32) *DOMNode {
 	var _arg0 *C.WebKitDOMNodeList // out
 	var _arg1 C.gulong             // out

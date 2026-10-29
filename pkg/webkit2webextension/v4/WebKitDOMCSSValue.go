@@ -90,7 +90,6 @@ func marshalDOMCSSValue(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMCSSValue) CSSText() string {
 	var _arg0 *C.WebKitDOMCSSValue // out
 	var _cret *C.gchar             // in
@@ -113,7 +112,6 @@ func (self *DOMCSSValue) CSSText() string {
 // The function returns the following values:
 //
 //   - gushort: #gushort.
-//
 func (self *DOMCSSValue) CSSValueType() uint16 {
 	var _arg0 *C.WebKitDOMCSSValue // out
 	var _cret C.gushort            // in
@@ -135,7 +133,6 @@ func (self *DOMCSSValue) CSSValueType() uint16 {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMCSSValue) SetCSSText(value string) error {
 	var _arg0 *C.WebKitDOMCSSValue // out
 	var _arg1 *C.gchar             // out

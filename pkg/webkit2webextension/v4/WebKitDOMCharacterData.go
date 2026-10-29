@@ -83,7 +83,6 @@ func marshalDOMCharacterData(p uintptr) (interface{}, error) {
 // The function takes the following parameters:
 //
 //   - data: #gchar.
-//
 func (self *DOMCharacterData) AppendData(data string) error {
 	var _arg0 *C.WebKitDOMCharacterData // out
 	var _arg1 *C.gchar                  // out
@@ -112,7 +111,6 @@ func (self *DOMCharacterData) AppendData(data string) error {
 //
 //   - offset: #gulong.
 //   - length: #gulong.
-//
 func (self *DOMCharacterData) DeleteData(offset, length uint32) error {
 	var _arg0 *C.WebKitDOMCharacterData // out
 	var _arg1 C.gulong                  // out
@@ -142,7 +140,6 @@ func (self *DOMCharacterData) DeleteData(offset, length uint32) error {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMCharacterData) Data() string {
 	var _arg0 *C.WebKitDOMCharacterData // out
 	var _cret *C.gchar                  // in
@@ -165,7 +162,6 @@ func (self *DOMCharacterData) Data() string {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMCharacterData) Length() uint32 {
 	var _arg0 *C.WebKitDOMCharacterData // out
 	var _cret C.gulong                  // in
@@ -188,7 +184,6 @@ func (self *DOMCharacterData) Length() uint32 {
 //
 //   - offset: #gulong.
 //   - data: #gchar.
-//
 func (self *DOMCharacterData) InsertData(offset uint32, data string) error {
 	var _arg0 *C.WebKitDOMCharacterData // out
 	var _arg1 C.gulong                  // out
@@ -221,7 +216,6 @@ func (self *DOMCharacterData) InsertData(offset uint32, data string) error {
 //   - offset: #gulong.
 //   - length: #gulong.
 //   - data: #gchar.
-//
 func (self *DOMCharacterData) ReplaceData(offset, length uint32, data string) error {
 	var _arg0 *C.WebKitDOMCharacterData // out
 	var _arg1 C.gulong                  // out
@@ -255,7 +249,6 @@ func (self *DOMCharacterData) ReplaceData(offset, length uint32, data string) er
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMCharacterData) SetData(value string) error {
 	var _arg0 *C.WebKitDOMCharacterData // out
 	var _arg1 *C.gchar                  // out
@@ -288,7 +281,6 @@ func (self *DOMCharacterData) SetData(value string) error {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMCharacterData) SubstringData(offset, length uint32) (string, error) {
 	var _arg0 *C.WebKitDOMCharacterData // out
 	var _arg1 C.gulong                  // out

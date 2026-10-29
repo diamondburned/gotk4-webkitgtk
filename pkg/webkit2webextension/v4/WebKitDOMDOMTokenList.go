@@ -81,7 +81,6 @@ func marshalDOMDOMTokenList(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDOMTokenList) Contains(token string) bool {
 	var _arg0 *C.WebKitDOMDOMTokenList // out
 	var _arg1 *C.gchar                 // out
@@ -109,7 +108,6 @@ func (self *DOMDOMTokenList) Contains(token string) bool {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMDOMTokenList) Length() uint32 {
 	var _arg0 *C.WebKitDOMDOMTokenList // out
 	var _cret C.gulong                 // in
@@ -131,7 +129,6 @@ func (self *DOMDOMTokenList) Length() uint32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDOMTokenList) Value() string {
 	var _arg0 *C.WebKitDOMDOMTokenList // out
 	var _cret *C.gchar                 // in
@@ -158,7 +155,6 @@ func (self *DOMDOMTokenList) Value() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMDOMTokenList) Item(index uint32) string {
 	var _arg0 *C.WebKitDOMDOMTokenList // out
 	var _arg1 C.gulong                 // out
@@ -185,7 +181,6 @@ func (self *DOMDOMTokenList) Item(index uint32) string {
 //
 //   - token: #gchar.
 //   - newToken: #gchar.
-//
 func (self *DOMDOMTokenList) Replace(token, newToken string) error {
 	var _arg0 *C.WebKitDOMDOMTokenList // out
 	var _arg1 *C.gchar                 // out
@@ -217,7 +212,6 @@ func (self *DOMDOMTokenList) Replace(token, newToken string) error {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMDOMTokenList) SetValue(value string) {
 	var _arg0 *C.WebKitDOMDOMTokenList // out
 	var _arg1 *C.gchar                 // out
@@ -237,7 +231,6 @@ func (self *DOMDOMTokenList) SetValue(value string) {
 //
 //   - token: #gchar.
 //   - force: #gboolean.
-//
 func (self *DOMDOMTokenList) Toggle(token string, force bool) error {
 	var _arg0 *C.WebKitDOMDOMTokenList // out
 	var _arg1 *C.gchar                 // out

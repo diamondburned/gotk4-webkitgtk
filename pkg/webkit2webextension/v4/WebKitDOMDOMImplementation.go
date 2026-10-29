@@ -82,7 +82,6 @@ func marshalDOMDOMImplementation(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - domcssStyleSheet: KitDOMCSSStyleSheet.
-//
 func (self *DOMDOMImplementation) CreateCSSStyleSheet(title, media string) (*DOMCSSStyleSheet, error) {
 	var _arg0 *C.WebKitDOMDOMImplementation // out
 	var _arg1 *C.gchar                      // out
@@ -123,7 +122,6 @@ func (self *DOMDOMImplementation) CreateCSSStyleSheet(title, media string) (*DOM
 // The function returns the following values:
 //
 //   - domDocument: KitDOMDocument.
-//
 func (self *DOMDOMImplementation) CreateDocument(namespaceURI, qualifiedName string, doctype *DOMDocumentType) (*DOMDocument, error) {
 	var _arg0 *C.WebKitDOMDOMImplementation // out
 	var _arg1 *C.gchar                      // out
@@ -171,7 +169,6 @@ func (self *DOMDOMImplementation) CreateDocument(namespaceURI, qualifiedName str
 // The function returns the following values:
 //
 //   - domDocumentType: KitDOMDocumentType.
-//
 func (self *DOMDOMImplementation) CreateDocumentType(qualifiedName, publicId, systemId string) (*DOMDocumentType, error) {
 	var _arg0 *C.WebKitDOMDOMImplementation // out
 	var _arg1 *C.gchar                      // out
@@ -214,7 +211,6 @@ func (self *DOMDOMImplementation) CreateDocumentType(qualifiedName, publicId, sy
 // The function returns the following values:
 //
 //   - domhtmlDocument: KitDOMHTMLDocument.
-//
 func (self *DOMDOMImplementation) CreateHtmlDocument(title string) *DOMHTMLDocument {
 	var _arg0 *C.WebKitDOMDOMImplementation // out
 	var _arg1 *C.gchar                      // out
@@ -245,7 +241,6 @@ func (self *DOMDOMImplementation) CreateHtmlDocument(title string) *DOMHTMLDocum
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMDOMImplementation) HasFeature(feature, version string) bool {
 	var _arg0 *C.WebKitDOMDOMImplementation // out
 	var _arg1 *C.gchar                      // out

@@ -69,7 +69,6 @@ func marshalWebsiteData(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: website name of website_data.
-//
 func (websiteData *WebsiteData) Name() string {
 	var _arg0 *C.WebKitWebsiteData // out
 	var _cret *C.char              // in
@@ -88,9 +87,10 @@ func (websiteData *WebsiteData) Name() string {
 
 // Size gets the size of the data of types types in a KitWebsiteData.
 //
-// Note that currently the data size is only known for
-// WEBKIT_WEBSITE_DATA_DISK_CACHE data type so for all other types 0 will be
-// returned.
+// Note that currently the data size is only known for the
+// WEBKIT_WEBSITE_DATA_DISK_CACHE, WEBKIT_WEBSITE_DATA_LOCAL_STORAGE,
+// WEBKIT_WEBSITE_DATA_INDEXEDDB_DATABASES and WEBKIT_WEBSITE_DATA_DOM_CACHE
+// data types, so for all other types 0 will be returned.
 //
 // The function takes the following parameters:
 //
@@ -99,7 +99,6 @@ func (websiteData *WebsiteData) Name() string {
 // The function returns the following values:
 //
 //   - guint64: size of website_data for the given types.
-//
 func (websiteData *WebsiteData) Size(types WebsiteDataTypes) uint64 {
 	var _arg0 *C.WebKitWebsiteData     // out
 	var _arg1 C.WebKitWebsiteDataTypes // out
@@ -127,7 +126,6 @@ func (websiteData *WebsiteData) Size(types WebsiteDataTypes) uint64 {
 // The function returns the following values:
 //
 //   - websiteDataTypes: bitmask of KitWebsiteDataTypes in website_data.
-//
 func (websiteData *WebsiteData) Types() WebsiteDataTypes {
 	var _arg0 *C.WebKitWebsiteData     // out
 	var _cret C.WebKitWebsiteDataTypes // in

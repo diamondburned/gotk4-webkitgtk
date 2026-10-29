@@ -86,7 +86,6 @@ func marshalDOMHTMLDListElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLDListElement) Compact() bool {
 	var _arg0 *C.WebKitDOMHTMLDListElement // out
 	var _cret C.gboolean                   // in
@@ -110,7 +109,6 @@ func (self *DOMHTMLDListElement) Compact() bool {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLDListElement) SetCompact(value bool) {
 	var _arg0 *C.WebKitDOMHTMLDListElement // out
 	var _arg1 C.gboolean                   // out

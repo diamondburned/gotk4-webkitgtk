@@ -3,11 +3,14 @@
 package webkit2
 
 import (
+	"context"
 	"fmt"
 	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/cairo"
+	"github.com/diamondburned/gotk4/pkg/core/gbox"
+	"github.com/diamondburned/gotk4/pkg/core/gcancel"
 	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
@@ -19,6 +22,8 @@ import (
 // #include <glib-object.h>
 // #include <webkit2/webkit2.h>
 // extern void _gotk4_webkit24_FaviconDatabase_ConnectFaviconChanged(gpointer, gchar*, gchar*, guintptr);
+// extern void _gotk4_webkit24_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
 import "C"
 
 // GType values.
@@ -73,7 +78,6 @@ func (f FaviconDatabaseError) String() string {
 // The function returns the following values:
 //
 //   - quark: favicon database error domain.
-//
 func FaviconDatabaseErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 
@@ -81,9 +85,7 @@ func FaviconDatabaseErrorQuark() glib.Quark {
 
 	var _quark glib.Quark // out
 
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
+	_quark = glib.Quark(_cret)
 
 	return _quark
 }
@@ -103,10 +105,10 @@ func defaultFaviconDatabaseOverrides(v *FaviconDatabase) FaviconDatabaseOverride
 // into a memory cache if possible. That cache is frozen to an on-disk database
 // for persistence.
 //
-// If KitSettings:enable-private-browsing is TRUE, new icons won't be added
-// to the on-disk database and no existing icons will be deleted from it.
-// Nevertheless, WebKit will still store them in the in-memory cache during the
-// current execution.
+// If websitedatamanager:is-ephemeral is TRUE, new icons won't be added to the
+// on-disk database and no existing icons will be deleted from it. Nevertheless,
+// WebKit will still store them in the in-memory cache during the current
+// execution.
 type FaviconDatabase struct {
 	_ [0]func() // equal guard
 	*coreglib.Object
@@ -162,6 +164,49 @@ func (database *FaviconDatabase) Clear() {
 	runtime.KeepAlive(database)
 }
 
+// Favicon: asynchronously obtains a favicon image.
+//
+// Asynchronously obtains an image of the favicon for the given page URI.
+// If the icon is already in the memory cache, its image data is not read from
+// the database again. The result is always delivered asynchronously.
+//
+// This is an asynchronous method. When the operation is finished, callback will
+// be invoked. You can then call webkit_favicon_database_get_favicon_finish() to
+// get the result of the operation.
+//
+// The function takes the following parameters:
+//
+//   - ctx (optional) or NULL.
+//   - pageUri: URI of the page for which we want to retrieve the favicon.
+//   - callback (optional) to call when the request is satisfied or NULL if you
+//     don't care about the result.
+func (database *FaviconDatabase) Favicon(ctx context.Context, pageUri string, callback gio.AsyncReadyCallback) {
+	var _arg0 *C.WebKitFaviconDatabase // out
+	var _arg2 *C.GCancellable          // out
+	var _arg1 *C.gchar                 // out
+	var _arg3 C.GAsyncReadyCallback    // out
+	var _arg4 C.gpointer
+
+	_arg0 = (*C.WebKitFaviconDatabase)(unsafe.Pointer(coreglib.InternObject(database).Native()))
+	{
+		cancellable := gcancel.GCancellableFromContext(ctx)
+		defer runtime.KeepAlive(cancellable)
+		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
+	}
+	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(pageUri)))
+	defer C.free(unsafe.Pointer(_arg1))
+	if callback != nil {
+		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
+		_arg4 = C.gpointer(gbox.AssignOnce(callback))
+	}
+
+	C.webkit_favicon_database_get_favicon(_arg0, _arg1, _arg2, _arg3, _arg4)
+	runtime.KeepAlive(database)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(pageUri)
+	runtime.KeepAlive(callback)
+}
+
 // FaviconFinish finishes an operation started with
 // webkit_favicon_database_get_favicon().
 //
@@ -173,7 +218,6 @@ func (database *FaviconDatabase) Clear() {
 // The function returns the following values:
 //
 //   - surface: new favicon image, or NULL in case of error.
-//
 func (database *FaviconDatabase) FaviconFinish(result gio.AsyncResulter) (*cairo.Surface, error) {
 	var _arg0 *C.WebKitFaviconDatabase // out
 	var _arg1 *C.GAsyncResult          // out
@@ -211,7 +255,6 @@ func (database *FaviconDatabase) FaviconFinish(result gio.AsyncResulter) (*cairo
 //
 //   - utf8: newly allocated URI for the favicon, or NULL if the database
 //     doesn't have a favicon for page_uri.
-//
 func (database *FaviconDatabase) FaviconURI(pageUri string) string {
 	var _arg0 *C.WebKitFaviconDatabase // out
 	var _arg1 *C.gchar                 // out

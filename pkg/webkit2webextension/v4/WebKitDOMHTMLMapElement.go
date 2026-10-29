@@ -86,7 +86,6 @@ func marshalDOMHTMLMapElement(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMHTMLMapElement) Areas() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMHTMLMapElement // out
 	var _cret *C.WebKitDOMHTMLCollection // in
@@ -108,7 +107,6 @@ func (self *DOMHTMLMapElement) Areas() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLMapElement) Name() string {
 	var _arg0 *C.WebKitDOMHTMLMapElement // out
 	var _cret *C.gchar                   // in
@@ -131,7 +129,6 @@ func (self *DOMHTMLMapElement) Name() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLMapElement) SetName(value string) {
 	var _arg0 *C.WebKitDOMHTMLMapElement // out
 	var _arg1 *C.gchar                   // out

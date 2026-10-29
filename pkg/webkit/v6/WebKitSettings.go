@@ -6,8 +6,10 @@ import (
 	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
 // #include <stdlib.h>
@@ -34,16 +36,16 @@ func defaultSettingsOverrides(v *Settings) SettingsOverrides {
 	return SettingsOverrides{}
 }
 
-// Settings: control the behaviour of a KitWebView.
+// Settings: control the behavior of a KitWebView.
 //
 // KitSettings can be applied to a KitWebView to control text charset, color,
 // font sizes, printing mode, script support, loading of images and various
 // other things on a KitWebView. After creation, a KitSettings object contains
 // default settings.
 //
-//    // Disable JavaScript
-//    WebKitSettings *settings = webkit_web_view_group_get_settings (my_view_group);
-//    webkit_settings_set_enable_javascript (settings, FALSE);.
+//	// Disable JavaScript
+//	WebKitSettings *settings = webkit_web_view_group_get_settings (my_view_group);
+//	webkit_settings_set_enable_javascript (settings, FALSE);.
 type Settings struct {
 	_ [0]func() // equal guard
 	*coreglib.Object
@@ -87,7 +89,6 @@ func marshalSettings(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - settings: new KitSettings instance.
-//
 func NewSettings() *Settings {
 	var _cret *C.WebKitSettings // in
 
@@ -100,13 +101,52 @@ func NewSettings() *Settings {
 	return _settings
 }
 
+// ApplyFromKeyFile reads the contents of the given group_name from the given
+// key_file and applies the value of each key/value to the corresponding
+// property on the settings.
+//
+// Value types have to match with the corresponding setting property type
+// and the group keys have to match existing setting property names. If those
+// conditions are not met, the function will return FALSE.
+//
+// Supported value types are strings (unquoted), booleans (0, 1, true, false)
+// and unsigned integers.
+//
+// The function takes the following parameters:
+//
+//   - keyFile: File.
+//   - groupName: name of the group to read from key_file.
+func (settings *Settings) ApplyFromKeyFile(keyFile *glib.KeyFile, groupName string) error {
+	var _arg0 *C.WebKitSettings // out
+	var _arg1 *C.GKeyFile       // out
+	var _arg2 *C.gchar          // out
+	var _cerr *C.GError         // in
+
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(coreglib.InternObject(settings).Native()))
+	_arg1 = (*C.GKeyFile)(gextras.StructNative(unsafe.Pointer(keyFile)))
+	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(groupName)))
+	defer C.free(unsafe.Pointer(_arg2))
+
+	C.webkit_settings_apply_from_key_file(_arg0, _arg1, _arg2, &_cerr)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(keyFile)
+	runtime.KeepAlive(groupName)
+
+	var _goerr error // out
+
+	if _cerr != nil {
+		_goerr = gerror.Take(unsafe.Pointer(_cerr))
+	}
+
+	return _goerr
+}
+
 // AllowFileAccessFromFileUrls: get the
 // KitSettings:allow-file-access-from-file-urls property.
 //
 // The function returns the following values:
 //
 //   - ok: TRUE If file access from file URLs is allowed or FALSE otherwise.
-//
 func (settings *Settings) AllowFileAccessFromFileUrls() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -131,7 +171,6 @@ func (settings *Settings) AllowFileAccessFromFileUrls() bool {
 //
 //   - ok: TRUE if it's allowed to create and run modal dialogs or FALSE
 //     otherwise.
-//
 func (settings *Settings) AllowModalDialogs() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -156,8 +195,7 @@ func (settings *Settings) AllowModalDialogs() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE If navigation to data URLs from the top frame is allowed or
-//     FALSE\ otherwise.
-//
+//     FALSE otherwise.
 func (settings *Settings) AllowTopNavigationToDataUrls() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -183,7 +221,6 @@ func (settings *Settings) AllowTopNavigationToDataUrls() bool {
 //
 //   - ok: TRUE If universal access from file URLs is allowed or FALSE
 //     otherwise.
-//
 func (settings *Settings) AllowUniversalAccessFromFileUrls() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -207,7 +244,6 @@ func (settings *Settings) AllowUniversalAccessFromFileUrls() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE If auto loading of images is enabled or FALSE otherwise.
-//
 func (settings *Settings) AutoLoadImages() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -232,7 +268,6 @@ func (settings *Settings) AutoLoadImages() bool {
 //
 //   - utf8: default font family used to display content marked with cursive
 //     font.
-//
 func (settings *Settings) CursiveFontFamily() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
@@ -254,7 +289,6 @@ func (settings *Settings) CursiveFontFamily() string {
 // The function returns the following values:
 //
 //   - utf8: default charset.
-//
 func (settings *Settings) DefaultCharset() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
@@ -277,7 +311,6 @@ func (settings *Settings) DefaultCharset() string {
 //
 //   - utf8: default font family used to display content that does not specify a
 //     font.
-//
 func (settings *Settings) DefaultFontFamily() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
@@ -299,7 +332,6 @@ func (settings *Settings) DefaultFontFamily() string {
 // The function returns the following values:
 //
 //   - guint32: default font size, in pixels.
-//
 func (settings *Settings) DefaultFontSize() uint32 {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.guint32         // in
@@ -322,7 +354,6 @@ func (settings *Settings) DefaultFontSize() uint32 {
 // The function returns the following values:
 //
 //   - guint32: default monospace font size, in pixels.
-//
 func (settings *Settings) DefaultMonospaceFontSize() uint32 {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.guint32         // in
@@ -344,7 +375,6 @@ func (settings *Settings) DefaultMonospaceFontSize() uint32 {
 // The function returns the following values:
 //
 //   - ok: TRUE If web security support is disabled or FALSE otherwise.
-//
 func (settings *Settings) DisableWebSecurity() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -369,7 +399,6 @@ func (settings *Settings) DisableWebSecurity() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE If compositing borders are drawn or FALSE otherwise.
-//
 func (settings *Settings) DrawCompositingIndicators() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -388,14 +417,37 @@ func (settings *Settings) DrawCompositingIndicators() bool {
 	return _ok
 }
 
+// Enable2DCanvasAcceleration: get the KitSettings:enable-2d-canvas-acceleration
+// property.
+//
+// The function returns the following values:
+//
+//   - ok: TRUE if 2D canvas acceleration is enabled or FALSE otherwise.
+func (settings *Settings) Enable2DCanvasAcceleration() bool {
+	var _arg0 *C.WebKitSettings // out
+	var _cret C.gboolean        // in
+
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(coreglib.InternObject(settings).Native()))
+
+	_cret = C.webkit_settings_get_enable_2d_canvas_acceleration(_arg0)
+	runtime.KeepAlive(settings)
+
+	var _ok bool // out
+
+	if _cret != 0 {
+		_ok = true
+	}
+
+	return _ok
+}
+
 // EnableBackForwardNavigationGestures: get the
 // KitSettings:enable-back-forward-navigation-gestures property.
 //
 // The function returns the following values:
 //
-//   - ok: TRUE if horizontal swipe gesture will trigger back-forward navigaiton
+//   - ok: TRUE if horizontal swipe gesture will trigger back-forward navigation
 //     or FALSE otherwise.
-//
 func (settings *Settings) EnableBackForwardNavigationGestures() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -419,7 +471,6 @@ func (settings *Settings) EnableBackForwardNavigationGestures() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE If caret browsing is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableCaretBrowsing() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -443,7 +494,6 @@ func (settings *Settings) EnableCaretBrowsing() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE If developer extras is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableDeveloperExtras() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -464,10 +514,11 @@ func (settings *Settings) EnableDeveloperExtras() bool {
 
 // EnableDnsPrefetching: get the KitSettings:enable-dns-prefetching property.
 //
+// Deprecated: since version 2.48.
+//
 // The function returns the following values:
 //
 //   - ok: TRUE If DNS prefetching is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableDnsPrefetching() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -491,7 +542,6 @@ func (settings *Settings) EnableDnsPrefetching() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if EncryptedMedia support is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableEncryptedMedia() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -515,7 +565,6 @@ func (settings *Settings) EnableEncryptedMedia() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE If fullscreen support is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableFullscreen() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -539,7 +588,6 @@ func (settings *Settings) EnableFullscreen() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if IndexedDB support is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableHtml5Database() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -564,7 +612,6 @@ func (settings *Settings) EnableHtml5Database() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE If HTML5 local storage support is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableHtml5LocalStorage() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -586,10 +633,11 @@ func (settings *Settings) EnableHtml5LocalStorage() bool {
 // EnableHyperlinkAuditing: get the KitSettings:enable-hyperlink-auditing
 // property.
 //
+// Deprecated: since version 2.50.
+//
 // The function returns the following values:
 //
 //   - ok: TRUE If hyper link auditing is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableHyperlinkAuditing() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -613,7 +661,6 @@ func (settings *Settings) EnableHyperlinkAuditing() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE If JavaScript is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableJavascript() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -638,7 +685,6 @@ func (settings *Settings) EnableJavascript() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if JavaScript markup is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableJavascriptMarkup() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -662,7 +708,6 @@ func (settings *Settings) EnableJavascriptMarkup() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if media support is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableMedia() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -687,7 +732,6 @@ func (settings *Settings) EnableMedia() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if MediaCapabilities support is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableMediaCapabilities() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -711,7 +755,6 @@ func (settings *Settings) EnableMediaCapabilities() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE If mediastream support is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableMediaStream() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -735,7 +778,6 @@ func (settings *Settings) EnableMediaStream() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE If MediaSource support is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableMediasource() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -760,7 +802,6 @@ func (settings *Settings) EnableMediasource() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE If mock capture devices is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableMockCaptureDevices() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -782,11 +823,11 @@ func (settings *Settings) EnableMockCaptureDevices() bool {
 // EnableOfflineWebApplicationCache: get the
 // KitSettings:enable-offline-web-application-cache property.
 //
+// Deprecated: since version 2.44.
+//
 // The function returns the following values:
 //
-//   - ok: TRUE If HTML5 offline web application cache support is enabled or
-//     FALSE otherwise.
-//
+//   - ok: FALSE.
 func (settings *Settings) EnableOfflineWebApplicationCache() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -809,8 +850,7 @@ func (settings *Settings) EnableOfflineWebApplicationCache() bool {
 //
 // The function returns the following values:
 //
-//   - ok: TRUE if page cache enabled or FALSE otherwise.
-//
+//   - ok: TRUE if page cache is enabled or FALSE otherwise.
 func (settings *Settings) EnablePageCache() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -835,7 +875,6 @@ func (settings *Settings) EnablePageCache() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE If text areas can be resized or FALSE otherwise.
-//
 func (settings *Settings) EnableResizableTextAreas() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -860,7 +899,6 @@ func (settings *Settings) EnableResizableTextAreas() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if site specific quirks are enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableSiteSpecificQuirks() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -884,7 +922,6 @@ func (settings *Settings) EnableSiteSpecificQuirks() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE if smooth scrolling is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableSmoothScrolling() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -910,7 +947,6 @@ func (settings *Settings) EnableSmoothScrolling() bool {
 //
 //   - ok: TRUE If HTML5 spatial navigation support is enabled or FALSE
 //     otherwise.
-//
 func (settings *Settings) EnableSpatialNavigation() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -934,7 +970,6 @@ func (settings *Settings) EnableSpatialNavigation() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE If tabs to link is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableTabsToLinks() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -958,7 +993,6 @@ func (settings *Settings) EnableTabsToLinks() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE If webaudio support is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableWebaudio() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -982,7 +1016,6 @@ func (settings *Settings) EnableWebaudio() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE If WebGL support is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableWebgl() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -1006,7 +1039,6 @@ func (settings *Settings) EnableWebgl() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE If WebRTC support is enabled or FALSE otherwise.
-//
 func (settings *Settings) EnableWebrtc() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -1032,7 +1064,6 @@ func (settings *Settings) EnableWebrtc() bool {
 //
 //   - ok: TRUE if writing console messages to stdout is enabled or FALSE
 //     otherwise.
-//
 func (settings *Settings) EnableWriteConsoleMessagesToStdout() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -1057,7 +1088,6 @@ func (settings *Settings) EnableWriteConsoleMessagesToStdout() bool {
 //
 //   - utf8: default font family used to display content marked with fantasy
 //     font.
-//
 func (settings *Settings) FantasyFontFamily() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
@@ -1078,12 +1108,11 @@ func (settings *Settings) FantasyFontFamily() string {
 //
 // The function takes the following parameters:
 //
-//   - feature to toggle.
+//   - feature to query.
 //
 // The function returns the following values:
 //
 //   - ok: whether the feature is enabled.
-//
 func (settings *Settings) FeatureEnabled(feature *Feature) bool {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.WebKitFeature  // out
@@ -1111,7 +1140,6 @@ func (settings *Settings) FeatureEnabled(feature *Feature) bool {
 // The function returns the following values:
 //
 //   - hardwareAccelerationPolicy: KitHardwareAccelerationPolicy.
-//
 func (settings *Settings) HardwareAccelerationPolicy() HardwareAccelerationPolicy {
 	var _arg0 *C.WebKitSettings                  // out
 	var _cret C.WebKitHardwareAccelerationPolicy // in
@@ -1135,7 +1163,6 @@ func (settings *Settings) HardwareAccelerationPolicy() HardwareAccelerationPolic
 //
 //   - ok: TRUE If javascript-can-access-clipboard is enabled or FALSE
 //     otherwise.
-//
 func (settings *Settings) JavascriptCanAccessClipboard() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -1159,8 +1186,7 @@ func (settings *Settings) JavascriptCanAccessClipboard() bool {
 //
 // The function returns the following values:
 //
-//   - ok: TRUE If JavaScript can open window automatically or FALSE otherwise.
-//
+//   - ok: TRUE If JavaScript can open windows automatically or FALSE otherwise.
 func (settings *Settings) JavascriptCanOpenWindowsAutomatically() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -1187,7 +1213,6 @@ func (settings *Settings) JavascriptCanOpenWindowsAutomatically() bool {
 // The function returns the following values:
 //
 //   - ok: FALSE.
-//
 func (settings *Settings) LoadIconsIgnoringImageLoadSetting() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -1206,13 +1231,36 @@ func (settings *Settings) LoadIconsIgnoringImageLoadSetting() bool {
 	return _ok
 }
 
+// MathFontFamily gets the KitSettings:math-font-family property.
+//
+// The function returns the following values:
+//
+//   - utf8 (optional): default font family used to display content marked with
+//     math font.
+func (settings *Settings) MathFontFamily() string {
+	var _arg0 *C.WebKitSettings // out
+	var _cret *C.gchar          // in
+
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(coreglib.InternObject(settings).Native()))
+
+	_cret = C.webkit_settings_get_math_font_family(_arg0)
+	runtime.KeepAlive(settings)
+
+	var _utf8 string // out
+
+	if _cret != nil {
+		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+	}
+
+	return _utf8
+}
+
 // MediaContentTypesRequiringHardwareSupport gets the
 // KitSettings:media-content-types-requiring-hardware-support property.
 //
 // The function returns the following values:
 //
 //   - utf8: media content types requiring hardware support, or NULL.
-//
 func (settings *Settings) MediaContentTypesRequiringHardwareSupport() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
@@ -1236,7 +1284,6 @@ func (settings *Settings) MediaContentTypesRequiringHardwareSupport() string {
 //
 //   - ok: TRUE If inline playback is allowed for media or FALSE if only
 //     fullscreen playback is allowed.
-//
 func (settings *Settings) MediaPlaybackAllowsInline() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -1260,9 +1307,8 @@ func (settings *Settings) MediaPlaybackAllowsInline() bool {
 //
 // The function returns the following values:
 //
-//   - ok: TRUE If an user gesture is needed to play or load media or FALSE if
-//     no user gesture is needed.
-//
+//   - ok: TRUE If a user gesture is needed to play or load media or FALSE if no
+//     user gesture is needed.
 func (settings *Settings) MediaPlaybackRequiresUserGesture() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -1286,7 +1332,6 @@ func (settings *Settings) MediaPlaybackRequiresUserGesture() bool {
 // The function returns the following values:
 //
 //   - guint32: minimum font size, in pixels.
-//
 func (settings *Settings) MinimumFontSize() uint32 {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.guint32         // in
@@ -1309,7 +1354,6 @@ func (settings *Settings) MinimumFontSize() uint32 {
 //
 //   - utf8: default font family used to display content marked with monospace
 //     font.
-//
 func (settings *Settings) MonospaceFontFamily() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
@@ -1332,7 +1376,6 @@ func (settings *Settings) MonospaceFontFamily() string {
 //
 //   - utf8: default font family used to display content marked with pictograph
 //     font.
-//
 func (settings *Settings) PictographFontFamily() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
@@ -1354,7 +1397,6 @@ func (settings *Settings) PictographFontFamily() string {
 // The function returns the following values:
 //
 //   - ok: TRUE If background images should be printed or FALSE otherwise.
-//
 func (settings *Settings) PrintBackgrounds() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -1379,7 +1421,6 @@ func (settings *Settings) PrintBackgrounds() bool {
 //
 //   - utf8: default font family used to display content marked with sans-serif
 //     font.
-//
 func (settings *Settings) SansSerifFontFamily() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
@@ -1401,7 +1442,6 @@ func (settings *Settings) SansSerifFontFamily() string {
 // The function returns the following values:
 //
 //   - utf8: default font family used to display content marked with serif font.
-//
 func (settings *Settings) SerifFontFamily() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
@@ -1423,7 +1463,6 @@ func (settings *Settings) SerifFontFamily() string {
 // The function returns the following values:
 //
 //   - utf8: current value of the user-agent property.
-//
 func (settings *Settings) UserAgent() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
@@ -1440,13 +1479,33 @@ func (settings *Settings) UserAgent() string {
 	return _utf8
 }
 
+// WebrtcUDPPortsRange: get the settings:webrtc-udp-ports-range property.
+//
+// The function returns the following values:
+//
+//   - utf8: webRTC UDP ports range, or NULL if un-set.
+func (settings *Settings) WebrtcUDPPortsRange() string {
+	var _arg0 *C.WebKitSettings // out
+	var _cret *C.gchar          // in
+
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(coreglib.InternObject(settings).Native()))
+
+	_cret = C.webkit_settings_get_webrtc_udp_ports_range(_arg0)
+	runtime.KeepAlive(settings)
+
+	var _utf8 string // out
+
+	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
+
+	return _utf8
+}
+
 // ZoomTextOnly: get the KitSettings:zoom-text-only property.
 //
 // The function returns the following values:
 //
 //   - ok: TRUE If zoom level of the view should only affect the text or FALSE
 //     if all view contents should be scaled.
-//
 func (settings *Settings) ZoomTextOnly() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -1471,7 +1530,6 @@ func (settings *Settings) ZoomTextOnly() bool {
 // The function takes the following parameters:
 //
 //   - allowed: value to be set.
-//
 func (settings *Settings) SetAllowFileAccessFromFileUrls(allowed bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1491,7 +1549,6 @@ func (settings *Settings) SetAllowFileAccessFromFileUrls(allowed bool) {
 // The function takes the following parameters:
 //
 //   - allowed: value to be set.
-//
 func (settings *Settings) SetAllowModalDialogs(allowed bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1512,7 +1569,6 @@ func (settings *Settings) SetAllowModalDialogs(allowed bool) {
 // The function takes the following parameters:
 //
 //   - allowed: value to be set.
-//
 func (settings *Settings) SetAllowTopNavigationToDataUrls(allowed bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1533,7 +1589,6 @@ func (settings *Settings) SetAllowTopNavigationToDataUrls(allowed bool) {
 // The function takes the following parameters:
 //
 //   - allowed: value to be set.
-//
 func (settings *Settings) SetAllowUniversalAccessFromFileUrls(allowed bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1553,7 +1608,6 @@ func (settings *Settings) SetAllowUniversalAccessFromFileUrls(allowed bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetAutoLoadImages(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1573,7 +1627,6 @@ func (settings *Settings) SetAutoLoadImages(enabled bool) {
 // The function takes the following parameters:
 //
 //   - cursiveFontFamily: new default cursive font family.
-//
 func (settings *Settings) SetCursiveFontFamily(cursiveFontFamily string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
@@ -1592,7 +1645,6 @@ func (settings *Settings) SetCursiveFontFamily(cursiveFontFamily string) {
 // The function takes the following parameters:
 //
 //   - defaultCharset: default charset to be set.
-//
 func (settings *Settings) SetDefaultCharset(defaultCharset string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
@@ -1611,7 +1663,6 @@ func (settings *Settings) SetDefaultCharset(defaultCharset string) {
 // The function takes the following parameters:
 //
 //   - defaultFontFamily: new default font family.
-//
 func (settings *Settings) SetDefaultFontFamily(defaultFontFamily string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
@@ -1630,7 +1681,6 @@ func (settings *Settings) SetDefaultFontFamily(defaultFontFamily string) {
 // The function takes the following parameters:
 //
 //   - fontSize: default font size to be set in pixels.
-//
 func (settings *Settings) SetDefaultFontSize(fontSize uint32) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.guint32         // out
@@ -1649,7 +1699,6 @@ func (settings *Settings) SetDefaultFontSize(fontSize uint32) {
 // The function takes the following parameters:
 //
 //   - fontSize: default monospace font size to be set in pixels.
-//
 func (settings *Settings) SetDefaultMonospaceFontSize(fontSize uint32) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.guint32         // out
@@ -1667,7 +1716,6 @@ func (settings *Settings) SetDefaultMonospaceFontSize(fontSize uint32) {
 // The function takes the following parameters:
 //
 //   - disabled: value to be set.
-//
 func (settings *Settings) SetDisableWebSecurity(disabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1688,7 +1736,6 @@ func (settings *Settings) SetDisableWebSecurity(disabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetDrawCompositingIndicators(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1703,13 +1750,32 @@ func (settings *Settings) SetDrawCompositingIndicators(enabled bool) {
 	runtime.KeepAlive(enabled)
 }
 
+// SetEnable2DCanvasAcceleration: set the
+// KitSettings:enable-2d-canvas-acceleration property.
+//
+// The function takes the following parameters:
+//
+//   - enabled: value to be set.
+func (settings *Settings) SetEnable2DCanvasAcceleration(enabled bool) {
+	var _arg0 *C.WebKitSettings // out
+	var _arg1 C.gboolean        // out
+
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(coreglib.InternObject(settings).Native()))
+	if enabled {
+		_arg1 = C.TRUE
+	}
+
+	C.webkit_settings_set_enable_2d_canvas_acceleration(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(enabled)
+}
+
 // SetEnableBackForwardNavigationGestures: set the
 // KitSettings:enable-back-forward-navigation-gestures property.
 //
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableBackForwardNavigationGestures(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1729,7 +1795,6 @@ func (settings *Settings) SetEnableBackForwardNavigationGestures(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableCaretBrowsing(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1750,7 +1815,6 @@ func (settings *Settings) SetEnableCaretBrowsing(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableDeveloperExtras(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1767,10 +1831,11 @@ func (settings *Settings) SetEnableDeveloperExtras(enabled bool) {
 
 // SetEnableDnsPrefetching: set the KitSettings:enable-dns-prefetching property.
 //
+// Deprecated: since version 2.48.
+//
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableDnsPrefetching(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1790,7 +1855,6 @@ func (settings *Settings) SetEnableDnsPrefetching(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableEncryptedMedia(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1810,7 +1874,6 @@ func (settings *Settings) SetEnableEncryptedMedia(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableFullscreen(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1830,7 +1893,6 @@ func (settings *Settings) SetEnableFullscreen(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableHtml5Database(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1851,7 +1913,6 @@ func (settings *Settings) SetEnableHtml5Database(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableHtml5LocalStorage(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1869,10 +1930,11 @@ func (settings *Settings) SetEnableHtml5LocalStorage(enabled bool) {
 // SetEnableHyperlinkAuditing: set the KitSettings:enable-hyperlink-auditing
 // property.
 //
+// Deprecated: since version 2.50.
+//
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableHyperlinkAuditing(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1892,7 +1954,6 @@ func (settings *Settings) SetEnableHyperlinkAuditing(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableJavascript(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1913,7 +1974,6 @@ func (settings *Settings) SetEnableJavascript(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableJavascriptMarkup(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1933,7 +1993,6 @@ func (settings *Settings) SetEnableJavascriptMarkup(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableMedia(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1954,7 +2013,6 @@ func (settings *Settings) SetEnableMedia(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableMediaCapabilities(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1974,7 +2032,6 @@ func (settings *Settings) SetEnableMediaCapabilities(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableMediaStream(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -1994,7 +2051,6 @@ func (settings *Settings) SetEnableMediaStream(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableMediasource(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2015,7 +2071,6 @@ func (settings *Settings) SetEnableMediasource(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableMockCaptureDevices(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2030,13 +2085,14 @@ func (settings *Settings) SetEnableMockCaptureDevices(enabled bool) {
 	runtime.KeepAlive(enabled)
 }
 
-// SetEnableOfflineWebApplicationCache: set the
-// KitSettings:enable-offline-web-application-cache property.
+// SetEnableOfflineWebApplicationCache: setting no longer supported. This
+// function does nothing.
+//
+// Deprecated: since version 2.44.
 //
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableOfflineWebApplicationCache(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2056,7 +2112,6 @@ func (settings *Settings) SetEnableOfflineWebApplicationCache(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnablePageCache(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2077,7 +2132,6 @@ func (settings *Settings) SetEnablePageCache(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableResizableTextAreas(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2098,7 +2152,6 @@ func (settings *Settings) SetEnableResizableTextAreas(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableSiteSpecificQuirks(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2119,7 +2172,6 @@ func (settings *Settings) SetEnableSiteSpecificQuirks(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableSmoothScrolling(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2140,7 +2192,6 @@ func (settings *Settings) SetEnableSmoothScrolling(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableSpatialNavigation(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2160,7 +2211,6 @@ func (settings *Settings) SetEnableSpatialNavigation(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableTabsToLinks(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2180,7 +2230,6 @@ func (settings *Settings) SetEnableTabsToLinks(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableWebaudio(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2200,7 +2249,6 @@ func (settings *Settings) SetEnableWebaudio(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableWebgl(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2223,7 +2271,6 @@ func (settings *Settings) SetEnableWebgl(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableWebrtc(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2244,7 +2291,6 @@ func (settings *Settings) SetEnableWebrtc(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetEnableWriteConsoleMessagesToStdout(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2264,7 +2310,6 @@ func (settings *Settings) SetEnableWriteConsoleMessagesToStdout(enabled bool) {
 // The function takes the following parameters:
 //
 //   - fantasyFontFamily: new default fantasy font family.
-//
 func (settings *Settings) SetFantasyFontFamily(fantasyFontFamily string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
@@ -2289,7 +2334,6 @@ func (settings *Settings) SetFantasyFontFamily(fantasyFontFamily string) {
 //
 //   - feature to toggle.
 //   - enabled: whether the feature will be enabled.
-//
 func (settings *Settings) SetFeatureEnabled(feature *Feature, enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.WebKitFeature  // out
@@ -2313,7 +2357,6 @@ func (settings *Settings) SetFeatureEnabled(feature *Feature, enabled bool) {
 // The function takes the following parameters:
 //
 //   - policy: KitHardwareAccelerationPolicy.
-//
 func (settings *Settings) SetHardwareAccelerationPolicy(policy HardwareAccelerationPolicy) {
 	var _arg0 *C.WebKitSettings                  // out
 	var _arg1 C.WebKitHardwareAccelerationPolicy // out
@@ -2332,7 +2375,6 @@ func (settings *Settings) SetHardwareAccelerationPolicy(policy HardwareAccelerat
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetJavascriptCanAccessClipboard(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2353,7 +2395,6 @@ func (settings *Settings) SetJavascriptCanAccessClipboard(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetJavascriptCanOpenWindowsAutomatically(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2376,7 +2417,6 @@ func (settings *Settings) SetJavascriptCanOpenWindowsAutomatically(enabled bool)
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetLoadIconsIgnoringImageLoadSetting(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2391,14 +2431,33 @@ func (settings *Settings) SetLoadIconsIgnoringImageLoadSetting(enabled bool) {
 	runtime.KeepAlive(enabled)
 }
 
+// SetMathFontFamily: set the KitSettings:math-font-family property.
+//
+// The function takes the following parameters:
+//
+//   - mathFontFamily (optional): new default math font family.
+func (settings *Settings) SetMathFontFamily(mathFontFamily string) {
+	var _arg0 *C.WebKitSettings // out
+	var _arg1 *C.gchar          // out
+
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(coreglib.InternObject(settings).Native()))
+	if mathFontFamily != "" {
+		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(mathFontFamily)))
+		defer C.free(unsafe.Pointer(_arg1))
+	}
+
+	C.webkit_settings_set_math_font_family(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(mathFontFamily)
+}
+
 // SetMediaContentTypesRequiringHardwareSupport: set the
 // KitSettings:media-content-types-requiring-hardware-support property.
 //
 // The function takes the following parameters:
 //
 //   - contentTypes (optional): list of media content types requiring hardware
-//     support split by semicolons (:) or NULL to use the default value.
-//
+//     support split by colons (:) or NULL to use the default value.
 func (settings *Settings) SetMediaContentTypesRequiringHardwareSupport(contentTypes string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
@@ -2420,7 +2479,6 @@ func (settings *Settings) SetMediaContentTypesRequiringHardwareSupport(contentTy
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetMediaPlaybackAllowsInline(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2441,7 +2499,6 @@ func (settings *Settings) SetMediaPlaybackAllowsInline(enabled bool) {
 // The function takes the following parameters:
 //
 //   - enabled: value to be set.
-//
 func (settings *Settings) SetMediaPlaybackRequiresUserGesture(enabled bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2461,7 +2518,6 @@ func (settings *Settings) SetMediaPlaybackRequiresUserGesture(enabled bool) {
 // The function takes the following parameters:
 //
 //   - fontSize: minimum font size to be set in pixels.
-//
 func (settings *Settings) SetMinimumFontSize(fontSize uint32) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.guint32         // out
@@ -2479,7 +2535,6 @@ func (settings *Settings) SetMinimumFontSize(fontSize uint32) {
 // The function takes the following parameters:
 //
 //   - monospaceFontFamily: new default monospace font family.
-//
 func (settings *Settings) SetMonospaceFontFamily(monospaceFontFamily string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
@@ -2498,7 +2553,6 @@ func (settings *Settings) SetMonospaceFontFamily(monospaceFontFamily string) {
 // The function takes the following parameters:
 //
 //   - pictographFontFamily: new default pictograph font family.
-//
 func (settings *Settings) SetPictographFontFamily(pictographFontFamily string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
@@ -2517,7 +2571,6 @@ func (settings *Settings) SetPictographFontFamily(pictographFontFamily string) {
 // The function takes the following parameters:
 //
 //   - printBackgrounds: value to be set.
-//
 func (settings *Settings) SetPrintBackgrounds(printBackgrounds bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out
@@ -2537,7 +2590,6 @@ func (settings *Settings) SetPrintBackgrounds(printBackgrounds bool) {
 // The function takes the following parameters:
 //
 //   - sansSerifFontFamily: new default sans-serif font family.
-//
 func (settings *Settings) SetSansSerifFontFamily(sansSerifFontFamily string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
@@ -2556,7 +2608,6 @@ func (settings *Settings) SetSansSerifFontFamily(sansSerifFontFamily string) {
 // The function takes the following parameters:
 //
 //   - serifFontFamily: new default serif font family.
-//
 func (settings *Settings) SetSerifFontFamily(serifFontFamily string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
@@ -2576,7 +2627,6 @@ func (settings *Settings) SetSerifFontFamily(serifFontFamily string) {
 //
 //   - userAgent (optional): new custom user agent string or NULL to use the
 //     default user agent.
-//
 func (settings *Settings) SetUserAgent(userAgent string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
@@ -2596,17 +2646,16 @@ func (settings *Settings) SetUserAgent(userAgent string) {
 // by appending the application details.
 //
 // Set the KitSettings:user-agent property by appending the application details
-// to the default user agent. If no application name or version is given,
-// the default user agent used will be used. If only the version is given,
-// the default engine version is used with the given application name.
+// to the default user agent. If no application name is given, the default user
+// agent will be used and application_version is ignored. If only the name is
+// given, the default engine version is used with the given application name.
 //
 // The function takes the following parameters:
 //
 //   - applicationName (optional): application name used for the user agent or
 //     NULL to use the default user agent.
 //   - applicationVersion (optional): application version for the user agent or
-//     NULL to user the default version.
-//
+//     NULL to use the default version.
 func (settings *Settings) SetUserAgentWithApplicationDetails(applicationName, applicationVersion string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
@@ -2628,12 +2677,29 @@ func (settings *Settings) SetUserAgentWithApplicationDetails(applicationName, ap
 	runtime.KeepAlive(applicationVersion)
 }
 
+// SetWebrtcUDPPortsRange: set the settings:webrtc-udp-ports-range property.
+//
+// The function takes the following parameters:
+//
+//   - udpPortRange: value to be set.
+func (settings *Settings) SetWebrtcUDPPortsRange(udpPortRange string) {
+	var _arg0 *C.WebKitSettings // out
+	var _arg1 *C.gchar          // out
+
+	_arg0 = (*C.WebKitSettings)(unsafe.Pointer(coreglib.InternObject(settings).Native()))
+	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(udpPortRange)))
+	defer C.free(unsafe.Pointer(_arg1))
+
+	C.webkit_settings_set_webrtc_udp_ports_range(_arg0, _arg1)
+	runtime.KeepAlive(settings)
+	runtime.KeepAlive(udpPortRange)
+}
+
 // SetZoomTextOnly: set the KitSettings:zoom-text-only property.
 //
 // The function takes the following parameters:
 //
 //   - zoomTextOnly: value to be set.
-//
 func (settings *Settings) SetZoomTextOnly(zoomTextOnly bool) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 C.gboolean        // out

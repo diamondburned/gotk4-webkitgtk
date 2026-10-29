@@ -95,7 +95,6 @@ func (self *DOMHTMLElement) Click() {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLElement) AccessKey() string {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _cret *C.gchar                // in
@@ -118,7 +117,6 @@ func (self *DOMHTMLElement) AccessKey() string {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMHTMLElement) Children() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMHTMLElement    // out
 	var _cret *C.WebKitDOMHTMLCollection // in
@@ -140,7 +138,6 @@ func (self *DOMHTMLElement) Children() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLElement) ContentEditable() string {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _cret *C.gchar                // in
@@ -163,7 +160,6 @@ func (self *DOMHTMLElement) ContentEditable() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLElement) Dir() string {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _cret *C.gchar                // in
@@ -186,7 +182,6 @@ func (self *DOMHTMLElement) Dir() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLElement) Draggable() bool {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _cret C.gboolean              // in
@@ -210,7 +205,6 @@ func (self *DOMHTMLElement) Draggable() bool {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLElement) Hidden() bool {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _cret C.gboolean              // in
@@ -234,7 +228,6 @@ func (self *DOMHTMLElement) Hidden() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLElement) InnerHtml() string {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _cret *C.gchar                // in
@@ -257,7 +250,6 @@ func (self *DOMHTMLElement) InnerHtml() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLElement) InnerText() string {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _cret *C.gchar                // in
@@ -280,7 +272,6 @@ func (self *DOMHTMLElement) InnerText() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLElement) IsContentEditable() bool {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _cret C.gboolean              // in
@@ -304,7 +295,6 @@ func (self *DOMHTMLElement) IsContentEditable() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLElement) Lang() string {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _cret *C.gchar                // in
@@ -327,7 +317,6 @@ func (self *DOMHTMLElement) Lang() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLElement) OuterHtml() string {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _cret *C.gchar                // in
@@ -350,7 +339,6 @@ func (self *DOMHTMLElement) OuterHtml() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLElement) OuterText() string {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _cret *C.gchar                // in
@@ -373,7 +361,6 @@ func (self *DOMHTMLElement) OuterText() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLElement) Spellcheck() bool {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _cret C.gboolean              // in
@@ -397,7 +384,6 @@ func (self *DOMHTMLElement) Spellcheck() bool {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLElement) TabIndex() int32 {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _cret C.glong                 // in
@@ -419,7 +405,6 @@ func (self *DOMHTMLElement) TabIndex() int32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLElement) Title() string {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _cret *C.gchar                // in
@@ -442,7 +427,6 @@ func (self *DOMHTMLElement) Title() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMHTMLElement) Translate() bool {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _cret C.gboolean              // in
@@ -466,7 +450,6 @@ func (self *DOMHTMLElement) Translate() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLElement) Webkitdropzone() string {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _cret *C.gchar                // in
@@ -489,7 +472,6 @@ func (self *DOMHTMLElement) Webkitdropzone() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLElement) SetAccessKey(value string) {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _arg1 *C.gchar                // out
@@ -508,7 +490,6 @@ func (self *DOMHTMLElement) SetAccessKey(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLElement) SetContentEditable(value string) error {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _arg1 *C.gchar                // out
@@ -536,7 +517,6 @@ func (self *DOMHTMLElement) SetContentEditable(value string) error {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLElement) SetDir(value string) {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _arg1 *C.gchar                // out
@@ -555,7 +535,6 @@ func (self *DOMHTMLElement) SetDir(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLElement) SetDraggable(value bool) {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _arg1 C.gboolean              // out
@@ -575,7 +554,6 @@ func (self *DOMHTMLElement) SetDraggable(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLElement) SetHidden(value bool) {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _arg1 C.gboolean              // out
@@ -595,7 +573,6 @@ func (self *DOMHTMLElement) SetHidden(value bool) {
 // The function takes the following parameters:
 //
 //   - contents with contents to set.
-//
 func (self *DOMHTMLElement) SetInnerHtml(contents string) error {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _arg1 *C.gchar                // out
@@ -623,7 +600,6 @@ func (self *DOMHTMLElement) SetInnerHtml(contents string) error {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLElement) SetInnerText(value string) error {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _arg1 *C.gchar                // out
@@ -651,7 +627,6 @@ func (self *DOMHTMLElement) SetInnerText(value string) error {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLElement) SetLang(value string) {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _arg1 *C.gchar                // out
@@ -670,7 +645,6 @@ func (self *DOMHTMLElement) SetLang(value string) {
 // The function takes the following parameters:
 //
 //   - contents with contents to set.
-//
 func (self *DOMHTMLElement) SetOuterHtml(contents string) error {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _arg1 *C.gchar                // out
@@ -698,7 +672,6 @@ func (self *DOMHTMLElement) SetOuterHtml(contents string) error {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLElement) SetOuterText(value string) error {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _arg1 *C.gchar                // out
@@ -726,7 +699,6 @@ func (self *DOMHTMLElement) SetOuterText(value string) error {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLElement) SetSpellcheck(value bool) {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _arg1 C.gboolean              // out
@@ -746,7 +718,6 @@ func (self *DOMHTMLElement) SetSpellcheck(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #glong.
-//
 func (self *DOMHTMLElement) SetTabIndex(value int32) {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _arg1 C.glong                 // out
@@ -764,7 +735,6 @@ func (self *DOMHTMLElement) SetTabIndex(value int32) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLElement) SetTitle(value string) {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _arg1 *C.gchar                // out
@@ -783,7 +753,6 @@ func (self *DOMHTMLElement) SetTitle(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gboolean.
-//
 func (self *DOMHTMLElement) SetTranslate(value bool) {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _arg1 C.gboolean              // out
@@ -803,7 +772,6 @@ func (self *DOMHTMLElement) SetTranslate(value bool) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLElement) SetWebkitdropzone(value string) {
 	var _arg0 *C.WebKitDOMHTMLElement // out
 	var _arg1 *C.gchar                // out

@@ -114,7 +114,6 @@ func (self *DOMHTMLDocument) Close() {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLDocument) AlinkColor() string {
 	var _arg0 *C.WebKitDOMHTMLDocument // out
 	var _cret *C.gchar                 // in
@@ -137,7 +136,6 @@ func (self *DOMHTMLDocument) AlinkColor() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLDocument) BgColor() string {
 	var _arg0 *C.WebKitDOMHTMLDocument // out
 	var _cret *C.gchar                 // in
@@ -160,7 +158,6 @@ func (self *DOMHTMLDocument) BgColor() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLDocument) CompatMode() string {
 	var _arg0 *C.WebKitDOMHTMLDocument // out
 	var _cret *C.gchar                 // in
@@ -183,7 +180,6 @@ func (self *DOMHTMLDocument) CompatMode() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLDocument) DesignMode() string {
 	var _arg0 *C.WebKitDOMHTMLDocument // out
 	var _cret *C.gchar                 // in
@@ -206,7 +202,6 @@ func (self *DOMHTMLDocument) DesignMode() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLDocument) Dir() string {
 	var _arg0 *C.WebKitDOMHTMLDocument // out
 	var _cret *C.gchar                 // in
@@ -229,7 +224,6 @@ func (self *DOMHTMLDocument) Dir() string {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMHTMLDocument) Embeds() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMHTMLDocument   // out
 	var _cret *C.WebKitDOMHTMLCollection // in
@@ -251,7 +245,6 @@ func (self *DOMHTMLDocument) Embeds() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLDocument) FgColor() string {
 	var _arg0 *C.WebKitDOMHTMLDocument // out
 	var _cret *C.gchar                 // in
@@ -274,7 +267,6 @@ func (self *DOMHTMLDocument) FgColor() string {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLDocument) Height() int32 {
 	var _arg0 *C.WebKitDOMHTMLDocument // out
 	var _cret C.glong                  // in
@@ -296,7 +288,6 @@ func (self *DOMHTMLDocument) Height() int32 {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLDocument) LinkColor() string {
 	var _arg0 *C.WebKitDOMHTMLDocument // out
 	var _cret *C.gchar                 // in
@@ -319,7 +310,6 @@ func (self *DOMHTMLDocument) LinkColor() string {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMHTMLDocument) Plugins() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMHTMLDocument   // out
 	var _cret *C.WebKitDOMHTMLCollection // in
@@ -341,7 +331,6 @@ func (self *DOMHTMLDocument) Plugins() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMHTMLDocument) Scripts() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMHTMLDocument   // out
 	var _cret *C.WebKitDOMHTMLCollection // in
@@ -363,7 +352,6 @@ func (self *DOMHTMLDocument) Scripts() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMHTMLDocument) VlinkColor() string {
 	var _arg0 *C.WebKitDOMHTMLDocument // out
 	var _cret *C.gchar                 // in
@@ -386,7 +374,6 @@ func (self *DOMHTMLDocument) VlinkColor() string {
 // The function returns the following values:
 //
 //   - glong: #glong.
-//
 func (self *DOMHTMLDocument) Width() int32 {
 	var _arg0 *C.WebKitDOMHTMLDocument // out
 	var _cret C.glong                  // in
@@ -418,7 +405,6 @@ func (self *DOMHTMLDocument) ReleaseEvents() {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLDocument) SetAlinkColor(value string) {
 	var _arg0 *C.WebKitDOMHTMLDocument // out
 	var _arg1 *C.gchar                 // out
@@ -437,7 +423,6 @@ func (self *DOMHTMLDocument) SetAlinkColor(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLDocument) SetBgColor(value string) {
 	var _arg0 *C.WebKitDOMHTMLDocument // out
 	var _arg1 *C.gchar                 // out
@@ -456,7 +441,6 @@ func (self *DOMHTMLDocument) SetBgColor(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLDocument) SetDesignMode(value string) {
 	var _arg0 *C.WebKitDOMHTMLDocument // out
 	var _arg1 *C.gchar                 // out
@@ -475,7 +459,6 @@ func (self *DOMHTMLDocument) SetDesignMode(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLDocument) SetDir(value string) {
 	var _arg0 *C.WebKitDOMHTMLDocument // out
 	var _arg1 *C.gchar                 // out
@@ -494,7 +477,6 @@ func (self *DOMHTMLDocument) SetDir(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLDocument) SetFgColor(value string) {
 	var _arg0 *C.WebKitDOMHTMLDocument // out
 	var _arg1 *C.gchar                 // out
@@ -513,7 +495,6 @@ func (self *DOMHTMLDocument) SetFgColor(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLDocument) SetLinkColor(value string) {
 	var _arg0 *C.WebKitDOMHTMLDocument // out
 	var _arg1 *C.gchar                 // out
@@ -532,7 +513,6 @@ func (self *DOMHTMLDocument) SetLinkColor(value string) {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMHTMLDocument) SetVlinkColor(value string) {
 	var _arg0 *C.WebKitDOMHTMLDocument // out
 	var _arg1 *C.gchar                 // out

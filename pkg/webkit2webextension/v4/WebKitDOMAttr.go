@@ -83,7 +83,6 @@ func marshalDOMAttr(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMAttr) LocalName() string {
 	var _arg0 *C.WebKitDOMAttr // out
 	var _cret *C.gchar         // in
@@ -106,7 +105,6 @@ func (self *DOMAttr) LocalName() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMAttr) Name() string {
 	var _arg0 *C.WebKitDOMAttr // out
 	var _cret *C.gchar         // in
@@ -129,7 +127,6 @@ func (self *DOMAttr) Name() string {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMAttr) NamespaceURI() string {
 	var _arg0 *C.WebKitDOMAttr // out
 	var _cret *C.gchar         // in
@@ -152,7 +149,6 @@ func (self *DOMAttr) NamespaceURI() string {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMAttr) OwnerElement() *DOMElement {
 	var _arg0 *C.WebKitDOMAttr    // out
 	var _cret *C.WebKitDOMElement // in
@@ -174,7 +170,6 @@ func (self *DOMAttr) OwnerElement() *DOMElement {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMAttr) Prefix() string {
 	var _arg0 *C.WebKitDOMAttr // out
 	var _cret *C.gchar         // in
@@ -197,7 +192,6 @@ func (self *DOMAttr) Prefix() string {
 // The function returns the following values:
 //
 //   - ok: #gboolean.
-//
 func (self *DOMAttr) Specified() bool {
 	var _arg0 *C.WebKitDOMAttr // out
 	var _cret C.gboolean       // in
@@ -221,7 +215,6 @@ func (self *DOMAttr) Specified() bool {
 // The function returns the following values:
 //
 //   - utf8: #gchar.
-//
 func (self *DOMAttr) Value() string {
 	var _arg0 *C.WebKitDOMAttr // out
 	var _cret *C.gchar         // in
@@ -244,7 +237,6 @@ func (self *DOMAttr) Value() string {
 // The function takes the following parameters:
 //
 //   - value: #gchar.
-//
 func (self *DOMAttr) SetValue(value string) error {
 	var _arg0 *C.WebKitDOMAttr // out
 	var _arg1 *C.gchar         // out

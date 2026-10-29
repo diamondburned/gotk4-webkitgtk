@@ -62,8 +62,8 @@ func (n NetworkProxyMode) String() string {
 // NetworkProxySettings configures network proxies.
 //
 // WebKitNetworkProxySettings can be used to provide a custom
-// proxy configuration to a KitWebContext. You need to call
-// webkit_web_context_set_network_proxy_settings() with
+// proxy configuration to a KitNetworkSession. You need to
+// call webkit_network_session_set_proxy_settings() with
 // WEBKIT_NETWORK_PROXY_MODE_CUSTOM and a WebKitNetworkProxySettings.
 //
 // An instance of this type is always passed by reference.
@@ -124,16 +124,14 @@ func NewNetworkProxySettings(defaultProxyUri string, ignoreHosts []string) *Netw
 
 // AddProxyForScheme adds a URI-scheme-specific proxy.
 //
-// URIs whose scheme matches uri_scheme will be proxied via proxy_uri.
-// As with the default proxy URI, if proxy_uri starts with "socks://", it will
-// be treated as referring to all three of the socks5, socks4a, and socks4 proxy
-// types.
+// URIs whose scheme matches scheme will be proxied via proxy_uri. As with the
+// default proxy URI, if proxy_uri starts with "socks://", it will be treated as
+// referring to all three of the socks5, socks4a, and socks4 proxy types.
 //
 // The function takes the following parameters:
 //
 //   - scheme: URI scheme to add a proxy for.
-//   - proxyUri: proxy URI to use for uri_scheme.
-//
+//   - proxyUri: proxy URI to use for scheme.
 func (proxySettings *NetworkProxySettings) AddProxyForScheme(scheme string, proxyUri string) {
 	var _arg0 *C.WebKitNetworkProxySettings // out
 	var _arg1 *C.gchar                      // out
@@ -156,7 +154,6 @@ func (proxySettings *NetworkProxySettings) AddProxyForScheme(scheme string, prox
 // The function returns the following values:
 //
 //   - networkProxySettings: copy of passed in KitNetworkProxySettings.
-//
 func (proxySettings *NetworkProxySettings) Copy() *NetworkProxySettings {
 	var _arg0 *C.WebKitNetworkProxySettings // out
 	var _cret *C.WebKitNetworkProxySettings // in

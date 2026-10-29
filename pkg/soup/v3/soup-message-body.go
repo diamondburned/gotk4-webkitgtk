@@ -64,7 +64,8 @@ func (m MemoryUse) String() string {
 	}
 }
 
-// MessageBody represents the request or response body of a message.
+// MessageBody: messagebody represents the request or response body of a
+// message.
 //
 // Note that while length always reflects the full length of the message body,
 // data is normally NULL, and will only be filled in after messagebody.Flatten
@@ -114,7 +115,6 @@ func NewMessageBody() *MessageBody {
 // The function takes the following parameters:
 //
 //   - buffer: #GBytes.
-//
 func (body *MessageBody) AppendBytes(buffer *glib.Bytes) {
 	var _arg0 *C.SoupMessageBody // out
 	var _arg1 *C.GBytes          // out
@@ -136,7 +136,6 @@ func (body *MessageBody) AppendBytes(buffer *glib.Bytes) {
 // The function takes the following parameters:
 //
 //   - data to append.
-//
 func (body *MessageBody) Append(data []byte) {
 	var _arg0 *C.SoupMessageBody // out
 	var _arg1 *C.guchar          // out
@@ -173,7 +172,6 @@ func (body *MessageBody) Complete() {
 //
 //   - bytes containing the same data as body. (You must glib.Bytes.Unref() this
 //     if you do not want it.).
-//
 func (body *MessageBody) Flatten() *glib.Bytes {
 	var _arg0 *C.SoupMessageBody // out
 	var _cret *C.GBytes          // in
@@ -203,7 +201,6 @@ func (body *MessageBody) Flatten() *glib.Bytes {
 // The function returns the following values:
 //
 //   - ok: accumulate flag for body.
-//
 func (body *MessageBody) Accumulate() bool {
 	var _arg0 *C.SoupMessageBody // out
 	var _cret C.gboolean         // in
@@ -243,7 +240,6 @@ func (body *MessageBody) Accumulate() bool {
 // The function returns the following values:
 //
 //   - bytes (optional): #GBytes.
-//
 func (body *MessageBody) Chunk(offset int64) *glib.Bytes {
 	var _arg0 *C.SoupMessageBody // out
 	var _arg1 C.goffset          // out
@@ -271,7 +267,7 @@ func (body *MessageBody) Chunk(offset int64) *glib.Bytes {
 	return _bytes
 }
 
-// GotChunk handles the MessageBody part of receiving a chunk of data from the
+// GotChunk handles the messagebody part of receiving a chunk of data from the
 // network.
 //
 // Normally this means appending chunk to body, exactly as with
@@ -283,7 +279,6 @@ func (body *MessageBody) Chunk(offset int64) *glib.Bytes {
 // The function takes the following parameters:
 //
 //   - chunk received from the network.
-//
 func (body *MessageBody) GotChunk(chunk *glib.Bytes) {
 	var _arg0 *C.SoupMessageBody // out
 	var _arg1 *C.GBytes          // out
@@ -312,7 +307,6 @@ func (body *MessageBody) GotChunk(chunk *glib.Bytes) {
 // The function takes the following parameters:
 //
 //   - accumulate: whether or not to accumulate body chunks in body.
-//
 func (body *MessageBody) SetAccumulate(accumulate bool) {
 	var _arg0 *C.SoupMessageBody // out
 	var _arg1 C.gboolean         // out
@@ -337,7 +331,7 @@ func (body *MessageBody) Truncate() {
 	runtime.KeepAlive(body)
 }
 
-// WroteChunk handles the MessageBody part of writing a chunk of data to the
+// WroteChunk handles the messagebody part of writing a chunk of data to the
 // network.
 //
 // Normally this is a no-op, but if you have set body's accumulate flag to
@@ -349,7 +343,6 @@ func (body *MessageBody) Truncate() {
 // The function takes the following parameters:
 //
 //   - chunk returned from messagebody.GetChunk.
-//
 func (body *MessageBody) WroteChunk(chunk *glib.Bytes) {
 	var _arg0 *C.SoupMessageBody // out
 	var _arg1 *C.GBytes          // out

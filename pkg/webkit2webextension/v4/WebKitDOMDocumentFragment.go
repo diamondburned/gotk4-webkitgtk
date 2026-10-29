@@ -83,7 +83,6 @@ func marshalDOMDocumentFragment(p uintptr) (interface{}, error) {
 // The function returns the following values:
 //
 //   - gulong: #gulong.
-//
 func (self *DOMDocumentFragment) ChildElementCount() uint32 {
 	var _arg0 *C.WebKitDOMDocumentFragment // out
 	var _cret C.gulong                     // in
@@ -105,7 +104,6 @@ func (self *DOMDocumentFragment) ChildElementCount() uint32 {
 // The function returns the following values:
 //
 //   - domhtmlCollection: KitDOMHTMLCollection.
-//
 func (self *DOMDocumentFragment) Children() *DOMHTMLCollection {
 	var _arg0 *C.WebKitDOMDocumentFragment // out
 	var _cret *C.WebKitDOMHTMLCollection   // in
@@ -131,7 +129,6 @@ func (self *DOMDocumentFragment) Children() *DOMHTMLCollection {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDocumentFragment) ElementByID(elementId string) *DOMElement {
 	var _arg0 *C.WebKitDOMDocumentFragment // out
 	var _arg1 *C.gchar                     // out
@@ -157,7 +154,6 @@ func (self *DOMDocumentFragment) ElementByID(elementId string) *DOMElement {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDocumentFragment) FirstElementChild() *DOMElement {
 	var _arg0 *C.WebKitDOMDocumentFragment // out
 	var _cret *C.WebKitDOMElement          // in
@@ -179,7 +175,6 @@ func (self *DOMDocumentFragment) FirstElementChild() *DOMElement {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDocumentFragment) LastElementChild() *DOMElement {
 	var _arg0 *C.WebKitDOMDocumentFragment // out
 	var _cret *C.WebKitDOMElement          // in
@@ -205,7 +200,6 @@ func (self *DOMDocumentFragment) LastElementChild() *DOMElement {
 // The function returns the following values:
 //
 //   - domElement: KitDOMElement.
-//
 func (self *DOMDocumentFragment) QuerySelector(selectors string) (*DOMElement, error) {
 	var _arg0 *C.WebKitDOMDocumentFragment // out
 	var _arg1 *C.gchar                     // out
@@ -240,7 +234,6 @@ func (self *DOMDocumentFragment) QuerySelector(selectors string) (*DOMElement, e
 // The function returns the following values:
 //
 //   - domNodeList: KitDOMNodeList.
-//
 func (self *DOMDocumentFragment) QuerySelectorAll(selectors string) (*DOMNodeList, error) {
 	var _arg0 *C.WebKitDOMDocumentFragment // out
 	var _arg1 *C.gchar                     // out

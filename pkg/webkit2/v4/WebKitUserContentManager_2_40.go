@@ -28,7 +28,7 @@ func init() {
 }
 
 // ScriptMessageReply: reply for a script message received. If no reply has been
-// sent by the user, an automatically generated reply with undefined value with
+// sent by the user, an automatically generated reply with undefined value will
 // be sent.
 //
 // An instance of this type is always passed by reference.
@@ -52,7 +52,6 @@ func marshalScriptMessageReply(p uintptr) (interface{}, error) {
 //
 //   - errorMessage: error message to return as specified by the user's script
 //     message.
-//
 func (scriptMessageReply *ScriptMessageReply) ReturnErrorMessage(errorMessage string) {
 	var _arg0 *C.WebKitScriptMessageReply // out
 	var _arg1 *C.char                     // out
@@ -68,12 +67,13 @@ func (scriptMessageReply *ScriptMessageReply) ReturnErrorMessage(errorMessage st
 
 // ReturnValue: reply to a script message with a value.
 //
-// This function can be called twice for passing the reply value in.
+// This function can only be called once. Further calls to it or to
+// webkit_script_message_reply_return_error_message() emit a critical warning
+// and are ignored.
 //
 // The function takes the following parameters:
 //
 //   - replyValue: reply value of the provided script message.
-//
 func (scriptMessageReply *ScriptMessageReply) ReturnValue(replyValue *javascriptcore.Value) {
 	var _arg0 *C.WebKitScriptMessageReply // out
 	var _arg1 *C.JSCValue                 // out

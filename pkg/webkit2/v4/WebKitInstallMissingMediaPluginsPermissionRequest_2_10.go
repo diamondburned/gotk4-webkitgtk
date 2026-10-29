@@ -88,7 +88,6 @@ func marshalInstallMissingMediaPluginsPermissionRequest(p uintptr) (interface{},
 // The function returns the following values:
 //
 //   - utf8: empty string.
-//
 func (request *InstallMissingMediaPluginsPermissionRequest) Description() string {
 	var _arg0 *C.WebKitInstallMissingMediaPluginsPermissionRequest // out
 	var _cret *C.gchar                                             // in
