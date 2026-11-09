@@ -74,7 +74,7 @@ func (c CacheModel) String() string {
 }
 
 // URISchemeRequestCallback: type definition for a function that will be called
-// back when a URI request is made for a user registered URI scheme.
+// back when an URI request is made for a user registered URI scheme.
 type URISchemeRequestCallback func(request *URISchemeRequest)
 
 // WebContextOverrides contains methods that are overridable.
@@ -85,13 +85,13 @@ func defaultWebContextOverrides(v *WebContext) WebContextOverrides {
 	return WebContextOverrides{}
 }
 
-// WebContext manages aspects common to all KitWebView objects
+// WebContext manages aspects common to all KitWebView<!-- -->s
 //
-// The KitWebContext manages all aspects common to all KitWebView objects.
+// The KitWebContext manages all aspects common to all KitWebView<!-- -->s.
 //
 // You can define the KitCacheModel with webkit_web_context_set_cache_model(),
 // depending on the needs of your application. You can access the
-// KitSecurityManager to specify the behavior of your application regarding
+// KitSecurityManager to specify the behaviour of your application regarding
 // security using webkit_web_context_get_security_manager().
 //
 // It is also possible to change your preferred language or enable
@@ -345,10 +345,10 @@ func (context *WebContext) SpellCheckingEnabled() bool {
 	return _ok
 }
 
-// SpellCheckingLanguages: get the list of spell checking languages.
+// SpellCheckingLanguages: get the the list of spell checking languages.
 //
-// Get the list of spell checking languages associated with context, or NULL if
-// no languages have been previously set.
+// Get the the list of spell checking languages associated with context, or NULL
+// if no languages have been previously set.
 //
 // See webkit_web_context_set_spell_checking_languages() for more details on the
 // format of the languages in the list.
@@ -386,10 +386,6 @@ func (context *WebContext) SpellCheckingLanguages() []string {
 }
 
 // TimeZoneOverride: get the KitWebContext:time-zone-override property.
-//
-// The function returns the following values:
-//
-//   - utf8 (optional): time zone override, or NULL if none was set.
 func (context *WebContext) TimeZoneOverride() string {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret *C.gchar            // in
@@ -401,9 +397,7 @@ func (context *WebContext) TimeZoneOverride() string {
 
 	var _utf8 string // out
 
-	if _cret != nil {
-		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	}
+	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
 
 	return _utf8
 }
@@ -483,12 +477,13 @@ func (context *WebContext) IsAutomationAllowed() bool {
 
 // RegisterURIScheme: register scheme in context.
 //
-// Register scheme in context, so that when a URI request with scheme is made in
-// the KitWebContext, the KitURISchemeRequestCallback registered will be called
-// with a KitURISchemeRequest. It is possible to handle URI scheme requests
-// asynchronously, by calling g_object_ref() on the KitURISchemeRequest and
-// calling webkit_uri_scheme_request_finish() later when the data of the request
-// is available or webkit_uri_scheme_request_finish_error() in case of error.
+// Register scheme in context, so that when an URI request with scheme is
+// made in the KitWebContext, the KitURISchemeRequestCallback registered will
+// be called with a KitURISchemeRequest. It is possible to handle URI scheme
+// requests asynchronously, by calling g_object_ref() on the KitURISchemeRequest
+// and calling webkit_uri_scheme_request_finish() later when the data of the
+// request is available or webkit_uri_scheme_request_finish_error() in case of
+// error.
 //
 //	static void
 //	about_uri_scheme_request_cb (WebKitURISchemeRequest *request,
@@ -541,7 +536,7 @@ func (context *WebContext) RegisterURIScheme(scheme string, callback URISchemeRe
 }
 
 // SendMessageToAllExtensions: send message to all web process extensions
-// associated with context.
+// associated to context.
 //
 // If message is floating, it's consumed.
 //
@@ -593,7 +588,7 @@ func (context *WebContext) SetAutomationAllowed(allowed bool) {
 // Specifies a usage model for WebViews, which WebKit will use to determine
 // its caching behavior. All web views follow the cache model. This cache
 // model determines the RAM and disk space to use for caching previously viewed
-// content.
+// content .
 //
 // Research indicates that users tend to browse within clusters of documents
 // that hold resources in common, and to revisit previously visited documents.

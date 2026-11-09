@@ -115,7 +115,7 @@ func defaultCookieManagerOverrides(v *CookieManager) CookieManagerOverrides {
 // cookies. You can get it from a KitWebsiteDataManager with
 // webkit_website_data_manager_get_cookie_manager(), and use it to set where to
 // store cookies with webkit_cookie_manager_set_persistent_storage(), or to set
-// the acceptance policy, with webkit_cookie_manager_set_accept_policy().
+// the acceptance policy, with webkit_cookie_manager_get_accept_policy().
 type CookieManager struct {
 	_ [0]func() // equal guard
 	*coreglib.Object
@@ -485,7 +485,7 @@ func (cookieManager *CookieManager) AllCookiesFinish(result gio.AsyncResulter) (
 // The function takes the following parameters:
 //
 //   - ctx (optional) or NULL to ignore.
-//   - uri: URI associated with the cookies to be retrieved.
+//   - uri: URI associated to the cookies to be retrieved.
 //   - callback (optional) to call when the request is satisfied.
 func (cookieManager *CookieManager) Cookies(ctx context.Context, uri string, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitCookieManager // out
@@ -757,12 +757,12 @@ func (cookieManager *CookieManager) SetAcceptPolicy(policy CookieAcceptPolicy) {
 // emitted. By default, cookie_manager doesn't store the cookies persistently,
 // so you need to call this method to keep cookies saved across sessions.
 //
-// This method should never be called on a KitCookieManager associated with an
+// This method should never be called on a KitCookieManager associated to an
 // ephemeral KitWebsiteDataManager.
 //
 // The function takes the following parameters:
 //
-//   - filename to read from/write to.
+//   - filename to read to/write from.
 //   - storage: KitCookiePersistentStorage.
 func (cookieManager *CookieManager) SetPersistentStorage(filename string, storage CookiePersistentStorage) {
 	var _arg0 *C.WebKitCookieManager          // out

@@ -139,7 +139,7 @@ func marshalEditorState(p uintptr) (interface{}, error) {
 	return wrapEditorState(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// ConnectChanged is emitted when the KitEditorState is changed.
+// ConnectChanged is emitted when the KitEdtorState is changed.
 func (editorState *EditorState) ConnectChanged(f func()) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(editorState, "changed", false, unsafe.Pointer(C._gotk4_webkit24_EditorState_ConnectChanged), f)
 }

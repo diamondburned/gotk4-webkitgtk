@@ -18,12 +18,12 @@ const MAJOR_VERSION = 3
 // MICRO_VERSION: like get_micro_version, but from the headers used at
 // application compile time, rather than from the library linked against at
 // application run time.
-const MICRO_VERSION = 0
+const MICRO_VERSION = 6
 
 // MINOR_VERSION: like get_minor_version, but from the headers used at
 // application compile time, rather than from the library linked against at
 // application run time.
-const MINOR_VERSION = 8
+const MINOR_VERSION = 6
 
 // VERSION_MIN_REQUIRED: macro that should be defined by the user prior to
 // including libsoup.h.

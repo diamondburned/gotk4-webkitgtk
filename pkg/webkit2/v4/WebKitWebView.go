@@ -697,43 +697,40 @@ func (webView *WebView) ConnectAuthenticate(f func(request *AuthenticationReques
 }
 
 // ConnectClose is emitted when closing a KitWebView is requested. This occurs
-// when a call is made from JavaScript's window.close function or after trying
-// to close the web_view with webkit_web_view_try_close(). It is the owner's
-// responsibility to handle this signal to hide or destroy the KitWebView,
-// if necessary.
+// when a call is made from JavaScript's <function>window.close</function>
+// function or after trying to close the web_view with
+// webkit_web_view_try_close(). It is the owner's responsibility to handle this
+// signal to hide or destroy the KitWebView, if necessary.
 func (webView *WebView) ConnectClose(f func()) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(webView, "close", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectClose), f)
 }
 
 // ConnectContextMenu is emitted when a context menu is about to be displayed
-// to give the application a chance to customize the proposed menu, prevent the
-// menu from being displayed, or build its own context menu.
-//
-// - To customize the proposed menu you can use webkit_context_menu_prepend(),
-// webkit_context_menu_append() or webkit_context_menu_insert() to add new
-// KitContextMenuItem objects to context_menu, webkit_context_menu_move_item()
-// to reorder existing items, or webkit_context_menu_remove() to remove
-// an existing item. The signal handler should return FALSE, and the menu
-// represented by context_menu will be shown.
-//
-// - To prevent the menu from being displayed you can just connect to this
-// signal and return TRUE so that the proposed menu will not be shown.
-//
-// - To build your own menu, you can remove all items from the proposed menu
-// with webkit_context_menu_remove_all(), add your own items and return FALSE so
-// that the menu will be shown. You can also ignore the proposed KitContextMenu,
+// to give the application a chance to customize the proposed menu,
+// prevent the menu from being displayed, or build its own context menu.
+// <itemizedlist> <listitem><para> To customize the proposed menu you
+// can use webkit_context_menu_prepend(), webkit_context_menu_append() or
+// webkit_context_menu_insert() to add new KitContextMenuItem<!-- -->s to
+// context_menu, webkit_context_menu_move_item() to reorder existing items,
+// or webkit_context_menu_remove() to remove an existing item. The signal
+// handler should return FALSE, and the menu represented by context_menu will
+// be shown. </para></listitem> <listitem><para> To prevent the menu from being
+// displayed you can just connect to this signal and return TRUE so that the
+// proposed menu will not be shown. </para></listitem> <listitem><para> To
+// build your own menu, you can remove all items from the proposed menu with
+// webkit_context_menu_remove_all(), add your own items and return FALSE so that
+// the menu will be shown. You can also ignore the proposed KitContextMenu,
 // build your own Menu and return TRUE to prevent the proposed menu from being
-// shown.
-//
-// - If you just want the default menu to be shown always, simply don't connect
-// to this signal because showing the proposed context menu is the default
-// behavior.
+// shown. </para></listitem> <listitem><para> If you just want the default menu
+// to be shown always, simply don't connect to this signal because showing
+// the proposed context menu is the default behaviour. </para></listitem>
+// </itemizedlist>
 //
 // The event parameter is now deprecated. Use webkit_context_menu_get_event() to
 // get the Event that triggered the context menu.
 //
 // If the signal handler returns FALSE the context menu represented by
-// context_menu will be shown, if it returns TRUE the context menu will not be
+// context_menu will be shown, if it return TRUE the context menu will not be
 // shown.
 //
 // The proposed KitContextMenu passed in context_menu argument is only valid
@@ -770,8 +767,9 @@ func (webView *WebView) ConnectCreate(f func(navigationAction *NavigationAction)
 // ConnectDecidePolicy: this signal is emitted when WebKit is requesting
 // the client to decide a policy decision, such as whether to navigate to
 // a page, open a new window or whether or not to download a resource.
-// The KitPolicyDecision passed in the decision argument is a generic type, but
-// should be cast to a more specific type when making the decision. For example:
+// The KitNavigationPolicyDecision passed in the decision argument is a generic
+// type, but should be casted to a more specific type when making the decision.
+// For example:
 //
 //	static gboolean
 //	decide_policy_cb (WebKitWebView *web_view,
@@ -806,17 +804,18 @@ func (webView *WebView) ConnectCreate(f func(navigationAction *NavigationAction)
 // on a KitPolicyDecision and no decision has been made explicitly,
 // webkit_policy_decision_use() will be the default policy decision. The default
 // signal handler will simply call webkit_policy_decision_use(). Only the first
-// policy decision chosen for a given KitPolicyDecision will have any effect.
+// policy decision chosen for a given KitPolicyDecision will have any affect.
 func (webView *WebView) ConnectDecidePolicy(f func(decision PolicyDecisioner, decisionType PolicyDecisionType) (ok bool)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(webView, "decide-policy", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectDecidePolicy), f)
 }
 
 // ConnectEnterFullscreen is emitted when JavaScript code calls
-// element.webkitRequestFullScreen. If the signal is not handled the KitWebView
-// will proceed to full screen its top level window. This signal can be used
-// by client code to request permission to the user prior to doing the full
-// screen transition and eventually prepare the top-level window (e.g. hide some
-// widgets that would otherwise be part of the full screen window).
+// <function>element.webkitRequestFullScreen</function>. If the signal is not
+// handled the KitWebView will proceed to full screen its top level window.
+// This signal can be used by client code to request permission to the user
+// prior doing the full screen transition and eventually prepare the top-level
+// window (e.g. hide some widgets that would otherwise be part of the full
+// screen window).
 func (webView *WebView) ConnectEnterFullscreen(f func() (ok bool)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(webView, "enter-fullscreen", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectEnterFullscreen), f)
 }
@@ -922,7 +921,7 @@ func (webView *WebView) ConnectMouseTargetChanged(f func(hitTestResult *HitTestR
 // to switch to fullscreen mode, sharing its location or similar operations.
 //
 // A possible way to use this signal could be through a dialog allowing the user
-// to decide what to do with the request:
+// decide what to do with the request:
 //
 //	static gboolean permission_request_cb (WebKitWebView *web_view,
 //	                                       WebKitPermissionRequest *request,
@@ -985,7 +984,7 @@ func (webView *WebView) ConnectPrint(f func(printOperation *PrintOperation) (ok 
 // You can handle the query asynchronously by calling
 // webkit_permission_state_query_ref() on query and returning TRUE. If the last
 // reference of query is removed and the query has not been handled, the query
-// result will be set to WEBKIT_PERMISSION_STATE_PROMPT.
+// result will be set to WEBKIT_QUERY_PERMISSION_PROMPT.
 func (webView *WebView) ConnectQueryPermissionState(f func(query *PermissionStateQuery) (ok bool)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(webView, "query-permission-state", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectQueryPermissionState), f)
 }
@@ -1008,12 +1007,12 @@ func (webView *WebView) ConnectResourceLoadStarted(f func(resource *WebResource,
 	return coreglib.ConnectGeneratedClosure(webView, "resource-load-started", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectResourceLoadStarted), f)
 }
 
-// ConnectRunAsModal is emitted after KitWebView::ready-to-show on the newly
-// created KitWebView when JavaScript code calls window.showModalDialog. The
-// purpose of this signal is to allow the client application to prepare the new
-// view to behave as modal. Once the signal is emitted a new main loop will be
-// run to block user interaction in the parent KitWebView until the new dialog
-// is closed.
+// ConnectRunAsModal is emitted after KitWebView::ready-to-show
+// on the newly created KitWebView when JavaScript code calls
+// <function>window.showModalDialog</function>. The purpose of this signal is to
+// allow the client application to prepare the new view to behave as modal. Once
+// the signal is emitted a new main loop will be run to block user interaction
+// in the parent KitWebView until the new dialog is closed.
 func (webView *WebView) ConnectRunAsModal(f func()) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(webView, "run-as-modal", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectRunAsModal), f)
 }
@@ -1047,24 +1046,23 @@ func (webView *WebView) ConnectRunFileChooser(f func(request *FileChooserRequest
 	return coreglib.ConnectGeneratedClosure(webView, "run-file-chooser", false, unsafe.Pointer(C._gotk4_webkit24_WebView_ConnectRunFileChooser), f)
 }
 
-// ConnectScriptDialog is emitted when JavaScript code calls window.alert,
-// window.confirm or window.prompt, or when onbeforeunload event is fired.
-// The dialog parameter should be used to build the dialog. If the signal is not
-// handled a different dialog will be built and shown depending on the dialog
-// type:
-//
-// - WEBKIT_SCRIPT_DIALOG_ALERT: message dialog with a single Close button.
-//
-// - WEBKIT_SCRIPT_DIALOG_CONFIRM: message dialog with OK and Cancel buttons.
-//
-// - WEBKIT_SCRIPT_DIALOG_PROMPT: message dialog with OK and Cancel buttons and
-// a text entry with the default text.
-//
-// - WEBKIT_SCRIPT_DIALOG_BEFORE_UNLOAD_CONFIRM: message dialog with Stay and
-// Leave buttons.
+// ConnectScriptDialog is emitted when JavaScript code calls
+// <function>window.alert</function>, <function>window.confirm</function>
+// or <function>window.prompt</function>, or when
+// <function>onbeforeunload</function> event is fired. The dialog parameter
+// should be used to build the dialog. If the signal is not handled a
+// different dialog will be built and shown depending on the dialog type:
+// <itemizedlist> <listitem><para> WEBKIT_SCRIPT_DIALOG_ALERT: message
+// dialog with a single Close button. </para></listitem> <listitem><para>
+// WEBKIT_SCRIPT_DIALOG_CONFIRM: message dialog with OK and Cancel buttons.
+// </para></listitem> <listitem><para> WEBKIT_SCRIPT_DIALOG_PROMPT:
+// message dialog with OK and Cancel buttons and a text entry
+// with the default text. </para></listitem> <listitem><para>
+// WEBKIT_SCRIPT_DIALOG_BEFORE_UNLOAD_CONFIRM: message dialog with Stay and
+// Leave buttons. </para></listitem> </itemizedlist>
 //
 // It is possible to handle the script dialog request asynchronously,
-// by simply calling webkit_script_dialog_ref() on the dialog argument and
+// by simply caling webkit_script_dialog_ref() on the dialog argument and
 // calling webkit_script_dialog_close() when done. If the last reference
 // is removed on a KitScriptDialog and the dialog has not been closed,
 // webkit_script_dialog_close() will be called.
@@ -1140,10 +1138,11 @@ func (webView *WebView) ConnectWebProcessTerminated(f func(reason WebProcessTerm
 
 // NewWebView creates a new KitWebView with the default KitWebContext.
 //
-// Creates a new KitWebView with the default KitWebContext and no
-// KitUserContentManager associated with it. Set the KitWebView:web-context,
-// KitWebView:user-content-manager or KitWebView:settings properties at
-// construction to use a different configuration.
+// Creates a new KitWebView with the default KitWebContext
+// and no KitUserContentManager associated with it.
+// See also webkit_web_view_new_with_context(),
+// webkit_web_view_new_with_user_content_manager(), and
+// webkit_web_view_new_with_settings().
 //
 // The function returns the following values:
 //
@@ -1291,8 +1290,8 @@ func NewWebViewWithUserContentManager(userContentManager *UserContentManager) *W
 // in web_view. The arguments values must be one of the following types,
 // or contain only the following GVariant types: number, string and dictionary.
 // The result of the operation can be a Promise that will be properly passed
-// to the callback. If world_name is NULL, the default world is used. Any
-// value that is not NULL is a distinct world. The source_uri will be shown in
+// to the callback. If world_name is NULL, the default world is used. Any value
+// that is not NULL is a distin ct world. The source_uri will be shown in
 // exceptions and doesn't affect the behavior of the script. When not provided,
 // the document URL is used.
 //
@@ -1323,12 +1322,13 @@ func NewWebViewWithUserContentManager(userContentManager *UserContentManager) *W
 //	    }
 //
 //	    if (jsc_value_is_number (value)) {
-//	        gint32        int_value = jsc_value_to_int32 (value);
+//	        gint32        int_value = jsc_value_to_string (value);
 //	        JSCException *exception = jsc_context_get_exception (jsc_value_get_context (value));
 //	        if (exception)
 //	            g_warning ("Error running javascript: s", jsc_exception_get_message (exception));
 //	        else
 //	            g_print ("Script result: d\n", int_value);
+//	        g_free (str_value);
 //	    } else {
 //	        g_warning ("Error running javascript: unexpected return value");
 //	    }
@@ -1343,7 +1343,7 @@ func NewWebViewWithUserContentManager(userContentManager *UserContentManager) *W
 //	    g_variant_dict_insert (&dict, "count", "u", 42);
 //	    GVariant *args = g_variant_dict_end (&dict);
 //	    const gchar *body = "return new Promise((resolve) => { resolve(count); });";
-//	    webkit_web_view_call_async_javascript_function (web_view, body, -1, args, NULL, NULL, NULL, web_view_javascript_finished, NULL);
+//	    webkit_web_view_call_async_javascript_function (web_view, body, -1, arguments, NULL, NULL, NULL, web_view_javascript_finished, NULL);
 //	}.
 //
 // The function takes the following parameters:
@@ -1884,9 +1884,8 @@ func (webView *WebView) BackgroundColor() *gdk.RGBA {
 //
 // The function returns the following values:
 //
-//   - mediaCaptureState of the camera device. If
-//     KitSettings:enable-media-stream is FALSE, this method will return
-//     WEBKIT_MEDIA_CAPTURE_STATE_NONE.
+//   - mediaCaptureState of the camera device. If KitSettings:enable-mediastream
+//     is FALSE, this method will return WEBKIT_MEDIA_CAPTURE_STATE_NONE.
 func (webView *WebView) CameraCaptureState() MediaCaptureState {
 	var _arg0 *C.WebKitWebView          // out
 	var _cret C.WebKitMediaCaptureState // in
@@ -1975,7 +1974,7 @@ func (webView *WebView) DefaultContentSecurityPolicy() string {
 // The function returns the following values:
 //
 //   - mediaCaptureState of the display device. If
-//     KitSettings:enable-media-stream is FALSE, this method will return
+//     KitSettings:enable-mediastream is FALSE, this method will return
 //     WEBKIT_MEDIA_CAPTURE_STATE_NONE.
 func (webView *WebView) DisplayCaptureState() MediaCaptureState {
 	var _arg0 *C.WebKitWebView          // out
@@ -2022,8 +2021,8 @@ func (webView *WebView) EditorState() *EditorState {
 //
 // The function returns the following values:
 //
-//   - gdouble: estimate of the percent complete for a document load as a range
-//     from 0.0 to 1.0.
+//   - gdouble: estimate of the of the percent complete for a document load as a
+//     range from 0.0 to 1.0.
 func (webView *WebView) EstimatedLoadProgress() float64 {
 	var _arg0 *C.WebKitWebView // out
 	var _cret C.gdouble        // in
@@ -2040,9 +2039,9 @@ func (webView *WebView) EstimatedLoadProgress() float64 {
 	return _gdouble
 }
 
-// Favicon returns favicon currently associated with web_view.
+// Favicon returns favicon currently associated to web_view.
 //
-// Returns favicon currently associated with web_view, if any. You can connect
+// Returns favicon currently associated to web_view, if any. You can connect
 // to notify::favicon signal of web_view to be notified when the favicon is
 // available.
 //
@@ -2077,7 +2076,7 @@ func (webView *WebView) Favicon() *cairo.Surface {
 //
 // The function returns the following values:
 //
-//   - findController associated with this particular KitWebView.
+//   - findController associated to this particular KitWebView.
 func (webView *WebView) FindController() *FindController {
 	var _arg0 *C.WebKitWebView        // out
 	var _cret *C.WebKitFindController // in
@@ -2134,7 +2133,7 @@ func (webView *WebView) InputMethodContext() InputMethodContexter {
 	return _inputMethodContext
 }
 
-// Inspector: get the KitWebInspector associated with web_view.
+// Inspector: get the KitWebInspector associated to web_view.
 //
 // The function returns the following values:
 //
@@ -2159,7 +2158,7 @@ func (webView *WebView) Inspector() *WebInspector {
 //
 // The function returns the following values:
 //
-//   - ok: TRUE if web_view audio is muted or FALSE if audio is not muted.
+//   - ok: TRUE if web_view audio is muted or FALSE is audio is not muted.
 func (webView *WebView) IsMuted() bool {
 	var _arg0 *C.WebKitWebView // out
 	var _cret C.gboolean       // in
@@ -2203,31 +2202,6 @@ func (webView *WebView) IsWebProcessResponsive() bool {
 	return _ok
 }
 
-// Magnification: get the magnification factor of web_view.
-//
-// The magnification factor represents the visual scaling of the page (similar
-// to pinch-to-zoom). This is independent of the layout zoom level (which is
-// obtained with webkit_web_view_get_zoom_level()).
-//
-// The function returns the following values:
-//
-//   - gdouble: current magnification factor of web_view.
-func (webView *WebView) Magnification() float64 {
-	var _arg0 *C.WebKitWebView // out
-	var _cret C.gdouble        // in
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
-
-	_cret = C.webkit_web_view_get_magnification(_arg0)
-	runtime.KeepAlive(webView)
-
-	var _gdouble float64 // out
-
-	_gdouble = float64(_cret)
-
-	return _gdouble
-}
-
 // MainResource: return the main resource of web_view.
 //
 // The function returns the following values:
@@ -2255,7 +2229,7 @@ func (webView *WebView) MainResource() *WebResource {
 // The function returns the following values:
 //
 //   - mediaCaptureState of the microphone device. If
-//     KitSettings:enable-media-stream is FALSE, this method will return
+//     KitSettings:enable-mediastream is FALSE, this method will return
 //     WEBKIT_MEDIA_CAPTURE_STATE_NONE.
 func (webView *WebView) MicrophoneCaptureState() MediaCaptureState {
 	var _arg0 *C.WebKitWebView          // out
@@ -2327,11 +2301,11 @@ func (webView *WebView) SessionState() *WebViewSessionState {
 // webkit_web_view_set_settings(), the default KitSettings will be returned.
 // This method always returns a valid KitSettings object. To modify any of
 // the web_view settings, you can either create a new KitSettings object with
-// webkit_settings_new(), setting the desired preferences, and then replace
-// the existing web_view settings with webkit_web_view_set_settings() or get
-// the existing web_view settings and update it directly. KitSettings objects
-// can be shared by multiple KitWebView objects, so modifying the settings of a
-// KitWebView would affect other KitWebView objects using the same KitSettings.
+// webkit_settings_new(), setting the desired preferences, and then replace the
+// existing web_view settings with webkit_web_view_set_settings() or get the
+// existing web_view settings and update it directly. KitSettings objects can
+// be shared by multiple KitWebView<!-- -->s, so modifying the settings of a
+// KitWebView would affect other KitWebView<!-- -->s using the same KitSettings.
 //
 // The function returns the following values:
 //
@@ -2553,30 +2527,30 @@ func (webView *WebView) TLSInfo() (gio.TLSCertificater, gio.TLSCertificateFlags,
 //
 // The active URI might change during a load operation:
 //
-// 1. When nothing has been loaded yet on web_view the active URI is NULL. 2.
+// <orderedlist> <listitem><para> When nothing has been loaded yet on
+// web_view the active URI is NULL. </para></listitem> <listitem><para>
 // When a new load operation starts the active URI is the requested URI:
-//
-//   - If the load operation was started by webkit_web_view_load_uri(),
-//     the requested URI is the given one.
-//   - If the load operation was started by webkit_web_view_load_html(),
-//     the requested URI is "about:blank".
-//   - If the load operation was started by
-//     webkit_web_view_load_alternate_html(), the requested URI is content URI
-//     provided.
-//   - If the load operation was started by webkit_web_view_go_back() or
-//     webkit_web_view_go_forward(), the requested URI is the original URI of
-//     the previous/next item in the KitBackForwardList of web_view.
-//   - If the load operation was started by
-//     webkit_web_view_go_to_back_forward_list_item(), the requested URI is the
-//     original URI of the given KitBackForwardListItem.
-//
-// 3. If there is a server redirection during the load operation, the active URI
-// is the redirected URI. When the signal KitWebView::load-changed is emitted
-// with WEBKIT_LOAD_REDIRECTED event, the active URI is already updated to the
-// redirected URI. 4. When the signal KitWebView::load-changed is emitted with
-// WEBKIT_LOAD_COMMITTED event, the active URI is the final one and it will not
-// change unless a new load operation is started or a navigation action within
-// the same page is performed.
+// <itemizedlist> <listitem><para> If the load operation was started
+// by webkit_web_view_load_uri(), the requested URI is the given one.
+// </para></listitem> <listitem><para> If the load operation was started
+// by webkit_web_view_load_html(), the requested URI is "about:blank".
+// </para></listitem> <listitem><para> If the load operation was started by
+// webkit_web_view_load_alternate_html(), the requested URI is content URI
+// provided. </para></listitem> <listitem><para> If the load operation was
+// started by webkit_web_view_go_back() or webkit_web_view_go_forward(),
+// the requested URI is the original URI of the previous/next item in the
+// KitBackForwardList of web_view. </para></listitem> <listitem><para> If the
+// load operation was started by webkit_web_view_go_to_back_forward_list_item(),
+// the requested URI is the opriginal URI of the given KitBackForwardListItem.
+// </para></listitem> </itemizedlist> </para></listitem> <listitem><para> If
+// there is a server redirection during the load operation, the active URI is
+// the redirected URI. When the signal KitWebView::load-changed is emitted
+// with WEBKIT_LOAD_REDIRECTED event, the active URI is already updated to
+// the redirected URI. </para></listitem> <listitem><para> When the signal
+// KitWebView::load-changed is emitted with WEBKIT_LOAD_COMMITTED event,
+// the active URI is the final one and it will not change unless a new
+// load operation is started or a navigation action within the same page is
+// performed. </para></listitem> </orderedlist>
 //
 // You can monitor the active URI by connecting to the notify::uri signal of
 // web_view.
@@ -2601,7 +2575,7 @@ func (webView *WebView) URI() string {
 	return _utf8
 }
 
-// UserContentManager gets the user content manager associated with web_view.
+// UserContentManager gets the user content manager associated to web_view.
 //
 // The function returns the following values:
 //
@@ -2643,7 +2617,7 @@ func (webView *WebView) WebExtensionMode() WebExtensionMode {
 	return _webExtensionMode
 }
 
-// WebsiteDataManager: get the KitWebsiteDataManager associated with web_view.
+// WebsiteDataManager: get the KitWebsiteDataManager associated to web_view.
 //
 // If web_view is not ephemeral, the returned KitWebsiteDataManager will be the
 // same as the KitWebsiteDataManager of web_view's KitWebContext.
@@ -2718,7 +2692,7 @@ func (webView *WebView) WindowProperties() *WindowProperties {
 	return _windowProperties
 }
 
-// ZoomLevel: get the zoom level of web_view.
+// ZoomLevel: set the zoom level of web_view.
 //
 // Get the zoom level of web_view, i.e. the factor by which the view contents
 // are scaled with respect to their original size.
@@ -2791,8 +2765,8 @@ func (webView *WebView) GoToBackForwardListItem(listItem *BackForwardListItem) {
 // IsControlledByAutomation: get whether a KitWebView was created with
 // KitWebView:is-controlled-by-automation property enabled.
 //
-// Only KitWebView objects controlled by automation can be used in an automation
-// session.
+// Only KitWebView<!-- -->s controlled by automation can be used in an
+// automation session.
 //
 // The function returns the following values:
 //
@@ -2847,7 +2821,7 @@ func (webView *WebView) IsEditable() bool {
 //
 // To create an ephemeral KitWebView you need to use g_object_new() and pass
 // is-ephemeral property with TRUE value. See KitWebView:is-ephemeral for more
-// details. If web_view was created with an ephemeral KitWebView:related-view or
+// details. If web_view was created with a ephemeral KitWebView:related-view or
 // an ephemeral KitWebView:web-context it will also be ephemeral.
 //
 // The function returns the following values:
@@ -2903,10 +2877,10 @@ func (webView *WebView) IsImmersiveModeEnabled() bool {
 // IsLoading gets the value of the KitWebView:is-loading property.
 //
 // You can monitor when a KitWebView is loading a page by connecting to
-// notify::is-loading signal of web_view. This is useful when you are interested
-// in knowing when the view is loading something but not in the details about
-// the status of the load operation, for example to start a spinner when the
-// view is loading a page and stop it when it finishes.
+// notify::is-loading signal of web_view. This is useful when you are
+// interesting in knowing when the view is loading something but not in the
+// details about the status of the load operation, for example to start a
+// spinner when the view is loading a page and stop it when it finishes.
 //
 // The function returns the following values:
 //
@@ -3214,7 +3188,7 @@ func (webView *WebView) RestoreSessionState(state *WebViewSessionState) {
 //	    JSCValue               *value;
 //	    GError                 *error = NULL;
 //
-//	    js_result = webkit_web_view_run_javascript_in_world_finish (WEBKIT_WEB_VIEW (object), result, &error);
+//	    js_result = webkit_web_view_run_javascript_finish (WEBKIT_WEB_VIEW (object), result, &error);
 //	    if (!js_result) {
 //	        g_warning ("Error running javascript: s", error->message);
 //	        g_error_free (error);
@@ -3223,12 +3197,13 @@ func (webView *WebView) RestoreSessionState(state *WebViewSessionState) {
 //
 //	    value = webkit_javascript_result_get_js_value (js_result);
 //	    if (jsc_value_is_number (value)) {
-//	        gint32        int_value = jsc_value_to_int32 (value);
+//	        gint32        int_value = jsc_value_to_string (value);
 //	        JSCException *exception = jsc_context_get_exception (jsc_value_get_context (value));
 //	        if (exception)
 //	            g_warning ("Error running javascript: s", jsc_exception_get_message (exception));
 //	        else
 //	            g_print ("Script result: d\n", int_value);
+//	        g_free (str_value);
 //	    } else {
 //	        g_warning ("Error running javascript: unexpected return value");
 //	    }
@@ -3243,7 +3218,7 @@ func (webView *WebView) RestoreSessionState(state *WebViewSessionState) {
 //	    g_variant_dict_insert (&dict, "count", "u", 42);
 //	    GVariant *args = g_variant_dict_end (&dict);
 //	    const gchar *body = "return new Promise((resolve) => { resolve(count); });";
-//	    webkit_web_view_run_async_javascript_function_in_world (web_view, body, args, NULL, NULL, web_view_javascript_finished, NULL);
+//	    webkit_web_view_run_async_javascript_function_in_world (web_view, body, arguments, NULL, NULL, web_view_javascript_finished, NULL);
 //	}
 //
 // Deprecated: Use webkit_web_view_call_async_javascript_function() instead.
@@ -3479,8 +3454,8 @@ func (webView *WebView) RunJavascriptFromGresource(ctx context.Context, resource
 //
 // The function returns the following values:
 //
-//   - javascriptResult with the result of the last executed statement in the
-//     script or NULL in case of error.
+//   - javascriptResult with the result of the last executed statement in script
+//     or NULL in case of error.
 func (webView *WebView) RunJavascriptFromGresourceFinish(result gio.AsyncResulter) (*JavascriptResult, error) {
 	var _arg0 *C.WebKitWebView          // out
 	var _arg1 *C.GAsyncResult           // out
@@ -3563,7 +3538,8 @@ func (webView *WebView) RunJavascriptInWorld(ctx context.Context, script, worldN
 // RunJavascriptInWorldFinish: finish an asynchronous operation started with
 // webkit_web_view_run_javascript_in_world().
 //
-// Deprecated: Use webkit_web_view_evaluate_javascript_finish() instead.
+// Deprecated: Use webkit_web_view_call_async_javascript_function_finish()
+// instead.
 //
 // The function takes the following parameters:
 //
@@ -3605,8 +3581,8 @@ func (webView *WebView) RunJavascriptInWorldFinish(result gio.AsyncResulter) (*J
 
 // Save: asynchronously save the current web page.
 //
-// Asynchronously save the current web page associated with the KitWebView into
-// a self-contained format using the mode specified in save_mode.
+// Asynchronously save the current web page associated to the KitWebView into a
+// self-contained format using the mode specified in save_mode.
 //
 // When the operation is finished, callback will be called. You can then call
 // webkit_web_view_save_finish() to get the result of the operation.
@@ -3695,9 +3671,9 @@ func (webView *WebView) SaveFinish(result gio.AsyncResulter) (gio.InputStreamer,
 
 // SaveToFile: asynchronously save the current web page.
 //
-// Asynchronously save the current web page associated with the KitWebView into
-// a self-contained format using the mode specified in save_mode and writing it
-// to file.
+// Asynchronously save the current web page associated to the KitWebView into a
+// self-contained format using the mode specified in save_mode and writing it to
+// file.
 //
 // When the operation is finished, callback will be called. You can then call
 // webkit_web_view_save_to_file_finish() to get the result of the operation.
@@ -3775,7 +3751,8 @@ func (webView *WebView) SaveToFileFinish(result gio.AsyncResulter) error {
 //
 //   - ctx (optional) or NULL to ignore.
 //   - message: KitUserMessage.
-//   - callback (optional) to call when the request is satisfied or NULL.
+//   - callback (optional): (nullable): A ReadyCallback to call when the request
+//     is satisfied or NULL.
 func (webView *WebView) SendMessageToPage(ctx context.Context, message *UserMessage, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitWebView      // out
 	var _arg2 *C.GCancellable       // out
@@ -3843,8 +3820,8 @@ func (webView *WebView) SendMessageToPageFinish(result gio.AsyncResulter) (*User
 // actual contents are rendered. Note that if the web page loaded in web_view
 // specifies a background color, it will take precedence over the rgba color.
 // By default the web_view background color is opaque white. Note that the
-// parent window must have an RGBA visual and Widget:app-paintable property set
-// to TRUE for background colors to work.
+// parent window must have a RGBA visual and Widget:app-paintable property set
+// to TRUE for backgrounds colors to work.
 //
 //	static void browser_window_set_background_color (BrowserWindow *window,
 //	                                                 const GdkRGBA *rgba)
@@ -3880,7 +3857,7 @@ func (webView *WebView) SetBackgroundColor(rgba *gdk.RGBA) {
 
 // SetCameraCaptureState: set the camera capture state of a KitWebView.
 //
-// If KitSettings:enable-media-stream is FALSE, this method will have
+// If KitSettings:enable-mediastream is FALSE, this method will have
 // no visible effect. Once the state of the device has been set to
 // WEBKIT_MEDIA_CAPTURE_STATE_NONE it cannot be changed anymore. The page can
 // however request capture again using the mediaDevices API.
@@ -3971,7 +3948,7 @@ func (webView *WebView) SetCustomCharset(charset string) {
 
 // SetDisplayCaptureState: set the display capture state of a KitWebView.
 //
-// If KitSettings:enable-media-stream is FALSE, this method will have
+// If KitSettings:enable-mediastream is FALSE, this method will have
 // no visible effect. Once the state of the device has been set to
 // WEBKIT_MEDIA_CAPTURE_STATE_NONE it cannot be changed anymore. The page can
 // however request capture again using the mediaDevices API.
@@ -3998,7 +3975,7 @@ func (webView *WebView) SetDisplayCaptureState(state MediaCaptureState) {
 // if the CONTENTEDITABLE attribute has been set on the element or one of its
 // parent elements. By default a KitWebView is not editable.
 //
-// Normally, an HTML document is not editable unless the elements within the
+// Normally, a HTML document is not editable unless the elements within the
 // document are editable. This function provides a way to make the contents of a
 // KitWebView editable without altering the document or DOM structure.
 //
@@ -4061,32 +4038,9 @@ func (webView *WebView) SetIsMuted(muted bool) {
 	runtime.KeepAlive(muted)
 }
 
-// SetMagnification: set the magnification factor of web_view.
-//
-// The magnification factor represents the visual scaling of the page (similar
-// to pinch-to-zoom). This is independent of the layout zoom level (which is
-// set with webkit_web_view_set_zoom_level()). Setting the magnification factor
-// scales the rendered page visually around the center of the view without
-// affecting page layout or text wrapping.
-//
-// The function takes the following parameters:
-//
-//   - magnification factor.
-func (webView *WebView) SetMagnification(magnification float64) {
-	var _arg0 *C.WebKitWebView // out
-	var _arg1 C.gdouble        // out
-
-	_arg0 = (*C.WebKitWebView)(unsafe.Pointer(coreglib.InternObject(webView).Native()))
-	_arg1 = C.gdouble(magnification)
-
-	C.webkit_web_view_set_magnification(_arg0, _arg1)
-	runtime.KeepAlive(webView)
-	runtime.KeepAlive(magnification)
-}
-
 // SetMicrophoneCaptureState: set the microphone capture state of a KitWebView.
 //
-// If KitSettings:enable-media-stream is FALSE, this method will have
+// If KitSettings:enable-mediastream is FALSE, this method will have
 // no visible effect. Once the state of the device has been set to
 // WEBKIT_MEDIA_CAPTURE_STATE_NONE it cannot be changed anymore. The page can
 // however request capture again using the mediaDevices API.
@@ -4110,7 +4064,7 @@ func (webView *WebView) SetMicrophoneCaptureState(state MediaCaptureState) {
 //
 // The existing KitSettings of web_view will be replaced by settings. New
 // settings are applied immediately on web_view. The same KitSettings object can
-// be shared by multiple KitWebView objects.
+// be shared by multiple KitWebView<!-- -->s.
 //
 // The function takes the following parameters:
 //
@@ -4161,7 +4115,7 @@ func (webView *WebView) StopLoading() {
 	runtime.KeepAlive(webView)
 }
 
-// TerminateWebProcess terminates the web process associated with web_view.
+// TerminateWebProcess terminates the web process associated to web_view.
 //
 // When the web process gets terminated using this method,
 // the KitWebView::web-process-terminated signal is emitted with

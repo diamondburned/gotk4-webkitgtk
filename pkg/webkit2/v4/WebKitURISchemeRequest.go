@@ -151,7 +151,7 @@ func (request *URISchemeRequest) FinishWithResponse(response *URISchemeResponse)
 //
 // The function returns the following values:
 //
-//   - inputStream (optional): body of the request.
+//   - inputStream: (nullable): the body of the request.
 func (request *URISchemeRequest) HTTPBody() gio.InputStreamer {
 	var _arg0 *C.WebKitURISchemeRequest // out
 	var _cret *C.GInputStream           // in
@@ -163,21 +163,22 @@ func (request *URISchemeRequest) HTTPBody() gio.InputStreamer {
 
 	var _inputStream gio.InputStreamer // out
 
-	if _cret != nil {
-		{
-			objptr := unsafe.Pointer(_cret)
-
-			object := coreglib.AssumeOwnership(objptr)
-			casted := object.WalkCast(func(obj coreglib.Objector) bool {
-				_, ok := obj.(gio.InputStreamer)
-				return ok
-			})
-			rv, ok := casted.(gio.InputStreamer)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.InputStreamer")
-			}
-			_inputStream = rv
+	{
+		objptr := unsafe.Pointer(_cret)
+		if objptr == nil {
+			panic("object of type gio.InputStreamer is nil")
 		}
+
+		object := coreglib.AssumeOwnership(objptr)
+		casted := object.WalkCast(func(obj coreglib.Objector) bool {
+			_, ok := obj.(gio.InputStreamer)
+			return ok
+		})
+		rv, ok := casted.(gio.InputStreamer)
+		if !ok {
+			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.InputStreamer")
+		}
+		_inputStream = rv
 	}
 
 	return _inputStream

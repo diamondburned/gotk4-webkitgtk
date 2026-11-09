@@ -30,7 +30,6 @@ import (
 // extern void _gotk4_soup3_Message_ConnectGotBody(gpointer, guintptr);
 // extern void _gotk4_soup3_Message_ConnectFinished(gpointer, guintptr);
 // extern void _gotk4_soup3_Message_ConnectContentSniffed(gpointer, gchar*, GHashTable*, guintptr);
-// extern gboolean _gotk4_soup3_Message_ConnectRequestCompressionDictionary(gpointer, SoupCompressionDictionaryRequest*, guintptr);
 // extern gboolean _gotk4_soup3_Message_ConnectRequestCertificatePassword(gpointer, GTlsPassword*, guintptr);
 // extern gboolean _gotk4_soup3_Message_ConnectRequestCertificate(gpointer, GTlsClientConnection*, guintptr);
 // extern gboolean _gotk4_soup3_Message_ConnectAuthenticate(gpointer, SoupAuth*, gboolean, guintptr);
@@ -363,18 +362,6 @@ func (msg *Message) ConnectRequestCertificatePassword(f func(tlsPassword *gio.TL
 	return coreglib.ConnectGeneratedClosure(msg, "request-certificate-password", false, unsafe.Pointer(C._gotk4_soup3_Message_ConnectRequestCertificatePassword), f)
 }
 
-// ConnectRequestCompressionDictionary is emitted when the server responds with
-// Content-Encoding: dcb or Content-Encoding: dcz and libsoup needs the raw
-// dictionary bytes to set up decompression.
-//
-// Call compressiondictionaryrequest.SetDictionary on request to provide the
-// dictionary, or compressiondictionaryrequest.Cancel to abort. Either can be
-// done synchronously inside this handler, or asynchronously after calling
-// gobject.Object.Ref() on request and returning TRUE.
-func (msg *Message) ConnectRequestCompressionDictionary(f func(request *CompressionDictionaryRequest) (ok bool)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(msg, "request-compression-dictionary", false, unsafe.Pointer(C._gotk4_soup3_Message_ConnectRequestCompressionDictionary), f)
-}
-
 // ConnectRestarted is emitted when a request that was already sent once is now
 // being sent again.
 //
@@ -616,61 +603,6 @@ func (msg *Message) DisableFeature(featureType coreglib.Type) {
 	C.soup_message_disable_feature(_arg0, _arg1)
 	runtime.KeepAlive(msg)
 	runtime.KeepAlive(featureType)
-}
-
-// CompressionDictionaryHash gets the SHA-256 hash of the shared dictionary
-// previously set with message.SetCompressionDictionaryHash.
-//
-// The function returns the following values:
-//
-//   - bytes (optional): raw 32-byte SHA-256 hash, or NULL.
-func (msg *Message) CompressionDictionaryHash() *glib.Bytes {
-	var _arg0 *C.SoupMessage // out
-	var _cret *C.GBytes      // in
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
-
-	_cret = C.soup_message_get_compression_dictionary_hash(_arg0)
-	runtime.KeepAlive(msg)
-
-	var _bytes *glib.Bytes // out
-
-	if _cret != nil {
-		_bytes = (*glib.Bytes)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-		C.g_bytes_ref(_cret)
-		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(_bytes)),
-			func(intern *struct{ C unsafe.Pointer }) {
-				C.g_bytes_unref((*C.GBytes)(intern.C))
-			},
-		)
-	}
-
-	return _bytes
-}
-
-// CompressionDictionaryID gets the identifier of the shared dictionary
-// previously set with message.SetCompressionDictionaryID.
-//
-// The function returns the following values:
-//
-//   - utf8 (optional): dictionary identifier, or NULL.
-func (msg *Message) CompressionDictionaryID() string {
-	var _arg0 *C.SoupMessage // out
-	var _cret *C.char        // in
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
-
-	_cret = C.soup_message_get_compression_dictionary_id(_arg0)
-	runtime.KeepAlive(msg)
-
-	var _utf8 string // out
-
-	if _cret != nil {
-		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	}
-
-	return _utf8
 }
 
 // ConnectionID returns the unique idenfier for the last connection used.
@@ -1284,71 +1216,6 @@ func (msg *Message) RemoveFlags(flags MessageFlags) {
 	C.soup_message_remove_flags(_arg0, _arg1)
 	runtime.KeepAlive(msg)
 	runtime.KeepAlive(flags)
-}
-
-// SetCompressionDictionaryHash sets the SHA-256 hash of the shared dictionary
-// to advertise for Compression Dictionary Transport (RFC 9842).
-//
-// When set, contentdecoder will include dcb and/or dcz in the Accept-Encoding
-// request header (over HTTPS) and will send an Available-Dictionary
-// header containing the base64-encoded hash. When the server responds with
-// Content-Encoding: dcb or dcz, the message::request-compression-dictionary
-// signal is emitted so the caller can supply the actual dictionary bytes.
-//
-// If the dictionary was registered with an identifier, set it with
-// message.SetCompressionDictionaryID so that a Dictionary-ID header accompanies
-// Available-Dictionary.
-//
-// The hash does not survive redirects: a dictionary is chosen for a specific
-// request URL, so when msg is redirected the hash, the id and both headers are
-// cleared. It is the caller's responsibility to select and set a new dictionary
-// appropriate for the redirect target, if any.
-//
-// The function takes the following parameters:
-//
-//   - hash (optional) containing the raw SHA-256 hash (32 bytes) of the shared
-//     dictionary, or NULL to unset.
-func (msg *Message) SetCompressionDictionaryHash(hash *glib.Bytes) {
-	var _arg0 *C.SoupMessage // out
-	var _arg1 *C.GBytes      // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
-	if hash != nil {
-		_arg1 = (*C.GBytes)(gextras.StructNative(unsafe.Pointer(hash)))
-	}
-
-	C.soup_message_set_compression_dictionary_hash(_arg0, _arg1)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(hash)
-}
-
-// SetCompressionDictionaryID sets the identifier of the shared dictionary
-// advertised for Compression Dictionary Transport (RFC 9842).
-//
-// id is the value the server gave in the id parameter of the Use-As-Dictionary
-// response header that registered the dictionary. It is sent as a Dictionary-ID
-// header alongside Available-Dictionary, and only when a hash has been set with
-// message.SetCompressionDictionaryHash and that header is sent, so it can never
-// be emitted on its own.
-//
-// Like the hash, the id does not survive redirects.
-//
-// The function takes the following parameters:
-//
-//   - id (optional): dictionary identifier, or NULL to unset.
-func (msg *Message) SetCompressionDictionaryID(id string) {
-	var _arg0 *C.SoupMessage // out
-	var _arg1 *C.char        // out
-
-	_arg0 = (*C.SoupMessage)(unsafe.Pointer(coreglib.InternObject(msg).Native()))
-	if id != "" {
-		_arg1 = (*C.char)(unsafe.Pointer(C.CString(id)))
-		defer C.free(unsafe.Pointer(_arg1))
-	}
-
-	C.soup_message_set_compression_dictionary_id(_arg0, _arg1)
-	runtime.KeepAlive(msg)
-	runtime.KeepAlive(id)
 }
 
 // SetFirstParty sets first_party as the main document #GUri for msg.

@@ -43,9 +43,9 @@ const (
 	OptionInt
 	// OptionUint option type.
 	OptionUint
-	// OptionSize option type.
+	// OptionSize options type.
 	OptionSize
-	// OptionDouble option type.
+	// OptionDouble options type.
 	OptionDouble
 	// OptionString: string option type.
 	OptionString
@@ -77,11 +77,11 @@ func (o OptionType) String() string {
 
 // OptionsFunc: function used to iterate options.
 //
-// Note that description string is not localized.
+// Not that description string is not localized.
 type OptionsFunc func(option string, typ OptionType, description string) (ok bool)
 
 // OptionsForEach iterates all available options calling function for each one.
-// Iteration can stop early if function returns TRUE.
+// Iteration can stop early if function returns FALSE.
 //
 // The function takes the following parameters:
 //
@@ -198,10 +198,11 @@ func OptionsGetInt(option string) (int, bool) {
 
 // OptionsGetOptionGroup: create a Group to handle JSCOptions as command line
 // arguments. The options will be exposed as command line arguments with the
-// form --jsc-<option>=<value>. Each entry in the returned Group is configured
-// to apply the corresponding option during command line parsing. Applications
-// only need to pass the returned group to g_option_context_add_group(), and the
-// rest will be taken care of automatically.
+// form <emphasis>--jsc-&lt;option&gt;=&lt;value&gt;</emphasis>. Each entry
+// in the returned Group is configured to apply the corresponding option
+// during command line parsing. Applications only need to pass the returned
+// group to g_option_context_add_group(), and the rest will be taken care for
+// automatically.
 //
 // The function returns the following values:
 //
@@ -224,10 +225,11 @@ func OptionsGetOptionGroup() *glib.OptionGroup {
 	return _optionGroup
 }
 
-// OptionsGetRangeString: get option as a range string. The string must be
-// in the format [!]<low>[:<high>] where low and high are #guint values.
-// Values between low and high (both included) will be considered in the range,
-// unless ! is used to invert the range.
+// OptionsGetRangeString: get option as a range string. The string must be in
+// the format <emphasis>[!]&lt;low&gt;[:&lt;high&gt;]</emphasis> where low and
+// high are #guint values. Values between low and high (both included) will be
+// considered in the range, unless <emphasis>!</emphasis> is used to invert the
+// range.
 //
 // The function takes the following parameters:
 //
@@ -455,10 +457,11 @@ func OptionsSetInt(option string, value int) bool {
 	return _ok
 }
 
-// OptionsSetRangeString: set option as a range string. The string must be
-// in the format [!]<low>[:<high>] where low and high are #guint values.
-// Values between low and high (both included) will be considered in the range,
-// unless ! is used to invert the range.
+// OptionsSetRangeString: set option as a range string. The string must be in
+// the format <emphasis>[!]&lt;low&gt;[:&lt;high&gt;]</emphasis> where low and
+// high are #guint values. Values between low and high (both included) will be
+// considered in the range, unless <emphasis>!</emphasis> is used to invert the
+// range.
 //
 // The function takes the following parameters:
 //

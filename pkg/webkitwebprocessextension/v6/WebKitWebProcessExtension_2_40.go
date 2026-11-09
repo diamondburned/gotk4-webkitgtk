@@ -45,8 +45,8 @@ func defaultWebProcessExtensionOverrides(v *WebProcessExtension) WebProcessExten
 
 // WebProcessExtension represents an extension of the web process.
 //
-// WebKitWebProcessExtension is a loadable module for the web process.
-// It allows you to execute code in the web process and to use the DOM API,
+// WebKitWebProcessExtension is a loadable module for the web process. It allows
+// you to execute code in the web process and being able to use the DOM API,
 // to change any request or to inject custom JavaScript code, for example.
 //
 // To create a WebKitWebProcessExtension you should write
@@ -79,43 +79,40 @@ func defaultWebProcessExtensionOverrides(v *WebProcessExtension) WebProcessExten
 // The previous piece of code shows a trivial example of an extension that
 // notifies when a KitWebPage is created.
 //
-// WebKit has to know where it can find the created
-// WebKitWebProcessExtension. To do so you should use the
-// webkit_web_context_set_web_process_extensions_directory() function. The
-// signal KitWebContext::initialize-web-process-extensions is the recommended
-// place to call it.
+// WebKit has to know where it can find the created WebKitWebProcessExtension.
+// To do so you should use the webkit_web_context_set_web_extensions_directory()
+// function. The signal KitWebContext::initialize-web-extensions is the
+// recommended place to call it.
 //
 // To provide the initialization data used by the
-// webkit_web_process_extension_initialize_with_user_data()
-// function, you have to call
-// webkit_web_context_set_web_process_extensions_initialization_user_data()
+// webkit_web_process_extension_initialize_with_user_data() function, you have
+// to call webkit_web_context_set_web_extensions_initialization_user_data()
 // with the desired data as parameter. You can see an example of this in the
 // following piece of code:
 //
-//	#define WEB_PROCESS_EXTENSIONS_DIRECTORY // ...
+//	#define WEB_EXTENSIONS_DIRECTORY // ...
 //
 //	static void
-//	initialize_web_process_extensions (WebKitWebContext *context,
-//	                                   gpointer          user_data)
+//	initialize_web_extensions (WebKitWebContext *context,
+//	                           gpointer          user_data)
 //	{
-//	  // Web process extensions get a different ID for each web process
+//	  // Web Extensions get a different ID for each Web Process
 //	  static guint32 unique_id = 0;
 //
-//	  webkit_web_context_set_web_process_extensions_directory (
-//	     context, WEB_PROCESS_EXTENSIONS_DIRECTORY);
-//	  webkit_web_context_set_web_process_extensions_initialization_user_data (
+//	  webkit_web_context_set_web_extensions_directory (
+//	     context, WEB_EXTENSIONS_DIRECTORY);
+//	  webkit_web_context_set_web_extensions_initialization_user_data (
 //	     context, g_variant_new_uint32 (unique_id++));
 //	}
 //
 //	int main (int argc, char **argv)
 //	{
 //	  g_signal_connect (webkit_web_context_get_default (),
-//	                    "initialize-web-process-extensions",
-//	                    G_CALLBACK (initialize_web_process_extensions),
+//	                   "initialize-web-extensions",
+//	                    G_CALLBACK (initialize_web_extensions),
 //	                    NULL);
 //
-//	  // With the legacy libwpe backend, WPE also needs the "backend" property
-//	  WebKitWebView *view = g_object_new (WEBKIT_TYPE_WEB_VIEW, NULL);
+//	  GtkWidget *view = webkit_web_view_new ();
 //
 //	  // ...
 //	}.
@@ -162,7 +159,7 @@ func (extension *WebProcessExtension) ConnectPageCreated(f func(webPage *WebPage
 
 // ConnectUserMessageReceived: this signal is emitted when a KitUserMessage is
 // received from the KitWebContext corresponding to extension. Messages sent by
-// KitWebContext are always broadcast to all web extensions and they can't be
+// KitWebContext are always broadcasted to all web extensions and they can't be
 // replied to. Calling webkit_user_message_send_reply() will do nothing.
 func (extension *WebProcessExtension) ConnectUserMessageReceived(f func(message *UserMessage)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(extension, "user-message-received", false, unsafe.Pointer(C._gotk4_webkitwebprocessextension6_WebProcessExtension_ConnectUserMessageReceived), f)
@@ -200,11 +197,10 @@ func (extension *WebProcessExtension) Page(pageId uint64) *WebPage {
 // SendMessageToContext: send message to the KitWebContext corresponding to
 // extension. If message is floating, it's consumed.
 //
-// If you don't expect any reply, or you simply want to ignore it,
-// you can pass NULL as callback. When the operation is
-// finished, callback will be called. You can then call
-// webkit_web_process_extension_send_message_to_context_finish() to get the
-// message reply.
+// If you don't expect any reply, or you simply want to ignore it, you can pass
+// NULL as calback. When the operation is finished, callback will be called. You
+// can then call webkit_web_process_extension_send_message_to_context_finish()
+// to get the message reply.
 //
 // The function takes the following parameters:
 //

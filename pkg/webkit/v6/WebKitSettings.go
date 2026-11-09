@@ -36,7 +36,7 @@ func defaultSettingsOverrides(v *Settings) SettingsOverrides {
 	return SettingsOverrides{}
 }
 
-// Settings: control the behavior of a KitWebView.
+// Settings: control the behaviour of a KitWebView.
 //
 // KitSettings can be applied to a KitWebView to control text charset, color,
 // font sizes, printing mode, script support, loading of images and various
@@ -102,8 +102,8 @@ func NewSettings() *Settings {
 }
 
 // ApplyFromKeyFile reads the contents of the given group_name from the given
-// key_file and applies the value of each key/value to the corresponding
-// property on the settings.
+// key_file and apply the value of each key/value to the corresponding property
+// on the settings.
 //
 // Value types have to match with the corresponding setting property type
 // and the group keys have to match existing setting property names. If those
@@ -195,7 +195,7 @@ func (settings *Settings) AllowModalDialogs() bool {
 // The function returns the following values:
 //
 //   - ok: TRUE If navigation to data URLs from the top frame is allowed or
-//     FALSE otherwise.
+//     FALSE\ otherwise.
 func (settings *Settings) AllowTopNavigationToDataUrls() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -446,7 +446,7 @@ func (settings *Settings) Enable2DCanvasAcceleration() bool {
 //
 // The function returns the following values:
 //
-//   - ok: TRUE if horizontal swipe gesture will trigger back-forward navigation
+//   - ok: TRUE if horizontal swipe gesture will trigger back-forward navigaiton
 //     or FALSE otherwise.
 func (settings *Settings) EnableBackForwardNavigationGestures() bool {
 	var _arg0 *C.WebKitSettings // out
@@ -850,7 +850,7 @@ func (settings *Settings) EnableOfflineWebApplicationCache() bool {
 //
 // The function returns the following values:
 //
-//   - ok: TRUE if page cache is enabled or FALSE otherwise.
+//   - ok: TRUE if page cache enabled or FALSE otherwise.
 func (settings *Settings) EnablePageCache() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -1108,7 +1108,7 @@ func (settings *Settings) FantasyFontFamily() string {
 //
 // The function takes the following parameters:
 //
-//   - feature to query.
+//   - feature to toggle.
 //
 // The function returns the following values:
 //
@@ -1186,7 +1186,7 @@ func (settings *Settings) JavascriptCanAccessClipboard() bool {
 //
 // The function returns the following values:
 //
-//   - ok: TRUE If JavaScript can open windows automatically or FALSE otherwise.
+//   - ok: TRUE If JavaScript can open window automatically or FALSE otherwise.
 func (settings *Settings) JavascriptCanOpenWindowsAutomatically() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -1237,6 +1237,8 @@ func (settings *Settings) LoadIconsIgnoringImageLoadSetting() bool {
 //
 //   - utf8 (optional): default font family used to display content marked with
 //     math font.
+//
+//     Since 2.52.
 func (settings *Settings) MathFontFamily() string {
 	var _arg0 *C.WebKitSettings // out
 	var _cret *C.gchar          // in
@@ -1307,8 +1309,8 @@ func (settings *Settings) MediaPlaybackAllowsInline() bool {
 //
 // The function returns the following values:
 //
-//   - ok: TRUE If a user gesture is needed to play or load media or FALSE if no
-//     user gesture is needed.
+//   - ok: TRUE If an user gesture is needed to play or load media or FALSE if
+//     no user gesture is needed.
 func (settings *Settings) MediaPlaybackRequiresUserGesture() bool {
 	var _arg0 *C.WebKitSettings // out
 	var _cret C.gboolean        // in
@@ -2433,6 +2435,8 @@ func (settings *Settings) SetLoadIconsIgnoringImageLoadSetting(enabled bool) {
 
 // SetMathFontFamily: set the KitSettings:math-font-family property.
 //
+// Since 2.52.
+//
 // The function takes the following parameters:
 //
 //   - mathFontFamily (optional): new default math font family.
@@ -2457,7 +2461,7 @@ func (settings *Settings) SetMathFontFamily(mathFontFamily string) {
 // The function takes the following parameters:
 //
 //   - contentTypes (optional): list of media content types requiring hardware
-//     support split by colons (:) or NULL to use the default value.
+//     support split by semicolons (:) or NULL to use the default value.
 func (settings *Settings) SetMediaContentTypesRequiringHardwareSupport(contentTypes string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out
@@ -2646,16 +2650,16 @@ func (settings *Settings) SetUserAgent(userAgent string) {
 // by appending the application details.
 //
 // Set the KitSettings:user-agent property by appending the application details
-// to the default user agent. If no application name is given, the default user
-// agent will be used and application_version is ignored. If only the name is
-// given, the default engine version is used with the given application name.
+// to the default user agent. If no application name or version is given,
+// the default user agent used will be used. If only the version is given,
+// the default engine version is used with the given application name.
 //
 // The function takes the following parameters:
 //
 //   - applicationName (optional): application name used for the user agent or
 //     NULL to use the default user agent.
 //   - applicationVersion (optional): application version for the user agent or
-//     NULL to use the default version.
+//     NULL to user the default version.
 func (settings *Settings) SetUserAgentWithApplicationDetails(applicationName, applicationVersion string) {
 	var _arg0 *C.WebKitSettings // out
 	var _arg1 *C.gchar          // out

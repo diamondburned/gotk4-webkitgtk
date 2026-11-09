@@ -188,8 +188,7 @@ func (inspector *WebInspector) Detach() {
 	runtime.KeepAlive(inspector)
 }
 
-// AttachedHeight: get the height that the inspector view should have when
-// attached.
+// AttachedHeight: get the height that the inspector view when attached.
 //
 // Get the height that the inspector view should have when it's attached.
 // If the inspector view is not attached this returns 0.
@@ -241,8 +240,8 @@ func (inspector *WebInspector) CanAttach() bool {
 // InspectedURI: get the URI that is currently being inspected.
 //
 // This can be NULL if nothing has been loaded yet in the inspected view,
-// if the inspector has been closed or when the inspected view was loaded from
-// an HTML string instead of a URI.
+// if the inspector has been closed or when inspected view was loaded from a
+// HTML string instead of a URI.
 //
 // The function returns the following values:
 //

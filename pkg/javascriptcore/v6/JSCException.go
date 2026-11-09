@@ -247,7 +247,7 @@ func (exception *Exception) Name() string {
 //
 // The function returns the following values:
 //
-//   - utf8 (optional): source URI of exception, or NULL.
+//   - utf8 (optional): the source URI of exception, or NULL.
 func (exception *Exception) SourceURI() string {
 	var _arg0 *C.JSCException // out
 	var _cret *C.char         // in
@@ -267,7 +267,7 @@ func (exception *Exception) SourceURI() string {
 }
 
 // Report: return a report message of exception, containing all the possible
-// details such as source URI, line, column and backtrace, and formatted to be
+// details such us source URI, line, column and backtrace, and formatted to be
 // printed.
 //
 // The function returns the following values:

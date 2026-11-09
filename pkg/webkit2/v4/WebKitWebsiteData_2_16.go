@@ -87,10 +87,9 @@ func (websiteData *WebsiteData) Name() string {
 
 // Size gets the size of the data of types types in a KitWebsiteData.
 //
-// Note that currently the data size is only known for the
-// WEBKIT_WEBSITE_DATA_DISK_CACHE, WEBKIT_WEBSITE_DATA_LOCAL_STORAGE,
-// WEBKIT_WEBSITE_DATA_INDEXEDDB_DATABASES and WEBKIT_WEBSITE_DATA_DOM_CACHE
-// data types, so for all other types 0 will be returned.
+// Note that currently the data size is only known for
+// WEBKIT_WEBSITE_DATA_DISK_CACHE data type so for all other types 0 will be
+// returned.
 //
 // The function takes the following parameters:
 //

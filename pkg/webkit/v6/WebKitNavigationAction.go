@@ -218,11 +218,11 @@ func (navigation *NavigationAction) NavigationType() NavigationType {
 
 // Request: return the KitURIRequest associated with the navigation action.
 //
-// Modifications to the returned object are *not* taken into account when the
-// request is sent over the network, and the object is intended only to aid in
-// evaluating whether a navigation action should be taken or not. To modify
-// requests before they are sent over the network the KitPage::send-request
-// signal can be used instead.
+// Modifications to the returned object are <emphasis>not</emphasis> taken
+// into account when the request is sent over the network, and is intended
+// only to aid in evaluating whether a navigation action should be taken
+// or not. To modify requests before they are sent over the network the
+// KitPage::send-request signal can be used instead.
 //
 // The function returns the following values:
 //

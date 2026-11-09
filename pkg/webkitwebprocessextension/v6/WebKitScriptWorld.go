@@ -80,12 +80,12 @@ func (world *ScriptWorld) ConnectWindowObjectCleared(f func(page *WebPage, frame
 }
 
 // NewScriptWorld creates a new isolated KitScriptWorld. Scripts executed
-// in isolated worlds have access to the DOM but not to other variables
+// in isolated worlds have access to the DOM but not to other variable
 // or functions created by the page. The KitScriptWorld is created with
 // a generated unique name. Use webkit_script_world_new_with_name() if
 // you want to create it with a custom name. You can get the JavaScript
 // execution context of a KitScriptWorld for a given KitFrame with
-// webkit_frame_get_js_context_for_script_world().
+// webkit_frame_get_javascript_context_for_script_world().
 //
 // The function returns the following values:
 //
@@ -104,9 +104,9 @@ func NewScriptWorld() *ScriptWorld {
 
 // NewScriptWorldWithName creates a new isolated KitScriptWorld with a name.
 // Scripts executed in isolated worlds have access to the DOM but not
-// to other variables or functions created by the page. You can get the
+// to other variable or functions created by the page. You can get the
 // JavaScript execution context of a KitScriptWorld for a given KitFrame with
-// webkit_frame_get_js_context_for_script_world().
+// webkit_frame_get_javascript_context_for_script_world().
 //
 // The function takes the following parameters:
 //

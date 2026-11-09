@@ -42,7 +42,7 @@ const (
 	FindOptionsNone FindOptions = 0b0
 	// FindOptionsCaseInsensitive: case insensitive search.
 	FindOptionsCaseInsensitive FindOptions = 0b1
-	// FindOptionsAtWordStarts: search text only at the beginning of the words.
+	// FindOptionsAtWordStarts: search text only at the begining of the words.
 	FindOptionsAtWordStarts FindOptions = 0b10
 	// FindOptionsTreatMedialCapitalAsWordStart: treat capital letters in the
 	// middle of words as word start.
@@ -109,13 +109,14 @@ func defaultFindControllerOverrides(v *FindController) FindControllerOverrides {
 
 // FindController controls text search in a KitWebView.
 //
-// A KitFindController is used to search text in a KitWebView. You can get a
-// KitWebView's KitFindController with webkit_web_view_get_find_controller(),
-// and later use it to search for text using webkit_find_controller_search(),
-// or get the number of matches using webkit_find_controller_count_matches().
+// A KitFindController is used to search text in a KitWebView.
+// You can get a KitWebView<!-- -->'s KitFindController with
+// webkit_web_view_get_find_controller(), and later use it to search
+// for text using webkit_find_controller_search(), or get the
+// number of matches using webkit_find_controller_count_matches().
 // The operations are asynchronous and trigger signals when ready, such as
 // KitFindController::found-text, KitFindController::failed-to-find-text or
-// KitFindController::counted-matches.
+// KitFindController::counted-matches<!-- -->.
 type FindController struct {
 	_ [0]func() // equal guard
 	*coreglib.Object
@@ -280,7 +281,7 @@ func (findController *FindController) SearchText() string {
 	return _utf8
 }
 
-// WebView gets the KitWebView this find controller is associated with.
+// WebView gets the KitWebView this find controller is associated to.
 //
 // Do not dereference the returned instance as it belongs to the
 // KitFindController.

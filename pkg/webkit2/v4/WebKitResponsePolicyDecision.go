@@ -79,11 +79,11 @@ func marshalResponsePolicyDecision(p uintptr) (interface{}, error) {
 
 // Request: return the KitURIRequest associated with the response decision.
 //
-// Modifications to the returned object are *not* taken into account when the
-// request is sent over the network, and is intended only to aid in evaluating
-// whether a response decision should be taken or not. To modify requests before
-// they are sent over the network the KitPage::send-request signal can be used
-// instead.
+// Modifications to the returned object are <emphasis>not</emphasis> taken
+// into account when the request is sent over the network, and is intended
+// only to aid in evaluating whether a response decision should be taken
+// or not. To modify requests before they are sent over the network the
+// KitPage::send-request signal can be used instead.
 //
 // The function returns the following values:
 //
@@ -130,7 +130,7 @@ func (decision *ResponsePolicyDecision) Response() *URIResponse {
 //
 // The function returns the following values:
 //
-//   - ok: TRUE if the request is the main frame main resource or FALSE
+//   - ok: TRUE if the request is the main frame main resouce or FALSE
 //     otherwise.
 func (decision *ResponsePolicyDecision) IsMainFrameMainResource() bool {
 	var _arg0 *C.WebKitResponsePolicyDecision // out

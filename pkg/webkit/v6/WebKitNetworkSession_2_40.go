@@ -91,12 +91,9 @@ func (session *NetworkSession) ConnectDownloadStarted(f func(download *Download)
 // passed, the default directory will be passed to KitWebsiteDataManager
 // so that webkit_website_data_manager_get_base_data_directory() and
 // webkit_website_data_manager_get_base_cache_directory() always return a value
-// for non-ephemeral sessions.
+// for non ephemeral sessions.
 //
-// It can be passed as the KitWebView:network-session construct parameter
-// of a KitWebView. A web view created without a network session uses
-// the one of its related view, if any, or the default one returned by
-// webkit_network_session_get_default().
+// It must be passed as construct parameter of a KitWebView.
 //
 // The function takes the following parameters:
 //
@@ -149,8 +146,8 @@ func NewNetworkSessionEphemeral() *NetworkSession {
 	return _networkSession
 }
 
-// AllowTLSCertificateForHost: ignore further TLS errors on the host for
-// certificate.
+// AllowTLSCertificateForHost: ignore further TLS errors on the host for the
+// certificate present in info.
 //
 // If host is an IPv6 address, it should not be surrounded by brackets. This
 // expectation matches g_uri_get_host().
@@ -177,8 +174,8 @@ func (session *NetworkSession) AllowTLSCertificateForHost(certificate gio.TLSCer
 
 // DownloadURI requests downloading of the specified URI string.
 //
-// The download operation will not be associated with any KitWebView,
-// if you are interested in starting a download from a particular KitWebView use
+// The download operation will not be associated to any KitWebView, if you
+// are interested in starting a download from a particular KitWebView use
 // webkit_web_view_download_uri() instead.
 //
 // The function takes the following parameters:
@@ -299,7 +296,7 @@ func (session *NetworkSession) ItpSummary(ctx context.Context, callback gio.Asyn
 // The function returns the following values:
 //
 //   - list of KitITPThirdParty. You must free the #GList with g_list_free() and
-//     unref the KitITPThirdParty objects with webkit_itp_third_party_unref()
+//     unref the KitITPThirdParty<!-- -->s with webkit_itp_third_party_unref()
 //     when you're done with them.
 func (session *NetworkSession) ItpSummaryFinish(result gio.AsyncResulter) ([]*ITPThirdParty, error) {
 	var _arg0 *C.WebKitNetworkSession // out
@@ -411,7 +408,7 @@ func (session *NetworkSession) WebsiteDataManager() *WebsiteDataManager {
 //
 // The function returns the following values:
 //
-//   - ok: TRUE if session is ephemeral, or FALSE otherwise.
+//   - ok: TRUE if session is pehmeral, or FALSE otherwise.
 func (session *NetworkSession) IsEphemeral() bool {
 	var _arg0 *C.WebKitNetworkSession // out
 	var _cret C.gboolean              // in
@@ -457,7 +454,7 @@ func (session *NetworkSession) PrefetchDns(hostname string) {
 // prevent user tracking. Note that while ITP is enabled the accept
 // policy WEBKIT_COOKIE_POLICY_ACCEPT_NO_THIRD_PARTY is ignored
 // and WEBKIT_COOKIE_POLICY_ACCEPT_ALWAYS is used instead. See also
-// webkit_cookie_manager_set_accept_policy().
+// webkit_cookie_session_set_accept_policy().
 //
 // The function takes the following parameters:
 //
@@ -480,7 +477,7 @@ func (session *NetworkSession) SetItpEnabled(enabled bool) {
 // credential storage.
 //
 // When enabled, which is the default for non-ephemeral sessions, the network
-// process will try to read and write HTTP authentication credentials from
+// process will try to read and write HTTP authentiacation credentials from
 // persistent storage.
 //
 // The function takes the following parameters:
@@ -501,7 +498,7 @@ func (session *NetworkSession) SetPersistentCredentialStorageEnabled(enabled boo
 }
 
 // SetProxySettings: set the network proxy settings to be used by connections
-// started in session.
+// started in session session.
 //
 // By default WEBKIT_NETWORK_PROXY_MODE_DEFAULT is used, which means that
 // the system settings will be used (g_proxy_resolver_get_default()).

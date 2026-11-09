@@ -26,7 +26,7 @@ func init() {
 	})
 }
 
-// UserContentFilter: compiled set of rules which are applied to resource loads.
+// UserContentFilter: compiled set of rules which applied to resource loads.
 //
 // An instance of this type is always passed by reference.
 type UserContentFilter struct {

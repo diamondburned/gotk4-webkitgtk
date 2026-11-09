@@ -1130,16 +1130,10 @@ func (self *DOMDOMWindow) Stop() {
 	runtime.KeepAlive(self)
 }
 
-// WebkitMessageHandlersPostMessage: deprecated: Use JavaScriptCore API instead.
-//
 // The function takes the following parameters:
 //
-//   - handler: name of the user message handler.
-//   - message: javaScript value to be sent.
-//
-// The function returns the following values:
-//
-//   - ok: whether the message was successfully sent.
+//   - handler
+//   - message
 func (window *DOMDOMWindow) WebkitMessageHandlersPostMessage(handler, message string) bool {
 	var _arg0 *C.WebKitDOMDOMWindow // out
 	var _arg1 *C.gchar              // out

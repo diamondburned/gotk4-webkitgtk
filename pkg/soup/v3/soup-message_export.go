@@ -354,34 +354,6 @@ func _gotk4_soup3_Message_ConnectRequestCertificatePassword(arg0 C.gpointer, arg
 	return cret
 }
 
-//export _gotk4_soup3_Message_ConnectRequestCompressionDictionary
-func _gotk4_soup3_Message_ConnectRequestCompressionDictionary(arg0 C.gpointer, arg1 *C.SoupCompressionDictionaryRequest, arg2 C.guintptr) (cret C.gboolean) {
-	var f func(request *CompressionDictionaryRequest) (ok bool)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			return
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(request *CompressionDictionaryRequest) (ok bool))
-	}
-
-	var _request *CompressionDictionaryRequest // out
-
-	_request = wrapCompressionDictionaryRequest(coreglib.Take(unsafe.Pointer(arg1)))
-
-	ok := f(_request)
-
-	var _ bool
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
 //export _gotk4_soup3_Message_ConnectRestarted
 func _gotk4_soup3_Message_ConnectRestarted(arg0 C.gpointer, arg1 C.guintptr) {
 	var f func()

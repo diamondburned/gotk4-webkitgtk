@@ -36,8 +36,8 @@ func defaultBackForwardListItemOverrides(v *BackForwardListItem) BackForwardList
 
 // BackForwardListItem: one item of the KitBackForwardList.
 //
-// A history item is part of the KitBackForwardList and consists of a title and
-// a URI.
+// A history item is part of the KitBackForwardList and consists out of a title
+// and a URI.
 type BackForwardListItem struct {
 	_ [0]func() // equal guard
 	coreglib.InitiallyUnowned

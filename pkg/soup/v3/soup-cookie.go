@@ -31,7 +31,7 @@ func init() {
 // COOKIE_MAX_AGE_ONE_DAY: constant corresponding to 1 day.
 //
 // For use with cookie.New and cookie.SetMaxAge.
-const COOKIE_MAX_AGE_ONE_DAY = 86400
+const COOKIE_MAX_AGE_ONE_DAY = 0
 
 // COOKIE_MAX_AGE_ONE_HOUR: constant corresponding to 1 hour.
 //
@@ -41,12 +41,12 @@ const COOKIE_MAX_AGE_ONE_HOUR = 3600
 // COOKIE_MAX_AGE_ONE_WEEK: constant corresponding to 1 week.
 //
 // For use with cookie.New and cookie.SetMaxAge.
-const COOKIE_MAX_AGE_ONE_WEEK = 604800
+const COOKIE_MAX_AGE_ONE_WEEK = 0
 
 // COOKIE_MAX_AGE_ONE_YEAR: constant corresponding to 1 year.
 //
 // For use with cookie.New and cookie.SetMaxAge.
-const COOKIE_MAX_AGE_ONE_YEAR = 31556926.08
+const COOKIE_MAX_AGE_ONE_YEAR = 0
 
 // SameSitePolicy represents the same-site policies of a cookie.
 type SameSitePolicy C.gint

@@ -361,7 +361,7 @@ func (request *AuthenticationRequest) IsForProxy() bool {
 	return _ok
 }
 
-// IsRetry: determine whether this is a first attempt or a retry for this
+// IsRetry: determine whether this this is a first attempt or a retry for this
 // authentication challenge.
 //
 // The function returns the following values:

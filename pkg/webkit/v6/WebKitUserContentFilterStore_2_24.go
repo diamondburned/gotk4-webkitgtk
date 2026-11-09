@@ -132,7 +132,7 @@ func NewUserContentFilterStore(storagePath string) *UserContentFilterStore {
 // The function takes the following parameters:
 //
 //   - ctx (optional) or NULL to ignore.
-//   - callback (optional) to call when the identifiers have been fetched.
+//   - callback (optional) to call when the removal is completed.
 func (store *UserContentFilterStore) FetchIdentifiers(ctx context.Context, callback gio.AsyncReadyCallback) {
 	var _arg0 *C.WebKitUserContentFilterStore // out
 	var _arg1 *C.GCancellable                 // out
@@ -370,10 +370,10 @@ func (store *UserContentFilterStore) RemoveFinish(result gio.AsyncResulter) erro
 	return _goerr
 }
 
-// Save: asynchronously save a content filter from a source rule set.
+// Save: asynchronously save a content filter from a set source rule.
 //
 // Asynchronously save a content filter from a source
-// rule set in the WebKit content extensions JSON format
+// rule set in the WebKit content extesions JSON format
 // (https://webkit.org/blog/3476/content-blockers-first-look/).
 //
 // The identifier can be used afterwards to refer to the filter
@@ -509,7 +509,7 @@ func (store *UserContentFilterStore) SaveFromFile(ctx context.Context, identifie
 	runtime.KeepAlive(callback)
 }
 
-// SaveFromFileFinish finishes an asynchronous filter save previously started
+// SaveFromFileFinish finishes and asynchronous filter save previously started
 // with webkit_user_content_filter_store_save_from_file().
 //
 // The function takes the following parameters:

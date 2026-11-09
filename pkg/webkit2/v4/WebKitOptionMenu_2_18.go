@@ -40,7 +40,7 @@ func defaultOptionMenuOverrides(v *OptionMenu) OptionMenuOverrides {
 //
 // When a select element in a KitWebView needs to display a dropdown menu, the
 // signal KitWebView::show-option-menu is emitted, providing a WebKitOptionMenu
-// with the KitOptionMenuItem objects that should be displayed.
+// with the KitOptionMenuItem<!-- -->s that should be displayed.
 type OptionMenu struct {
 	_ [0]func() // equal guard
 	*coreglib.Object
@@ -179,7 +179,7 @@ func (menu *OptionMenu) Item(index uint) *OptionMenuItem {
 //
 // The function returns the following values:
 //
-//   - guint: number of KitOptionMenuItem objects in menu.
+//   - guint: number of KitOptionMenuItem<!-- -->s in menu.
 func (menu *OptionMenu) NItems() uint {
 	var _arg0 *C.WebKitOptionMenu // out
 	var _cret C.guint             // in
@@ -200,7 +200,7 @@ func (menu *OptionMenu) NItems() uint {
 //
 // Selecting an item changes the text shown by the combo button, but it
 // doesn't change the value of the element. You need to explicitly activate
-// the item with webkit_option_menu_activate_item() or close the menu with
+// the item with webkit_option_menu_select_item() or close the menu with
 // webkit_option_menu_close() in which case the currently selected item will be
 // activated.
 //

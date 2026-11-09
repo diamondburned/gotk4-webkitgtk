@@ -101,7 +101,7 @@ func (c CacheModel) String() string {
 }
 
 // URISchemeRequestCallback: type definition for a function that will be called
-// back when a URI request is made for a user registered URI scheme.
+// back when an URI request is made for a user registered URI scheme.
 type URISchemeRequestCallback func(request *URISchemeRequest)
 
 // WebContextOverrides contains methods that are overridable.
@@ -123,13 +123,13 @@ func defaultWebContextOverrides(v *WebContext) WebContextOverrides {
 	}
 }
 
-// WebContext manages aspects common to all KitWebView objects
+// WebContext manages aspects common to all KitWebView<!-- -->s
 //
-// The KitWebContext manages all aspects common to all KitWebView objects.
+// The KitWebContext manages all aspects common to all KitWebView<!-- -->s.
 //
 // You can define the KitCacheModel with webkit_web_context_set_cache_model(),
 // depending on the needs of your application. You can access the
-// KitSecurityManager to specify the behavior of your application regarding
+// KitSecurityManager to specify the behaviour of your application regarding
 // security using webkit_web_context_get_security_manager().
 //
 // It is also possible to change your preferred language or enable
@@ -269,7 +269,7 @@ func NewWebContext() *WebContext {
 // An ephemeral KitWebContext is a context created with an ephemeral
 // KitWebsiteDataManager. This is just a convenient method to create ephemeral
 // contexts without having to create your own KitWebsiteDataManager.
-// All KitWebView objects associated with this context will also be ephemeral.
+// All KitWebView<!-- -->s associated with this context will also be ephemeral.
 // Websites will not store any data in the client storage. This is normally used
 // to implement private instances.
 //
@@ -347,8 +347,8 @@ func (context *WebContext) AddPathToSandbox(path string, readOnly bool) {
 	runtime.KeepAlive(readOnly)
 }
 
-// AllowTLSCertificateForHost: ignore further TLS errors on the host for
-// certificate.
+// AllowTLSCertificateForHost: ignore further TLS errors on the host for the
+// certificate present in info.
 //
 // If host is an IPv6 address, it should not be surrounded by brackets. This
 // expectation matches g_uri_get_host().
@@ -387,8 +387,8 @@ func (context *WebContext) ClearCache() {
 
 // DownloadURI requests downloading of the specified URI string.
 //
-// The download operation will not be associated with any KitWebView,
-// if you are interested in starting a download from a particular KitWebView use
+// The download operation will not be associated to any KitWebView, if you
+// are interested in starting a download from a particular KitWebView use
 // webkit_web_view_download_uri() instead.
 //
 // The function takes the following parameters:
@@ -585,7 +585,7 @@ func (context *WebContext) Plugins(ctx context.Context, callback gio.AsyncReadyC
 // The function returns the following values:
 //
 //   - list of KitPlugin. You must free the #GList with g_list_free() and unref
-//     the KitPlugin objects with g_object_unref() when you're done with them.
+//     the KitPlugin<!-- -->s with g_object_unref() when you're done with them.
 func (context *WebContext) PluginsFinish(result gio.AsyncResulter) ([]*Plugin, error) {
 	var _arg0 *C.WebKitWebContext // out
 	var _arg1 *C.GAsyncResult     // out
@@ -710,10 +710,10 @@ func (context *WebContext) SpellCheckingEnabled() bool {
 	return _ok
 }
 
-// SpellCheckingLanguages: get the list of spell checking languages.
+// SpellCheckingLanguages: get the the list of spell checking languages.
 //
-// Get the list of spell checking languages associated with context, or NULL if
-// no languages have been previously set.
+// Get the the list of spell checking languages associated with context, or NULL
+// if no languages have been previously set.
 //
 // See webkit_web_context_set_spell_checking_languages() for more details on the
 // format of the languages in the list.
@@ -751,10 +751,6 @@ func (context *WebContext) SpellCheckingLanguages() []string {
 }
 
 // TimeZoneOverride: get the KitWebContext:time-zone-override property.
-//
-// The function returns the following values:
-//
-//   - utf8 (optional): time zone override, or NULL if none was set.
 func (context *WebContext) TimeZoneOverride() string {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret *C.gchar            // in
@@ -766,9 +762,7 @@ func (context *WebContext) TimeZoneOverride() string {
 
 	var _utf8 string // out
 
-	if _cret != nil {
-		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	}
+	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
 
 	return _utf8
 }
@@ -803,8 +797,8 @@ func (context *WebContext) TLSErrorsPolicy() TLSErrorsPolicy {
 //
 // The function returns the following values:
 //
-//   - ok: TRUE if scrollbars are rendered using the system appearance, or FALSE
-//     otherwise.
+//   - ok: TRUE if scrollbars are rendering using the system appearance,
+//     or FALSE otherwise.
 func (context *WebContext) UseSystemAppearanceForScrollbars() bool {
 	var _arg0 *C.WebKitWebContext // out
 	var _cret C.gboolean          // in
@@ -990,12 +984,13 @@ func (context *WebContext) PrefetchDns(hostname string) {
 
 // RegisterURIScheme: register scheme in context.
 //
-// Register scheme in context, so that when a URI request with scheme is made in
-// the KitWebContext, the KitURISchemeRequestCallback registered will be called
-// with a KitURISchemeRequest. It is possible to handle URI scheme requests
-// asynchronously, by calling g_object_ref() on the KitURISchemeRequest and
-// calling webkit_uri_scheme_request_finish() later when the data of the request
-// is available or webkit_uri_scheme_request_finish_error() in case of error.
+// Register scheme in context, so that when an URI request with scheme is
+// made in the KitWebContext, the KitURISchemeRequestCallback registered will
+// be called with a KitURISchemeRequest. It is possible to handle URI scheme
+// requests asynchronously, by calling g_object_ref() on the KitURISchemeRequest
+// and calling webkit_uri_scheme_request_finish() later when the data of the
+// request is available or webkit_uri_scheme_request_finish_error() in case of
+// error.
 //
 //	static void
 //	about_uri_scheme_request_cb (WebKitURISchemeRequest *request,
@@ -1048,7 +1043,7 @@ func (context *WebContext) RegisterURIScheme(scheme string, callback URISchemeRe
 }
 
 // SendMessageToAllExtensions: send message to all web process extensions
-// associated with context.
+// associated to context.
 //
 // If message is floating, it's consumed.
 //
@@ -1121,7 +1116,7 @@ func (context *WebContext) SetAutomationAllowed(allowed bool) {
 // Specifies a usage model for WebViews, which WebKit will use to determine
 // its caching behavior. All web views follow the cache model. This cache
 // model determines the RAM and disk space to use for caching previously viewed
-// content.
+// content .
 //
 // Research indicates that users tend to browse within clusters of documents
 // that hold resources in common, and to revisit previously visited documents.

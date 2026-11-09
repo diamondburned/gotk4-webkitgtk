@@ -30,7 +30,7 @@ func init() {
 type WebExtensionMatchPatternError C.gint
 
 const (
-	// WebExtensionMatchPatternErrorUnknown: unknown error occurred.
+	// WebExtensionMatchPatternErrorUnknown: unknown error occured.
 	WebExtensionMatchPatternErrorUnknown WebExtensionMatchPatternError = 899
 	// WebExtensionMatchPatternErrorInvalidScheme: scheme component was invalid.
 	WebExtensionMatchPatternErrorInvalidScheme WebExtensionMatchPatternError = 808

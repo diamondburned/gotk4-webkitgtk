@@ -89,7 +89,7 @@ func (self *DOMNodeIterator) Detach() {
 //
 // The function returns the following values:
 //
-//   - ok: #gboolean.
+//   - ok: #gboolean *.
 func (self *DOMNodeIterator) ExpandEntityReferences() bool {
 	var _arg0 *C.WebKitDOMNodeIterator // out
 	var _cret C.gboolean               // in

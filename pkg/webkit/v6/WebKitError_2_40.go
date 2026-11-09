@@ -53,7 +53,7 @@ func (m MediaError) String() string {
 //
 // The function returns the following values:
 //
-//   - quark: media error domain.
+//   - quark: media error domin.
 func MediaErrorQuark() glib.Quark {
 	var _cret C.GQuark // in
 

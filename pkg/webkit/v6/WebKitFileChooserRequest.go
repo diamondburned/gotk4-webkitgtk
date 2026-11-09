@@ -40,8 +40,8 @@ func defaultFileChooserRequestOverrides(v *FileChooserRequest) FileChooserReques
 // Whenever the user interacts with an HTML input element with file type,
 // WebKit will need to show a dialog to choose one or more files to be uploaded
 // to the server along with the rest of the form data. For that to happen in a
-// general way, instead of just opening a FileChooserDialog (which might not
-// be desirable for applications that prefer to use their own file chooser
+// general way, instead of just opening a FileChooserDialog (which might be not
+// desirable in some cases, which could prefer to use their own file chooser
 // dialog), WebKit will fire the KitWebView::run-file-chooser signal with a
 // KitFileChooserRequest object, which will allow the client application to
 // specify the files to be selected, to inspect the details of the request (e.g.
@@ -156,8 +156,7 @@ func (request *FileChooserRequest) MIMETypes() []string {
 // The function returns the following values:
 //
 //   - fileFilter if a list of accepted MIME types is defined or NULL otherwise.
-//     The returned object is owned by WebKit and should not be modified or
-//     freed.
+//     The returned object is owned by WebKit should not be modified or freed.
 func (request *FileChooserRequest) MIMETypesFilter() *gtk.FileFilter {
 	var _arg0 *C.WebKitFileChooserRequest // out
 	var _cret *C.GtkFileFilter            // in
@@ -188,7 +187,7 @@ func (request *FileChooserRequest) MIMETypesFilter() *gtk.FileFilter {
 // SelectMultiple: whether the file chooser should allow selecting multiple
 // files.
 //
-// Determine whether the file chooser associated with this KitFileChooserRequest
+// Determine whether the file chooser associated to this KitFileChooserRequest
 // should allow selecting multiple files, which depends on the HTML input
 // element having a 'multiple' attribute defined.
 //
@@ -214,13 +213,13 @@ func (request *FileChooserRequest) SelectMultiple() bool {
 	return _ok
 }
 
-// SelectedFiles: get the list of selected files associated with the request.
+// SelectedFiles: get the list of selected files associated to the request.
 //
-// Get the list of selected files currently associated with the request.
+// Get the list of selected files currently associated to the request.
 // Initially, the return value of this method contains any files selected
 // in previous file chooser requests for this HTML input element. Once
-// webkit_file_chooser_request_select_files() has been called, the value will
-// reflect whatever files are given.
+// webkit_file_chooser_request_select_files, the value will reflect whatever
+// files are given.
 //
 // This function should normally be called only before presenting the file
 // chooser dialog to the user, to decide whether to perform some extra action,

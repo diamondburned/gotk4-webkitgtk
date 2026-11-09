@@ -33,14 +33,12 @@ import "C"
 // GType values.
 var (
 	GTypeCookieJarAcceptPolicy = coreglib.Type(C.soup_cookie_jar_accept_policy_get_type())
-	GTypeCookieJarError        = coreglib.Type(C.soup_cookie_jar_error_get_type())
 	GTypeCookieJar             = coreglib.Type(C.soup_cookie_jar_get_type())
 )
 
 func init() {
 	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
 		coreglib.TypeMarshaler{T: GTypeCookieJarAcceptPolicy, F: marshalCookieJarAcceptPolicy},
-		coreglib.TypeMarshaler{T: GTypeCookieJarError, F: marshalCookieJarError},
 		coreglib.TypeMarshaler{T: GTypeCookieJar, F: marshalCookieJar},
 	})
 }
@@ -97,28 +95,6 @@ func (c CookieJarAcceptPolicy) String() string {
 		return "GrandfatheredThirdParty"
 	default:
 		return fmt.Sprintf("CookieJarAcceptPolicy(%d)", c)
-	}
-}
-
-// CookieJarError: soupcookiejar error.
-type CookieJarError C.gint
-
-const (
-	// CookieJarErrorDb: error from a database operation.
-	CookieJarErrorDb CookieJarError = iota
-)
-
-func marshalCookieJarError(p uintptr) (interface{}, error) {
-	return CookieJarError(coreglib.ValueFromNative(unsafe.Pointer(p)).Enum()), nil
-}
-
-// String returns the name in string for CookieJarError.
-func (c CookieJarError) String() string {
-	switch c {
-	case CookieJarErrorDb:
-		return "Db"
-	default:
-		return fmt.Sprintf("CookieJarError(%d)", c)
 	}
 }
 

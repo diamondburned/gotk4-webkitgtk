@@ -444,27 +444,6 @@ func (self *WebsocketConnection) MaxIncomingPayloadSize() uint64 {
 	return _guint64
 }
 
-// MaxTotalMessageSize gets the maximum total message size allowed for packets.
-//
-// The function returns the following values:
-//
-//   - guint64: maximum total message size.
-func (self *WebsocketConnection) MaxTotalMessageSize() uint64 {
-	var _arg0 *C.SoupWebsocketConnection // out
-	var _cret C.guint64                  // in
-
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.soup_websocket_connection_get_max_total_message_size(_arg0)
-	runtime.KeepAlive(self)
-
-	var _guint64 uint64 // out
-
-	_guint64 = uint64(_cret)
-
-	return _guint64
-}
-
 // Origin: get the origin of the WebSocket.
 //
 // The function returns the following values:
@@ -686,26 +665,6 @@ func (self *WebsocketConnection) SetMaxIncomingPayloadSize(maxIncomingPayloadSiz
 	C.soup_websocket_connection_set_max_incoming_payload_size(_arg0, _arg1)
 	runtime.KeepAlive(self)
 	runtime.KeepAlive(maxIncomingPayloadSize)
-}
-
-// SetMaxTotalMessageSize sets the maximum total message size allowed for
-// packets.
-//
-// It does not limit the outgoing packet size.
-//
-// The function takes the following parameters:
-//
-//   - maxTotalMessageSize: maximum total message size.
-func (self *WebsocketConnection) SetMaxTotalMessageSize(maxTotalMessageSize uint64) {
-	var _arg0 *C.SoupWebsocketConnection // out
-	var _arg1 C.guint64                  // out
-
-	_arg0 = (*C.SoupWebsocketConnection)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	_arg1 = C.guint64(maxTotalMessageSize)
-
-	C.soup_websocket_connection_set_max_total_message_size(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(maxTotalMessageSize)
 }
 
 // WebsocketConnectionClass: abstract base class for websocketconnection.

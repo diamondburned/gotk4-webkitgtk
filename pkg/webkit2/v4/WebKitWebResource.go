@@ -113,7 +113,7 @@ func (resource *WebResource) ConnectFinished(f func()) coreglib.SignalHandle {
 // every time new data has been received. It's useful to know the progress of
 // the resource load operation.
 //
-// This signal is deprecated since version 2.40 and it's never emitted.
+// This is signal is deprecated since version 2.40 and it's never emitted.
 func (resource *WebResource) ConnectReceivedData(f func(dataLength uint64)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(resource, "received-data", false, unsafe.Pointer(C._gotk4_webkit24_WebResource_ConnectReceivedData), f)
 }
@@ -169,7 +169,7 @@ func (resource *WebResource) Data(ctx context.Context, callback gio.AsyncReadyCa
 // The function returns the following values:
 //
 //   - guint8s: a string with the data of resource, or NULL in case of error.
-//     If length is not NULL, the size of the data will be assigned to it.
+//     if length is not NULL, the size of the data will be assigned to it.
 func (resource *WebResource) DataFinish(result gio.AsyncResulter) ([]byte, error) {
 	var _arg0 *C.WebKitWebResource // out
 	var _arg1 *C.GAsyncResult      // out
@@ -226,14 +226,16 @@ func (resource *WebResource) Response() *URIResponse {
 //
 // The active URI might change during a load operation:
 //
-// 1. When the resource load starts, the active URI is the requested URI 2.
-// When the initial request is sent to the server, KitWebResource::sent-request
-// signal is emitted without a redirected response, the active URI is the URI
-// of the request sent to the server. 3. In case of a server redirection,
-// KitWebResource::sent-request signal is emitted again with a redirected
-// response, the active URI is the URI the request was redirected to. 4. When
-// the response is received from the server, the active URI is the final one and
-// it will not change again.
+// <orderedlist> <listitem><para> When the resource load starts, the active URI
+// is the requested URI </para></listitem> <listitem><para> When the initial
+// request is sent to the server, KitWebResource::sent-request signal is emitted
+// without a redirected response, the active URI is the URI of the request
+// sent to the server. </para></listitem> <listitem><para> In case of a server
+// redirection, KitWebResource::sent-request signal is emitted again with a
+// redirected response, the active URI is the URI the request was redirected to.
+// </para></listitem> <listitem><para> When the response is received from
+// the server, the active URI is the final one and it will not change again.
+// </para></listitem> </orderedlist>
 //
 // You can monitor the active URI by connecting to the notify::uri signal of
 // resource.

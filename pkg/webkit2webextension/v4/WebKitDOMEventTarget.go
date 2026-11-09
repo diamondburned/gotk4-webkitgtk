@@ -49,14 +49,14 @@ type DOMEventTargetter interface {
 	coreglib.Objector
 
 	// AddEventListener: version of webkit_dom_event_target_add_event_listener()
-	// using a closure instead of callbacks for easier binding in other
+	// using a closure instead of a callbacks for easier binding in other
 	// languages.
 	AddEventListener(eventName string, handler coreglib.AnyClosure, useCapture bool) bool
 	// DispatchEvent: deprecated: Use JavaScriptCore API instead.
 	DispatchEvent(event *DOMEvent) error
 	// RemoveEventListener: version of
 	// webkit_dom_event_target_remove_event_listener() using a closure instead
-	// of callbacks for easier binding in other languages.
+	// of a callbacks for easier binding in other languages.
 	RemoveEventListener(eventName string, handler coreglib.AnyClosure, useCapture bool) bool
 }
 
@@ -73,7 +73,7 @@ func marshalDOMEventTarget(p uintptr) (interface{}, error) {
 }
 
 // AddEventListener: version of webkit_dom_event_target_add_event_listener()
-// using a closure instead of callbacks for easier binding in other languages.
+// using a closure instead of a callbacks for easier binding in other languages.
 //
 // Deprecated: Use JavaScriptCore API instead.
 //
@@ -143,7 +143,7 @@ func (target *DOMEventTarget) DispatchEvent(event *DOMEvent) error {
 }
 
 // RemoveEventListener: version of
-// webkit_dom_event_target_remove_event_listener() using a closure instead of
+// webkit_dom_event_target_remove_event_listener() using a closure instead of a
 // callbacks for easier binding in other languages.
 //
 // Deprecated: Use JavaScriptCore API instead.

@@ -436,7 +436,7 @@ func (self *DOMElement) ClientLeft() float64 {
 }
 
 // ClientRects returns a collection of KitDOMClientRect objects, each of which
-// describes the size and position of a CSS border box relative to the viewport.
+// describe the size and position of a CSS border box relative to the viewport.
 //
 // Deprecated: Use JavaScriptCore API instead.
 //

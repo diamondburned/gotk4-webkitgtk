@@ -68,7 +68,7 @@ func (info *MIMEInfo) Description() string {
 	return _utf8
 }
 
-// Extensions: get the list of file extensions associated with the MIME type.
+// Extensions: get the list of file extensions associated to the MIME type.
 //
 // Deprecated: since version 2.32.
 //

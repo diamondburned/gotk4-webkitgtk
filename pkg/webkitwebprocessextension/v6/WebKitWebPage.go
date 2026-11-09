@@ -85,7 +85,7 @@ func marshalWebPage(p uintptr) (interface{}, error) {
 // ConnectConsoleMessageSent is emitted when a message is sent to the console.
 // This can be a message produced by the use of JavaScript console API,
 // a JavaScript exception, a security error or other errors, warnings, debug or
-// log messages. The console_message contains information about the message.
+// log messages. The console_message contains information of the message.
 func (webPage *WebPage) ConnectConsoleMessageSent(f func(consoleMessage *ConsoleMessage)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(webPage, "console-message-sent", false, unsafe.Pointer(C._gotk4_webkitwebprocessextension6_WebPage_ConnectConsoleMessageSent), f)
 }
@@ -117,7 +117,7 @@ func (webPage *WebPage) ConnectDocumentLoaded(f func()) coreglib.SignalHandle {
 // In case of a server redirection this signal is emitted again with the request
 // argument containing the new request to be sent to the server due to the
 // redirection and the redirected_response parameter containing the response
-// received from the server for the initial request.
+// received by the server for the initial request.
 //
 // Modifications to the KitURIRequest and its associated MessageHeaders will be
 // taken into account when the request is sent over the network.
@@ -131,8 +131,8 @@ func (webPage *WebPage) ConnectSendRequest(f func(request *URIRequest, redirecte
 //
 // You can handle the user message asynchronously by calling g_object_ref() on
 // message and returning TRUE. If the last reference of message is removed and
-// the message has not been replied to, the operation in the KitWebView will
-// finish with error WEBKIT_USER_MESSAGE_UNHANDLED_MESSAGE.
+// the message has been replied, the operation in the KitWebView will finish
+// with error WEBKIT_USER_MESSAGE_UNHANDLED_MESSAGE.
 func (webPage *WebPage) ConnectUserMessageReceived(f func(message *UserMessage) (ok bool)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(webPage, "user-message-received", false, unsafe.Pointer(C._gotk4_webkitwebprocessextension6_WebPage_ConnectUserMessageReceived), f)
 }
@@ -239,7 +239,7 @@ func (webPage *WebPage) MainFrame() *Frame {
 //
 // The function returns the following values:
 //
-//   - utf8: current active URI of web_page or NULL if nothing has been loaded
+//   - utf8: current active URI of web_view or NULL if nothing has been loaded
 //     yet.
 func (webPage *WebPage) URI() string {
 	var _arg0 *C.WebKitWebPage // out

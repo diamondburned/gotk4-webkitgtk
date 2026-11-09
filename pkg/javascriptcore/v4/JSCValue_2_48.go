@@ -8,7 +8,7 @@ import ()
 // #include <jsc/jsc.h>
 import "C"
 
-// Executor: function passed to jsc_value_new_promise() called during
+// Executor: function passed to jsc_value_new_promise called during
 // initialization
 //
 // It is called like a JavaScript function, so exceptions raised will not be

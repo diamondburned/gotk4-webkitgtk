@@ -166,7 +166,7 @@ func NewContext() *Context {
 	return _context
 }
 
-// NewContextWithVirtualMachine: create a new CContext in vm.
+// NewContextWithVirtualMachine: create a new CContext in virtual_machine.
 //
 // The function takes the following parameters:
 //
@@ -289,13 +289,14 @@ func (context *Context) Evaluate(code string) *Value {
 	return _value
 }
 
-// EvaluateInObject: evaluate code and create a new object where symbols defined
-// in code will be added as properties, instead of being added to context
-// global object. The new object is returned as object parameter. Similar to how
-// jsc_value_new_object() works, if object_instance is not NULL object_class
-// must be provided too. The line_number is the starting line number in uri;
-// the value is one-based so the first line is 1. uri and line_number will be
-// shown in exceptions and they don't affect the behavior of the script.
+// EvaluateInObject: evaluate code and create an new object where symbols
+// defined in code will be added as properties, instead of being added to
+// context global object. The new object is returned as object parameter.
+// Similar to how jsc_value_new_object() works, if object_instance is not
+// NULL object_class must be provided too. The line_number is the starting
+// line number in uri; the value is one-based so the first line is 1. uri and
+// line_number will be shown in exceptions and they don't affect the behavior of
+// the script.
 //
 // The function takes the following parameters:
 //
@@ -394,8 +395,8 @@ func (context *Context) EvaluateWithSourceURI(code, uri string, lineNumber uint)
 	return _value
 }
 
-// Exception: get the last unhandled exception thrown in context by API function
-// calls.
+// Exception: get the last unhandled exception thrown in context by API
+// functions calls.
 //
 // The function returns the following values:
 //

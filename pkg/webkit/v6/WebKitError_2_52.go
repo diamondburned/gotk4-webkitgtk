@@ -33,7 +33,7 @@ func init() {
 type WebExtensionError C.gint
 
 const (
-	// WebExtensionErrorUnknown: unknown error occurred.
+	// WebExtensionErrorUnknown: unknown error occured.
 	WebExtensionErrorUnknown WebExtensionError = 899
 	// WebExtensionErrorResourceNotFound: specified resource was not found on
 	// disk.
@@ -112,7 +112,7 @@ func WebExtensionErrorQuark() glib.Quark {
 type WebExtensionMatchPatternError C.gint
 
 const (
-	// WebExtensionMatchPatternErrorUnknown: unknown error occurred.
+	// WebExtensionMatchPatternErrorUnknown: unknown error occured.
 	WebExtensionMatchPatternErrorUnknown WebExtensionMatchPatternError = 899
 	// WebExtensionMatchPatternErrorInvalidScheme: scheme component was invalid.
 	WebExtensionMatchPatternErrorInvalidScheme WebExtensionMatchPatternError = 808

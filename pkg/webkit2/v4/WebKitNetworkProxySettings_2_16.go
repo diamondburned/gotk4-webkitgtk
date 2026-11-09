@@ -124,14 +124,15 @@ func NewNetworkProxySettings(defaultProxyUri string, ignoreHosts []string) *Netw
 
 // AddProxyForScheme adds a URI-scheme-specific proxy.
 //
-// URIs whose scheme matches scheme will be proxied via proxy_uri. As with the
-// default proxy URI, if proxy_uri starts with "socks://", it will be treated as
-// referring to all three of the socks5, socks4a, and socks4 proxy types.
+// URIs whose scheme matches uri_scheme will be proxied via proxy_uri.
+// As with the default proxy URI, if proxy_uri starts with "socks://", it will
+// be treated as referring to all three of the socks5, socks4a, and socks4 proxy
+// types.
 //
 // The function takes the following parameters:
 //
 //   - scheme: URI scheme to add a proxy for.
-//   - proxyUri: proxy URI to use for scheme.
+//   - proxyUri: proxy URI to use for uri_scheme.
 func (proxySettings *NetworkProxySettings) AddProxyForScheme(scheme string, proxyUri string) {
 	var _arg0 *C.WebKitNetworkProxySettings // out
 	var _arg1 *C.gchar                      // out

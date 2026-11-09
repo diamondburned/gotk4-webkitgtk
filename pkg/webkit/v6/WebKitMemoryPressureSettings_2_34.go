@@ -33,11 +33,11 @@ func init() {
 // custom settings to control how the memory pressure situations are handled by
 // the different processes.
 //
-// The memory pressure system implemented inside the different processes will
-// try to keep the memory usage under the defined memory limit. In order to do
-// that, it will check the used memory with a user defined frequency and decide
+// The memory pressure system implemented inside the different process will try
+// to keep the memory usage under the defined memory limit. In order to do that,
+// it will check the used memory with a user defined frequency and decide
 // whether it should try to release memory. The thresholds passed will define
-// how urgent it is to release that memory.
+// how urgent is to release that memory.
 //
 // Take into account that badly defined parameters can greatly reduce the
 // performance of the engine. For example, setting memory limit too low with a
@@ -91,7 +91,7 @@ func NewMemoryPressureSettings() *MemoryPressureSettings {
 //
 // The function returns the following values:
 //
-//   - memoryPressureSettings: copy of the passed KitMemoryPressureSettings.
+//   - memoryPressureSettings: copy of of the passed KitMemoryPressureSettings.
 func (settings *MemoryPressureSettings) Copy() *MemoryPressureSettings {
 	var _arg0 *C.WebKitMemoryPressureSettings // out
 	var _cret *C.WebKitMemoryPressureSettings // in
@@ -249,8 +249,8 @@ func (settings *MemoryPressureSettings) SetConservativeThreshold(value float64) 
 // SetKillThreshold sets value as the fraction of the defined memory limit where
 // the process will be killed.
 //
-// The threshold must be a value bigger than or equal to 0. A value of 0 means
-// that the process is never killed. If the threshold is not 0, then it must be
+// The threshold must be a value bigger or equal to 0. A value of 0 means that
+// the process is never killed. If the threshold is not 0, then it must be
 // bigger than the strict threshold defined in settings. The threshold can also
 // have values bigger than 1. The default value is 0.
 //
@@ -270,7 +270,7 @@ func (settings *MemoryPressureSettings) SetKillThreshold(value float64) {
 	runtime.KeepAlive(value)
 }
 
-// SetMemoryLimit sets memory_limit as the memory limit value of settings.
+// SetMemoryLimit sets memory_limit the memory limit value to settings.
 //
 // The default value is the system's RAM size with a maximum of 3GB.
 //

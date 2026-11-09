@@ -43,11 +43,10 @@ func defaultURISchemeResponseOverrides(v *URISchemeResponse) URISchemeResponseOv
 // KitURISchemeRequestCallback. After that, when a URI response is made with
 // that particular scheme, your callback will be called. There you will be able
 // to provide more response parameters when the methods and properties of a
-// KitURISchemeRequest are not enough.
+// KitURISchemeRequest is not enough.
 //
 // When you finished setting up your KitURISchemeResponse, call
-// webkit_uri_scheme_request_finish_with_response() with it to return the
-// response.
+// webkit_uri_request_finish_with_response() with it to return the response.
 type URISchemeResponse struct {
 	_ [0]func() // equal guard
 	*coreglib.Object

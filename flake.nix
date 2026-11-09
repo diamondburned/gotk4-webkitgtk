@@ -1,7 +1,9 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-unstable";
-    nixpkgs-gotk4.url = "github:NixOS/nixpkgs?ref=nixos-26.05";
+    # Pinned to gotk4's nixos-26.05 commit before WebKitGTK 2.54 and libsoup 3.8
+    # were backported to nixos-26.05.
+    nixpkgs-gotk4.url = "github:NixOS/nixpkgs/21ea275a7c46aef9d4d6ddc962e6d562e9d94183";
     gotk4-nix.url = "github:diamondburned/gotk4-nix/main";
     flake-utils.url = "github:numtide/flake-utils";
   };

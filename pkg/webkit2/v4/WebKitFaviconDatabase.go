@@ -105,10 +105,10 @@ func defaultFaviconDatabaseOverrides(v *FaviconDatabase) FaviconDatabaseOverride
 // into a memory cache if possible. That cache is frozen to an on-disk database
 // for persistence.
 //
-// If websitedatamanager:is-ephemeral is TRUE, new icons won't be added to the
-// on-disk database and no existing icons will be deleted from it. Nevertheless,
-// WebKit will still store them in the in-memory cache during the current
-// execution.
+// If KitSettings:enable-private-browsing is TRUE, new icons won't be added
+// to the on-disk database and no existing icons will be deleted from it.
+// Nevertheless, WebKit will still store them in the in-memory cache during the
+// current execution.
 type FaviconDatabase struct {
 	_ [0]func() // equal guard
 	*coreglib.Object
@@ -167,8 +167,8 @@ func (database *FaviconDatabase) Clear() {
 // Favicon: asynchronously obtains a favicon image.
 //
 // Asynchronously obtains an image of the favicon for the given page URI.
-// If the icon is already in the memory cache, its image data is not read from
-// the database again. The result is always delivered asynchronously.
+// It returns the cached icon if it's in the database asynchronously waiting for
+// the icon to be read from the database.
 //
 // This is an asynchronous method. When the operation is finished, callback will
 // be invoked. You can then call webkit_favicon_database_get_favicon_finish() to

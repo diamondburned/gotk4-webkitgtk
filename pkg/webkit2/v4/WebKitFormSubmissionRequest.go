@@ -78,12 +78,12 @@ func marshalFormSubmissionRequest(p uintptr) (interface{}, error) {
 }
 
 // TextFields: get the values of the text fields contained in the form
-// associated with request.
+// associated to request.
 //
 // Get a Table with the values of the text fields contained in the form
-// associated with request. Note that fields will be missing if the form
-// contains multiple text input elements with the same name, so this function
-// does not reliably return all text fields.
+// associated to request. Note that fields will be missing if the form contains
+// multiple text input elements with the same name, so this function does not
+// reliably return all text fields.
 //
 // Deprecated: Use webkit_form_submission_request_list_text_fields() instead.
 //

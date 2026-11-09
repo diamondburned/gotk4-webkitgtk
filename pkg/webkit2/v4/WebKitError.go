@@ -94,7 +94,7 @@ const (
 	// execution.
 	JavascriptErrorScriptFailed JavascriptError = 699
 	// JavascriptErrorInvalidParameter: unsupported parameter has been used to
-	// call an async function from API. Since 2.40.
+	// call and async function from API. Since 2.40.
 	JavascriptErrorInvalidParameter JavascriptError = 600
 	// JavascriptErrorInvalidResult: result of JavaScript execution could not be
 	// returned. Since 2.40.

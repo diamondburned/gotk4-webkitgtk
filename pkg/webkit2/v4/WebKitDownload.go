@@ -233,13 +233,14 @@ func (download *Download) ElapsedTime() float64 {
 }
 
 // EstimatedProgress gets the value of the KitDownload:estimated-progress
-// property. You can monitor the estimated progress of the download operation by
-// connecting to the notify::estimated-progress signal of download.
+// property. Gets the value of the KitDownload:estimated-progress property. You
+// can monitor the estimated progress of the download operation by connecting to
+// the notify::estimated-progress signal of download.
 //
 // The function returns the following values:
 //
-//   - gdouble: estimate of the percent complete for a download as a range from
-//     0.0 to 1.0.
+//   - gdouble: estimate of the of the percent complete for a download as a
+//     range from 0.0 to 1.0.
 func (download *Download) EstimatedProgress() float64 {
 	var _arg0 *C.WebKitDownload // out
 	var _cret C.gdouble         // in

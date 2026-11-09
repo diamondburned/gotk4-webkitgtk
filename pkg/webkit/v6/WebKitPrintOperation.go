@@ -237,11 +237,11 @@ func (printOperation *PrintOperation) Print() {
 // is returned and the print operation starts. In this case, the
 // KitPrintOperation::finished signal is emitted when the operation finishes.
 // If an error occurs while printing, the signal KitPrintOperation::failed
-// is emitted before KitPrintOperation::finished. If the print dialog is not
-// cancelled, the current print settings and page setup of print_operation
-// are updated with the options selected by the user when the Print button
-// is pressed in the print dialog. You can get the updated print settings
-// and page setup by calling webkit_print_operation_get_print_settings() and
+// is emitted before KitPrintOperation::finished. If the print dialog is
+// not cancelled current print settings and page setup of print_operation
+// are updated with options selected by the user when Print button is
+// pressed in print dialog. You can get the updated print settings and
+// page setup by calling webkit_print_operation_get_print_settings() and
 // webkit_print_operation_get_page_setup() after this method.
 //
 // The function takes the following parameters:

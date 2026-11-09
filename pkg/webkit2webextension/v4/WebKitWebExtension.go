@@ -46,8 +46,8 @@ func defaultWebExtensionOverrides(v *WebExtension) WebExtensionOverrides {
 // WebExtension represents an extension of the WebProcess.
 //
 // WebKitWebExtension is a loadable module for the WebProcess. It allows you to
-// execute code in the WebProcess and to use the DOM API, to change any request
-// or to inject custom JavaScript code, for example.
+// execute code in the WebProcess and being able to use the DOM API, to change
+// any request or to inject custom JavaScript code, for example.
 //
 // To create a WebKitWebExtension you should write a
 // module with an initialization function that could
@@ -158,9 +158,10 @@ func (extension *WebExtension) ConnectPageCreated(f func(webPage *WebPage)) core
 }
 
 // ConnectUserMessageReceived: this signal is emitted when a KitUserMessage is
-// received from the KitWebContext corresponding to extension. Messages sent by
-// KitWebContext are always broadcast to all web extensions and they can't be
-// replied to. Calling webkit_user_message_send_reply() will do nothing.
+// received from the KitWebContext corresponding to extension. Messages sent
+// by KitWebContext are always broadcasted to all KitWebExtension<!-- -->s and
+// they can't be replied to. Calling webkit_user_message_send_reply() will do
+// nothing.
 func (extension *WebExtension) ConnectUserMessageReceived(f func(message *UserMessage)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(extension, "user-message-received", false, unsafe.Pointer(C._gotk4_webkit2webextension4_WebExtension_ConnectUserMessageReceived), f)
 }
@@ -198,7 +199,7 @@ func (extension *WebExtension) Page(pageId uint64) *WebPage {
 // extension. If message is floating, it's consumed.
 //
 // If you don't expect any reply, or you simply want to ignore it, you can pass
-// NULL as callback. When the operation is finished, callback will be called.
+// NULL as calback. When the operation is finished, callback will be called.
 // You can then call webkit_web_extension_send_message_to_context_finish() to
 // get the message reply.
 //

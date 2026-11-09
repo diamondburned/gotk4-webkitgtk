@@ -107,9 +107,6 @@ const (
 	InputPurposeEmail
 	// InputPurposePassword: editable element expects a password.
 	InputPurposePassword
-	// InputPurposeSearch: edited field contents will be used for searching
-	// data.
-	InputPurposeSearch
 )
 
 func marshalInputPurpose(p uintptr) (interface{}, error) {
@@ -133,8 +130,6 @@ func (i InputPurpose) String() string {
 		return "Email"
 	case InputPurposePassword:
 		return "Password"
-	case InputPurposeSearch:
-		return "Search"
 	default:
 		return fmt.Sprintf("InputPurpose(%d)", i)
 	}
@@ -149,7 +144,7 @@ const (
 	InputHintNone InputHints = 0b0
 	// InputHintSpellcheck: suggest spell checking.
 	InputHintSpellcheck InputHints = 0b1
-	// InputHintLowercase: suggest to not autocapitalize.
+	// InputHintLowercase: suggest to not autocapitlize.
 	InputHintLowercase InputHints = 0b10
 	// InputHintUppercaseChars: suggest to capitalize all text.
 	InputHintUppercaseChars InputHints = 0b100
@@ -947,7 +942,7 @@ type inputMethodContextClass struct {
 	native *C.WebKitInputMethodContextClass
 }
 
-// InputMethodUnderline: range of text in a preedit string to be shown
+// InputMethodUnderline: range of text in an preedit string to be shown
 // underlined.
 //
 // An instance of this type is always passed by reference.

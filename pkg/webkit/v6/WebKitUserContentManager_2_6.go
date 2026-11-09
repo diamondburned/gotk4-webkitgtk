@@ -84,17 +84,18 @@ func marshalUserContentManager(p uintptr) (interface{}, error) {
 	return wrapUserContentManager(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// ConnectScriptMessageReceived: this signal is
-// emitted when JavaScript in a web view calls
-// window.webkit.messageHandlers.<name>.postMessage(), after registering <name>
-// using webkit_user_content_manager_register_script_message_handler().
+// ConnectScriptMessageReceived: this signal is emitted when JavaScript in a web
+// view calls <code>window.webkit.messageHandlers.<name>.postMessage()</code>,
+// after registering <code><name></code> using
+// webkit_user_content_manager_register_script_message_handler().
 func (manager *UserContentManager) ConnectScriptMessageReceived(f func(value *javascriptcore.Value)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(manager, "script-message-received", false, unsafe.Pointer(C._gotk4_webkit6_UserContentManager_ConnectScriptMessageReceived), f)
 }
 
-// ConnectScriptMessageWithReplyReceived: this signal is emitted when JavaScript
-// in a web view calls window.webkit.messageHandlers.<name>.postMessage(),
-// after registering <name> using
+// ConnectScriptMessageWithReplyReceived: this signal
+// is emitted when JavaScript in a web view calls
+// <code>window.webkit.messageHandlers.<name>.postMessage()</code>,
+// after registering <code><name></code> using
 // webkit_user_content_manager_register_script_message_handler_with_reply()
 //
 // The given reply can be used to send a return value with
@@ -199,7 +200,7 @@ func (manager *UserContentManager) AddStyleSheet(stylesheet *UserStyleSheet) {
 // recommended to connect to the signal *before* registering the handler name:
 //
 //	WebKitWebView *view = webkit_web_view_new ();
-//	WebKitUserContentManager *manager = webkit_web_view_get_user_content_manager (view);
+//	WebKitUserContentManager *manager = webkit_web_view_get_user_content_manager ();
 //	g_signal_connect (manager, "script-message-received::foobar",
 //	                  G_CALLBACK (handle_script_message), NULL);
 //	webkit_user_content_manager_register_script_message_handler (manager, "foobar", "world");
@@ -340,6 +341,8 @@ func (manager *UserContentManager) RemoveAllStyleSheets() {
 }
 
 // RemoveFilter removes a filter from the given KitUserContentManager.
+//
+// Since 2.24.
 //
 // The function takes the following parameters:
 //

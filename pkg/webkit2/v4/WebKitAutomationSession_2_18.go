@@ -102,9 +102,9 @@ func (session *AutomationSession) ConnectWillClose(f func()) coreglib.SignalHand
 	return coreglib.ConnectGeneratedClosure(session, "will-close", false, unsafe.Pointer(C._gotk4_webkit24_AutomationSession_ConnectWillClose), f)
 }
 
-// ApplicationInfo: get the previously set KitApplicationInfo.
+// ApplicationInfo: get the the previously set KitAutomationSession.
 //
-// Get the KitApplicationInfo previously set with
+// Get the KitAutomationSession previously set with
 // webkit_automation_session_set_application_info().
 //
 // The function returns the following values:

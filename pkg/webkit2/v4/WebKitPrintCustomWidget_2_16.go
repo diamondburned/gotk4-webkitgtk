@@ -55,9 +55,9 @@ func defaultPrintCustomWidgetOverrides(v *PrintCustomWidget) PrintCustomWidgetOv
 	}
 }
 
-// PrintCustomWidget allows embedding a custom widget in the print dialog.
+// PrintCustomWidget allows to embed a custom widget in print dialog.
 //
-// A WebKitPrintCustomWidget allows embedding a custom widget in the print
+// A WebKitPrintCustomWidget allows to embed a custom widget in the print
 // dialog by connecting to the KitPrintOperation::create-custom-widget
 // signal, creating a new WebKitPrintCustomWidget with
 // webkit_print_custom_widget_new() and returning it from there. You can later
@@ -125,7 +125,7 @@ func (printCustomWidget *PrintCustomWidget) ConnectApply(f func()) coreglib.Sign
 
 // ConnectUpdate is emitted after change of selected printer in the dialog.
 // The actual page setup and print settings are available and the custom widget
-// can update itself according to their values.
+// can actualize itself according to their values.
 func (printCustomWidget *PrintCustomWidget) ConnectUpdate(f func(pageSetup *gtk.PageSetup, printSettings *gtk.PrintSettings)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(printCustomWidget, "update", false, unsafe.Pointer(C._gotk4_webkit24_PrintCustomWidget_ConnectUpdate), f)
 }
@@ -146,7 +146,7 @@ func (printCustomWidget *PrintCustomWidget) ConnectUpdate(f func(pageSetup *gtk.
 //
 // The function returns the following values:
 //
-//   - printCustomWidget: new KitPrintCustomWidget.
+//   - printCustomWidget: new KitPrintOperation.
 func NewPrintCustomWidget(widget gtk.Widgetter, title string) *PrintCustomWidget {
 	var _arg1 *C.GtkWidget               // out
 	var _arg2 *C.char                    // out

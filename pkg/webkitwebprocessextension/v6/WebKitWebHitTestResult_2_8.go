@@ -236,7 +236,7 @@ func (webHitTestResult *WebHitTestResult) ContextIsSelection() bool {
 	return _ok
 }
 
-// Context gets the context flags for the hit test result.
+// Context gets the the context flags for the hit test result.
 //
 // The function returns the following values:
 //

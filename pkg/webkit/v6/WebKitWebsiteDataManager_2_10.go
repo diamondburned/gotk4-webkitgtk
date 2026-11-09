@@ -46,7 +46,7 @@ func defaultWebsiteDataManagerOverrides(v *WebsiteDataManager) WebsiteDataManage
 //
 // You can use WebKitWebsiteDataManager to configure the local directories where
 // website data will be stored. Use KitWebsiteDataManager:base-data-directory
-// and KitWebsiteDataManager:base-cache-directory to set a common base directory
+// and KitWebsiteDataManager:base-cache-directory set a common base directory
 // for all website data and caches.
 //
 // A WebKitWebsiteDataManager can be ephemeral, in which case all the
@@ -214,7 +214,7 @@ func (manager *WebsiteDataManager) Fetch(ctx context.Context, types WebsiteDataT
 // The function returns the following values:
 //
 //   - list of KitWebsiteData. You must free the #GList with g_list_free() and
-//     unref the KitWebsiteData objects with webkit_website_data_unref() when
+//     unref the KitWebsiteData<!-- -->s with webkit_website_data_unref() when
 //     you're done with them.
 func (manager *WebsiteDataManager) FetchFinish(result gio.AsyncResulter) ([]*WebsiteData, error) {
 	var _arg0 *C.WebKitWebsiteDataManager // out
@@ -396,7 +396,7 @@ func (manager *WebsiteDataManager) ItpSummary(ctx context.Context, callback gio.
 // The function returns the following values:
 //
 //   - list of KitITPThirdParty. You must free the #GList with g_list_free() and
-//     unref the KitITPThirdParty objects with webkit_itp_third_party_unref()
+//     unref the KitITPThirdParty<!-- -->s with webkit_itp_third_party_unref()
 //     when you're done with them.
 func (manager *WebsiteDataManager) ItpSummaryFinish(result gio.AsyncResulter) ([]*ITPThirdParty, error) {
 	var _arg0 *C.WebKitWebsiteDataManager // out

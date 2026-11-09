@@ -64,7 +64,7 @@ func marshalDOMXPathNSResolver(p uintptr) (interface{}, error) {
 //
 // The function takes the following parameters:
 //
-//   - prefix to look up.
+//   - prefix to lookup.
 //
 // The function returns the following values:
 //
@@ -94,7 +94,7 @@ func (resolver *DOMXPathNSResolver) LookupNamespaceURI(prefix string) string {
 //
 // The function takes the following parameters:
 //
-//   - prefix to look up.
+//   - prefix to lookup.
 //
 // The function returns the following values:
 //

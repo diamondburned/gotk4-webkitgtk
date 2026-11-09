@@ -130,7 +130,7 @@ func marshalValue(p uintptr) (interface{}, error) {
 }
 
 // NewValueArrayFromStrv: create a new CValue referencing an array of strings
-// with the items from strv. If strv is NULL or empty a new empty array will be
+// with the items from strv. If array is NULL or empty a new empty array will be
 // created.
 //
 // The function takes the following parameters:
@@ -234,7 +234,8 @@ func NewValueFromJson(context *Context, json string) *Value {
 	return _value
 }
 
-// NewValueNull: create a new CValue referencing null in context.
+// NewValueNull: create a new CValue referencing <function>null</function> in
+// context.
 //
 // The function takes the following parameters:
 //
@@ -328,7 +329,7 @@ func NewValueObject(context *Context, instance unsafe.Pointer, jscClass *Class) 
 
 // NewValuePromise creates a new Promise. executor will be invoked during
 // promise initialization and it receives the resolve and reject objects
-// that can be called to resolve or reject the promise. It is called like a
+// than can be called to resolve or reject the promise. It is called like a
 // JavaScript function, so exceptions raised during the executor invocation
 // will not be propagated to the context, but handled by the promise causing a
 // rejection.
@@ -469,7 +470,8 @@ func NewValueTypedArray(context *Context, typ TypedArrayType, length uint) *Valu
 	return _value
 }
 
-// NewValueUndefined: create a new CValue referencing undefined in context.
+// NewValueUndefined: create a new CValue referencing
+// <function>undefined</function> in context.
 //
 // The function takes the following parameters:
 //
@@ -556,12 +558,13 @@ func (value *Value) ArrayBufferGetSize() uint {
 	return _gsize
 }
 
-// ConstructorCall: invoke new with constructor referenced by value.
-// If n_parameters is 0 no parameters will be passed to the constructor.
+// ConstructorCall: invoke <function>new</function> with constructor referenced
+// by value. If n_parameters is 0 no parameters will be passed to the
+// constructor.
 //
 // The function takes the following parameters:
 //
-//   - parameters (optional) objects to pass as parameters to the constructor,
+//   - parameters (optional) -->s to pass as parameters to the constructor,
 //     or NULL.
 //
 // The function returns the following values:
@@ -602,11 +605,11 @@ func (value *Value) ConstructorCall(parameters []*Value) *Value {
 // function.
 //
 // This function always returns a CValue, in case of void functions a CValue
-// referencing undefined is returned.
+// referencing <function>undefined</function> is returned.
 //
 // The function takes the following parameters:
 //
-//   - parameters (optional) objects to pass as parameters to the function,
+//   - parameters (optional) -->s to pass as parameters to the function,
 //     or NULL.
 //
 // The function returns the following values:
@@ -778,7 +781,8 @@ func (value *Value) IsFunction() bool {
 	return _ok
 }
 
-// IsNull: get whether the value referenced by value is null.
+// IsNull: get whether the value referenced by value is
+// <function>null</function>.
 //
 // The function returns the following values:
 //
@@ -893,7 +897,8 @@ func (value *Value) IsTypedArray() bool {
 	return _ok
 }
 
-// IsUndefined: get whether the value referenced by value is undefined.
+// IsUndefined: get whether the value referenced by value is
+// <function>undefined</function>.
 //
 // The function returns the following values:
 //
@@ -967,7 +972,8 @@ func (arrayBuffer *Value) NewTypedArrayWithBuffer(typ TypedArrayType, offset uin
 
 // ObjectDefinePropertyData: define or modify a property with property_name
 // in object referenced by value. This is equivalent to JavaScript
-// Object.defineProperty() when used with a data descriptor.
+// <function>Object.defineProperty()</function> when used with a data
+// descriptor.
 //
 // The function takes the following parameters:
 //
@@ -1163,13 +1169,12 @@ func (value *Value) ObjectHasProperty(name string) bool {
 // so it should never be passed explicitly as parameter of this function.
 //
 // This function always returns a CValue, in case of void methods a CValue
-// referencing undefined is returned.
+// referencing <function>undefined</function> is returned.
 //
 // The function takes the following parameters:
 //
 //   - name: method name.
-//   - parameters (optional) objects to pass as parameters to the method,
-//     or NULL.
+//   - parameters (optional) -->s to pass as parameters to the method, or NULL.
 //
 // The function returns the following values:
 //
@@ -1455,9 +1460,9 @@ func (value *Value) TypedArrayGetBuffer() *Value {
 // TypedArrayGetData obtains a pointer to the memory region that holds the
 // elements of the typed array; modifications done to them will be visible to
 // JavaScript code. If length is not NULL, the number of elements contained in
-// the typed array is also stored in the pointed location.
+// the typed array are also stored in the pointed location.
 //
-// The returned pointer needs to be cast to the appropriate type (see
+// The returned pointer needs to be casted to the appropriate type (see
 // CTypedArrayType), and has the offset over the underlying array buffer data
 // applied—that is, points to the first element of the typed array:
 //
@@ -1465,7 +1470,7 @@ func (value *Value) TypedArrayGetBuffer() *Value {
 //	    g_error ("Only arrays of uint32_t are supported");
 //
 //	gsize count = 0;
-//	uint32_t *elements = jsc_value_typed_array_get_data (value, &count);
+//	uint32_t *elements = jsc_value_typed_array_get_contents (value, &count);
 //	for (gsize i = 0; i < count; i++)
 //	     g_print ("index zu, value %" PRIu32 "\n", i, elements[i]);
 //

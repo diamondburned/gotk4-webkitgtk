@@ -70,7 +70,7 @@ func (itpFirstParty *ITPFirstParty) Domain() string {
 // LastUpdateTime: get the last time a KitITPThirdParty has been seen under
 // itp_first_party.
 //
-// Each KitITPFirstParty is created by
+// Each WebKitITPFirstParty is created by
 // webkit_itp_third_party_get_first_parties() and therefore corresponds to
 // exactly one KitITPThirdParty.
 //
@@ -103,7 +103,7 @@ func (itpFirstParty *ITPFirstParty) LastUpdateTime() *glib.DateTime {
 // WebsiteDataAccessAllowed: get whether itp_first_party has granted website
 // data access to its KitITPThirdParty.
 //
-// Each KitITPFirstParty is created by
+// Each WebKitITPFirstParty is created by
 // webkit_itp_third_party_get_first_parties() and therefore corresponds to
 // exactly one KitITPThirdParty.
 //

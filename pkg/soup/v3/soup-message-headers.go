@@ -384,11 +384,6 @@ func (hdrs *MessageHeaders) ContentLength() int64 {
 // and total_length. If the total length field in the header was specified as
 // "*", then total_length will be set to -1.
 //
-// On success start and end are always non-negative, end is not before start,
-// and end is within total_length if that was given, so they can be used
-// directly as offsets into the response body. The out parameters are left
-// untouched if the header cannot be parsed.
-//
 // The function returns the following values:
 //
 //   - start: return value for the start of the range.
@@ -632,10 +627,6 @@ func (hdrs *MessageHeaders) One(name string) string {
 //
 // Beware that even if given a total_length, this function does not check that
 // the ranges are satisfiable.
-//
-// A Range header requesting more than 200 ranges is rejected, since serving
-// that many ranges costs far more than the request asking for them. server
-// answers such a request with SOUP_STATUS_REQUESTED_RANGE_NOT_SATISFIABLE.
 //
 // server has built-in handling for range requests. If your server handler
 // returns a SOUP_STATUS_OK response containing the complete response body

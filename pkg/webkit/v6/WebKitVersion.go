@@ -14,12 +14,12 @@ const MAJOR_VERSION = 2
 // MICRO_VERSION: like webkit_get_micro_version(), but from the headers used
 // at application compile time, rather than from the library linked against at
 // application run time.
-const MICRO_VERSION = 1
+const MICRO_VERSION = 5
 
 // MINOR_VERSION: like webkit_get_minor_version(), but from the headers used
 // at application compile time, rather than from the library linked against at
 // application run time.
-const MINOR_VERSION = 54
+const MINOR_VERSION = 52
 
 // GetMajorVersion returns the major version number of the WebKit library.
 //

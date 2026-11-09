@@ -126,10 +126,10 @@ func NewWebExtension(extensionPath string) (*WebExtension, error) {
 // specified size. This icon serves as a default and should be used to represent
 // the extension in contexts like action sheets or toolbars prior to the
 // extension being loaded into an extension context. Once the extension is
-// loaded, a tab-specific icon may be used instead. The returned image will be
-// the best match for the specified size that is available in the extension's
-// action icon set. If no matching icon is available, the method will fall back
-// to the extension's icon.
+// loaded, use the actionForTab: API to get the tab-specific icon. The returned
+// image will be the best match for the specified size that is available in the
+// extension's action icon set. If no matching icon is available, the method
+// will fall back to the extension's icon.
 //
 // The function takes the following parameters:
 //
@@ -237,10 +237,10 @@ func (extension *WebExtension) DefaultLocale() string {
 
 // DisplayActionLabel: get the localized display action label for the extension.
 //
-// This label serves as a default and should be used to represent the
-// extension in contexts like action sheets or toolbars prior to the extension
-// being loaded into an extension context. Once the extension is loaded,
-// a tab-specific label may be used instead.
+// This label serves as a default and should be used to represent the extension
+// in contexts like action sheets or toolbars prior to the extension being
+// loaded into an extension context. Once the extension is loaded, use the
+// actionForTab: API to get the tab-specific label.
 //
 // The function returns the following values:
 //
@@ -388,7 +388,9 @@ func (extension *WebExtension) HasBackgroundContent() bool {
 // invoke.
 //
 // These commands should be accessible via keyboard shortcuts, menu items,
-// or other user interface elements provided by the app.
+// or other user interface elements provided by the app. The list of commands
+// can be accessed via commands on an extension context, and invoked via
+// performCommand:.
 //
 // The function returns the following values:
 //
@@ -440,9 +442,9 @@ func (extension *WebExtension) HasContentModificationRules() bool {
 // HasInjectedContent: get whether the extension has script or stylesheet
 // content that can be injected into webpages.
 //
-// Once the extension is loaded, use
-// webkit_web_extension_context_get_has_injected_content(), as the injectable
-// content can change after the extension is loaded.
+// Once the extension is loaded, use the hasInjectedContent property on an
+// extension context, as the injectable content can change after the extension
+// is loaded.
 //
 // The function returns the following values:
 //
@@ -468,9 +470,8 @@ func (extension *WebExtension) HasInjectedContent() bool {
 
 // HasOptionsPage: get whether the extension has an options page.
 //
-// The app should provide access to this page through
-// a user interface element, which can be accessed via
-// webkit_web_extension_context_get_options_page_uri().
+// The app should provide access to this page through a user interface element,
+// which can be accessed via optionsPageURL on an extension context.
 //
 // The function returns the following values:
 //
@@ -497,9 +498,9 @@ func (extension *WebExtension) HasOptionsPage() bool {
 // HasOverrideNewTabPage: get whether the extension provides an alternative to
 // the default new tab page.
 //
-// The app should prompt the user for permission to use the
-// extension's new tab page as the default, which can be accessed via
-// webkit_web_extension_context_get_override_new_tab_page_uri().
+// The app should prompt the user for permission to use the extension's new tab
+// page as the default, which can be accessed via overrideNewTabPageURL on an
+// extension context.
 //
 // The function returns the following values:
 //
@@ -593,8 +594,8 @@ func (extension *WebExtension) Icon(width, height float64) *gio.Icon {
 // ManifestVersion: get the parsed manifest version, or 0 if there is no version
 // specified in the manifest.
 //
-// A WEBKIT_WEB_EXTENSION_ERROR_UNSUPPORTED_MANIFEST_VERSION error will be
-// reported if the manifest version isn't specified.
+// A webkit.WebExtensionError.UNSUPPORTEDMANIFESTVERSION error will be reported
+// if the manifest version isn't specified.
 //
 // The function returns the following values:
 //

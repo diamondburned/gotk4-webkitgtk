@@ -40,7 +40,7 @@ const (
 	// WebExtensionMatchPatternOptionsIgnoreSchemes: scheme components should be
 	// ignored while matching.
 	WebExtensionMatchPatternOptionsIgnoreSchemes WebExtensionMatchPatternOptions = 0b10
-	// WebExtensionMatchPatternOptionsIgnorePaths: path components should be
+	// WebExtensionMatchPatternOptionsIgnorePaths: host components should be
 	// ignored while matching.
 	WebExtensionMatchPatternOptionsIgnorePaths WebExtensionMatchPatternOptions = 0b100
 	// WebExtensionMatchPatternOptionsMatchBidirectionally: two patterns should
@@ -244,8 +244,8 @@ func (matchPattern *WebExtensionMatchPattern) Host() string {
 	return _utf8
 }
 
-// MatchesAllHosts gets whether the match pattern matches all hosts. This
-// happens when the pattern is <all_urls>, or if * is set as the host string.
+// MatchesAllHosts gets whether the match pattern matches all host. This happens
+// when the pattern is <all_urls>, or if * is set as the host string.
 //
 // The function returns the following values:
 //
@@ -363,7 +363,7 @@ func (matchPattern *WebExtensionMatchPattern) String() string {
 // The function takes the following parameters:
 //
 //   - pattern to match with matchPattern.
-//   - options to use while matching.
+//   - options use while matching.
 //
 // The function returns the following values:
 //
@@ -397,7 +397,7 @@ func (matchPattern *WebExtensionMatchPattern) MatchesPattern(pattern *WebExtensi
 // The function takes the following parameters:
 //
 //   - url: URL to match against the pattern.
-//   - options to use while matching.
+//   - options use while matching.
 //
 // The function returns the following values:
 //

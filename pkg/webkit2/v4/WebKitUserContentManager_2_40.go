@@ -28,7 +28,7 @@ func init() {
 }
 
 // ScriptMessageReply: reply for a script message received. If no reply has been
-// sent by the user, an automatically generated reply with undefined value will
+// sent by the user, an automatically generated reply with undefined value with
 // be sent.
 //
 // An instance of this type is always passed by reference.
@@ -67,9 +67,7 @@ func (scriptMessageReply *ScriptMessageReply) ReturnErrorMessage(errorMessage st
 
 // ReturnValue: reply to a script message with a value.
 //
-// This function can only be called once. Further calls to it or to
-// webkit_script_message_reply_return_error_message() emit a critical warning
-// and are ignored.
+// This function can be called twice for passing the reply value in.
 //
 // The function takes the following parameters:
 //

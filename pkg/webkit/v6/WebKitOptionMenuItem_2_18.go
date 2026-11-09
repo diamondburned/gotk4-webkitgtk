@@ -28,7 +28,7 @@ func init() {
 
 // OptionMenuItem: one item of a KitOptionMenu.
 //
-// The KitOptionMenu is composed of WebKitOptionMenuItem objects.
+// The KitOptionMenu is composed of WebKitOptionMenuItem<!-- -->s.
 // A WebKitOptionMenuItem always has a label and can contain a tooltip text. You
 // can use the WebKitOptionMenuItem of a KitOptionMenu to build your own menus.
 //
